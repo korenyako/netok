@@ -6,7 +6,7 @@ use iced::{
  
 
 // Импорт API ядра (проверьте имя пакета core в Cargo.toml)
-use netok_core::{NodeKind, Snapshot, Status, run_all, DnsMode, dns, tools, TopBanner, Overall, compose_top_banner};
+use netok_core::{NodeKind, Snapshot, Status, run_all, DnsMode, dns, tools, Overall, compose_top_banner};
 
 #[derive(Debug, Clone)]
 enum Route {
@@ -226,13 +226,12 @@ impl Application for NetokApp {
 
 impl NetokApp {
     fn view_main(&self) -> Element<'_, Message> {
-        // Верхние 3 строки
-        let (internet_line, speed_line, vpn_line) = top_lines(self.snapshot.as_ref());
+        // Верхние строки
+        let (internet_line, speed_line) = top_lines(self.snapshot.as_ref());
 
         let header = column![
             text(internet_line),
             text(speed_line),
-            text(vpn_line),
         ]
         .spacing(4);
 
@@ -258,9 +257,9 @@ impl NetokApp {
         container(
             column![
                 container(header).padding([12, 16]),
-                Space::with_height(8),
+                Space::with_height(Length::Fixed(8.0)),
                 container(nodes).padding([8, 16]).width(Length::Fill),
-                Space::with_height(8),
+                Space::with_height(Length::Fixed(8.0)),
                 container(bottom)
                     .padding([8, 16])
                     .width(Length::Fill)
@@ -329,11 +328,11 @@ impl NetokApp {
         container(
             column![
                 container(back_btn).padding([12, 16]),
-                Space::with_height(16),
+                Space::with_height(Length::Fixed(16.0)),
                 container(dns_block).padding([16, 16]),
-                Space::with_height(16),
+                Space::with_height(Length::Fixed(16.0)),
                 container(geodata_toggle).padding([16, 16]),
-                Space::with_height(16),
+                Space::with_height(Length::Fixed(16.0)),
                 container(action_buttons).padding([16, 16]),
             ]
             .spacing(8)
@@ -350,7 +349,7 @@ impl NetokApp {
 
  
 
-fn top_lines(snap: Option<&Snapshot>) -> (String, String, String) {
+fn top_lines(snap: Option<&Snapshot>) -> (String, String) {
     let tb = snap.map(compose_top_banner);
     let internet_line = match tb.as_ref().map(|t| t.overall) {
         Some(Overall::Ok) => "Интернет работает, всё в порядке.".into(),
@@ -362,14 +361,8 @@ fn top_lines(snap: Option<&Snapshot>) -> (String, String, String) {
     let speed_line = tb.as_ref()
         .and_then(|t| t.speed)
         .map(|(d,u)| format!("Скорость: {d}/{u} Мбит/с"))
-        .unwrap_or_else(|| "Скорость: —/— Мбит/с".into());
-    let vpn_line = match tb {
-        Some(TopBanner{ vpn: Some((flag, city)), .. }) => {
-            match city { Some(c) => format!("VPN включён — {flag} {c}"), None => "VPN включён".into() }
-        }
-        _ => "Соединение без VPN. Настроить VPN".into()
-    };
-    (internet_line, speed_line, vpn_line)
+        .unwrap_or_else(|| "Скорость: неизвестно".into());
+    (internet_line, speed_line)
 }
 
 // Указываем явный lifetime, чтобы не было ворнингов о скрытой 'a
@@ -404,7 +397,7 @@ fn nodes_view<'a>(snap: Option<&'a Snapshot>) -> Element<'a, Message> {
         match kind {
             NodeKind::Network => {
                 // Определяем тип и SSID
-                let mut net_type: Option<&str> = None; // "Wi‑Fi", "Кабель", "другое"
+                let mut net_type: Option<&str> = None; // "Wi-Fi", "кабель", "usb-модем"...
                 let mut ssid: Option<String> = None;
                 let mut signal: Option<String> = None;
                 let mut link: Option<String> = None;
@@ -414,11 +407,15 @@ fn nodes_view<'a>(snap: Option<&'a Snapshot>) -> Element<'a, Message> {
                     if k == "Сигнал" { signal = Some(v.clone()); }
                     if k == "Линк" { link = Some(v.clone()); }
                 }
+                let net_type_lc = net_type.map(|s| s.to_lowercase());
 
-                let title = match (net_type.map(|s| s.to_lowercase()), ssid) {
-                    (Some(t), Some(name)) if t.contains("wi-fi") || t.contains("wifi") => format!("Сеть Wi‑Fi \"{}\"", name),
-                    (Some(t), None) if t.contains("wi-fi") || t.contains("wifi") => "Сеть Wi‑Fi".to_string(),
+                let title = match (net_type_lc.as_deref(), ssid) {
+                    (Some(t), Some(name)) if t.contains("wi-fi") || t.contains("wifi") => format!("Сеть Wi-Fi {}", name),
+                    (Some(t), None) if t.contains("wi-fi") || t.contains("wifi") => "Сеть Wi-Fi".to_string(),
                     (Some(t), _) if t.contains("кабель") || t.contains("ethernet") => "Сеть Кабель".to_string(),
+                    (Some(t), _) if t.contains("usb") && t.contains("модем") => "Сеть USB-модем".to_string(),
+                    (Some(t), _) if t.contains("bt") || t.contains("bluetooth") => "Сеть BT".to_string(),
+                    (Some(t), _) if t.contains("мобиль") && t.contains("модем") => "Сеть мобильный модем".to_string(),
                     _ => "Сеть".to_string(),
                 };
                 facts_col = facts_col.push(text(title).size(16));
@@ -427,10 +424,17 @@ fn nodes_view<'a>(snap: Option<&'a Snapshot>) -> Element<'a, Message> {
                 if let Some(sig) = signal {
                     facts_col = facts_col.push(text(format!("Сигнал: {}", sig)).size(14));
                 } else if let Some(l) = link {
+                    let l = if let Some(val) = l.strip_suffix(" Mbps") {
+                        format!("{} Мбит/с", val)
+                    } else if let Some(val) = l.strip_suffix(" Gbps") {
+                        format!("{} Гбит/с", val)
+                    } else {
+                        l
+                    };
                     facts_col = facts_col.push(text(format!("Линк: {}", l)).size(14));
-                } else if matches!(net_type.as_deref(), Some("Wi-Fi") | Some("Wi‑Fi") ) {
+                } else if matches!(net_type_lc.as_deref(), Some(t) if t.contains("wi-fi") || t.contains("wifi")) {
                     facts_col = facts_col.push(text("Сигнал: неизвестно").size(14));
-                } else if matches!(net_type.as_deref(), Some("кабель") ) {
+                } else if matches!(net_type_lc.as_deref(), Some(t) if t.contains("кабель") || t.contains("ethernet")) {
                     facts_col = facts_col.push(text("Линк: нет").size(14));
                 } else {
                     facts_col = facts_col.push(text("неизвестно").size(14));
@@ -445,23 +449,27 @@ fn nodes_view<'a>(snap: Option<&'a Snapshot>) -> Element<'a, Message> {
                     if k == "Сетевой адаптер" { adapter = Some(v.clone()); }
                     if k == "IP в локальной сети" || k == "IP" { ip_local = Some(v.clone()); }
                 }
-                let title = match name { Some(n) => format!("Компьютер {}", n), None => "Компьютер неизвестно".to_string() };
+                let title = match name { Some(n) => format!("Компьютер {}", n), None => "Компьютер".to_string() };
                 facts_col = facts_col.push(text(title).size(16));
 
-                if let Some(a) = adapter {
-                    facts_col = facts_col.push(text(format!("Адаптер: {}", a)).size(14));
-                }
+                let adapter_line = format!(
+                    "Сетевой адаптер: {}",
+                    adapter.unwrap_or_else(|| "неизвестно".into())
+                );
+                facts_col = facts_col.push(text(adapter_line).size(14));
+
+                let ip_display = ip_local.clone().unwrap_or_else(|| "неизвестно".into());
+                let mut line = row![text(format!("IP в локальной сети: {}", ip_display)).size(14)]
+                    .align_items(Alignment::Center);
                 if let Some(ip) = ip_local {
-                    let mut line = row![text(format!("IP: {}", ip)).size(14)]
-                        .align_items(Alignment::Center);
-                    line = line.push(Space::with_width(8));
+                    line = line.push(Space::with_width(Length::Fixed(8.0)));
                     line = line.push(
                         button(text("[📋]").size(14))
                             .on_press(Message::CopyToClipboard(ip.clone()))
                             .padding([0, 4])
                     );
-                    facts_col = facts_col.push(line);
                 }
+                facts_col = facts_col.push(line);
             }
             NodeKind::Router => {
                 let mut model: Option<String> = None;
@@ -473,56 +481,71 @@ fn nodes_view<'a>(snap: Option<&'a Snapshot>) -> Element<'a, Message> {
                 let title = match model { Some(m) => format!("Роутер {}", m), None => "Роутер".to_string() };
                 facts_col = facts_col.push(text(title).size(16));
 
+                let ip_display = ip_local.clone().unwrap_or_else(|| "неизвестно".into());
+                let mut line = row![text(format!("IP в локальной сети: {}", ip_display)).size(14)]
+                    .align_items(Alignment::Center);
                 if let Some(ip) = ip_local {
-                    let mut line = row![text(format!("IP: {}", ip)).size(14)]
-                        .align_items(Alignment::Center);
-                    line = line.push(Space::with_width(8));
+                    line = line.push(Space::with_width(Length::Fixed(8.0)));
                     line = line.push(
                         button(text("[📋]").size(14))
                             .on_press(Message::CopyToClipboard(ip.clone()))
                             .padding([0, 4])
                     );
-                    line = line.push(Space::with_width(4));
+                    line = line.push(Space::with_width(Length::Fixed(4.0)));
                     line = line.push(
                         button(text("[↗︎]").size(14))
                             .on_press(Message::OpenUrl(format!("http://{}/", ip)))
                             .padding([0, 4])
                     );
-                    facts_col = facts_col.push(line);
                 }
+                facts_col = facts_col.push(line);
             }
             NodeKind::Internet => {
                 let mut provider: Option<String> = None;
                 let mut public_ip: Option<String> = None;
+                let mut country: Option<String> = None;
                 let mut geo_city: Option<String> = None;
                 for (k, v) in facts {
                     if k == "Провайдер" || k == "ISP" { provider = Some(v.clone()); }
                     if k == "Public IP" || k == "IP" { public_ip = Some(v.clone()); }
+                    if k == "Страна" || k == "Country" { country = Some(v.clone()); }
                     if k == "Город" || k == "City" { geo_city = Some(v.clone()); }
                 }
                 let title = match provider { Some(p) => format!("Интернет {}", p), None => "Интернет".to_string() };
                 facts_col = facts_col.push(text(title).size(16));
 
+                let ip_display = public_ip.clone().unwrap_or_else(|| "неизвестно".into());
+                let mut line = row![text(format!("IP: {}", ip_display)).size(14)]
+                    .align_items(Alignment::Center);
                 if let Some(ip) = public_ip {
-                    let mut line = row![text(format!("IP: {}", ip)).size(14)]
-                        .align_items(Alignment::Center);
-                    line = line.push(Space::with_width(8));
+                    line = line.push(Space::with_width(Length::Fixed(8.0)));
                     line = line.push(
                         button(text("[📋]").size(14))
                             .on_press(Message::CopyToClipboard(ip.clone()))
                             .padding([0, 4])
                     );
-                    facts_col = facts_col.push(line);
                 }
-                if let Some(city) = geo_city {
-                    facts_col = facts_col.push(text(format!("Город: {}", city)).size(14));
-                }
+                facts_col = facts_col.push(line);
+
+                let location = match (country, geo_city) {
+                    (Some(cn), Some(ct)) => format!("{}, {}", cn, ct),
+                    (Some(cn), None) => cn,
+                    (None, Some(ct)) => ct,
+                    (None, None) => "неизвестно".into(),
+                };
+                facts_col = facts_col.push(text(location).size(14));
             }
         }
 
         col = col.push(
-            row![bead, Space::with_width(6), icon, Space::with_width(6), facts_col]
-                .align_items(Alignment::Center),
+            row![
+                bead,
+                Space::with_width(Length::Fixed(6.0)),
+                icon,
+                Space::with_width(Length::Fixed(6.0)),
+                facts_col
+            ]
+            .align_items(Alignment::Center),
         );
     }
 
