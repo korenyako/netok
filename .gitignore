@@ -1,2 +1,16 @@
+# Rust build artifacts
 /target
+
+# Cargo lockfile for libraries (если проект — бинарник, lockfile обычно нужен)
+/Cargo.lock
+
+# Rustfmt backups
 **/*.rs.bk
+
+# By default, don't commit IDE/Editor specific files
+.idea/
+.vscode/
+
+# OS-specific junk
+.DS_Store
+Thumbs.db
