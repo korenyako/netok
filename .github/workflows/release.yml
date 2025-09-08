@@ -1,0 +1,66 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: Build desktop binaries
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            . -> target
+            core -> target
+            desktop -> target
+
+      - name: Build
+        run: cargo build --release -p netok-desktop
+
+      - name: Archive artifacts (windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          mkdir artifacts
+          copy target\release\netok-desktop.exe artifacts\netok-desktop.exe
+        shell: pwsh
+
+      - name: Archive artifacts (linux/macos)
+        if: matrix.os != 'windows-latest'
+        run: |
+          mkdir -p artifacts
+          cp target/release/netok-desktop artifacts/netok-desktop
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: netok-desktop-${{ matrix.os }}
+          path: artifacts/*
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/**
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

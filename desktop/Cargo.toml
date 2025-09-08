@@ -1,0 +1,10 @@
+[package]
+name = "netok-desktop"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+
+[dependencies]
+iced = "0.12.1"
+netok-core = { path = "../core" }
+arboard = "3"
