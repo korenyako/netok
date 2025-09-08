@@ -173,6 +173,10 @@ pub fn detect_network_kind() -> NetworkKind {
     }
 }
 
+/// Returns current Wi‑Fi RSSI in dBm (signed).
+///
+/// The value is taken as-is from the platform (negative dBm).
+/// If the platform does not provide RSSI, returns `None`.
 pub fn wifi_signal_dbm() -> Option<i32> {
     #[cfg(target_os = "windows")]
     {

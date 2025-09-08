@@ -474,7 +474,7 @@ fn nodes_view<'a>(snap: Option<&'a Snapshot>) -> Element<'a, Message> {
                 facts_col = facts_col.push(text(title).size(16));
 
                 if is_wifi {
-                    if let Some(dbm) = rssi {
+                    if let Some(dbm) = netok_core::netinfo::wifi_signal_dbm() {
                         let grade = wifi_signal_grade(dbm);
                         facts_col = facts_col
                             .push(text(format!("Сигнал: {} ({} dBm)", grade, dbm)).size(14));
