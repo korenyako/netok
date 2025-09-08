@@ -373,15 +373,9 @@ fn top_lines(snap: Option<&Snapshot>) -> (String, String) {
     let tb = snap.map(compose_top_banner);
     let internet_line = match tb.as_ref().map(|t| t.overall) {
         Some(Overall::Ok) => "Интернет работает, всё в порядке.".into(),
-        Some(Overall::DnsProblem) => {
-            "Интернет работает частично. Адреса сайтов не находятся (DNS).".into()
-        }
-        Some(Overall::NoGateway) => {
-            "Интернет недоступен. Нет связи с роутером/точкой доступа.".into()
-        }
-        Some(Overall::ProviderIssue) => {
-            "Интернет недоступен. Похоже, проблема в сети оператора.".into()
-        }
+        Some(Overall::DnsProblem) => "Интернет работает частично.".into(),
+        Some(Overall::NoGateway) => "Интернет недоступен.".into(),
+        Some(Overall::ProviderIssue) => "Интернет недоступен.".into(),
         None => "Проверяю…".into(),
     };
     let speed_line = tb
