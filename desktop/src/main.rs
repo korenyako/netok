@@ -697,8 +697,8 @@ fn nodes_view<'a>(
                         text(format!("{}: {}", s(S::LocalIp), s(S::Unknown))).size(14),
                         Space::with_width(Length::Fixed(8.0)),
                         button(text("↗︎").size(14))
-                            .style(theme::Button::Text)
-                            .padding([0, 4]),
+                            .style(theme::Button::Text),
+                            // .padding([0, 4]), // This button is non-functional, so no padding or on_press
                     );
                     facts_col = facts_col.push(line);
                 }
