@@ -529,14 +529,15 @@ fn nodes_view<'a>(
                 facts_col = facts_col.push(text(title).size(16));
 
                 if is_wifi {
-                    if let Some(dbm) = rssi {
-                        let grade = wifi_signal_grade(dbm);
-                        let val = s(S::SignalValue).replace("{grade}", s(grade)).replace("{dbm}", &dbm.to_string());
-                        facts_col = facts_col.push(text(format!("{}: {}", s(S::Signal), val)).size(14));
-                    } else {
-                        facts_col = facts_col.push(text(format!("{}: {}", s(S::Signal), s(S::Unknown))).size(14));
-                    }
+                    // Per UI-SPEC §10, only show signal for Wi-Fi.
+                    let signal_text = rssi.map(|dbm| {
+                            let grade = wifi_signal_grade(dbm);
+                            s(S::SignalValue).replace("{grade}", s(grade)).replace("{dbm}", &dbm.to_string())
+                        })
+                        .unwrap_or_else(|| s(S::Unknown).to_string());
+                    facts_col = facts_col.push(text(format!("{}: {}", s(S::Signal), signal_text)).size(14));
                 } else if is_cable {
+                    // Per UI-SPEC §10, only show link speed for cable.
                     if let Some(l) = link {
                         let l = if let Some(val) = l.strip_suffix(" Mbps") {
                             format!("{} Мбит/с", val)
@@ -547,7 +548,7 @@ fn nodes_view<'a>(
                         };
                         facts_col = facts_col.push(text(format!("{}: {}", s(S::Link), l)).size(14));
                     } else {
-                        facts_col = facts_col.push(text(format!("{}: {}", s(S::Link), s(S::LinkStatusInactive))).size(14));
+                        facts_col = facts_col.push(text(format!("{}: {}", s(S::Link), s(S::Unknown))).size(14));
                     }
                 } else {
                     // Ничего не выводим для других типов
@@ -574,27 +575,30 @@ fn nodes_view<'a>(
                 };
                 facts_col = facts_col.push(text(title).size(16));
 
-                let adapter_line = format!(
-                    "{}: {}",
-                    s(S::NetAdapter),
-                    adapter.unwrap_or_else(|| s(S::Unknown).into())
-                );
-                facts_col = facts_col.push(text(adapter_line).size(14));
+                // Per UI-SPEC §10, hide row if data is missing.
+                if let Some(adapter_name) = adapter {
+                    let adapter_line = format!("{}: {}", s(S::NetAdapter), adapter_name);
+                    facts_col = facts_col.push(text(adapter_line).size(14));
+                }
 
-                let ip_val = ip_local.filter(|s| !s.trim().is_empty());
-                let ip_display = ip_val.clone().unwrap_or_else(|| s(S::Unknown).into());
-                let mut line = row![text(format!("{}: {}", s(S::LocalIp), ip_display)).size(14)]
-                    .align_items(Alignment::Center);
-                if let Some(ip) = ip_val {
+                // Per UI-SPEC §10, hide row if data is missing.
+                if let Some(ip_val) = ip_local.filter(|s| !s.trim().is_empty()) {
+                    let ip_display = ip_val.clone();
+                    let mut line = row![text(format!("{}: {}", s(S::LocalIp), ip_display)).size(14)]
+                        .align_items(Alignment::Center);
+                    
                     line = line.push(Space::with_width(Length::Fixed(8.0)));
                     line = line.push(
                         button(text("[📋]").size(14))
                             .style(theme::Button::Text)
-                            .on_press(Message::CopyToClipboard(ip))
+                            .on_press(Message::CopyToClipboard(ip_val))
                             .padding([0, 4]),
                     );
+                    facts_col = facts_col.push(line);
+                } else {
+                    // If no IP, show "неизвестно" without a copy button.
+                    facts_col = facts_col.push(text(format!("{}: {}", s(S::LocalIp), s(S::Unknown))).size(14));
                 }
-                facts_col = facts_col.push(line);
             }
             NodeKind::Router => {
                 let mut model: Option<String> = None;
@@ -613,33 +617,36 @@ fn nodes_view<'a>(
                 };
                 facts_col = facts_col.push(text(title).size(16));
 
-                let ip_val = ip_local.filter(|s| !s.trim().is_empty());
-                let ip_display = ip_val.clone().unwrap_or_else(|| s(S::Unknown).into());
-                let mut line = row![text(format!("{}: {}", s(S::LocalIp), ip_display)).size(14)]
-                    .align_items(Alignment::Center);
-                line = line.push(Space::with_width(Length::Fixed(8.0)));
-                if let Some(ip) = ip_val.clone() {
+                if let Some(ip_val) = ip_local.filter(|s| !s.trim().is_empty()) {
+                    let ip_display = ip_val.clone();
+                    let mut line = row![text(format!("{}: {}", s(S::LocalIp), ip_display)).size(14)]
+                        .align_items(Alignment::Center);
+                    
+                    line = line.push(Space::with_width(Length::Fixed(8.0)));
                     line = line.push(
                         button(text("[📋]").size(14))
                             .style(theme::Button::Text)
-                            .on_press(Message::CopyToClipboard(ip.clone()))
+                            .on_press(Message::CopyToClipboard(ip_val.clone()))
                             .padding([0, 4]),
                     );
                     line = line.push(Space::with_width(Length::Fixed(4.0)));
                     line = line.push(
                         button(text("↗︎").size(14))
                             .style(theme::Button::Text)
-                            .on_press(Message::OpenUrl(format!("http://{}/", ip)))
+                            .on_press(Message::OpenUrl(format!("http://{}/", ip_val)))
                             .padding([0, 4]),
                     );
+                    facts_col = facts_col.push(line);
                 } else {
-                    line = line.push(
+                    let line = row![
+                        text(format!("{}: {}", s(S::LocalIp), s(S::Unknown))).size(14),
+                        Space::with_width(Length::Fixed(8.0)),
                         button(text("↗︎").size(14))
                             .style(theme::Button::Text)
                             .padding([0, 4]),
                     );
+                    facts_col = facts_col.push(line);
                 }
-                facts_col = facts_col.push(line);
             }
             NodeKind::Internet => {
                 let mut provider: Option<String> = None;
@@ -666,28 +673,32 @@ fn nodes_view<'a>(
                 };
                 facts_col = facts_col.push(text(title).size(16));
 
-                let ip_val = public_ip.filter(|s| !s.trim().is_empty());
-                let ip_display = ip_val.clone().unwrap_or_else(|| s(S::Unknown).into());
-                let mut line = row![text(format!("{}: {}", s(S::PublicIp), ip_display)).size(14)]
-                    .align_items(Alignment::Center);
-                if let Some(ip) = ip_val {
+                if let Some(ip_val) = public_ip.filter(|s| !s.trim().is_empty()) {
+                    let ip_display = ip_val.clone();
+                    let mut line = row![text(format!("{}: {}", s(S::PublicIp), ip_display)).size(14)]
+                        .align_items(Alignment::Center);
+                    
                     line = line.push(Space::with_width(Length::Fixed(8.0)));
                     line = line.push(
                         button(text("[📋]").size(14))
                             .style(theme::Button::Text)
-                            .on_press(Message::CopyToClipboard(ip))
+                            .on_press(Message::CopyToClipboard(ip_val))
                             .padding([0, 4]),
                     );
+                    facts_col = facts_col.push(line);
+                } else {
+                    facts_col = facts_col.push(text(format!("{}: {}", s(S::PublicIp), s(S::Unknown))).size(14));
                 }
-                facts_col = facts_col.push(line);
 
-                let location = match (country, geo_city) {
-                    (Some(cn), Some(ct)) => s(S::LocationValue).replace("{country}", &cn).replace("{city}", &ct),
-                    (Some(cn), None) => cn,
-                    (None, Some(ct)) => ct,
-                    (None, None) => s(S::Unknown).into(),
-                };
-                facts_col = facts_col.push(text(location).size(14));
+                if country.is_some() || geo_city.is_some() {
+                    let location = match (country, geo_city) {
+                        (Some(cn), Some(ct)) => s(S::LocationValue).replace("{country}", &cn).replace("{city}", &ct),
+                        (Some(cn), None) => cn,
+                        (None, Some(ct)) => ct,
+                        (None, None) => unreachable!(), // Covered by the outer if.
+                    };
+                    facts_col = facts_col.push(text(location).size(14));
+                }
             }
         }
 
