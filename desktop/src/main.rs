@@ -384,27 +384,27 @@ impl NetokApp {
 
     fn view_settings(&self) -> Element<'_, Message> {
         let dns_section = column![
-            text("DNS").size(18),
+            text(s(S::Dns)).size(18),
             radio(
-                "Авто",
+                s(S::DnsAuto),
                 DnsModeUI::Auto,
                 Some(self.dns_mode),
                 Message::DnsModeChanged
             ),
             radio(
-                "Cloudflare (1.1.1.1)",
+                s(S::DnsCloudflare),
                 DnsModeUI::Cloudflare,
                 Some(self.dns_mode),
                 Message::DnsModeChanged
             ),
             radio(
-                "Google (8.8.8.8)",
+                s(S::DnsGoogle),
                 DnsModeUI::Google,
                 Some(self.dns_mode),
                 Message::DnsModeChanged
             ),
             radio(
-                "Пользовательский",
+                s(S::DnsCustom),
                 DnsModeUI::Custom,
                 Some(self.dns_mode),
                 Message::DnsModeChanged

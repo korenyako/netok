@@ -109,6 +109,13 @@ static RU: Lazy<HashMap<S, &'static str>> = Lazy::new(|| {
     m.insert(S::LinkStatusInactive, "нет");
     m.insert(S::LocationValue, "{country}, {city}");
     
+    m.insert(S::Dns, "DNS");
+    m.insert(S::DnsAuto, "Авто");
+    m.insert(S::DnsCloudflare, "Cloudflare (1.1.1.1)");
+    m.insert(S::DnsGoogle, "Google (8.8.8.8)");
+    m.insert(S::DnsCustom, "Пользовательский");
+    m.insert(S::DnsCustomPlaceholder, "Введите IP адрес");
+    m.insert(S::ApplyDns, "Применить DNS");
     // ... other strings can be added here
     m
 });
