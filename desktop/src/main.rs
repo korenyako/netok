@@ -1,6 +1,7 @@
 use iced::{
     executor, theme,
     widget::{button, column, container, horizontal_space, radio, row, text, text_input, Space, scrollable, canvas, svg},
+    time,
     Alignment, Application, Command, Element, Length, Settings, Theme, Color, Point, Size,
 };
 
@@ -49,6 +50,7 @@ struct NetokApp {
     last_ssid: Option<String>,
     last_rssi: Option<i32>,
     bead_cache: canvas::Cache,
+    animation_progress: f32,
 }
 
 #[derive(Debug, Clone)]
@@ -75,6 +77,7 @@ enum Message {
     DiagnosticsCopied,
     CopyToClipboard(String),
     OpenUrl(String),
+    Tick(time::Instant),
 }
 
 impl Application for NetokApp {
@@ -94,6 +97,7 @@ impl Application for NetokApp {
             last_ssid: None,
             last_rssi: None,
             bead_cache: canvas::Cache::new(),
+            animation_progress: 0.0,
         };
         // Первый запуск — тянем снапшот
         let cmd = Command::perform(run_all(Some(true)), Message::SnapshotReady);
@@ -108,10 +112,20 @@ impl Application for NetokApp {
         Theme::Dark
     }
 
+    fn subscription(&self) -> iced::Subscription<Message> {
+        if self.loading {
+            time::every(std::time::Duration::from_millis(16)).map(Message::Tick)
+        } else {
+            iced::Subscription::none()
+        }
+    }
+
     fn update(&mut self, message: Message) -> Command<Message> {
         match message {
             Message::Refresh => {
                 self.loading = true;
+                // Reset animation progress on new refresh
+                self.animation_progress = 0.0;
                 self.bead_cache.clear();
                 return Command::perform(
                     run_all(Some(self.geodata_enabled)),
@@ -267,6 +281,10 @@ impl Application for NetokApp {
                     |_| Message::Refresh,
                 );
             }
+            Message::Tick(_) => {
+                self.animation_progress = (self.animation_progress + 0.02) % 1.0;
+                self.bead_cache.clear();
+            }
         }
         Command::none()
     }
@@ -286,8 +304,8 @@ impl NetokApp {
 
         let header = column![text(internet_line), text(speed_line),].spacing(4);
 
-        // Центральный «путь»
-        let nodes = nodes_view(self.snapshot.as_ref(), &self.bead_cache);
+        // Центральный «путь» - pass loading and animation state
+        let nodes = nodes_view(self.snapshot.as_ref(), &self.bead_cache, self.loading, self.animation_progress);
 
         // Низ: кнопки
         let refresh_btn: Element<Message> = if self.loading {
@@ -452,6 +470,8 @@ fn top_lines(snap: Option<&Snapshot>) -> (String, String) {
 fn nodes_view<'a>(
     snap: Option<&'a Snapshot>,
     bead_cache: &'a canvas::Cache,
+    loading: bool,
+    animation_progress: f32,
 ) -> Element<'a, Message> {
     let order = [
         NodeKind::Computer,
@@ -471,7 +491,7 @@ fn nodes_view<'a>(
             None => (Status::Unknown, &[]),
         };
 
-        let bead = bead_view(status, bead_cache);
+        let bead = bead_view(status, bead_cache, loading, animation_progress);
         let icon = icon_view(kind);
         let mut facts_col = column![];
 
@@ -732,13 +752,28 @@ fn icon_view(kind: NodeKind) -> Element<'static, Message> {
         .into()
 }
 
-fn bead_view<'a>(status: Status, cache: &'a canvas::Cache) -> Element<'a, Message> {
+fn bead_view<'a>(status: Status, cache: &'a canvas::Cache, loading: bool, animation_progress: f32) -> Element<'a, Message> {
     canvas(cache.clone())
         .width(12)
         .height(12)
         .draw(move |frame| {
             let center = frame.center();
             let radius = frame.width() / 2.0;
+
+            // Draw pulsing outline if loading
+            if loading {
+                let pulse_radius = radius + (2.0 * (std::f32::consts::PI * animation_progress).sin().abs());
+                let pulse_alpha = 1.0 - (std::f32::consts::PI * animation_progress).sin().abs();
+                let outline = canvas::Path::circle(center, pulse_radius);
+                frame.stroke(
+                    &outline,
+                    canvas::Stroke::default()
+                        .with_color(Color::from_rgba8(0x3B, 0x82, 0xF6, pulse_alpha)) // Blue with alpha
+                        .with_width(1.5),
+                );
+            }
+
+            // Draw main bead
             let bead = canvas::Path::circle(center, radius);
             frame.fill(&bead, bead_color(status));
         })
