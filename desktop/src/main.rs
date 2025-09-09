@@ -9,6 +9,9 @@ use netok_core::{
     compose_top_banner, dns, run_all, tools, DnsMode, NodeKind, Overall, Snapshot, Status,
 };
 
+mod i18n;
+use i18n::{s, S};
+
 #[derive(Debug, Clone)]
 enum Route {
     Main,
@@ -98,7 +101,7 @@ impl Application for NetokApp {
     }
 
     fn title(&self) -> String {
-        "Netok".into()
+        s(S::AppName).into()
     }
 
     fn theme(&self) -> Theme {
@@ -144,10 +147,7 @@ impl Application for NetokApp {
                     if !has_rssi {
                         if let Some(last_rssi) = self.last_rssi {
                             let grade = wifi_signal_grade(last_rssi);
-                            node.facts.push((
-                                "Сигнал".to_string(),
-                                format!("{} ({} dBm)", grade, last_rssi),
-                            ));
+                            node.facts.push(("Сигнал".to_string(), format!("{} ({} dBm)", s(grade), last_rssi)));
                         }
                     }
                 }
@@ -291,9 +291,9 @@ impl NetokApp {
 
         // Низ: кнопки
         let refresh_btn: Element<Message> = if self.loading {
-            button("Обновление...").padding([8, 16]).into()
+            button(s(S::Refreshing)).padding([8, 16]).into()
         } else {
-            button("Обновить")
+            button(s(S::Refresh))
                 .on_press(Message::Refresh)
                 .padding([8, 16])
                 .into()
@@ -302,7 +302,7 @@ impl NetokApp {
         let bottom = row![
             refresh_btn,
             Space::with_width(Length::Fill),
-            button("Настройки")
+            button(s(S::Settings))
                 .on_press(Message::OpenSettings)
                 .padding([8, 16]),
         ];
@@ -360,26 +360,26 @@ impl NetokApp {
         .spacing(8);
 
         let custom_dns_input = if matches!(self.dns_mode, DnsModeUI::Custom) {
-            text_input("Введите IP адрес", &self.custom_dns)
+            text_input(s(S::DnsCustomPlaceholder), &self.custom_dns)
                 .on_input(Message::CustomDnsChanged)
                 .padding(8)
         } else {
             text_input("", "").padding(8)
         };
 
-        let apply_dns_btn = button("Применить DNS")
+        let apply_dns_btn = button(s(S::ApplyDns))
             .on_press(Message::ApplyDns)
             .padding([8, 16]);
 
         let dns_block = column![dns_section, custom_dns_input, apply_dns_btn,].spacing(12);
 
         let geodata_toggle = row![
-            text("Показывать геоданные"),
+            text(s(S::ShowGeodata)),
             horizontal_space(),
             button(if self.geodata_enabled {
-                "Вкл"
+                s(S::Enabled)
             } else {
-                "Выкл"
+                s(S::Disabled)
             })
             .on_press(Message::ToggleGeodata)
             .padding([4, 8]),
@@ -387,25 +387,25 @@ impl NetokApp {
         .align_items(Alignment::Center);
 
         let action_buttons = column![
-            button("Короткий спидтест")
+            button(s(S::ShortSpeedtest))
                 .on_press(Message::ShortSpeedTest)
                 .padding([8, 16]),
-            button("Очистить DNS-кэш")
+            button(s(S::ClearDnsCache))
                 .on_press(Message::ClearDnsCache)
                 .padding([8, 16]),
-            button("Открыть каптив")
+            button(s(S::OpenCaptive))
                 .on_press(Message::OpenCaptive)
                 .padding([8, 16]),
-            button("Открыть роутер")
+            button(s(S::OpenRouterPage))
                 .on_press(Message::OpenRouter)
                 .padding([8, 16]),
-            button("Скопировать диагностику")
+            button(s(S::CopyDiagnostics))
                 .on_press(Message::CopyDiagnostics)
                 .padding([8, 16]),
         ]
         .spacing(8);
 
-        let back_btn = button("← Назад")
+        let back_btn = button(s(S::Back))
             .on_press(Message::BackToMain)
             .padding([8, 16]);
 
@@ -434,17 +434,17 @@ impl NetokApp {
 fn top_lines(snap: Option<&Snapshot>) -> (String, String) {
     let tb = snap.map(compose_top_banner);
     let internet_line = match tb.as_ref().map(|t| t.overall) {
-        Some(Overall::Ok) => "Интернет работает, всё в порядке.".into(),
-        Some(Overall::DnsProblem) => "Интернет работает частично.".into(),
-        Some(Overall::NoGateway) => "Интернет недоступен.".into(),
-        Some(Overall::ProviderIssue) => "Интернет недоступен.".into(),
-        None => "Проверяю…".into(),
+        Some(Overall::Ok) => s(S::InternetOk).into(),
+        Some(Overall::DnsProblem) => s(S::InternetPartial).into(),
+        Some(Overall::NoGateway) => s(S::InternetDown).into(),
+        Some(Overall::ProviderIssue) => s(S::InternetDown).into(),
+        None => s(S::Loading).into(),
     };
     let speed_line = tb
         .as_ref()
         .and_then(|t| t.speed)
-        .map(|(d, u)| format!("Скорость: {d}/{u} Мбит/с"))
-        .unwrap_or_else(|| "Скорость: неизвестно".into());
+        .map(|(d, u)| s(S::SpeedValue).replace("{down}", &d.to_string()).replace("{up}", &u.to_string()))
+        .unwrap_or_else(|| format!("{}: {}", s(S::Speed), s(S::Unknown)));
     (internet_line, speed_line)
 }
 
@@ -514,25 +514,23 @@ fn nodes_view<'a>(
                 let is_cable = matches!(net_type_lc.as_deref(), Some(t) if t.contains("кабель") || t.contains("ethernet"));
 
                 let title = match (net_type_lc.as_deref(), ssid) {
-                    (Some(t), Some(name)) if t.contains("wi-fi") || t.contains("wifi") => {
-                        format!("Сеть Wi-Fi {}", name)
-                    }
+                    (Some(t), Some(name)) if t.contains("wi-fi") || t.contains("wifi") => format!("{} Wi-Fi {}", s(S::NodeNetwork), name),
                     (Some(t), None) if t.contains("wi-fi") || t.contains("wifi") => {
-                        "Сеть Wi-Fi (неизвестно)".to_string()
+                        format!("{} Wi-Fi ({})", s(S::NodeNetwork), s(S::Unknown))
                     }
                     (Some(t), _) if t.contains("кабель") || t.contains("ethernet") => {
-                        "Сеть Кабель".to_string()
+                        format!("{} Кабель", s(S::NodeNetwork))
                     }
                     (Some(t), _) if t.contains("usb") && t.contains("модем") => {
-                        "Сеть USB-модем".to_string()
+                        format!("{} USB-модем", s(S::NodeNetwork))
                     }
                     (Some(t), _) if t.contains("bt") || t.contains("bluetooth") => {
-                        "Сеть BT".to_string()
+                        format!("{} BT", s(S::NodeNetwork))
                     }
                     (Some(t), _) if t.contains("мобиль") && t.contains("модем") => {
-                        "Сеть мобильный модем".to_string()
+                        format!("{} мобильный модем", s(S::NodeNetwork))
                     }
-                    _ => "Сеть (неизвестно)".to_string(),
+                    _ => format!("{} ({})", s(S::NodeNetwork), s(S::Unknown)),
                 };
                 facts_col = facts_col.push(text(title).size(16));
 
@@ -540,9 +538,9 @@ fn nodes_view<'a>(
                     if let Some(dbm) = rssi {
                         let grade = wifi_signal_grade(dbm);
                         facts_col = facts_col
-                            .push(text(format!("Сигнал: {} ({} dBm)", grade, dbm)).size(14));
+                            .push(text(format!("Сигнал: {} ({} dBm)", s(grade), dbm)).size(14));
                     } else {
-                        facts_col = facts_col.push(text("Сигнал: неизвестно").size(14));
+                        facts_col = facts_col.push(text(format!("Сигнал: {}", s(S::Unknown))).size(14));
                     }
                 } else if is_cable {
                     if let Some(l) = link {
@@ -555,7 +553,7 @@ fn nodes_view<'a>(
                         };
                         facts_col = facts_col.push(text(format!("Линк: {}", l)).size(14));
                     } else {
-                        facts_col = facts_col.push(text("Линк: нет").size(14));
+                        facts_col = facts_col.push(text("Линк: нет").size(14)); // TODO: i18n
                     }
                 } else {
                     // Ничего не выводим для других типов
@@ -577,20 +575,20 @@ fn nodes_view<'a>(
                     }
                 }
                 let title = match name {
-                    Some(n) => format!("Компьютер {}", n),
-                    None => "Компьютер".to_string(),
+                    Some(n) => format!("{} {}", s(S::NodeComputer), n),
+                    None => s(S::NodeComputer).to_string(),
                 };
                 facts_col = facts_col.push(text(title).size(16));
 
                 let adapter_line = format!(
-                    "Сетевой адаптер: {}",
-                    adapter.unwrap_or_else(|| "неизвестно".into())
+                    "Сетевой адаптер: {}", // TODO: i18n
+                    adapter.unwrap_or_else(|| s(S::Unknown).into())
                 );
                 facts_col = facts_col.push(text(adapter_line).size(14));
 
                 let ip_val = ip_local.filter(|s| !s.trim().is_empty());
-                let ip_display = ip_val.clone().unwrap_or_else(|| "неизвестно".into());
-                let mut line = row![text(format!("IP в локальной сети: {}", ip_display)).size(14)]
+                let ip_display = ip_val.clone().unwrap_or_else(|| s(S::Unknown).into());
+                let mut line = row![text(format!("IP в локальной сети: {}", ip_display)).size(14)] // TODO: i18n
                     .align_items(Alignment::Center);
                 if let Some(ip) = ip_val {
                     line = line.push(Space::with_width(Length::Fixed(8.0)));
@@ -615,14 +613,14 @@ fn nodes_view<'a>(
                     }
                 }
                 let title = match model {
-                    Some(m) => format!("Роутер {}", m),
-                    None => "Роутер".to_string(),
+                    Some(m) => format!("{} {}", s(S::NodeRouter), m),
+                    None => s(S::NodeRouter).to_string(),
                 };
                 facts_col = facts_col.push(text(title).size(16));
 
                 let ip_val = ip_local.filter(|s| !s.trim().is_empty());
-                let ip_display = ip_val.clone().unwrap_or_else(|| "неизвестно".into());
-                let mut line = row![text(format!("IP в локальной сети: {}", ip_display)).size(14)]
+                let ip_display = ip_val.clone().unwrap_or_else(|| s(S::Unknown).into());
+                let mut line = row![text(format!("IP в локальной сети: {}", ip_display)).size(14)] // TODO: i18n
                     .align_items(Alignment::Center);
                 line = line.push(Space::with_width(Length::Fixed(8.0)));
                 if let Some(ip) = ip_val.clone() {
@@ -668,14 +666,14 @@ fn nodes_view<'a>(
                     }
                 }
                 let title = match provider {
-                    Some(p) => format!("Интернет {}", p),
-                    None => "Интернет".to_string(),
+                    Some(p) => format!("{} {}", s(S::NodeInternet), p),
+                    None => s(S::NodeInternet).to_string(),
                 };
                 facts_col = facts_col.push(text(title).size(16));
 
                 let ip_val = public_ip.filter(|s| !s.trim().is_empty());
-                let ip_display = ip_val.clone().unwrap_or_else(|| "неизвестно".into());
-                let mut line = row![text(format!("IP: {}", ip_display)).size(14)]
+                let ip_display = ip_val.clone().unwrap_or_else(|| s(S::Unknown).into());
+                let mut line = row![text(format!("IP: {}", ip_display)).size(14)] // TODO: i18n
                     .align_items(Alignment::Center);
                 if let Some(ip) = ip_val {
                     line = line.push(Space::with_width(Length::Fixed(8.0)));
@@ -692,7 +690,7 @@ fn nodes_view<'a>(
                     (Some(cn), Some(ct)) => format!("{}, {}", cn, ct),
                     (Some(cn), None) => cn,
                     (None, Some(ct)) => ct,
-                    (None, None) => "неизвестно".into(),
+                    (None, None) => s(S::Unknown).into(),
                 };
                 facts_col = facts_col.push(text(location).size(14));
             }
@@ -735,15 +733,15 @@ fn bead_color(status: Status) -> iced::Color {
     }
 }
 
-fn wifi_signal_grade(rssi: i32) -> &'static str {
+fn wifi_signal_grade(rssi: i32) -> S {
     if rssi >= -55 {
-        "отличный"
+        S::SignalExcellent
     } else if rssi >= -65 {
-        "хороший"
+        S::SignalGood
     } else if rssi >= -70 {
-        "средний"
+        S::SignalAverage
     } else {
-        "слабый"
+        S::SignalWeak
     }
 }
 
