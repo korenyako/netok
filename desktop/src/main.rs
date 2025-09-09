@@ -1,7 +1,7 @@
 use iced::{
     executor, theme,
-    widget::{button, column, container, horizontal_space, radio, row, text, text_input, Space},
-    Alignment, Application, Command, Element, Length, Settings, Theme,
+    widget::{button, column, container, horizontal_space, radio, row, text, text_input, Space, scrollable, canvas},
+    Alignment, Application, Command, Element, Length, Settings, Theme, Color, Point, Size,
 };
 
 // Импорт API ядра (проверьте имя пакета core в Cargo.toml)
@@ -23,8 +23,17 @@ enum DnsModeUI {
     Custom,
 }
 
+use iced::window;
+
 pub fn main() -> iced::Result {
-    NetokApp::run(Settings::default())
+    NetokApp::run(Settings {
+        window: window::Settings {
+            size: (300, 480),
+            min_size: Some((240, 360)),
+            ..window::Settings::default()
+        },
+        ..Settings::default()
+    })
 }
 
 struct NetokApp {
@@ -36,6 +45,7 @@ struct NetokApp {
     custom_dns: String,
     last_ssid: Option<String>,
     last_rssi: Option<i32>,
+    bead_cache: canvas::Cache,
 }
 
 #[derive(Debug, Clone)]
@@ -80,6 +90,7 @@ impl Application for NetokApp {
             custom_dns: String::new(),
             last_ssid: None,
             last_rssi: None,
+            bead_cache: canvas::Cache::new(),
         };
         // Первый запуск — тянем снапшот
         let cmd = Command::perform(run_all(Some(true)), Message::SnapshotReady);
@@ -98,6 +109,7 @@ impl Application for NetokApp {
         match message {
             Message::Refresh => {
                 self.loading = true;
+                self.bead_cache.clear();
                 return Command::perform(
                     run_all(Some(self.geodata_enabled)),
                     Message::SnapshotReady,
@@ -142,6 +154,7 @@ impl Application for NetokApp {
 
                 self.snapshot = Some(s);
                 self.loading = false;
+                self.bead_cache.clear();
             }
             Message::OpenSettings => {
                 self.route = Route::Settings;
@@ -274,7 +287,7 @@ impl NetokApp {
         let header = column![text(internet_line), text(speed_line),].spacing(4);
 
         // Центральный «путь»
-        let nodes = nodes_view(self.snapshot.as_ref());
+        let nodes = nodes_view(self.snapshot.as_ref(), &self.bead_cache);
 
         // Низ: кнопки
         let refresh_btn: Element<Message> = if self.loading {
@@ -297,9 +310,11 @@ impl NetokApp {
         container(
             column![
                 container(header).padding([12, 16]),
-                Space::with_height(Length::Fixed(8.0)),
-                container(nodes).padding([8, 16]).width(Length::Fill),
-                Space::with_height(Length::Fixed(8.0)),
+                scrollable(
+                    container(nodes)
+                        .padding([8, 16])
+                        .width(Length::Fill)
+                ),
                 container(bottom)
                     .padding([8, 16])
                     .width(Length::Fill)
@@ -434,7 +449,10 @@ fn top_lines(snap: Option<&Snapshot>) -> (String, String) {
 }
 
 // Указываем явный lifetime, чтобы не было ворнингов о скрытой 'a
-fn nodes_view<'a>(snap: Option<&'a Snapshot>) -> Element<'a, Message> {
+fn nodes_view<'a>(
+    snap: Option<&'a Snapshot>,
+    bead_cache: &'a canvas::Cache,
+) -> Element<'a, Message> {
     let order = [
         NodeKind::Computer,
         NodeKind::Network,
@@ -453,7 +471,7 @@ fn nodes_view<'a>(snap: Option<&'a Snapshot>) -> Element<'a, Message> {
             None => (Status::Unknown, &[]),
         };
 
-        let bead = text(bead_emoji(status)).size(20);
+        let bead = bead_view(status, bead_cache);
         let icon = text(match kind {
             NodeKind::Computer => "🖥️",
             NodeKind::Network => "📶",
@@ -695,12 +713,25 @@ fn nodes_view<'a>(snap: Option<&'a Snapshot>) -> Element<'a, Message> {
     col.into()
 }
 
-fn bead_emoji(status: Status) -> &'static str {
+fn bead_view<'a>(status: Status, cache: &'a canvas::Cache) -> Element<'a, Message> {
+    canvas(cache.clone())
+        .width(12)
+        .height(12)
+        .draw(move |frame| {
+            let center = frame.center();
+            let radius = frame.width() / 2.0;
+            let bead = canvas::Path::circle(center, radius);
+            frame.fill(&bead, bead_color(status));
+        })
+        .into()
+}
+
+fn bead_color(status: Status) -> iced::Color {
     match status {
-        Status::Good => "🟢",
-        Status::Partial => "🟡",
-        Status::Bad => "🔴",
-        Status::Unknown => "⚪",
+        Status::Good => iced::Color::from_rgb8(0x22, 0xC5, 0x5E),    // Green
+        Status::Partial => iced::Color::from_rgb8(0xF5, 0x9E, 0x0B), // Orange
+        Status::Bad => iced::Color::from_rgb8(0xEF, 0x44, 0x44),      // Red
+        Status::Unknown => iced::Color::from_rgb8(0x9C, 0xA3, 0xAF), // Grey
     }
 }
 
