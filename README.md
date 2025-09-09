@@ -15,7 +15,7 @@ Mono-repo с двумя крейтами: `core` (Apache-2.0) и `desktop` (Iced
 Требуется Rust stable.
 
 ```bash
-cargo build --release -p desktop
+cargo build --release -p netok-desktop
 ```
 
 ## Запуск

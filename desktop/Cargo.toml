@@ -1,5 +1,5 @@
 [package]
-name = "desktop"
+name = "netok-desktop"
 version = "0.1.0"
 edition = "2021"
 
@@ -21,8 +21,3 @@ name = "Netok"
 identifier = "com.netok.app"
 icon = ["assets/icon.ico"]
 version = "0.1.0"
-
-[profile.release]
-strip = true
-lto = true
-codegen-units = 1
