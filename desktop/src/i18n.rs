@@ -39,6 +39,7 @@ pub enum S {
     LinkValue,
     PublicIp,
     Location,
+    LocationValue,
     Ssid,
     Gateway,
     Provider,
@@ -48,6 +49,10 @@ pub enum S {
     SignalGood,
     SignalAverage,
     SignalWeak,
+
+    // Link status
+    LinkStatusActive,
+    LinkStatusInactive,
 
     // Settings
     Dns,
@@ -92,6 +97,17 @@ static RU: Lazy<HashMap<S, &'static str>> = Lazy::new(|| {
     m.insert(S::SignalGood, "хороший");
     m.insert(S::SignalAverage, "средний");
     m.insert(S::SignalWeak, "слабый");
+
+    m.insert(S::NetAdapter, "Сетевой адаптер");
+    m.insert(S::LocalIp, "IP в локальной сети");
+    m.insert(S::PublicIp, "IP");
+    m.insert(S::Signal, "Сигнал");
+    m.insert(S::SignalValue, "{grade} ({dbm} dBm)");
+    m.insert(S::Link, "Линк");
+    m.insert(S::LinkValue, "{speed} {unit}");
+    m.insert(S::LinkStatusActive, "активен");
+    m.insert(S::LinkStatusInactive, "нет");
+    m.insert(S::LocationValue, "{country}, {city}");
     
     // ... other strings can be added here
     m

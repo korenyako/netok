@@ -1,6 +1,6 @@
 use iced::{
     executor, theme,
-    widget::{button, column, container, horizontal_space, radio, row, text, text_input, Space, scrollable, canvas},
+    widget::{button, column, container, horizontal_space, radio, row, text, text_input, Space, scrollable, canvas, svg},
     Alignment, Application, Command, Element, Length, Settings, Theme, Color, Point, Size,
 };
 
@@ -472,13 +472,7 @@ fn nodes_view<'a>(
         };
 
         let bead = bead_view(status, bead_cache);
-        let icon = text(match kind {
-            NodeKind::Computer => "🖥️",
-            NodeKind::Network => "📶",
-            NodeKind::Router => "📡",
-            NodeKind::Internet => "🌐",
-        })
-        .size(18);
+        let icon = icon_view(kind);
         let mut facts_col = column![];
 
         match kind {
@@ -537,10 +531,10 @@ fn nodes_view<'a>(
                 if is_wifi {
                     if let Some(dbm) = rssi {
                         let grade = wifi_signal_grade(dbm);
-                        facts_col = facts_col
-                            .push(text(format!("Сигнал: {} ({} dBm)", s(grade), dbm)).size(14));
+                        let val = s(S::SignalValue).replace("{grade}", s(grade)).replace("{dbm}", &dbm.to_string());
+                        facts_col = facts_col.push(text(format!("{}: {}", s(S::Signal), val)).size(14));
                     } else {
-                        facts_col = facts_col.push(text(format!("Сигнал: {}", s(S::Unknown))).size(14));
+                        facts_col = facts_col.push(text(format!("{}: {}", s(S::Signal), s(S::Unknown))).size(14));
                     }
                 } else if is_cable {
                     if let Some(l) = link {
@@ -551,9 +545,9 @@ fn nodes_view<'a>(
                         } else {
                             l
                         };
-                        facts_col = facts_col.push(text(format!("Линк: {}", l)).size(14));
+                        facts_col = facts_col.push(text(format!("{}: {}", s(S::Link), l)).size(14));
                     } else {
-                        facts_col = facts_col.push(text("Линк: нет").size(14)); // TODO: i18n
+                        facts_col = facts_col.push(text(format!("{}: {}", s(S::Link), s(S::LinkStatusInactive))).size(14));
                     }
                 } else {
                     // Ничего не выводим для других типов
@@ -581,14 +575,15 @@ fn nodes_view<'a>(
                 facts_col = facts_col.push(text(title).size(16));
 
                 let adapter_line = format!(
-                    "Сетевой адаптер: {}", // TODO: i18n
+                    "{}: {}",
+                    s(S::NetAdapter),
                     adapter.unwrap_or_else(|| s(S::Unknown).into())
                 );
                 facts_col = facts_col.push(text(adapter_line).size(14));
 
                 let ip_val = ip_local.filter(|s| !s.trim().is_empty());
                 let ip_display = ip_val.clone().unwrap_or_else(|| s(S::Unknown).into());
-                let mut line = row![text(format!("IP в локальной сети: {}", ip_display)).size(14)] // TODO: i18n
+                let mut line = row![text(format!("{}: {}", s(S::LocalIp), ip_display)).size(14)]
                     .align_items(Alignment::Center);
                 if let Some(ip) = ip_val {
                     line = line.push(Space::with_width(Length::Fixed(8.0)));
@@ -620,7 +615,7 @@ fn nodes_view<'a>(
 
                 let ip_val = ip_local.filter(|s| !s.trim().is_empty());
                 let ip_display = ip_val.clone().unwrap_or_else(|| s(S::Unknown).into());
-                let mut line = row![text(format!("IP в локальной сети: {}", ip_display)).size(14)] // TODO: i18n
+                let mut line = row![text(format!("{}: {}", s(S::LocalIp), ip_display)).size(14)]
                     .align_items(Alignment::Center);
                 line = line.push(Space::with_width(Length::Fixed(8.0)));
                 if let Some(ip) = ip_val.clone() {
@@ -673,7 +668,7 @@ fn nodes_view<'a>(
 
                 let ip_val = public_ip.filter(|s| !s.trim().is_empty());
                 let ip_display = ip_val.clone().unwrap_or_else(|| s(S::Unknown).into());
-                let mut line = row![text(format!("IP: {}", ip_display)).size(14)] // TODO: i18n
+                let mut line = row![text(format!("{}: {}", s(S::PublicIp), ip_display)).size(14)]
                     .align_items(Alignment::Center);
                 if let Some(ip) = ip_val {
                     line = line.push(Space::with_width(Length::Fixed(8.0)));
@@ -687,7 +682,7 @@ fn nodes_view<'a>(
                 facts_col = facts_col.push(line);
 
                 let location = match (country, geo_city) {
-                    (Some(cn), Some(ct)) => format!("{}, {}", cn, ct),
+                    (Some(cn), Some(ct)) => s(S::LocationValue).replace("{country}", &cn).replace("{city}", &ct),
                     (Some(cn), None) => cn,
                     (None, Some(ct)) => ct,
                     (None, None) => s(S::Unknown).into(),
@@ -699,9 +694,9 @@ fn nodes_view<'a>(
         col = col.push(
             row![
                 bead,
-                Space::with_width(Length::Fixed(6.0)),
+                Space::with_width(Length::Fixed(12.0)),
                 icon,
-                Space::with_width(Length::Fixed(6.0)),
+                Space::with_width(Length::Fixed(12.0)),
                 facts_col
             ]
             .align_items(Alignment::Center),
@@ -709,6 +704,21 @@ fn nodes_view<'a>(
     }
 
     col.into()
+}
+
+fn icon_view(kind: NodeKind) -> Element<'static, Message> {
+    let icon_path = match kind {
+        NodeKind::Computer => "desktop/assets/computer.svg",
+        NodeKind::Network => "desktop/assets/wifi.svg",
+        NodeKind::Router => "desktop/assets/router.svg",
+        NodeKind::Internet => "desktop/assets/globe.svg",
+    };
+
+    svg(svg::Handle::from_path(icon_path))
+        .width(20)
+        .height(20)
+        .style(theme::Svg::custom_fn(|_theme| svg::Appearance { color: Some(Color::WHITE) }))
+        .into()
 }
 
 fn bead_view<'a>(status: Status, cache: &'a canvas::Cache) -> Element<'a, Message> {
