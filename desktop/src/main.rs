@@ -1,7 +1,7 @@
 use iced::{
     executor, theme,
     widget::{button, column, container, horizontal_space, radio, row, text, text_input, Space, scrollable, canvas, svg},
-    time,
+    time, event,
     Alignment, Application, Command, Element, Length, Settings, Theme, Color, Point, Size,
 };
 
@@ -12,6 +12,7 @@ use netok_core::{
 
 mod i18n;
 use i18n::{s, S};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone)]
 enum Route {
@@ -29,11 +30,27 @@ enum DnsModeUI {
 
 use iced::window;
 
+#[derive(Debug, Serialize, Deserialize)]
+struct AppConfig {
+    width: u32,
+    height: u32,
+    x: i32,
+    y: i32,
+}
+
+impl Default for AppConfig {
+    fn default() -> Self {
+        Self { width: 300, height: 480, x: 0, y: 0 }
+    }
+}
+
 pub fn main() -> iced::Result {
+    let cfg: AppConfig = confy::load("netok", None).unwrap_or_default();
     NetokApp::run(Settings {
         window: window::Settings {
-            size: (300, 480),
+            size: (cfg.width, cfg.height),
             min_size: Some((240, 360)),
+            position: window::Position::Specific(cfg.x, cfg.y),
             ..window::Settings::default()
         },
         ..Settings::default()
@@ -78,6 +95,7 @@ enum Message {
     CopyToClipboard(String),
     OpenUrl(String),
     Tick(time::Instant),
+    EventOccurred(event::Event),
 }
 
 impl Application for NetokApp {
@@ -113,11 +131,16 @@ impl Application for NetokApp {
     }
 
     fn subscription(&self) -> iced::Subscription<Message> {
+        let mut subs = Vec::new();
+
         if self.loading {
-            time::every(std::time::Duration::from_millis(16)).map(Message::Tick)
-        } else {
-            iced::Subscription::none()
+            subs.push(time::every(std::time::Duration::from_millis(16)).map(Message::Tick));
         }
+
+        // Subscribe to window events for saving state
+        subs.push(event::listen().map(Message::EventOccurred));
+
+        iced::Subscription::batch(subs)
     }
 
     fn update(&mut self, message: Message) -> Command<Message> {
@@ -284,6 +307,18 @@ impl Application for NetokApp {
             Message::Tick(_) => {
                 self.animation_progress = (self.animation_progress + 0.02) % 1.0;
                 self.bead_cache.clear();
+            }
+            Message::EventOccurred(event) => {
+                if let event::Event::Window(_, window::Event::Resized { width, height }) = event {
+                    let cfg = AppConfig { width, height, x: 0, y: 0 }; // Position will be updated by Moved event
+                    let _ = confy::store("netok", None, cfg);
+                }
+                if let event::Event::Window(_, window::Event::Moved { x, y }) = event {
+                    let mut cfg: AppConfig = confy::load("netok", None).unwrap_or_default();
+                    cfg.x = x;
+                    cfg.y = y;
+                    let _ = confy::store("netok", None, cfg);
+                }
             }
         }
         Command::none()
