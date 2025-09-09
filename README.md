@@ -1,6 +1,14 @@
 # Netok MVP (Desktop)
 
-Mono-repo с двумя крейтами: `core` (Apache-2.0) и `desktop` (Iced UI). 
+## Project Docs
+
+UI-SPEC v1: docs/UI-SPEC.md — single source of truth for UI/UX. Cite sections like §1.
+
+AI Assistants Guide: AI_ASSISTANTS.md — how Gemini/Cursor/etc. should work with this repo.
+
+GEMINI.md: project-specific instructions for the VSCode Gemini extension.
+
+Mono-repo с двумя крейтами: `core` (Apache-2.0) и `desktop` (Iced UI).
 
 ## Сборка
 

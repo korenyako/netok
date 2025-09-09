@@ -34,6 +34,8 @@ struct NetokApp {
     geodata_enabled: bool,
     dns_mode: DnsModeUI,
     custom_dns: String,
+    last_ssid: Option<String>,
+    last_rssi: Option<i32>,
 }
 
 #[derive(Debug, Clone)]
@@ -56,7 +58,7 @@ enum Message {
     SpeedTestResult(()),
     DnsCacheCleared,
     CaptiveOpened,
-    RouterOpened,
+    RouterOpened(String),
     DiagnosticsCopied,
     CopyToClipboard(String),
     OpenUrl(String),
@@ -76,6 +78,8 @@ impl Application for NetokApp {
             geodata_enabled: true,
             dns_mode: DnsModeUI::Auto,
             custom_dns: String::new(),
+            last_ssid: None,
+            last_rssi: None,
         };
         // Первый запуск — тянем снапшот
         let cmd = Command::perform(run_all(Some(true)), Message::SnapshotReady);
@@ -99,7 +103,43 @@ impl Application for NetokApp {
                     Message::SnapshotReady,
                 );
             }
-            Message::SnapshotReady(s) => {
+            Message::SnapshotReady(mut s) => {
+                if let Some(node) = s.nodes.iter_mut().find(|n| n.kind == NodeKind::Network) {
+                    let mut has_ssid = false;
+                    let mut has_rssi = false;
+
+                    for (k, v) in &node.facts {
+                        if k == "SSID" {
+                            has_ssid = true;
+                            self.last_ssid = Some(v.clone());
+                        }
+                        if k == "Сигнал" {
+                            // Пытаемся распарсить RSSI из факта
+                            let cleaned = v.split('(').nth(1).unwrap_or("").trim_end_matches(" dBm)");
+                            if let Ok(val) = cleaned.parse::<i32>() {
+                                has_rssi = true;
+                                self.last_rssi = Some(val);
+                            }
+                        }
+                    }
+
+                    if !has_ssid {
+                        if let Some(last_ssid) = &self.last_ssid {
+                            node.facts.push(("SSID".to_string(), last_ssid.clone()));
+                        }
+                    }
+
+                    if !has_rssi {
+                        if let Some(last_rssi) = self.last_rssi {
+                            let grade = wifi_signal_grade(last_rssi);
+                            node.facts.push((
+                                "Сигнал".to_string(),
+                                format!("{} ({} dBm)", grade, last_rssi),
+                            ));
+                        }
+                    }
+                }
+
                 self.snapshot = Some(s);
                 self.loading = false;
             }
@@ -156,14 +196,14 @@ impl Application for NetokApp {
             }
             Message::OpenRouter => {
                 return Command::perform(tools::open_router(), |result| match result {
-                    Ok(ip) => Message::OpenUrl(format!("http://{}/", ip)),
-                    Err(_) => Message::SpeedTestResult(()),
+                    Ok(ip) => Message::RouterOpened(ip),
+                    Err(_) => Message::DnsError(()), // Generic error
                 });
             }
             Message::CopyDiagnostics => {
                 return Command::perform(tools::copy_report(), |result| match result {
                     Ok(_) => Message::DiagnosticsCopied,
-                    Err(_) => Message::SpeedTestResult(()),
+                    Err(_) => Message::DnsError(()), // Generic error
                 });
             }
             Message::DnsApplied => {
@@ -181,8 +221,15 @@ impl Application for NetokApp {
             Message::CaptiveOpened => {
                 // Показать toast "Каптив открыт"
             }
-            Message::RouterOpened => {
+            Message::RouterOpened(ip) => {
                 // Показать toast "Роутер открыт"
+                // и открыть URL
+                return Command::perform(
+                    async move {
+                        let _ = open_url(&format!("http://{}/", ip));
+                    },
+                    |_| Message::Refresh, // эффективный no-op
+                );
             }
             Message::DiagnosticsCopied => {
                 // Показать toast "Диагностика скопирована"
@@ -431,9 +478,13 @@ fn nodes_view<'a>(snap: Option<&'a Snapshot>) -> Element<'a, Message> {
                         ssid = Some(v.clone());
                     }
                     if k == "Сигнал" {
-                        let cleaned = v.trim().trim_end_matches(" dBm").replace('−', "-");
-                        if let Ok(val) = cleaned.parse::<i32>() {
-                            rssi = Some(val);
+                        if let Some(start) = v.find('(') {
+                            if let Some(end) = v.find(" dBm)") {
+                                let num_str = &v[start + 1..end];
+                                if let Ok(val) = num_str.parse::<i32>() {
+                                    rssi = Some(val);
+                                }
+                            }
                         }
                     }
                     if k == "Линк" {
@@ -449,7 +500,7 @@ fn nodes_view<'a>(snap: Option<&'a Snapshot>) -> Element<'a, Message> {
                         format!("Сеть Wi-Fi {}", name)
                     }
                     (Some(t), None) if t.contains("wi-fi") || t.contains("wifi") => {
-                        "Сеть Wi-Fi".to_string()
+                        "Сеть Wi-Fi (неизвестно)".to_string()
                     }
                     (Some(t), _) if t.contains("кабель") || t.contains("ethernet") => {
                         "Сеть Кабель".to_string()
@@ -463,12 +514,12 @@ fn nodes_view<'a>(snap: Option<&'a Snapshot>) -> Element<'a, Message> {
                     (Some(t), _) if t.contains("мобиль") && t.contains("модем") => {
                         "Сеть мобильный модем".to_string()
                     }
-                    _ => "Сеть".to_string(),
+                    _ => "Сеть (неизвестно)".to_string(),
                 };
                 facts_col = facts_col.push(text(title).size(16));
 
                 if is_wifi {
-                    if let Some(dbm) = netok_core::netinfo::wifi_signal_dbm() {
+                    if let Some(dbm) = rssi {
                         let grade = wifi_signal_grade(dbm);
                         facts_col = facts_col
                             .push(text(format!("Сигнал: {} ({} dBm)", grade, dbm)).size(14));
@@ -489,7 +540,7 @@ fn nodes_view<'a>(snap: Option<&'a Snapshot>) -> Element<'a, Message> {
                         facts_col = facts_col.push(text("Линк: нет").size(14));
                     }
                 } else {
-                    facts_col = facts_col.push(text("неизвестно").size(14));
+                    // Ничего не выводим для других типов
                 }
             }
             NodeKind::Computer => {
