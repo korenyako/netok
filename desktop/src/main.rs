@@ -1,6 +1,6 @@
 use iced::{
     executor, theme,
-    widget::{button, column, container, horizontal_space, radio, row, text, text_input, Space, scrollable, canvas, svg, Canvas},
+    widget::{button, column, container, horizontal_space, radio, row, scrollable, text, text_input, Space, svg, canvas, Canvas},
     time, event,
     Alignment, Application, Command, Element, Length, Settings, Theme, Color, Point, Size,
 };
@@ -14,7 +14,12 @@ mod i18n;
 use i18n::{s, S};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Language {
+    Ru,
+    En,
+}
+
 enum Route {
     Main,
     Settings,
@@ -26,6 +31,16 @@ enum DnsModeUI {
     Cloudflare,
     Google,
     Custom,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum SettingsSection {
+    General,
+    Network,
+    Dns,
+    Appearance,
+    Tools,
+    About,
 }
 
 use iced::window;
@@ -63,6 +78,8 @@ struct NetokApp {
     snapshot: Option<Snapshot>,
     route: Route,
     geodata_enabled: bool,
+    language: Language,
+    active_settings_section: SettingsSection,
     dns_mode: DnsModeUI,
     custom_dns: String,
     last_ssid: Option<String>,
@@ -75,6 +92,8 @@ enum Message {
     SnapshotReady(Snapshot),
     OpenSettings,
     BackToMain,
+    LanguageChanged(Language),
+    SettingsSectionChanged(SettingsSection),
     DnsModeChanged(DnsModeUI),
     CustomDnsChanged(String),
     ApplyDns,
@@ -85,15 +104,16 @@ enum Message {
     OpenRouter,
     CopyDiagnostics,
     DnsApplied,
-    DnsError(()),
-    SpeedTestResult(()),
+    DnsError,
+    SpeedTestResult,
     DnsCacheCleared,
+    DnsCacheClearError,
     CaptiveOpened,
     RouterOpened(String),
     DiagnosticsCopied,
     CopyToClipboard(String),
     OpenUrl(String),
-    Tick,
+    Tick(std::time::Instant),
     EventOccurred(event::Event),
 }
 
@@ -109,6 +129,8 @@ impl Application for NetokApp {
             snapshot: None,
             route: Route::Main,
             geodata_enabled: true,
+            language: Language::Ru, // Default to Russian
+            active_settings_section: SettingsSection::General,
             dns_mode: DnsModeUI::Auto,
             custom_dns: String::new(),
             last_ssid: None,
@@ -131,7 +153,7 @@ impl Application for NetokApp {
         let mut subs = Vec::new();
 
         if self.loading {
-            subs.push(time::every(std::time::Duration::from_millis(16)).map(|_| Message::Tick));
+            subs.push(time::every(std::time::Duration::from_millis(16)).map(Message::Tick));
         }
 
         // Subscribe to window events for saving state
@@ -193,6 +215,13 @@ impl Application for NetokApp {
             Message::BackToMain => {
                 self.route = Route::Main;
             }
+            Message::LanguageChanged(lang) => {
+                self.language = lang;
+                i18n::set_lang(if matches!(lang, Language::Ru) { "ru" } else { "en" });
+            }
+            Message::SettingsSectionChanged(section) => {
+                self.active_settings_section = section;
+            }
             Message::DnsModeChanged(mode) => {
                 self.dns_mode = mode;
             }
@@ -213,7 +242,7 @@ impl Application for NetokApp {
                     },
                     |result| match result {
                         Ok(_) => Message::DnsApplied,
-                        Err(_) => Message::DnsError(()),
+                        Err(_) => Message::DnsError,
                     },
                 );
             }
@@ -222,45 +251,48 @@ impl Application for NetokApp {
             }
             Message::ShortSpeedTest => {
                 return Command::perform(tools::short_speedtest(), |result| match result {
-                    Ok((_down, _up)) => Message::SpeedTestResult(()),
-                    Err(_) => Message::SpeedTestResult(()),
+                    Ok((_down, _up)) => Message::SpeedTestResult,
+                    Err(_) => Message::SpeedTestResult,
                 });
             }
             Message::ClearDnsCache => {
                 return Command::perform(dns::flush(), |result| match result {
                     Ok(_) => Message::DnsCacheCleared,
-                    Err(_) => Message::SpeedTestResult(()),
+                    Err(_) => Message::DnsCacheClearError,
                 });
             }
             Message::OpenCaptive => {
                 return Command::perform(tools::open_captive(), |result| match result {
                     Ok(_) => Message::CaptiveOpened,
-                    Err(_) => Message::SpeedTestResult(()),
+                    Err(_) => Message::SpeedTestResult,
                 });
             }
             Message::OpenRouter => {
                 return Command::perform(tools::open_router(), |result| match result {
                     Ok(ip) => Message::RouterOpened(ip),
-                    Err(_) => Message::DnsError(()), // Generic error
+                    Err(_) => Message::DnsError, // Generic error
                 });
             }
             Message::CopyDiagnostics => {
                 return Command::perform(tools::copy_report(), |result| match result {
                     Ok(_) => Message::DiagnosticsCopied,
-                    Err(_) => Message::DnsError(()), // Generic error
+                    Err(_) => Message::DnsError, // Generic error
                 });
             }
             Message::DnsApplied => {
                 // Показать toast "Готово"
             }
-            Message::DnsError(_) => {
+            Message::DnsError => {
                 // Показать toast с ошибкой
             }
-            Message::SpeedTestResult(_) => {
-                // Показать результат
+            Message::SpeedTestResult => {
+                // Показать результат (пустой кортеж, чтобы не было ворнинга)
             }
             Message::DnsCacheCleared => {
                 // Показать toast "Кэш очищен"
+            }
+            Message::DnsCacheClearError => {
+                // Показать toast "Ошибка очистки кэша"
             }
             Message::CaptiveOpened => {
                 // Показать toast "Каптив открыт"
@@ -298,7 +330,7 @@ impl Application for NetokApp {
                     |_| Message::Refresh,
                 );
             }
-            Message::Tick => {
+            Message::Tick(_) => {
                 // This message will now trigger a redraw, which is all we need for the animation.
             }
             Message::EventOccurred(event) => {
@@ -330,8 +362,8 @@ impl NetokApp {
         // Верхние строки
         let (internet_line, speed_line) = top_lines(self.snapshot.as_ref());
 
-        let header = column![text(internet_line), text(speed_line),].spacing(4);
-
+        let header = column![text(internet_line).size(13), text(speed_line).size(13),].spacing(4);
+        
         // Центральный «путь» - pass loading and animation state
         let nodes = nodes_view(self.snapshot.as_ref(), self.loading);
 
@@ -355,20 +387,21 @@ impl NetokApp {
                 .width(120),
         ].spacing(12);
 
-        let content = column![
-            container(header).padding([12, 16]),
-            scrollable(
-                container(nodes)
-                    .padding([8, 16])
-                    .width(Length::Fill)
-            ),
-        ].spacing(8);
-
         container(
-            column![content, container(bottom).padding([8, 16]).width(Length::Fill)]
-                .spacing(8)
-                .width(Length::Fill)
+            column![
+                // 1. Header (fixed)
+                container(header).padding([12, 16]),
+                // 2. Scrollable content (fills remaining space)
+                scrollable(
+                    container(nodes)
+                        .padding([8, 16])
+                        .width(Length::Fill)
+                )
                 .height(Length::Fill),
+                // 3. Footer (fixed)
+                container(bottom).padding([8, 16]).width(Length::Fill)
+            ]
+            .spacing(8),
         )
         .width(Length::Fill)
         .height(Length::Fill)
@@ -376,109 +409,109 @@ impl NetokApp {
     }
 
     fn view_settings(&self) -> Element<'_, Message> {
-        let back_btn = button(s(S::Back))
-            .on_press(Message::BackToMain)
-            .padding([8, 16])
-            .width(Length::Fixed(120.0));  // Фиксированная ширина
+        let sidebar = settings_sidebar(self.active_settings_section);
 
-        let dns_section = column![
-            text(s(S::Dns)).size(18),
-            radio(
-                s(S::DnsAuto),
-                DnsModeUI::Auto,
-                Some(self.dns_mode),
-                Message::DnsModeChanged
-            ),
-            radio(
-                s(S::DnsCloudflare),
-                DnsModeUI::Cloudflare,
-                Some(self.dns_mode), 
-                Message::DnsModeChanged
-            ),
-            radio(
-                s(S::DnsGoogle),
-                DnsModeUI::Google,
-                Some(self.dns_mode),
-                Message::DnsModeChanged
-            ),
-            radio(
-                s(S::DnsCustom),
-                DnsModeUI::Custom,
-                Some(self.dns_mode),
-                Message::DnsModeChanged
-            ),
-        ]
-        .spacing(8);
+        let content: Element<Message> = match self.active_settings_section {
+            SettingsSection::Dns => {
+                let dns_section = column![
+                    text(s(S::Dns)).size(16),
+                    radio(s(S::DnsAuto), DnsModeUI::Auto, Some(self.dns_mode), Message::DnsModeChanged),
+                    radio(s(S::DnsCloudflare), DnsModeUI::Cloudflare, Some(self.dns_mode), Message::DnsModeChanged),
+                    radio(s(S::DnsGoogle), DnsModeUI::Google, Some(self.dns_mode), Message::DnsModeChanged),
+                    radio(s(S::DnsCustom), DnsModeUI::Custom, Some(self.dns_mode), Message::DnsModeChanged),
+                ]
+                .spacing(8);
 
-        let custom_dns_input = if matches!(self.dns_mode, DnsModeUI::Custom) {
-            text_input(s(S::DnsCustomPlaceholder), &self.custom_dns)
-                .on_input(Message::CustomDnsChanged)
-                .padding(8)
-        } else {
-            text_input("", "").padding(8)
+                let custom_dns_input = if matches!(self.dns_mode, DnsModeUI::Custom) {
+                    text_input(s(S::DnsCustomPlaceholder), &self.custom_dns)
+                        .on_input(Message::CustomDnsChanged)
+                        .padding(8)
+                } else {
+                    text_input("", "").padding(8)
+                };
+
+                let apply_dns_btn = button(s(S::ApplyDns))
+                    .on_press(Message::ApplyDns)
+                    .padding([8, 16]);
+
+                column![dns_section, custom_dns_input, apply_dns_btn].spacing(12).into()
+            }
+            SettingsSection::General => {
+                let lang_section = row![
+                    text(s(S::Language)).size(13),
+                    horizontal_space(),
+                    radio("RU", Language::Ru, Some(self.language), Message::LanguageChanged).size(13),
+                    radio("EN", Language::En, Some(self.language), Message::LanguageChanged).size(13),
+                ]
+                .spacing(8)
+                .align_items(Alignment::Center);
+
+                let geodata_toggle = row![
+                    text(s(S::ShowGeodata)).size(13),
+                    horizontal_space(),
+                    button(if self.geodata_enabled { s(S::Enabled) } else { s(S::Disabled) })
+                        .on_press(Message::ToggleGeodata)
+                        .padding([4, 8])
+                ]
+                .align_items(Alignment::Center);
+
+                column![
+                    text(s(S::SettingsGeneral)).size(16),
+                    lang_section,
+                    geodata_toggle,
+                ].spacing(12).into()
+            }
+            SettingsSection::Tools => {
+                let action_buttons = column![
+                    button(s(S::ShortSpeedtest)).on_press(Message::ShortSpeedTest).padding([8, 16]),
+                    button(s(S::ClearDnsCache)).on_press(Message::ClearDnsCache).padding([8, 16]),
+                    button(s(S::OpenCaptive)).on_press(Message::OpenCaptive).padding([8, 16]),
+                    button(s(S::OpenRouterPage)).on_press(Message::OpenRouter).padding([8, 16]),
+                    button(s(S::CopyDiagnostics)).on_press(Message::CopyDiagnostics).padding([8, 16]),
+                ]
+                .spacing(8)
+                .width(Length::Fill);
+
+                column![
+                    text("Инструменты").size(16),
+                    action_buttons,
+                ].spacing(12).into()
+            }
+            SettingsSection::About => {
+                let version = env!("CARGO_PKG_VERSION");
+                column![
+                    text(s(S::SettingsAbout)).size(16),
+                    text(format!("{}: {}", s(S::Version), version)).size(13),
+                    text(s(S::Licenses)).size(13),
+                    text(s(S::LicenseInter)).size(12),
+                    text(s(S::LicenseLucide)).size(12),
+                    button(s(S::ReportIssue))
+                        .on_press(Message::OpenUrl("https://github.com/netok-tools/netok/issues".to_string()))
+                        .padding(8),
+                ].spacing(12).into()
+            }
+            // Placeholder for other sections
+            _ => text(s(S::Tbd)).into(),
         };
 
-        let apply_dns_btn = button(s(S::ApplyDns))
-            .on_press(Message::ApplyDns)
-            .padding([8, 16])
-            .width(Length::Fixed(200.0));  // Фиксированная ширина
-
-        let dns_block = column![dns_section, custom_dns_input, apply_dns_btn].spacing(12);
-
-        let geodata_toggle = row![
-            text(s(S::ShowGeodata)),
-            horizontal_space(),
-            button(if self.geodata_enabled {
-                s(S::Enabled)
-            } else {
-                s(S::Disabled)
-            })
-            .on_press(Message::ToggleGeodata)
-            .padding([4, 8])
-            .width(Length::Fixed(100.0))  // Фиксированная ширина
-        ]
-        .align_items(Alignment::Center);
-
-        let action_buttons = column![
-            button(s(S::ShortSpeedtest))
-                .on_press(Message::ShortSpeedTest)
-                .padding([8, 16])
-                .width(Length::Fixed(200.0)),
-            button(s(S::ClearDnsCache))
-                .on_press(Message::ClearDnsCache)
-                .padding([8, 16])
-                .width(Length::Fixed(200.0)),
-            button(s(S::OpenCaptive))
-                .on_press(Message::OpenCaptive)
-                .padding([8, 16])
-                .width(Length::Fixed(200.0)),
-            button(s(S::OpenRouterPage))
-                .on_press(Message::OpenRouter)
-                .padding([8, 16])
-                .width(Length::Fixed(200.0)),
-            button(s(S::CopyDiagnostics))
-                .on_press(Message::CopyDiagnostics)
-                .padding([8, 16])
-                .width(Length::Fixed(200.0)),
-        ]
-        .spacing(8);
-
-        let content = scrollable(
-            column![
-                container(dns_block).padding([0, 16]),
-                Space::with_height(Length::Fixed(16.0)),
-                container(geodata_toggle).padding([0, 16]),
-                Space::with_height(Length::Fixed(16.0)),
-                container(action_buttons).padding([0, 16]),
-            ]
-            .spacing(8)
-            .width(Length::Fill)  // Важно для правильного скроллинга
-        );
+        let main_content = row![
+            sidebar,
+            scrollable(
+                container(content)
+                    .padding(16)
+                    .width(Length::Fill)
+            ).width(Length::Fill),
+        ].height(Length::Fill);
 
         container(
             column![
-                container(back_btn).padding([12, 16]),
-                content,
+                // Header with back button
+                container(
+                    button(s(S::Back))
+                        .on_press(Message::BackToMain)
+                        .padding([8, 16])
+                ).padding([12, 16, 0, 16]),
+                main_content,
             ]
             .spacing(8)
         )
@@ -486,6 +519,36 @@ impl NetokApp {
         .height(Length::Fill)
         .into()
     }
+}
+
+fn settings_sidebar(active_section: SettingsSection) -> Element<'static, Message> {
+    let sections = [
+        (SettingsSection::General, s(S::SettingsGeneral)),
+        (SettingsSection::Network, s(S::SettingsNetwork)),
+        (SettingsSection::Dns, s(S::SettingsDns)),
+        (SettingsSection::Appearance, s(S::SettingsAppearance)),
+        (SettingsSection::Tools, s(S::SettingsTools)),
+        (SettingsSection::About, s(S::SettingsAbout)),
+    ];
+
+    let buttons = sections.iter().fold(column![].spacing(4), |col, (section, label)| {
+        let is_active = *section == active_section;
+        let btn_style = if is_active { theme::Button::Primary } else { theme::Button::Text };
+
+        col.push(
+            button(text(*label).width(Length::Fill))
+                .style(btn_style)
+                .on_press(Message::SettingsSectionChanged(*section))
+                .padding(8)
+                .width(Length::Fill),
+        )
+    });
+
+    container(buttons)
+        .width(Length::Fixed(160.0)) // Per UI-SPEC §2
+        .height(Length::Fill)
+        .padding(16)
+        .into()
 }
 
 // ---------- helpers ----------
@@ -528,7 +591,7 @@ fn nodes_view<'a>(snap: Option<&'a Snapshot>, loading: bool) -> Element<'a, Mess
         };
 
         let bead = bead_view(status, loading);
-        let icon = icon_view(kind);
+        let node_icon = icon_view(kind);
         let mut facts_col = column![];
 
         match kind {
@@ -581,7 +644,7 @@ fn nodes_view<'a>(snap: Option<&'a Snapshot>, loading: bool) -> Element<'a, Mess
                     }
                     _ => format!("{} ({})", s(S::NodeNetwork), s(S::Unknown)),
                 };
-                facts_col = facts_col.push(text(title).size(16));
+                facts_col = facts_col.push(text(title).size(16)); // Node title
 
                 if is_wifi {
                     // Per UI-SPEC §10, only show signal for Wi-Fi.
@@ -590,7 +653,7 @@ fn nodes_view<'a>(snap: Option<&'a Snapshot>, loading: bool) -> Element<'a, Mess
                             s(S::SignalValue).replace("{grade}", s(grade)).replace("{dbm}", &dbm.to_string())
                         })
                         .unwrap_or_else(|| s(S::Unknown).to_string());
-                    facts_col = facts_col.push(text(format!("{}: {}", s(S::Signal), signal_text)).size(14));
+                    facts_col = facts_col.push(text(format!("{}: {}", s(S::Signal), signal_text)).size(13));
                 } else if is_cable {
                     // Per UI-SPEC §10, only show link speed for cable.
                     if let Some(l) = link {
@@ -601,9 +664,9 @@ fn nodes_view<'a>(snap: Option<&'a Snapshot>, loading: bool) -> Element<'a, Mess
                         } else {
                             l
                         };
-                        facts_col = facts_col.push(text(format!("{}: {}", s(S::Link), l)).size(14));
+                        facts_col = facts_col.push(text(format!("{}: {}", s(S::Link), l)).size(13));
                     } else {
-                        facts_col = facts_col.push(text(format!("{}: {}", s(S::Link), s(S::Unknown))).size(14));
+                        facts_col = facts_col.push(text(format!("{}: {}", s(S::Link), s(S::Unknown))).size(13));
                     }
                 } else {
                     // Ничего не выводим для других типов
@@ -628,31 +691,30 @@ fn nodes_view<'a>(snap: Option<&'a Snapshot>, loading: bool) -> Element<'a, Mess
                     Some(n) => format!("{} {}", s(S::NodeComputer), n),
                     None => s(S::NodeComputer).to_string(),
                 };
-                facts_col = facts_col.push(text(title).size(16));
+                facts_col = facts_col.push(text(title).size(16)); // Node title
 
                 // Per UI-SPEC §10, hide row if data is missing.
                 if let Some(adapter_name) = adapter {
                     let adapter_line = format!("{}: {}", s(S::NetAdapter), adapter_name);
-                    facts_col = facts_col.push(text(adapter_line).size(14));
+                    facts_col = facts_col.push(text(adapter_line).size(13));
                 }
 
                 // Per UI-SPEC §10, hide row if data is missing.
                 if let Some(ip_val) = ip_local.filter(|s| !s.trim().is_empty()) {
                     let ip_display = ip_val.clone();
-                    let mut line = row![text(format!("{}: {}", s(S::LocalIp), ip_display)).size(14)]
+                    let mut line = row![text(format!("{}: {}", s(S::LocalIp), ip_display)).size(13)]
                         .align_items(Alignment::Center);
                     
                     line = line.push(Space::with_width(Length::Fixed(8.0)));
-                    line = line.push(
-                        button(text("[📋]").size(14))
-                            .style(theme::Button::Text)
-                            .on_press(Message::CopyToClipboard(ip_val))
-                            .padding([0, 4]),
+                    line = line.push(button(icon("desktop/assets/copy.svg"))
+                        .style(theme::Button::Text)
+                        .on_press(Message::CopyToClipboard(ip_val))
+                        .padding(0)
                     );
                     facts_col = facts_col.push(line);
                 } else {
                     // If no IP, show "неизвестно" without a copy button.
-                    facts_col = facts_col.push(text(format!("{}: {}", s(S::LocalIp), s(S::Unknown))).size(14));
+                    facts_col = facts_col.push(text(format!("{}: {}", s(S::LocalIp), s(S::Unknown))).size(13));
                 }
             }
             NodeKind::Router => {
@@ -670,35 +732,29 @@ fn nodes_view<'a>(snap: Option<&'a Snapshot>, loading: bool) -> Element<'a, Mess
                     Some(m) => format!("{} {}", s(S::NodeRouter), m),
                     None => s(S::NodeRouter).to_string(),
                 };
-                facts_col = facts_col.push(text(title).size(16));
+                facts_col = facts_col.push(text(title).size(16)); // Node title
 
                 if let Some(ip_val) = ip_local.filter(|s| !s.trim().is_empty()) {
                     let ip_display = ip_val.clone();
-                    let mut line = row![text(format!("{}: {}", s(S::LocalIp), ip_display)).size(14)]
+                    let mut line = row![text(format!("{}: {}", s(S::LocalIp), ip_display)).size(13)]
                         .align_items(Alignment::Center);
                     
                     line = line.push(Space::with_width(Length::Fixed(8.0)));
-                    line = line.push(
-                        button(text("[📋]").size(14))
-                            .style(theme::Button::Text)
-                            .on_press(Message::CopyToClipboard(ip_val.clone()))
-                            .padding([0, 4]),
+                    line = line.push(button(icon("desktop/assets/copy.svg"))
+                        .style(theme::Button::Text)
+                        .on_press(Message::CopyToClipboard(ip_val.clone()))
+                        .padding(0)
                     );
                     line = line.push(Space::with_width(Length::Fixed(4.0)));
-                    line = line.push(
-                        button(text("↗︎").size(14))
-                            .style(theme::Button::Text)
-                            .on_press(Message::OpenRouter)
-                            .padding([0, 4]),
+                    line = line.push(button(icon("desktop/assets/external-link.svg"))
+                        .style(theme::Button::Text)
+                        .on_press(Message::OpenRouter)
+                        .padding(0)
                     );
                     facts_col = facts_col.push(line);
                 } else {
                     let line = row![
-                        text(format!("{}: {}", s(S::LocalIp), s(S::Unknown))).size(14),
-                        Space::with_width(Length::Fixed(8.0)),
-                        button(text("↗︎").size(14))
-                            .style(theme::Button::Text),
-                            // .padding([0, 4]), // This button is non-functional, so no padding or on_press
+                        text(format!("{}: {}", s(S::LocalIp), s(S::Unknown))).size(13),
                     ];
                     facts_col = facts_col.push(line);
                 }
@@ -726,23 +782,22 @@ fn nodes_view<'a>(snap: Option<&'a Snapshot>, loading: bool) -> Element<'a, Mess
                     Some(p) => format!("{} {}", s(S::NodeInternet), p),
                     None => s(S::NodeInternet).to_string(),
                 };
-                facts_col = facts_col.push(text(title).size(16));
+                facts_col = facts_col.push(text(title).size(16)); // Node title
 
                 if let Some(ip_val) = public_ip.filter(|s| !s.trim().is_empty()) {
                     let ip_display = ip_val.clone();
-                    let mut line = row![text(format!("{}: {}", s(S::PublicIp), ip_display)).size(14)]
+                    let mut line = row![text(format!("{}: {}", s(S::PublicIp), ip_display)).size(13)]
                         .align_items(Alignment::Center);
                     
                     line = line.push(Space::with_width(Length::Fixed(8.0)));
-                    line = line.push(
-                        button(text("[📋]").size(14))
-                            .style(theme::Button::Text)
-                            .on_press(Message::CopyToClipboard(ip_val))
-                            .padding([0, 4]),
+                    line = line.push(button(icon("desktop/assets/copy.svg"))
+                        .style(theme::Button::Text)
+                        .on_press(Message::CopyToClipboard(ip_val))
+                        .padding(0)
                     );
                     facts_col = facts_col.push(line);
                 } else {
-                    facts_col = facts_col.push(text(format!("{}: {}", s(S::PublicIp), s(S::Unknown))).size(14));
+                    facts_col = facts_col.push(text(format!("{}: {}", s(S::PublicIp), s(S::Unknown))).size(13));
                 }
 
                 if country.is_some() || geo_city.is_some() {
@@ -752,7 +807,7 @@ fn nodes_view<'a>(snap: Option<&'a Snapshot>, loading: bool) -> Element<'a, Mess
                         (None, Some(ct)) => ct,
                         (None, None) => unreachable!(), // Covered by the outer if.
                     };
-                    facts_col = facts_col.push(text(location).size(14));
+                    facts_col = facts_col.push(text(location).size(13));
                 }
             }
         }
@@ -761,7 +816,7 @@ fn nodes_view<'a>(snap: Option<&'a Snapshot>, loading: bool) -> Element<'a, Mess
             row![
                 bead,
                 Space::with_width(Length::Fixed(12.0)),
-                icon,
+                node_icon,
                 Space::with_width(Length::Fixed(12.0)),
                 facts_col
             ]
@@ -779,11 +834,16 @@ fn icon_view(kind: NodeKind) -> Element<'static, Message> {
         NodeKind::Router => "desktop/assets/router.svg",
         NodeKind::Internet => "desktop/assets/globe.svg",
     };
+    icon(icon_path)
+}
 
-    svg(svg::Handle::from_path(icon_path))
-        .width(20)
-        .height(20)
-        .style(theme::Svg::custom_fn(|_theme| svg::Appearance { color: Some(Color::WHITE) }))
+fn icon(path: &str) -> Element<'static, Message> {
+    svg(svg::Handle::from_path(path))
+        .width(16)
+        .height(16)
+        .style(theme::Svg::custom_fn(|theme| svg::Appearance {
+            color: Some(theme.palette().text),
+        }))
         .into()
 }
 
@@ -827,7 +887,11 @@ fn bead_view<'a>(status: Status, loading: bool) -> Element<'a, Message> {
     let bead_program = Bead {
         status,
         loading,
-        animation_progress: if loading { (std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_millis() % 1000) as f32 / 1000.0 } else { 0.0 },
+        animation_progress: if loading {
+            // Use system time to create a value between 0.0 and 1.0 for the animation cycle
+            let now_ms = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_millis();
+            (now_ms % 1000) as f32 / 1000.0
+        } else { 0.0 },
     };
     Canvas::new(bead_program)
         .width(12)
@@ -887,6 +951,7 @@ fn open_url(url: &str) -> std::io::Result<()> {
         return Ok(());
     }
 
-    #[allow(unreachable_code)]
+    // For other unhandled OSes, this is a no-op that returns Ok.
+    // The #[allow(unused)] at the function level handles cases where it's not used.
     Ok(())
 }

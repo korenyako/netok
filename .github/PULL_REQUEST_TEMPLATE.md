@@ -1,12 +1,27 @@
-# Pull Request Template
+# Netok — Pull Request Template
 
-## UI-SPEC compliance
+## Description
+Кратко опишите задачу (1–2 предложения).
+Ссылайтесь на `docs/UI-SPEC.md` и SoT (например, UI-SPEC §2).
 
-- [ ] §1 Window: default 300×480, min 240×360, header fixed
-- [ ] §2 Settings: sidebar + small-screen fallback
-- [ ] §3 Scrollbars visible where needed
-- [ ] §4/§5 Typography & Buttons tokens applied
-- [ ] §6 Icons (SVG set, sizes) wired
-- [ ] §7 Beads component (states + animation)
-- [ ] §10 “неизвестно” rules respected
-- [ ] §9 Clipboard export text (RU) implemented
+## Changes
+- [ ] Краткий список изменений по файлам/модулям
+- [ ] Указать, если были добавлены новые зависимости (с обоснованием)
+
+## Checklist
+Перед тем как просить review, проверьте:
+
+- [ ] Я прочитал(а) `docs/UI-SPEC.md` и `docs/CODING_RULES.md`
+- [ ] Код оформлен (`cargo fmt`)
+- [ ] Нет предупреждений (`cargo clippy -- -D warnings`)
+- [ ] Тесты проходят (`cargo test`)
+- [ ] Все строки вынесены в i18n (без хардкода RU/EN в логике)
+- [ ] UI соответствует токенам и правилам из UI-SPEC (радиусы, цвета, шрифты, скролл)
+- [ ] Проверена навигация по клавиатуре и видимость focus ring
+- [ ] Проверена работа в Light/Dark темах
+
+## Screenshots / Demos
+*(по возможности приложите GIF/скриншот окна в разных размерах)*
+
+## Related
+Ссылка на задачу / issue / обсуждение.
