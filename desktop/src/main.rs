@@ -699,7 +699,7 @@ fn nodes_view<'a>(
                         button(text("↗︎").size(14))
                             .style(theme::Button::Text),
                             // .padding([0, 4]), // This button is non-functional, so no padding or on_press
-                    );
+                    ];
                     facts_col = facts_col.push(line);
                 }
             }
