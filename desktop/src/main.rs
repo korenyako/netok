@@ -378,7 +378,8 @@ impl NetokApp {
     fn view_settings(&self) -> Element<'_, Message> {
         let back_btn = button(s(S::Back))
             .on_press(Message::BackToMain)
-            .padding([8, 16]);
+            .padding([8, 16])
+            .width(Length::Fixed(120.0));  // Фиксированная ширина
 
         let dns_section = column![
             text(s(S::Dns)).size(18),
@@ -391,7 +392,7 @@ impl NetokApp {
             radio(
                 s(S::DnsCloudflare),
                 DnsModeUI::Cloudflare,
-                Some(self.dns_mode),
+                Some(self.dns_mode), 
                 Message::DnsModeChanged
             ),
             radio(
@@ -419,9 +420,10 @@ impl NetokApp {
 
         let apply_dns_btn = button(s(S::ApplyDns))
             .on_press(Message::ApplyDns)
-            .padding([8, 16]);
+            .padding([8, 16])
+            .width(Length::Fixed(200.0));  // Фиксированная ширина
 
-        let dns_block = column![dns_section, custom_dns_input, apply_dns_btn,].spacing(12);
+        let dns_block = column![dns_section, custom_dns_input, apply_dns_btn].spacing(12);
 
         let geodata_toggle = row![
             text(s(S::ShowGeodata)),
@@ -432,26 +434,32 @@ impl NetokApp {
                 s(S::Disabled)
             })
             .on_press(Message::ToggleGeodata)
-            .padding([4, 8]),
+            .padding([4, 8])
+            .width(Length::Fixed(100.0))  // Фиксированная ширина
         ]
         .align_items(Alignment::Center);
 
         let action_buttons = column![
             button(s(S::ShortSpeedtest))
                 .on_press(Message::ShortSpeedTest)
-                .padding([8, 16]),
+                .padding([8, 16])
+                .width(Length::Fixed(200.0)),
             button(s(S::ClearDnsCache))
                 .on_press(Message::ClearDnsCache)
-                .padding([8, 16]),
+                .padding([8, 16])
+                .width(Length::Fixed(200.0)),
             button(s(S::OpenCaptive))
                 .on_press(Message::OpenCaptive)
-                .padding([8, 16]),
+                .padding([8, 16])
+                .width(Length::Fixed(200.0)),
             button(s(S::OpenRouterPage))
                 .on_press(Message::OpenRouter)
-                .padding([8, 16]),
+                .padding([8, 16])
+                .width(Length::Fixed(200.0)),
             button(s(S::CopyDiagnostics))
                 .on_press(Message::CopyDiagnostics)
-                .padding([8, 16]),
+                .padding([8, 16])
+                .width(Length::Fixed(200.0)),
         ]
         .spacing(8);
 
@@ -464,13 +472,15 @@ impl NetokApp {
                 container(action_buttons).padding([0, 16]),
             ]
             .spacing(8)
+            .width(Length::Fill)  // Важно для правильного скроллинга
         );
 
         container(
             column![
                 container(back_btn).padding([12, 16]),
                 content,
-            ].spacing(8)
+            ]
+            .spacing(8)
         )
         .width(Length::Fill)
         .height(Length::Fill)
