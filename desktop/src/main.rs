@@ -538,8 +538,7 @@ fn nodes_view<'a>(snap: Option<&'a Snapshot>, loading: bool) -> Element<'a, Mess
                     if k == "Сигнал" {
                         if let Some(start) = v.find('(') {
                             if let Some(end) = v.find(" dBm)") {
-                                let num_str = &v[start + 1..end];
-                                if let Ok(val) = num_str.parse::<i32>() {
+                                if let Ok(val) = v[start + 1..end].trim().parse::<i32>() {
                                     rssi = Some(val);
                                 }
                             }
@@ -679,7 +678,7 @@ fn nodes_view<'a>(snap: Option<&'a Snapshot>, loading: bool) -> Element<'a, Mess
                     line = line.push(
                         button(text("↗︎").size(14))
                             .style(theme::Button::Text)
-                            .on_press(Message::OpenUrl(format!("http://{}/", ip_val)))
+                            .on_press(Message::OpenRouter)
                             .padding([0, 4]),
                     );
                     facts_col = facts_col.push(line);
