@@ -1,6 +1,6 @@
 use iced::{
     executor, theme,
-    widget::{button, column, container, horizontal_space, radio, row, text, text_input, Space, scrollable, canvas, svg},
+    widget::{button, column, container, horizontal_space, radio, row, text, text_input, Space, scrollable, canvas, svg, Canvas},
     time, event,
     Alignment, Application, Command, Element, Length, Settings, Theme, Color, Point, Size,
 };
@@ -48,11 +48,12 @@ pub fn main() -> iced::Result {
     let cfg: AppConfig = confy::load("netok", None).unwrap_or_default();
     NetokApp::run(Settings {
         window: window::Settings {
-            size: (cfg.width, cfg.height),
-            min_size: Some((240, 360)),
-            position: window::Position::Specific(cfg.x, cfg.y),
+            size: Size::new(cfg.width as f32, cfg.height as f32),
+            min_size: Some(Size::new(240.0, 360.0)),
+            position: window::Position::Specific(Point::new(cfg.x as f32, cfg.y as f32)),
             ..window::Settings::default()
         },
+        antialiasing: true,
         ..Settings::default()
     })
 }
@@ -66,8 +67,6 @@ struct NetokApp {
     custom_dns: String,
     last_ssid: Option<String>,
     last_rssi: Option<i32>,
-    bead_cache: canvas::Cache,
-    animation_progress: f32,
 }
 
 #[derive(Debug, Clone)]
@@ -94,7 +93,7 @@ enum Message {
     DiagnosticsCopied,
     CopyToClipboard(String),
     OpenUrl(String),
-    Tick(time::Instant),
+    Tick,
     EventOccurred(event::Event),
 }
 
@@ -114,8 +113,6 @@ impl Application for NetokApp {
             custom_dns: String::new(),
             last_ssid: None,
             last_rssi: None,
-            bead_cache: canvas::Cache::new(),
-            animation_progress: 0.0,
         };
         // Первый запуск — тянем снапшот
         let cmd = Command::perform(run_all(Some(true)), Message::SnapshotReady);
@@ -134,7 +131,7 @@ impl Application for NetokApp {
         let mut subs = Vec::new();
 
         if self.loading {
-            subs.push(time::every(std::time::Duration::from_millis(16)).map(Message::Tick));
+            subs.push(time::every(std::time::Duration::from_millis(16)).map(|_| Message::Tick));
         }
 
         // Subscribe to window events for saving state
@@ -148,20 +145,18 @@ impl Application for NetokApp {
             Message::Refresh => {
                 self.loading = true;
                 // Reset animation progress on new refresh
-                self.animation_progress = 0.0;
-                self.bead_cache.clear();
                 return Command::perform(
                     run_all(Some(self.geodata_enabled)),
                     Message::SnapshotReady,
                 );
             }
-            Message::SnapshotReady(mut s) => {
-                if let Some(node) = s.nodes.iter_mut().find(|n| n.kind == NodeKind::Network) {
+            Message::SnapshotReady(mut snapshot) => {
+                if let Some(node) = snapshot.nodes.iter_mut().find(|n| n.kind == NodeKind::Network) {
                     let mut has_ssid = false;
                     let mut has_rssi = false;
 
                     for (k, v) in &node.facts {
-                        if k == "SSID" {
+                        if k == "SSID" { // Per UI-SPEC §10, SSID can be stale
                             has_ssid = true;
                             self.last_ssid = Some(v.clone());
                         }
@@ -184,14 +179,13 @@ impl Application for NetokApp {
                     if !has_rssi {
                         if let Some(last_rssi) = self.last_rssi {
                             let grade = wifi_signal_grade(last_rssi);
-                            node.facts.push(("Сигнал".to_string(), format!("{} ({} dBm)", s(grade), last_rssi)));
+                            node.facts.push(("Сигнал".to_string(), format!("{} ({} dBm)", i18n::s(grade), last_rssi)));
                         }
                     }
                 }
 
-                self.snapshot = Some(s);
+                self.snapshot = Some(snapshot);
                 self.loading = false;
-                self.bead_cache.clear();
             }
             Message::OpenSettings => {
                 self.route = Route::Settings;
@@ -304,9 +298,8 @@ impl Application for NetokApp {
                     |_| Message::Refresh,
                 );
             }
-            Message::Tick(_) => {
-                self.animation_progress = (self.animation_progress + 0.02) % 1.0;
-                self.bead_cache.clear();
+            Message::Tick => {
+                // This message will now trigger a redraw, which is all we need for the animation.
             }
             Message::EventOccurred(event) => {
                 if let event::Event::Window(_, window::Event::Resized { width, height }) = event {
@@ -340,42 +333,42 @@ impl NetokApp {
         let header = column![text(internet_line), text(speed_line),].spacing(4);
 
         // Центральный «путь» - pass loading and animation state
-        let nodes = nodes_view(self.snapshot.as_ref(), &self.bead_cache, self.loading, self.animation_progress);
+        let nodes = nodes_view(self.snapshot.as_ref(), self.loading);
 
         // Низ: кнопки
         let refresh_btn: Element<Message> = if self.loading {
-            button(s(S::Refreshing)).padding([8, 16]).into()
+            button(s(S::Refreshing)).padding([8, 16]).width(120).into()
         } else {
             button(s(S::Refresh))
                 .on_press(Message::Refresh)
                 .padding([8, 16])
+                .width(120)
                 .into()
         };
 
         let bottom = row![
             refresh_btn,
-            Space::with_width(Length::Fill),
+            horizontal_space(),
             button(s(S::Settings))
                 .on_press(Message::OpenSettings)
-                .padding([8, 16]),
-        ];
+                .padding([8, 16])
+                .width(120),
+        ].spacing(12);
 
-        container(
-            column![
-                container(header).padding([12, 16]),
-                scrollable(
-                    container(nodes)
-                        .padding([8, 16])
-                        .width(Length::Fill)
-                ),
-                container(bottom)
+        let content = column![
+            container(header).padding([12, 16]),
+            scrollable(
+                container(nodes)
                     .padding([8, 16])
                     .width(Length::Fill)
-                    .align_x(iced::alignment::Horizontal::Left),
-            ]
-            .spacing(8)
-            .width(Length::Fill)
-            .height(Length::Fill),
+            ),
+        ].spacing(8);
+
+        container(
+            column![content, container(bottom).padding([8, 16]).width(Length::Fill)]
+                .spacing(8)
+                .width(Length::Fill)
+                .height(Length::Fill),
         )
         .width(Length::Fill)
         .height(Length::Fill)
@@ -383,6 +376,10 @@ impl NetokApp {
     }
 
     fn view_settings(&self) -> Element<'_, Message> {
+        let back_btn = button(s(S::Back))
+            .on_press(Message::BackToMain)
+            .padding([8, 16]);
+
         let dns_section = column![
             text(s(S::Dns)).size(18),
             radio(
@@ -458,23 +455,22 @@ impl NetokApp {
         ]
         .spacing(8);
 
-        let back_btn = button(s(S::Back))
-            .on_press(Message::BackToMain)
-            .padding([8, 16]);
+        let content = scrollable(
+            column![
+                container(dns_block).padding([0, 16]),
+                Space::with_height(Length::Fixed(16.0)),
+                container(geodata_toggle).padding([0, 16]),
+                Space::with_height(Length::Fixed(16.0)),
+                container(action_buttons).padding([0, 16]),
+            ]
+            .spacing(8)
+        );
 
         container(
             column![
                 container(back_btn).padding([12, 16]),
-                Space::with_height(Length::Fixed(16.0)),
-                container(dns_block).padding([16, 16]),
-                Space::with_height(Length::Fixed(16.0)),
-                container(geodata_toggle).padding([16, 16]),
-                Space::with_height(Length::Fixed(16.0)),
-                container(action_buttons).padding([16, 16]),
-            ]
-            .spacing(8)
-            .width(Length::Fill)
-            .height(Length::Fill),
+                content,
+            ].spacing(8)
         )
         .width(Length::Fill)
         .height(Length::Fill)
@@ -502,12 +498,7 @@ fn top_lines(snap: Option<&Snapshot>) -> (String, String) {
 }
 
 // Указываем явный lifetime, чтобы не было ворнингов о скрытой 'a
-fn nodes_view<'a>(
-    snap: Option<&'a Snapshot>,
-    bead_cache: &'a canvas::Cache,
-    loading: bool,
-    animation_progress: f32,
-) -> Element<'a, Message> {
+fn nodes_view<'a>(snap: Option<&'a Snapshot>, loading: bool) -> Element<'a, Message> {
     let order = [
         NodeKind::Computer,
         NodeKind::Network,
@@ -526,7 +517,7 @@ fn nodes_view<'a>(
             None => (Status::Unknown, &[]),
         };
 
-        let bead = bead_view(status, bead_cache, loading, animation_progress);
+        let bead = bead_view(status, loading);
         let icon = icon_view(kind);
         let mut facts_col = column![];
 
@@ -787,31 +778,51 @@ fn icon_view(kind: NodeKind) -> Element<'static, Message> {
         .into()
 }
 
-fn bead_view<'a>(status: Status, cache: &'a canvas::Cache, loading: bool, animation_progress: f32) -> Element<'a, Message> {
-    canvas(cache.clone())
+#[derive(Debug)]
+struct Bead {
+    status: Status,
+    loading: bool,
+    animation_progress: f32,
+}
+
+impl<M> canvas::Program<M> for Bead {
+    type State = ();
+
+    fn draw(&self, _state: &Self::State, renderer: &iced::Renderer, _theme: &Theme, bounds: iced::Rectangle, _cursor: iced::mouse::Cursor) -> Vec<canvas::Geometry> {
+        let mut frame = canvas::Frame::new(renderer, bounds.size());
+        let center = frame.center();
+        let radius = bounds.width / 2.0;
+
+        // Draw pulsing outline if loading
+        if self.loading {
+            let pulse_radius = radius + (2.0 * (std::f32::consts::PI * self.animation_progress).sin().abs());
+            let pulse_alpha = 1.0 - (std::f32::consts::PI * self.animation_progress).sin().abs();
+            let outline = canvas::Path::circle(center, pulse_radius);
+            frame.stroke(
+                &outline,
+                canvas::Stroke::default()
+                    .with_color(Color::from_rgba8(0x3B, 0x82, 0xF6, pulse_alpha)) // Blue with alpha
+                    .with_width(1.5),
+            );
+        }
+
+        // Draw main bead
+        let bead = canvas::Path::circle(center, radius);
+        frame.fill(&bead, bead_color(self.status));
+
+        vec![frame.into_geometry()]
+    }
+}
+
+fn bead_view<'a>(status: Status, loading: bool) -> Element<'a, Message> {
+    let bead_program = Bead {
+        status,
+        loading,
+        animation_progress: if loading { (std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_millis() % 1000) as f32 / 1000.0 } else { 0.0 },
+    };
+    Canvas::new(bead_program)
         .width(12)
         .height(12)
-        .draw(move |frame| {
-            let center = frame.center();
-            let radius = frame.width() / 2.0;
-
-            // Draw pulsing outline if loading
-            if loading {
-                let pulse_radius = radius + (2.0 * (std::f32::consts::PI * animation_progress).sin().abs());
-                let pulse_alpha = 1.0 - (std::f32::consts::PI * animation_progress).sin().abs();
-                let outline = canvas::Path::circle(center, pulse_radius);
-                frame.stroke(
-                    &outline,
-                    canvas::Stroke::default()
-                        .with_color(Color::from_rgba8(0x3B, 0x82, 0xF6, pulse_alpha)) // Blue with alpha
-                        .with_width(1.5),
-                );
-            }
-
-            // Draw main bead
-            let bead = canvas::Path::circle(center, radius);
-            frame.fill(&bead, bead_color(status));
-        })
         .into()
 }
 
