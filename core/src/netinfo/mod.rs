@@ -97,7 +97,7 @@ pub fn detect_network_kind() -> NetworkKind {
                 _ => { /* смотрим дальше */ }
             }
         }
-        cur = unsafe { a.Next };
+        cur = a.Next;
     }
 
     NetworkKind::Other
