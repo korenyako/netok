@@ -6,7 +6,7 @@ Netok uses a lightweight JSON-based i18n system with hardcoded fallbacks. This d
 
 ## Structure
 
-```
+```json
 i18n/
 ├── README.md      # This file
 ├── en.json        # English translations
@@ -16,6 +16,7 @@ i18n/
 ## Translation Files
 
 ### Format
+
 All translation files use JSON format with flat key-value pairs:
 
 ```json
@@ -28,6 +29,7 @@ All translation files use JSON format with flat key-value pairs:
 ```
 
 ### Keys Convention
+
 - **PascalCase**: All keys use PascalCase (e.g., `AppName`, `InternetOk`)
 - **Descriptive**: Keys describe the UI element or action (e.g., `DnsCustomPlaceholder`)
 - **Categorized**: Related keys share prefixes:
@@ -37,7 +39,9 @@ All translation files use JSON format with flat key-value pairs:
   - `Settings*`: Settings section names (e.g., `SettingsGeneral`, `SettingsDns`)
 
 ### Placeholders
+
 Use `{key}` syntax for dynamic values:
+
 - `{down}` and `{up}` for speed values
 - `{grade}` and `{dbm}` for signal strength
 - `{country}` and `{city}` for location
@@ -45,11 +49,13 @@ Use `{key}` syntax for dynamic values:
 ## Usage in Code
 
 ### Import Functions
+
 ```rust
 use i18n::{s, S, t, is_fact_key, set_lang};
 ```
 
 ### Simple Strings
+
 ```rust
 // Use s() function with enum keys
 text(s(S::AppName))
@@ -58,6 +64,7 @@ button(s(S::Refresh))
 ```
 
 ### Templated Strings
+
 ```rust
 // Use t() function with placeholders
 let speed_text = t("SpeedValue", &[("down", "100"), ("up", "50")]);
@@ -65,6 +72,7 @@ let signal_text = t("SignalValue", &[("grade", "excellent"), ("dbm", "-45")]);
 ```
 
 ### Fact Key Matching
+
 ```rust
 // Use is_fact_key() for data matching across languages
 if is_fact_key(fact_name, S::FactSignal) {
@@ -73,6 +81,7 @@ if is_fact_key(fact_name, S::FactSignal) {
 ```
 
 ### Language Switching
+
 ```rust
 // Set language (updates UI immediately)
 set_lang("en");  // English
@@ -87,6 +96,7 @@ set_lang("ru");  // Russian (default)
 4. **Update code**: Add language option to UI if needed
 
 Example for German (`de.json`):
+
 ```json
 {
   "AppName": "Netok",
@@ -104,6 +114,7 @@ Example for German (`de.json`):
 4. **Use in code**: Use `s(S::YourNewKey)` in UI code
 
 Example:
+
 ```rust
 // 1. In i18n.rs enum S
 NewFeature,
@@ -125,18 +136,21 @@ text(s(S::NewFeature))
 ## Translation Guidelines
 
 ### Russian (ru.json)
+
 - **Tone**: Professional but friendly
 - **Terminology**: Use established IT terms where appropriate
 - **Consistency**: Match Windows/macOS terminology for system elements
 - **Punctuation**: Use Russian typography rules (ellipsis: `...`)
 
 ### English (en.json)
+
 - **Tone**: Clear and concise
 - **Terminology**: Standard technical terms
 - **Consistency**: Follow platform conventions
 - **Punctuation**: Standard English punctuation
 
 ### General Rules
+
 - **Preserve placeholders**: Keep `{key}` syntax unchanged
 - **Context awareness**: Consider UI space constraints
 - **User perspective**: Write from user's point of view
@@ -145,6 +159,7 @@ text(s(S::NewFeature))
 ## Validation
 
 ### Pre-commit Hook
+
 A git pre-commit hook prevents hardcoded Cyrillic text in `desktop/src/`:
 
 ```bash
@@ -153,6 +168,7 @@ rg "[А-Яа-я]" desktop/src --type rust
 ```
 
 ### Testing
+
 ```bash
 # Run i18n tests
 cd desktop && cargo test test_i18n

@@ -22,7 +22,7 @@ The Netok repository includes a git pre-commit hook that prevents hardcoded Cyri
 
 ## Example Error Output
 
-```
+```bash
 ❌ COMMIT BLOCKED: Hardcoded Cyrillic text found in:
    desktop/src/main.rs
    Problematic lines:
@@ -45,11 +45,13 @@ The Netok repository includes a git pre-commit hook that prevents hardcoded Cyri
 To test if you have hardcoded Cyrillic text:
 
 ### Windows (PowerShell)
+
 ```powershell
 Get-ChildItem desktop/src -Recurse -Include "*.rs" | Select-String "[А-Яа-я]"
 ```
 
 ### Unix/Linux/macOS
+
 ```bash
 grep -r "[А-Яа-я]" desktop/src --include="*.rs"
 # or with ripgrep
@@ -69,23 +71,29 @@ git commit --no-verify -m "Emergency commit"
 ## Troubleshooting
 
 ### Hook Not Running
+
 1. Check if file exists: `ls -la .git/hooks/pre-commit*`
 2. On Unix systems, ensure executable: `chmod +x .git/hooks/pre-commit`
 3. On Windows, ensure PowerShell execution policy allows scripts
 
 ### Legitimate Exclusions
+
 The hook automatically allows:
+
 - **Translation strings in `i18n.rs`** - Part of the translation system
 - **Test file `main.rs`** - Contains i18n tests with expected Russian strings
 - **Comments in Russian** - Documentation and explanations
 
 ### Rare False Positives
+
 If you encounter false positives, check:
+
 - **String interpolation** - Ensure proper `t()` function usage
 - **Dynamic strings** - Should use i18n keys, not hardcoded text
 - **Error messages** - Should be localized anyway
 
 ### Hook Doesn't Trigger
+
 - Hooks only run on `git commit`, not `git add`
 - Hooks don't run if no files are staged
 - Check that you're not using `git commit --no-verify`
