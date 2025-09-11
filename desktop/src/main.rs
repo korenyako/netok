@@ -11,8 +11,44 @@ use netok_core::{
 };
 
 mod i18n;
-use i18n::{s, S};
+use i18n::{s, S, set_lang, t, is_fact_key, get_network_type_label};
 use serde::{Deserialize, Serialize};
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_i18n_basic() {
+        // Test Russian (default)
+        assert_eq!(s(S::AppName), "Netok");
+        assert_eq!(s(S::Loading), "Проверяю...");
+        assert_eq!(s(S::Settings), "Настройки");
+        
+        // Switch to English
+        set_lang("en");
+        assert_eq!(s(S::AppName), "Netok");
+        assert_eq!(s(S::Loading), "Checking…");
+        assert_eq!(s(S::Settings), "Settings");
+        
+        // Switch back to Russian
+        set_lang("ru");
+        assert_eq!(s(S::Settings), "Настройки");
+    }
+
+    #[test]
+    fn test_i18n_templated() {
+        // Test Russian templated strings
+        set_lang("ru");
+        let result = t("SpeedValue", &[("down", "100"), ("up", "50")]);
+        assert_eq!(result, "Скорость: 100/50 Мбит/с");
+        
+        // Test English templated strings
+        set_lang("en");
+        let result = t("SpeedValue", &[("down", "100"), ("up", "50")]);
+        assert_eq!(result, "Speed: 100/50 Mbps");
+    }
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Language {
@@ -182,7 +218,7 @@ impl Application for NetokApp {
                             has_ssid = true;
                             self.last_ssid = Some(v.clone());
                         }
-                        if k == "Сигнал" {
+                        if is_fact_key(k, S::FactSignal) {
                             // Пытаемся распарсить RSSI из факта
                             let cleaned = v.split('(').nth(1).unwrap_or("").trim_end_matches(" dBm)");
                             if let Ok(val) = cleaned.parse::<i32>() {
@@ -201,7 +237,7 @@ impl Application for NetokApp {
                     if !has_rssi {
                         if let Some(last_rssi) = self.last_rssi {
                             let grade = wifi_signal_grade(last_rssi);
-                            node.facts.push(("Сигнал".to_string(), format!("{} ({} dBm)", i18n::s(grade), last_rssi)));
+                            node.facts.push((s(S::FactSignal).to_string(), format!("{} ({} dBm)", s(grade), last_rssi)));
                         }
                     }
                 }
@@ -280,7 +316,7 @@ impl Application for NetokApp {
                 });
             }
             Message::DnsApplied => {
-                // Показать toast "Готово"
+                // Show toast "Done"
             }
             Message::DnsError => {
                 // Показать toast с ошибкой
@@ -289,16 +325,16 @@ impl Application for NetokApp {
                 // Показать результат (пустой кортеж, чтобы не было ворнинга)
             }
             Message::DnsCacheCleared => {
-                // Показать toast "Кэш очищен"
+                // Show toast "Cache cleared"
             }
             Message::DnsCacheClearError => {
-                // Показать toast "Ошибка очистки кэша"
+                // Show toast "Cache clear error"
             }
             Message::CaptiveOpened => {
-                // Показать toast "Каптив открыт"
+                // Show toast "Captive opened"
             }
             Message::RouterOpened(ip) => {
-                // Показать toast "Роутер открыт"
+                // Show toast "Router opened"
                 // и открыть URL
                 return Command::perform(
                     async move {
@@ -308,7 +344,7 @@ impl Application for NetokApp {
                 );
             }
             Message::DiagnosticsCopied => {
-                // Показать toast "Диагностика скопирована"
+                // Show toast "Diagnostics copied"
             }
             Message::CopyToClipboard(s) => {
                 // Best-effort копирование в буфер обмена
@@ -409,113 +445,221 @@ impl NetokApp {
     }
 
     fn view_settings(&self) -> Element<'_, Message> {
+        let back_btn: Element<Message> = button(s(S::Back))
+            .on_press(Message::BackToMain)
+            .padding([8, 16])
+            .width(Length::Fixed(120.0))
+            .into();
+
         let sidebar = settings_sidebar(self.active_settings_section);
+        let content = self.settings_content();
 
-        let content: Element<Message> = match self.active_settings_section {
-            SettingsSection::Dns => {
-                let dns_section = column![
-                    text(s(S::Dns)).size(16),
-                    radio(s(S::DnsAuto), DnsModeUI::Auto, Some(self.dns_mode), Message::DnsModeChanged),
-                    radio(s(S::DnsCloudflare), DnsModeUI::Cloudflare, Some(self.dns_mode), Message::DnsModeChanged),
-                    radio(s(S::DnsGoogle), DnsModeUI::Google, Some(self.dns_mode), Message::DnsModeChanged),
-                    radio(s(S::DnsCustom), DnsModeUI::Custom, Some(self.dns_mode), Message::DnsModeChanged),
-                ]
-                .spacing(8);
-
-                let custom_dns_input = if matches!(self.dns_mode, DnsModeUI::Custom) {
-                    text_input(s(S::DnsCustomPlaceholder), &self.custom_dns)
-                        .on_input(Message::CustomDnsChanged)
-                        .padding(8)
-                } else {
-                    text_input("", "").padding(8)
-                };
-
-                let apply_dns_btn = button(s(S::ApplyDns))
-                    .on_press(Message::ApplyDns)
-                    .padding([8, 16]);
-
-                column![dns_section, custom_dns_input, apply_dns_btn].spacing(12).into()
-            }
-            SettingsSection::General => {
-                let lang_section = row![
-                    text(s(S::Language)).size(13),
-                    horizontal_space(),
-                    radio("RU", Language::Ru, Some(self.language), Message::LanguageChanged).size(13),
-                    radio("EN", Language::En, Some(self.language), Message::LanguageChanged).size(13),
-                ]
-                .spacing(8)
-                .align_items(Alignment::Center);
-
-                let geodata_toggle = row![
-                    text(s(S::ShowGeodata)).size(13),
-                    horizontal_space(),
-                    button(if self.geodata_enabled { s(S::Enabled) } else { s(S::Disabled) })
-                        .on_press(Message::ToggleGeodata)
-                        .padding([4, 8])
-                ]
-                .align_items(Alignment::Center);
-
-                column![
-                    text(s(S::SettingsGeneral)).size(16),
-                    lang_section,
-                    geodata_toggle,
-                ].spacing(12).into()
-            }
-            SettingsSection::Tools => {
-                let action_buttons = column![
-                    button(s(S::ShortSpeedtest)).on_press(Message::ShortSpeedTest).padding([8, 16]),
-                    button(s(S::ClearDnsCache)).on_press(Message::ClearDnsCache).padding([8, 16]),
-                    button(s(S::OpenCaptive)).on_press(Message::OpenCaptive).padding([8, 16]),
-                    button(s(S::OpenRouterPage)).on_press(Message::OpenRouter).padding([8, 16]),
-                    button(s(S::CopyDiagnostics)).on_press(Message::CopyDiagnostics).padding([8, 16]),
-                ]
-                .spacing(8)
-                .width(Length::Fill);
-
-                column![
-                    text("Инструменты").size(16),
-                    action_buttons,
-                ].spacing(12).into()
-            }
-            SettingsSection::About => {
-                let version = env!("CARGO_PKG_VERSION");
-                column![
-                    text(s(S::SettingsAbout)).size(16),
-                    text(format!("{}: {}", s(S::Version), version)).size(13),
-                    text(s(S::Licenses)).size(13),
-                    text(s(S::LicenseInter)).size(12),
-                    text(s(S::LicenseLucide)).size(12),
-                    button(s(S::ReportIssue))
-                        .on_press(Message::OpenUrl("https://github.com/netok-tools/netok/issues".to_string()))
-                        .padding(8),
-                ].spacing(12).into()
-            }
-            // Placeholder for other sections
-            _ => text(s(S::Tbd)).into(),
-        };
-
-        let main_content = row![
-            sidebar,
-            scrollable(
+        container(
+            row![
+                sidebar,
                 container(content)
                     .padding(16)
                     .width(Length::Fill)
-            ).width(Length::Fill),
-        ].height(Length::Fill);
-
-        container(
-            column![
-                // Header with back button
-                container(
-                    button(s(S::Back))
-                        .on_press(Message::BackToMain)
-                        .padding([8, 16])
-                ).padding([12, 16, 0, 16]),
-                main_content,
+                    .height(Length::Fill)
             ]
             .spacing(8)
         )
         .width(Length::Fill)
+        .height(Length::Fill)
+        .into()
+    }
+
+    fn settings_content(&self) -> Element<'_, Message> {
+        let content = match self.active_settings_section {
+            SettingsSection::General => self.general_settings(),
+            SettingsSection::Network => self.network_settings(),
+            SettingsSection::Dns => self.dns_settings(),
+            SettingsSection::Appearance => self.appearance_settings(),
+            SettingsSection::Tools => self.tools_settings(),
+            SettingsSection::About => self.about_settings(),
+        };
+
+        container(
+            column![
+                container(content).padding([0, 16]),
+            ]
+            .spacing(8)
+            .width(Length::Fill)
+        )
+        .width(Length::Fill)
+        .height(Length::Fill)
+        .into()
+    }
+
+    fn general_settings(&self) -> Element<'_, Message> {
+        let language_section = column![
+            text(s(S::Language)).size(18),
+            radio(
+                s(S::LanguageRu),
+                Language::Ru,
+                Some(self.language),
+                Message::LanguageChanged
+            ),
+            radio(
+                s(S::LanguageEn),
+                Language::En,
+                Some(self.language),
+                Message::LanguageChanged
+            ),
+        ]
+        .spacing(8);
+
+        let geodata_toggle = row![
+            text(s(S::ShowGeodata)),
+            horizontal_space(),
+            button(if self.geodata_enabled {
+                s(S::Enabled)
+            } else {
+                s(S::Disabled)
+            })
+            .on_press(Message::ToggleGeodata)
+            .padding([4, 8])
+            .width(Length::Fixed(100.0))
+        ]
+        .align_items(Alignment::Center);
+
+        scrollable(
+            column![
+                container(language_section).padding([0, 16]),
+                Space::with_height(Length::Fixed(16.0)),
+                container(geodata_toggle).padding([0, 16]),
+            ]
+            .spacing(8)
+            .width(Length::Fill)
+        )
+        .height(Length::Fill)
+        .into()
+    }
+
+    fn network_settings(&self) -> Element<'_, Message> {
+        scrollable(
+            column![
+                text(s(S::Tbd)).size(18),
+            ]
+            .spacing(8)
+            .width(Length::Fill)
+        )
+        .height(Length::Fill)
+        .into()
+    }
+
+    fn dns_settings(&self) -> Element<'_, Message> {
+        let dns_section = column![
+            text(s(S::Dns)).size(18),
+            radio(
+                s(S::DnsAuto),
+                DnsModeUI::Auto,
+                Some(self.dns_mode),
+                Message::DnsModeChanged
+            ),
+            radio(
+                s(S::DnsCloudflare),
+                DnsModeUI::Cloudflare,
+                Some(self.dns_mode), 
+                Message::DnsModeChanged
+            ),
+            radio(
+                s(S::DnsGoogle),
+                DnsModeUI::Google,
+                Some(self.dns_mode),
+                Message::DnsModeChanged
+            ),
+            radio(
+                s(S::DnsCustom),
+                DnsModeUI::Custom,
+                Some(self.dns_mode),
+                Message::DnsModeChanged
+            ),
+        ]
+        .spacing(8);
+
+        let custom_dns_input = if matches!(self.dns_mode, DnsModeUI::Custom) {
+            text_input(s(S::DnsCustomPlaceholder), &self.custom_dns)
+                .on_input(Message::CustomDnsChanged)
+                .padding(8)
+        } else {
+            text_input("", "").padding(8)
+        };
+
+        let apply_dns_btn = button(s(S::ApplyDns))
+            .on_press(Message::ApplyDns)
+            .padding([8, 16])
+            .width(Length::Fixed(200.0));
+
+        let dns_block = column![dns_section, custom_dns_input, apply_dns_btn].spacing(12);
+
+        scrollable(
+            column![
+                container(dns_block).padding([0, 16]),
+            ]
+            .spacing(8)
+            .width(Length::Fill)
+        )
+        .height(Length::Fill)
+        .into()
+    }
+
+    fn appearance_settings(&self) -> Element<'_, Message> {
+        scrollable(
+            column![
+                text(s(S::Tbd)).size(18),
+            ]
+            .spacing(8)
+            .width(Length::Fill)
+        )
+        .height(Length::Fill)
+        .into()
+    }
+
+    fn tools_settings(&self) -> Element<'_, Message> {
+        let action_buttons = column![
+            button(s(S::ShortSpeedtest))
+                .on_press(Message::ShortSpeedTest)
+                .padding([8, 16])
+                .width(Length::Fixed(200.0)),
+            button(s(S::ClearDnsCache))
+                .on_press(Message::ClearDnsCache)
+                .padding([8, 16])
+                .width(Length::Fixed(200.0)),
+            button(s(S::OpenCaptive))
+                .on_press(Message::OpenCaptive)
+                .padding([8, 16])
+                .width(Length::Fixed(200.0)),
+            button(s(S::OpenRouterPage))
+                .on_press(Message::OpenRouter)
+                .padding([8, 16])
+                .width(Length::Fixed(200.0)),
+            button(s(S::CopyDiagnostics))
+                .on_press(Message::CopyDiagnostics)
+                .padding([8, 16])
+                .width(Length::Fixed(200.0)),
+        ]
+        .spacing(8);
+
+        scrollable(
+            column![
+                container(action_buttons).padding([0, 16]),
+            ]
+            .spacing(8)
+            .width(Length::Fill)
+        )
+        .height(Length::Fill)
+        .into()
+    }
+
+    fn about_settings(&self) -> Element<'_, Message> {
+        scrollable(
+            column![
+                text(s(S::Tbd)).size(18),
+            ]
+            .spacing(8)
+            .width(Length::Fill)
+        )
         .height(Length::Fill)
         .into()
     }
@@ -602,13 +746,13 @@ fn nodes_view<'a>(snap: Option<&'a Snapshot>, loading: bool) -> Element<'a, Mess
                 let mut rssi: Option<i32> = None;
                 let mut link: Option<String> = None;
                 for (k, v) in facts {
-                    if k == "Тип" {
+                    if is_fact_key(k, S::FactType) {
                         net_type = Some(v.as_str());
                     }
                     if k == "SSID" {
                         ssid = Some(v.clone());
                     }
-                    if k == "Сигнал" {
+                    if is_fact_key(k, S::FactSignal) {
                         if let Some(start) = v.find('(') {
                             if let Some(end) = v.find(" dBm)") {
                                 if let Ok(val) = v[start + 1..end].trim().parse::<i32>() {
@@ -617,30 +761,30 @@ fn nodes_view<'a>(snap: Option<&'a Snapshot>, loading: bool) -> Element<'a, Mess
                             }
                         }
                     }
-                    if k == "Линк" {
+                    if is_fact_key(k, S::FactLink) {
                         link = Some(v.clone());
                     }
                 }
                 let net_type_lc = net_type.map(|s| s.to_lowercase());
                 let is_wifi = matches!(net_type_lc.as_deref(), Some(t) if t.contains("wi-fi") || t.contains("wifi"));
-                let is_cable = matches!(net_type_lc.as_deref(), Some(t) if t.contains("кабель") || t.contains("ethernet"));
+                let is_cable = matches!(net_type_lc.as_deref(), Some(t) if t.contains("кабель") || t.contains("ethernet") || t.contains("cable"));
 
                 let title = match (net_type_lc.as_deref(), ssid) {
-                    (Some(t), Some(name)) if t.contains("wi-fi") || t.contains("wifi") => format!("{} Wi-Fi {}", s(S::NodeNetwork), name),
+                    (Some(t), Some(name)) if t.contains("wi-fi") || t.contains("wifi") => format!("{} {} {}", s(S::NodeNetwork), s(S::NetworkWifi), name),
                     (Some(t), None) if t.contains("wi-fi") || t.contains("wifi") => {
-                        format!("{} Wi-Fi ({})", s(S::NodeNetwork), s(S::Unknown))
+                        format!("{} {} ({})", s(S::NodeNetwork), s(S::NetworkWifi), s(S::Unknown))
                     }
-                    (Some(t), _) if t.contains("кабель") || t.contains("ethernet") => {
-                        format!("{} Кабель", s(S::NodeNetwork))
+                    (Some(t), _) if t.contains("кабель") || t.contains("ethernet") || t.contains("cable") => {
+                        format!("{} {}", s(S::NodeNetwork), s(S::NetworkCable))
                     }
-                    (Some(t), _) if t.contains("usb") && t.contains("модем") => {
-                        format!("{} USB-модем", s(S::NodeNetwork))
+                    (Some(t), _) if t.contains("usb") && (t.contains("модем") || t.contains("modem")) => {
+                        format!("{} {}", s(S::NodeNetwork), s(S::NetworkUsbModem))
                     }
                     (Some(t), _) if t.contains("bt") || t.contains("bluetooth") => {
-                        format!("{} BT", s(S::NodeNetwork))
+                        format!("{} {}", s(S::NodeNetwork), s(S::NetworkBluetooth))
                     }
-                    (Some(t), _) if t.contains("мобиль") && t.contains("модем") => {
-                        format!("{} мобильный модем", s(S::NodeNetwork))
+                    (Some(t), _) if t.contains("мобиль") && (t.contains("модем") || t.contains("mobile")) => {
+                        format!("{} {}", s(S::NodeNetwork), s(S::NetworkMobileModem))
                     }
                     _ => format!("{} ({})", s(S::NodeNetwork), s(S::Unknown)),
                 };
@@ -677,13 +821,13 @@ fn nodes_view<'a>(snap: Option<&'a Snapshot>, loading: bool) -> Element<'a, Mess
                 let mut adapter: Option<String> = None;
                 let mut ip_local: Option<String> = None;
                 for (k, v) in facts {
-                    if k == "Имя" || k == "Host" || k == "Hostname" {
+                    if is_fact_key(k, S::FactName) || is_fact_key(k, S::FactHost) || is_fact_key(k, S::FactHostname) {
                         name = Some(v.clone());
                     }
-                    if k == "Сетевой адаптер" {
+                    if is_fact_key(k, S::FactNetAdapter) {
                         adapter = Some(v.clone());
                     }
-                    if k == "IP в локальной сети" || k == "IP" {
+                    if is_fact_key(k, S::FactLocalIp) || is_fact_key(k, S::FactIp) {
                         ip_local = Some(v.clone());
                     }
                 }
@@ -713,7 +857,7 @@ fn nodes_view<'a>(snap: Option<&'a Snapshot>, loading: bool) -> Element<'a, Mess
                     );
                     facts_col = facts_col.push(line);
                 } else {
-                    // If no IP, show "неизвестно" without a copy button.
+                    // If no IP, show "unknown" without a copy button.
                     facts_col = facts_col.push(text(format!("{}: {}", s(S::LocalIp), s(S::Unknown))).size(13));
                 }
             }
@@ -721,10 +865,10 @@ fn nodes_view<'a>(snap: Option<&'a Snapshot>, loading: bool) -> Element<'a, Mess
                 let mut model: Option<String> = None;
                 let mut ip_local: Option<String> = None;
                 for (k, v) in facts {
-                    if k == "Модель" || k == "Model" {
+                    if is_fact_key(k, S::FactModel) {
                         model = Some(v.clone());
                     }
-                    if k == "IP в локальной сети" || k == "Gateway" || k == "IP" {
+                    if is_fact_key(k, S::FactLocalIp) || k == "Gateway" || is_fact_key(k, S::FactIp) {
                         ip_local = Some(v.clone());
                     }
                 }
@@ -765,16 +909,16 @@ fn nodes_view<'a>(snap: Option<&'a Snapshot>, loading: bool) -> Element<'a, Mess
                 let mut country: Option<String> = None;
                 let mut geo_city: Option<String> = None;
                 for (k, v) in facts {
-                    if k == "Провайдер" || k == "ISP" {
+                    if is_fact_key(k, S::FactProvider) || is_fact_key(k, S::FactIsp) {
                         provider = Some(v.clone());
                     }
-                    if k == "Public IP" || k == "IP" {
+                    if is_fact_key(k, S::FactPublicIp) || is_fact_key(k, S::FactIp) {
                         public_ip = Some(v.clone());
                     }
-                    if k == "Страна" || k == "Country" {
+                    if is_fact_key(k, S::FactCountry) {
                         country = Some(v.clone());
                     }
-                    if k == "Город" || k == "City" {
+                    if is_fact_key(k, S::FactCity) {
                         geo_city = Some(v.clone());
                     }
                 }

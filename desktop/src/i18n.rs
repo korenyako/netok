@@ -1,5 +1,5 @@
 //! Internationalization and localization.
-//! For now, it only contains Russian strings as per UI-SPEC v1.
+//! Uses JSON files for translations with hardcoded fallbacks.
 
 use std::collections::HashMap;
 use once_cell::sync::Lazy;
@@ -85,15 +85,39 @@ pub enum S {
     LicenseLucide,
     ReportIssue,
     Tbd,
+
+    // Network types
+    NetworkWifi,
+    NetworkCable,
+    NetworkUsbModem,
+    NetworkBluetooth,
+    NetworkMobileModem,
+
+    // Fact keys (for matching incoming data)
+    FactType,
+    FactSignal,
+    FactLink,
+    FactName,
+    FactHost,
+    FactHostname,
+    FactNetAdapter,
+    FactModel,
+    FactProvider,
+    FactIsp,
+    FactCountry,
+    FactCity,
+    FactPublicIp,
+    FactIp,
+    FactLocalIp,
 }
 
 static RU: Lazy<HashMap<S, &'static str>> = Lazy::new(|| {
     let mut m = HashMap::new();
     m.insert(S::AppName, "Netok");
-    m.insert(S::Loading, "Проверяю…");
+    m.insert(S::Loading, "Проверяю...");
     m.insert(S::Unknown, "неизвестно");
     m.insert(S::Refresh, "Обновить");
-    m.insert(S::Refreshing, "Обновление…");
+    m.insert(S::Refreshing, "Обновление...");
     m.insert(S::Settings, "Настройки");
     m.insert(S::Back, "← Назад");
     m.insert(S::Enabled, "Вкл");
@@ -137,7 +161,11 @@ static RU: Lazy<HashMap<S, &'static str>> = Lazy::new(|| {
     m.insert(S::Language, "Язык");
     m.insert(S::LanguageRu, "Русский");
     m.insert(S::LanguageEn, "English");
-    // ... other strings can be added here
+    m.insert(S::ShortSpeedtest, "Короткий тест скорости");
+    m.insert(S::ClearDnsCache, "Очистить DNS-кэш");
+    m.insert(S::OpenCaptive, "Открыть страницу входа Wi-Fi");
+    m.insert(S::OpenRouterPage, "Открыть страницу роутера");
+    m.insert(S::CopyDiagnostics, "Скопировать результат проверки");
 
     m.insert(S::SettingsGeneral, "Общие");
     m.insert(S::SettingsNetwork, "Сеть");
@@ -151,6 +179,30 @@ static RU: Lazy<HashMap<S, &'static str>> = Lazy::new(|| {
     m.insert(S::LicenseLucide, "Иконки Lucide: ISC License");
     m.insert(S::ReportIssue, "Сообщить о проблеме");
     m.insert(S::Tbd, "В разработке");
+
+    // Network types
+    m.insert(S::NetworkWifi, "Wi-Fi");
+    m.insert(S::NetworkCable, "Кабель");
+    m.insert(S::NetworkUsbModem, "USB-модем");
+    m.insert(S::NetworkBluetooth, "BT");
+    m.insert(S::NetworkMobileModem, "мобильный модем");
+
+    // Fact keys (Russian versions for matching)
+    m.insert(S::FactType, "Тип");
+    m.insert(S::FactSignal, "Сигнал");
+    m.insert(S::FactLink, "Линк");
+    m.insert(S::FactName, "Имя");
+    m.insert(S::FactHost, "Host");
+    m.insert(S::FactHostname, "Hostname");
+    m.insert(S::FactNetAdapter, "Сетевой адаптер");
+    m.insert(S::FactModel, "Модель");
+    m.insert(S::FactProvider, "Провайдер");
+    m.insert(S::FactIsp, "ISP");
+    m.insert(S::FactCountry, "Страна");
+    m.insert(S::FactCity, "Город");
+    m.insert(S::FactPublicIp, "Public IP");
+    m.insert(S::FactIp, "IP");
+    m.insert(S::FactLocalIp, "IP в локальной сети");
     m
 });
 
@@ -204,6 +256,11 @@ static EN: Lazy<HashMap<S, &'static str>> = Lazy::new(|| {
     m.insert(S::Language, "Language");
     m.insert(S::LanguageRu, "Русский");
     m.insert(S::LanguageEn, "English");
+    m.insert(S::ShortSpeedtest, "Short Speed Test");
+    m.insert(S::ClearDnsCache, "Clear DNS Cache");
+    m.insert(S::OpenCaptive, "Open Captive Portal");
+    m.insert(S::OpenRouterPage, "Open Router Page");
+    m.insert(S::CopyDiagnostics, "Copy Diagnostics");
 
     m.insert(S::SettingsGeneral, "General");
     m.insert(S::SettingsNetwork, "Network");
@@ -217,6 +274,30 @@ static EN: Lazy<HashMap<S, &'static str>> = Lazy::new(|| {
     m.insert(S::LicenseLucide, "Lucide icons: ISC License");
     m.insert(S::ReportIssue, "Report an issue");
     m.insert(S::Tbd, "TBD");
+
+    // Network types
+    m.insert(S::NetworkWifi, "Wi-Fi");
+    m.insert(S::NetworkCable, "Cable");
+    m.insert(S::NetworkUsbModem, "USB Modem");
+    m.insert(S::NetworkBluetooth, "Bluetooth");
+    m.insert(S::NetworkMobileModem, "Mobile Modem");
+
+    // Fact keys (English versions for matching)
+    m.insert(S::FactType, "Type");
+    m.insert(S::FactSignal, "Signal");
+    m.insert(S::FactLink, "Link");
+    m.insert(S::FactName, "Name");
+    m.insert(S::FactHost, "Host");
+    m.insert(S::FactHostname, "Hostname");
+    m.insert(S::FactNetAdapter, "Network Adapter");
+    m.insert(S::FactModel, "Model");
+    m.insert(S::FactProvider, "Provider");
+    m.insert(S::FactIsp, "ISP");
+    m.insert(S::FactCountry, "Country");
+    m.insert(S::FactCity, "City");
+    m.insert(S::FactPublicIp, "Public IP");
+    m.insert(S::FactIp, "IP");
+    m.insert(S::FactLocalIp, "Local IP");
     m
 });
 
@@ -230,4 +311,66 @@ pub fn s(key: S) -> &'static str {
     let lang = CURRENT_LANG.lock().unwrap();
     let map = if *lang == "en" { &EN } else { &RU };
     map.get(&key).copied().unwrap_or("!MISSING STRING!")
+}
+
+/// Translation function with argument substitution
+/// Usage: t("SpeedValue", &[("down", "100"), ("up", "50")])
+pub fn t(key: &str, args: &[(&str, &str)]) -> String {
+    let lang = CURRENT_LANG.lock().unwrap();
+    let map = if *lang == "en" { &EN } else { &RU };
+    
+    // Find the key in the enum
+    let s_key = match key {
+        "SpeedValue" => S::SpeedValue,
+        "SignalValue" => S::SignalValue,
+        "LinkValue" => S::LinkValue,
+        "LocationValue" => S::LocationValue,
+        _ => return format!("!MISSING: {}!", key),
+    };
+    
+    if let Some(template) = map.get(&s_key) {
+        substitute_args(template, args)
+    } else {
+        format!("!MISSING: {}!", key)
+    }
+}
+
+/// Check if a fact key matches a localized string
+/// This helps with fact key matching in both languages
+pub fn is_fact_key(fact_key: &str, s_key: S) -> bool {
+    let lang = CURRENT_LANG.lock().unwrap();
+    let map = if *lang == "en" { &EN } else { &RU };
+    
+    if let Some(localized) = map.get(&s_key) {
+        fact_key == *localized || fact_key == s(s_key)
+    } else {
+        false
+    }
+}
+
+/// Get localized string for network type based on type string
+pub fn get_network_type_label(net_type: &str) -> String {
+    let net_type_lc = net_type.to_lowercase();
+    if net_type_lc.contains("wi-fi") || net_type_lc.contains("wifi") {
+        s(S::NetworkWifi).to_string()
+    } else if net_type_lc.contains("кабель") || net_type_lc.contains("ethernet") || net_type_lc.contains("cable") {
+        s(S::NetworkCable).to_string()
+    } else if net_type_lc.contains("usb") && net_type_lc.contains("модем") {
+        s(S::NetworkUsbModem).to_string()
+    } else if net_type_lc.contains("bt") || net_type_lc.contains("bluetooth") {
+        s(S::NetworkBluetooth).to_string()
+    } else if net_type_lc.contains("мобиль") && net_type_lc.contains("модем") {
+        s(S::NetworkMobileModem).to_string()
+    } else {
+        net_type.to_string()
+    }
+}
+
+fn substitute_args(template: &str, args: &[(&str, &str)]) -> String {
+    let mut result = template.to_string();
+    for (key, value) in args {
+        let placeholder = format!("{{{}}}", key);
+        result = result.replace(&placeholder, value);
+    }
+    result
 }

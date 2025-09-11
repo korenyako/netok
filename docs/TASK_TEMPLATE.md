@@ -1,5 +1,8 @@
 # Netok — Task Template
 
+> **⚠️ Deprecated — 2025-09-11**  
+> This guide is outdated. Use [docs/UI-SPEC.md](docs/UI-SPEC.md) for current UI/UX rules and [i18n/README.md](i18n/README.md) for internationalization guidelines.
+
 ## Title
 Кратко: «Scrollable main column; fixed bottom buttons»
 

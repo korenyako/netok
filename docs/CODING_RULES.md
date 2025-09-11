@@ -1,5 +1,8 @@
 # Netok — Coding Rules
 
+> **⚠️ Deprecated — 2025-09-11**  
+> This guide is outdated. Use [docs/UI-SPEC.md](docs/UI-SPEC.md) for current UI/UX rules and [i18n/README.md](i18n/README.md) for internationalization guidelines.
+
 ## Архитектура
 - Монорепо: `/core` (Apache-2.0), `/desktop` (Iced). Core API стабильный: `Snapshot/Node/Status/run_all()`.
 - **Жёсткое правило:** `core` не зависит от pro/private модулей.
