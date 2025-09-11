@@ -7,11 +7,11 @@ use iced::{
 
 // Импорт API ядра (проверьте имя пакета core в Cargo.toml)
 use netok_core::{
-    compose_top_banner, dns, run_all, tools, DnsMode, NodeKind, Overall, Snapshot, Status,
+    compose_top_banner, dns, run_all_with_timeouts, tools, DnsMode, NodeKind, Overall, Snapshot, Status,
 };
 
 mod i18n;
-use i18n::{s, S, set_lang, t, is_fact_key, get_network_type_label};
+use i18n::{s, S, set_lang, t, is_fact_key};
 use serde::{Deserialize, Serialize};
 
 #[cfg(test)]
@@ -173,7 +173,7 @@ impl Application for NetokApp {
             last_rssi: None,
         };
         // Первый запуск — тянем снапшот
-        let cmd = Command::perform(run_all(Some(true)), Message::SnapshotReady);
+        let cmd = Command::perform(run_all_with_timeouts(Some(true)), Message::SnapshotReady);
         (app, cmd)
     }
 
@@ -204,7 +204,7 @@ impl Application for NetokApp {
                 self.loading = true;
                 // Reset animation progress on new refresh
                 return Command::perform(
-                    run_all(Some(self.geodata_enabled)),
+                    run_all_with_timeouts(Some(self.geodata_enabled)),
                     Message::SnapshotReady,
                 );
             }

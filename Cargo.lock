@@ -1852,6 +1852,7 @@ name = "netok-core"
 version = "0.1.0"
 dependencies = [
  "get_if_addrs",
+ "tokio",
  "windows 0.58.0",
 ]
 

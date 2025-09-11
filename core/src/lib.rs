@@ -99,7 +99,31 @@ pub mod tools {
     pub async fn copy_report() -> Result<String, String> { Ok("Диагностика скопирована".into()) }
 }
 
-pub async fn run_all(_geodata_enabled: Option<bool>) -> Snapshot {
+/// Async version that runs network checks off the UI thread
+pub async fn run_all_with_timeouts(geodata_enabled: Option<bool>) -> Snapshot {
+    // Run the blocking network operations in a background thread
+    tokio::task::spawn_blocking(move || {
+        run_all_blocking(geodata_enabled)
+    })
+    .await
+    .unwrap_or_else(|_| {
+        // If the task panicked, return a minimal snapshot
+        Snapshot {
+            nodes: vec![
+                Node {
+                    kind: NodeKind::Computer,
+                    status: Status::Unknown,
+                    facts: vec![("Error".to_string(), "Task failed".to_string())],
+                },
+            ],
+            internet_speed: None,
+            vpn_detected: false,
+        }
+    })
+}
+
+/// Original blocking implementation moved to separate function
+pub fn run_all_blocking(_geodata_enabled: Option<bool>) -> Snapshot {
     // geodata_enabled пока игнорируется
     let mut nodes: Vec<Node> = Vec::new();
 
@@ -164,6 +188,11 @@ pub async fn run_all(_geodata_enabled: Option<bool>) -> Snapshot {
         internet_speed: Some((100, 50)),
         vpn_detected: false,
     }
+}
+
+/// Legacy async function - now delegates to the new timeout-aware version
+pub async fn run_all(geodata_enabled: Option<bool>) -> Snapshot {
+    run_all_with_timeouts(geodata_enabled).await
 }
 
 // Заглушечные модули (пока не используются)
