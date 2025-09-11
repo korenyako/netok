@@ -101,17 +101,58 @@ pub fn main() -> iced::Result {
         .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
         .init();
 
+    // Configure wgpu backends via environment variables
+    // Force DX12 and GL backends, exclude Vulkan
+    std::env::set_var("WGPU_BACKEND", "dx12,gl");
+    
+    // Log the configuration
+    tracing::info!("WGPU_BACKEND set to: dx12,gl");
+    tracing::info!("Antialiasing disabled (MSAA = None)");
+
     let cfg: AppConfig = confy::load("netok", None).unwrap_or_default();
-    NetokApp::run(Settings {
+    
+    // Try to run with the configured backends
+    try_run_with_backends(cfg)
+}
+
+fn try_run_with_backends(cfg: AppConfig) -> iced::Result {
+    // First attempt: try with DX12 and GL backends
+    tracing::info!("Attempting to run with DX12 and GL backends, MSAA disabled");
+    
+    match NetokApp::run(Settings {
         window: window::Settings {
             size: Size::new(cfg.width as f32, cfg.height as f32),
             min_size: Some(Size::new(240.0, 360.0)),
             position: window::Position::Specific(Point::new(cfg.x as f32, cfg.y as f32)),
             ..window::Settings::default()
         },
-        antialiasing: true,
+        antialiasing: false, // Disable MSAA completely
         ..Settings::default()
-    })
+    }) {
+        Ok(result) => {
+            tracing::info!("Successfully started with configured backends");
+            Ok(result)
+        },
+        Err(e) => {
+            tracing::warn!("Failed to run with DX12/GL backends: {}", e);
+            tracing::info!("This may be due to graphics driver issues on AMD Vega 10 GPU");
+            
+            // Try with GL-only backend as fallback
+            tracing::info!("Attempting fallback to GL-only backend");
+            std::env::set_var("WGPU_BACKEND", "gl");
+            
+            NetokApp::run(Settings {
+                window: window::Settings {
+                    size: Size::new(cfg.width as f32, cfg.height as f32),
+                    min_size: Some(Size::new(240.0, 360.0)),
+                    position: window::Position::Specific(Point::new(cfg.x as f32, cfg.y as f32)),
+                    ..window::Settings::default()
+                },
+                antialiasing: false, // Disable MSAA completely
+                ..Settings::default()
+            })
+        }
+    }
 }
 
 struct NetokApp {
