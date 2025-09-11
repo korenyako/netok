@@ -16,9 +16,8 @@ The Netok repository includes a git pre-commit hook that prevents hardcoded Cyri
 2. **JSON Validation**: Validates syntax of `i18n/*.json` files if being committed
 3. **Smart Exclusions**: Automatically skips legitimate uses:
    - Translation strings in `desktop/src/i18n.rs`
+   - Test file `desktop/src/main.rs` (contains i18n tests)
    - Comments (`//` and `/* */`)
-   - Test assertions (`assert_eq!`)
-   - Test modules and functions
 4. **Helpful Error Messages**: Provides clear guidance on how to fix issues
 
 ## Example Error Output
@@ -77,9 +76,8 @@ git commit --no-verify -m "Emergency commit"
 ### Legitimate Exclusions
 The hook automatically allows:
 - **Translation strings in `i18n.rs`** - Part of the translation system
+- **Test file `main.rs`** - Contains i18n tests with expected Russian strings
 - **Comments in Russian** - Documentation and explanations
-- **Test assertions** - Expected Russian strings in tests
-- **Test code** - Testing the i18n system itself
 
 ### Rare False Positives
 If you encounter false positives, check:
