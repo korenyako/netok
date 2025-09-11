@@ -96,6 +96,11 @@ impl Default for AppConfig {
 }
 
 pub fn main() -> iced::Result {
+    // Initialize tracing subscriber for logging
+    tracing_subscriber::fmt()
+        .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
+        .init();
+
     let cfg: AppConfig = confy::load("netok", None).unwrap_or_default();
     NetokApp::run(Settings {
         window: window::Settings {

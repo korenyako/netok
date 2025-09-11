@@ -103,30 +103,32 @@ pub mod tools {
 pub async fn run_all_with_timeouts(geodata_enabled: Option<bool>) -> Snapshot {
     use std::time::Duration;
     
+    tracing::info!("Starting parallel network diagnostics");
+    
     // Create futures for each adapter type with specific timeouts
     let wifi_future = tokio::time::timeout(
         Duration::from_millis(1500),
-        tokio::task::spawn_blocking(wifi_adapter_info)
+        tokio::task::spawn_blocking(|| timed_adapter("wifi", wifi_adapter_info))
     );
     
     let computer_future = tokio::time::timeout(
         Duration::from_millis(500), // Quick operation
-        tokio::task::spawn_blocking(computer_adapter_info)
+        tokio::task::spawn_blocking(|| timed_adapter("computer", computer_adapter_info))
     );
     
     let upnp_future = tokio::time::timeout(
         Duration::from_millis(1000),
-        tokio::task::spawn_blocking(upnp_adapter_info)
+        tokio::task::spawn_blocking(|| timed_adapter("upnp", upnp_adapter_info))
     );
     
     let dns_future = tokio::time::timeout(
         Duration::from_millis(1000),
-        tokio::task::spawn_blocking(dns_adapter_info)
+        tokio::task::spawn_blocking(|| timed_adapter("dns", dns_adapter_info))
     );
     
     let internet_meta_future = tokio::time::timeout(
         Duration::from_millis(1500),
-        tokio::task::spawn_blocking(move || internet_meta_adapter_info(geodata_enabled))
+        tokio::task::spawn_blocking(move || timed_adapter("internet", || internet_meta_adapter_info(geodata_enabled)))
     );
     
     // Run all adapters in parallel
@@ -144,10 +146,21 @@ pub async fn run_all_with_timeouts(geodata_enabled: Option<bool>) -> Snapshot {
     // Computer node (always first)
     let computer_node = match computer_result {
         Ok(Ok(node)) => node,
-        _ => Node {
-            kind: NodeKind::Computer,
-            status: Status::Unknown,
-            facts: vec![("Error".to_string(), "Timeout or failed".to_string())],
+        Err(_) => {
+            tracing::warn!("computer adapter timed out");
+            Node {
+                kind: NodeKind::Computer,
+                status: Status::Unknown,
+                facts: vec![("Error".to_string(), "Timeout".to_string())],
+            }
+        }
+        Ok(Err(_)) => {
+            tracing::warn!("computer adapter task failed");
+            Node {
+                kind: NodeKind::Computer,
+                status: Status::Unknown,
+                facts: vec![("Error".to_string(), "Task failed".to_string())],
+            }
         }
     };
     nodes.push(computer_node);
@@ -155,10 +168,21 @@ pub async fn run_all_with_timeouts(geodata_enabled: Option<bool>) -> Snapshot {
     // Network node (WiFi/Ethernet) - merge with DNS results
     let mut network_node = match wifi_result {
         Ok(Ok(node)) => node,
-        _ => Node {
-            kind: NodeKind::Network,
-            status: Status::Unknown,
-            facts: vec![("Type".to_string(), "Unknown".to_string())],
+        Err(_) => {
+            tracing::warn!("wifi adapter timed out");
+            Node {
+                kind: NodeKind::Network,
+                status: Status::Unknown,
+                facts: vec![("Type".to_string(), "Timeout".to_string())],
+            }
+        }
+        Ok(Err(_)) => {
+            tracing::warn!("wifi adapter task failed");
+            Node {
+                kind: NodeKind::Network,
+                status: Status::Unknown,
+                facts: vec![("Type".to_string(), "Task failed".to_string())],
+            }
         }
     };
     
@@ -175,8 +199,16 @@ pub async fn run_all_with_timeouts(geodata_enabled: Option<bool>) -> Snapshot {
                 network_node.status = Status::Partial;
             }
         }
-        _ => {
+        Err(_) => {
+            tracing::warn!("dns adapter timed out");
             network_node.facts.push(("DNS".to_string(), "Timeout".to_string()));
+            if network_node.status == Status::Good {
+                network_node.status = Status::Partial;
+            }
+        }
+        Ok(Err(_)) => {
+            tracing::warn!("dns adapter task failed");
+            network_node.facts.push(("DNS".to_string(), "Task failed".to_string()));
             if network_node.status == Status::Good {
                 network_node.status = Status::Partial;
             }
@@ -187,10 +219,21 @@ pub async fn run_all_with_timeouts(geodata_enabled: Option<bool>) -> Snapshot {
     // Router node (UPnP)
     let router_node = match upnp_result {
         Ok(Ok(node)) => node,
-        _ => Node {
-            kind: NodeKind::Router,
-            status: Status::Unknown,
-            facts: vec![("Gateway".to_string(), "Unknown".to_string())],
+        Err(_) => {
+            tracing::warn!("upnp adapter timed out");
+            Node {
+                kind: NodeKind::Router,
+                status: Status::Unknown,
+                facts: vec![("Gateway".to_string(), "Timeout".to_string())],
+            }
+        }
+        Ok(Err(_)) => {
+            tracing::warn!("upnp adapter task failed");
+            Node {
+                kind: NodeKind::Router,
+                status: Status::Unknown,
+                facts: vec![("Gateway".to_string(), "Task failed".to_string())],
+            }
         }
     };
     nodes.push(router_node);
@@ -198,10 +241,21 @@ pub async fn run_all_with_timeouts(geodata_enabled: Option<bool>) -> Snapshot {
     // Internet node
     let internet_node = match internet_result {
         Ok(Ok(node)) => node,
-        _ => Node {
-            kind: NodeKind::Internet,
-            status: Status::Unknown,
-            facts: vec![("Public IP".to_string(), "Unknown".to_string())],
+        Err(_) => {
+            tracing::warn!("internet adapter timed out");
+            Node {
+                kind: NodeKind::Internet,
+                status: Status::Unknown,
+                facts: vec![("Public IP".to_string(), "Timeout".to_string())],
+            }
+        }
+        Ok(Err(_)) => {
+            tracing::warn!("internet adapter task failed");
+            Node {
+                kind: NodeKind::Internet,
+                status: Status::Unknown,
+                facts: vec![("Public IP".to_string(), "Task failed".to_string())],
+            }
         }
     };
     nodes.push(internet_node);
@@ -213,11 +267,14 @@ pub async fn run_all_with_timeouts(geodata_enabled: Option<bool>) -> Snapshot {
         None
     };
     
-    Snapshot {
+    let snapshot = Snapshot {
         nodes,
         internet_speed,
         vpn_detected: false,
-    }
+    };
+    
+    tracing::info!("Completed parallel network diagnostics");
+    snapshot
 }
 
 /// Original blocking implementation moved to separate function
@@ -286,6 +343,19 @@ pub fn run_all_blocking(_geodata_enabled: Option<bool>) -> Snapshot {
         internet_speed: Some((100, 50)),
         vpn_detected: false,
     }
+}
+
+/// Timing wrapper for adapter functions
+fn timed_adapter<F>(name: &str, func: F) -> Node 
+where 
+    F: FnOnce() -> Node,
+{
+    tracing::info!("start {}", name);
+    let start = std::time::Instant::now();
+    let result = func();
+    let elapsed = start.elapsed();
+    tracing::info!("done {} in {} ms", name, elapsed.as_millis());
+    result
 }
 
 /// Individual adapter functions for parallel execution
