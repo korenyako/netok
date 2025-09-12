@@ -1,0 +1,56 @@
+name: Tauri Windows
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          targets: x86_64-pc-windows-msvc
+
+      - name: Install frontend deps
+        working-directory: netok_desktop
+        run: |
+          npm ci
+
+      - name: Build (Tauri)
+        working-directory: netok_desktop
+        env:
+          # Optional: silence telemetry etc.
+          CI: true
+        run: |
+          npm run tauri build
+
+      - name: Collect artifacts
+        id: collect
+        shell: pwsh
+        run: |
+          $bundleRoot = "netok_desktop/src-tauri/target/release/bundle"
+          Write-Host "Bundle root: $bundleRoot"
+          Get-ChildItem -Recurse $bundleRoot | Write-Host
+          echo "path=$bundleRoot" >> $env:GITHUB_OUTPUT
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: netok-windows-bundle
+          path: ${{ steps.collect.outputs.path }}/**
+          if-no-files-found: error
