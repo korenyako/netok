@@ -1,41 +1,74 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { invoke } from "@tauri-apps/api/core";
-import { t } from "./i18n";
+import { useTranslation } from "react-i18next";
 import "./App.css";
 
-type NodeInfo = { 
-  id: string; 
-  name_key: string; 
-  status: string; 
-  latency_ms?: number; 
-  hint_key?: string 
-};
+type Overall = 'ok' | 'partial' | 'down';
+type NodeId = 'computer' | 'network' | 'dns' | 'internet';
 
-type Snapshot = { 
-  at_utc: string; 
-  nodes: NodeInfo[]; 
-  summary_key: string 
-};
+interface NodeResult {
+  id: NodeId;
+  label: string;            // e.g. "Компьютер", "Wi-Fi", "DNS", "Интернет"
+  status: Overall | 'ok';   // keep as in bridge
+  latency_ms?: number;
+  details?: string;         // optional factual line
+}
+
+interface Snapshot {
+  overall: Overall;                 // ok / partial / down
+  nodes: NodeResult[];
+  speed?: { down_mbps?: number; up_mbps?: number };
+}
+
+const hasBooted = (globalThis as any);
 
 export default function App() {
-  const [data, setData] = useState<Snapshot | null>(null);
+  const { t } = useTranslation();
+  const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const refresh = useCallback(async () => {
+    try {
+      setLoading(true);
+      const data = await invoke<Snapshot>('run_diagnostics');
+      setSnapshot(data);
+    } catch (e) {
+      console.error('run_diagnostics failed', e);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    // guard to avoid double-run in React 18 StrictMode
+    if (hasBooted.__netokBooted) return;
+    hasBooted.__netokBooted = true;
+    refresh();
+  }, [refresh]);
   
-  const refresh = async () => {
-    const json = await invoke<string>("run_diagnostics", { settingsJson: null });
-    setData(JSON.parse(json));
+  const getOverallText = (overall: Overall) => {
+    switch (overall) {
+      case 'ok': return 'Интернет работает';
+      case 'partial': return 'Интернет работает частично';
+      case 'down': return 'Интернет недоступен';
+      default: return 'Статус неизвестен';
+    }
   };
-  
+
   return (
     <div style={{ padding: 16 }}>
       <h3>Netok</h3>
-      <button onClick={refresh}>{t("button.refresh")}</button>
-      {data && (
+      <button onClick={refresh} disabled={loading}>
+        {t("button.refresh")}
+      </button>
+      {snapshot && (
         <>
-          <p><em>{t(data.summary_key)}</em></p>
+          <p><em>{getOverallText(snapshot.overall)}</em></p>
           <ul>
-            {data.nodes.map(n => (
+            {snapshot.nodes.map(n => (
               <li key={n.id}>
-                <b>{t(n.name_key)}</b> — {n.status} {n.latency_ms ? `(${n.latency_ms}ms)` : ""}
+                <b>{n.label}</b> — {n.status} {n.latency_ms ? `(${n.latency_ms}ms)` : ""}
+                {n.details && <div style={{ fontSize: '0.9em', color: '#666' }}>{n.details}</div>}
               </li>
             ))}
           </ul>
