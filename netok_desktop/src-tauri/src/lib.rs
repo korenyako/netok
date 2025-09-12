@@ -1,3 +1,6 @@
+// Re-export types from netok_bridge
+pub use netok_bridge::{Snapshot, NodeResult, SpeedInfo};
+
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
 fn get_settings() -> String {
@@ -10,8 +13,8 @@ fn set_settings(json: String) -> Result<(), String> {
 }
 
 #[tauri::command]
-fn run_diagnostics(settings_json: Option<String>) -> Result<String, String> {
-    netok_bridge::run_diagnostics_json(settings_json.as_deref()).map_err(|e| e.to_string())
+async fn run_diagnostics() -> Result<Snapshot, String> {
+    netok_bridge::run_diagnostics_struct().await.map_err(|e| e.to_string())
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
