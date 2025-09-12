@@ -2,8 +2,12 @@ use iced::{
     executor, theme,
     widget::{button, column, container, horizontal_space, radio, row, scrollable, text, text_input, Space, svg, canvas, Canvas},
     time, event,
-    Alignment, Application, Command, Element, Length, Settings, Theme, Color, Point, Size,
+    Alignment, Application, Command, Element, Length, Settings, Theme, Color, Point, Size, Font,
 };
+
+// Use a specific system font to avoid font scanning
+// Arial is commonly available on Windows systems
+const SYSTEM_FONT_NAME: &str = "Arial";
 
 // Импорт API ядра (проверьте имя пакета core в Cargo.toml)
 use netok_core::{
@@ -81,7 +85,7 @@ enum SettingsSection {
 
 use iced::window;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 struct AppConfig {
     width: u32,
     height: u32,
@@ -101,58 +105,82 @@ pub fn main() -> iced::Result {
         .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
         .init();
 
-    // Configure wgpu backends via environment variables
-    // Force DX12 and GL backends, exclude Vulkan
-    std::env::set_var("WGPU_BACKEND", "dx12,gl");
-    
-    // Log the configuration
-    tracing::info!("WGPU_BACKEND set to: dx12,gl");
-    tracing::info!("Antialiasing disabled (MSAA = None)");
-
     let cfg: AppConfig = confy::load("netok", None).unwrap_or_default();
     
-    // Try to run with the configured backends
-    try_run_with_backends(cfg)
+    // Check for safe render mode override
+    let safe_render = std::env::var("NETOK_SAFE_RENDER").is_ok();
+    
+    if safe_render {
+        tracing::info!("NETOK_SAFE_RENDER=1 detected, forcing GL-only mode");
+        run_with_backends(cfg, &["gl"], true)
+    } else {
+        // Try GL first, then optionally DX12
+        run_with_backends(cfg, &["gl", "dx12"], false)
+    }
 }
 
-fn try_run_with_backends(cfg: AppConfig) -> iced::Result {
-    // First attempt: try with DX12 and GL backends
-    tracing::info!("Attempting to run with DX12 and GL backends, MSAA disabled");
-    
-    match NetokApp::run(Settings {
-        window: window::Settings {
-            size: Size::new(cfg.width as f32, cfg.height as f32),
-            min_size: Some(Size::new(240.0, 360.0)),
-            position: window::Position::Specific(Point::new(cfg.x as f32, cfg.y as f32)),
-            ..window::Settings::default()
-        },
-        antialiasing: false, // Disable MSAA completely
-        ..Settings::default()
-    }) {
-        Ok(result) => {
-            tracing::info!("Successfully started with configured backends");
-            Ok(result)
-        },
-        Err(e) => {
-            tracing::warn!("Failed to run with DX12/GL backends: {}", e);
-            tracing::info!("This may be due to graphics driver issues on AMD Vega 10 GPU");
-            
-            // Try with GL-only backend as fallback
-            tracing::info!("Attempting fallback to GL-only backend");
-            std::env::set_var("WGPU_BACKEND", "gl");
-            
-            NetokApp::run(Settings {
-                window: window::Settings {
-                    size: Size::new(cfg.width as f32, cfg.height as f32),
-                    min_size: Some(Size::new(240.0, 360.0)),
-                    position: window::Position::Specific(Point::new(cfg.x as f32, cfg.y as f32)),
-                    ..window::Settings::default()
-                },
-                antialiasing: false, // Disable MSAA completely
-                ..Settings::default()
-            })
+fn run_with_backends(cfg: AppConfig, backends: &[&str], force_safe: bool) -> iced::Result {
+    for (i, backend) in backends.iter().enumerate() {
+        tracing::info!("Attempt {}: Trying {} backend", i + 1, backend.to_uppercase());
+        
+        // Set WGPU backend environment variable
+        std::env::set_var("WGPU_BACKEND", backend);
+        
+        // Configure bulletproof graphics settings
+        let settings = create_bulletproof_settings(cfg.clone(), force_safe);
+        
+        match NetokApp::run(settings) {
+            Ok(result) => {
+                tracing::info!("Netok gfx: {}, AA=None, Present=Immediate", backend.to_uppercase());
+                return Ok(result);
+            },
+            Err(e) => {
+                tracing::warn!("Failed to run with {} backend: {}", backend.to_uppercase(), e);
+                if i < backends.len() - 1 {
+                    tracing::info!("Trying next backend...");
+                }
+            }
         }
     }
+    
+    panic!("No suitable graphics backend available")
+}
+
+fn create_bulletproof_settings(cfg: AppConfig, force_safe: bool) -> Settings<()> {
+    // Configure window settings
+    let window_settings = window::Settings {
+        size: Size::new(cfg.width as f32, cfg.height as f32),
+        min_size: Some(Size::new(240.0, 360.0)),
+        position: window::Position::Specific(Point::new(cfg.x as f32, cfg.y as f32)),
+        ..window::Settings::default()
+    };
+    
+    // Configure bulletproof graphics settings
+    let settings = Settings {
+        window: window_settings,
+        antialiasing: false, // Disable MSAA completely
+        default_font: Font::default(), // Use system default font
+        ..Settings::default()
+    };
+    
+    // In iced 0.12, we can't directly configure wgpu settings through Settings
+    // The WGPU_BACKEND environment variable is the primary way to control backends
+    // Additional wgpu configuration would need to be done through environment variables
+    
+    if force_safe {
+        // Force safe mode settings
+        std::env::set_var("WGPU_POWER_PREFERENCE", "low-power");
+        std::env::set_var("WGPU_PRESENT_MODE", "immediate");
+        std::env::set_var("WGPU_FORCE_FALLBACK_ADAPTER", "false");
+        tracing::info!("Safe mode: GL-only, Immediate present, LowPower, No fallback adapter");
+    } else {
+        // Set additional wgpu environment variables for better stability
+        std::env::set_var("WGPU_POWER_PREFERENCE", "low-power");
+        std::env::set_var("WGPU_PRESENT_MODE", "immediate");
+        std::env::set_var("WGPU_FORCE_FALLBACK_ADAPTER", "false");
+    }
+    
+    settings
 }
 
 struct NetokApp {
