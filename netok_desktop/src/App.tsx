@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
+import { t } from "./i18n";
 import "./App.css";
 
 type NodeInfo = { 
@@ -27,15 +28,18 @@ export default function App() {
   return (
     <div style={{ padding: 16 }}>
       <h3>Netok</h3>
-      <button onClick={refresh}>Обновить</button>
+      <button onClick={refresh}>{t("button.refresh")}</button>
       {data && (
-        <ul>
-          {data.nodes.map(n => (
-            <li key={n.id}>
-              <b>{n.name_key}</b> — {n.status} {n.latency_ms ? `(${n.latency_ms}ms)` : ""}
-            </li>
-          ))}
-        </ul>
+        <>
+          <p><em>{t(data.summary_key)}</em></p>
+          <ul>
+            {data.nodes.map(n => (
+              <li key={n.id}>
+                <b>{t(n.name_key)}</b> — {n.status} {n.latency_ms ? `(${n.latency_ms}ms)` : ""}
+              </li>
+            ))}
+          </ul>
+        </>
       )}
     </div>
   );
