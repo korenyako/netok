@@ -1,7 +1,7 @@
 # Netok — AI Assistant Context
 
 > **⚠️ Deprecated — 2025-09-11**  
-> This guide is outdated. Use [docs/UI-SPEC.md](docs/UI-SPEC.md) for current UI/UX rules and [i18n/README.md](i18n/README.md) for internationalization guidelines.
+> This guide is outdated. Use [docs/UI-SPEC.md](docs/UI-SPEC.md) for current UI/UX rules, [i18n/README.md](i18n/README.md) for internationalization guidelines, and [docs/SoT-ARCH.md](docs/SoT-ARCH.md) for current architecture.
 
 ## Project
 
