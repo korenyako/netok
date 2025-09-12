@@ -1,0 +1,10 @@
+[package]
+name = "netok_core"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+time = { workspace = true }
+thiserror = { workspace = true }

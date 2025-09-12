@@ -78,5 +78,10 @@
   "FactCity": "Город",
   "FactPublicIp": "Public IP",
   "FactIp": "IP",
-  "FactLocalIp": "IP в локальной сети"
+  "FactLocalIp": "IP в локальной сети",
+  "nodes.computer.name": "Компьютер",
+  "nodes.wifi.name": "Wi-Fi",
+  "nodes.dns.name": "DNS",
+  "nodes.internet.name": "Интернет",
+  "summary.ok": "Всё в порядке"
 }

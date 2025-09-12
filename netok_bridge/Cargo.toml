@@ -1,0 +1,10 @@
+[package]
+name = "netok_bridge"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+netok_core = { path = "../netok_core" }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+thiserror = { workspace = true }

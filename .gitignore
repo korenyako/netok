@@ -17,3 +17,7 @@ Cargo.lock
 # OS-specific files
 .DS_Store
 Thumbs.db
+
+# Frontend dependencies
+netok_desktop/node_modules
+netok_desktop/dist

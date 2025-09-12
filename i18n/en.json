@@ -78,5 +78,10 @@
   "FactCity": "City",
   "FactPublicIp": "Public IP",
   "FactIp": "IP",
-  "FactLocalIp": "Local IP"
+  "FactLocalIp": "Local IP",
+  "nodes.computer.name": "Computer",
+  "nodes.wifi.name": "Wi-Fi",
+  "nodes.dns.name": "DNS",
+  "nodes.internet.name": "Internet",
+  "summary.ok": "All good"
 }
