@@ -1,5 +1,0 @@
-[33m5fa87f7[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m fixed SoT-ARCH.md
-[33m8a33e04[m docs: fix formatting in SoT-ARCH.md - remove duplicates, improve structure, add proper code blocks
-[33m6fe8a94[m fix - graphics backend issue
-[33m7cf5209[m Implemented comprehensive tracing/logging around each adapter step in the parallel network diagnostics system
-[33m844e4f5[m implemented run_all_with_timeouts() that runs network adapters in parallel with enforced per-adapter timeouts
