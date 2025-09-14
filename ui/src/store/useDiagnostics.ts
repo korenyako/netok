@@ -54,6 +54,7 @@ interface DiagnosticsStore {
   loading: boolean;
   error: string | null;
   updatedAt: number;
+  lastUpdated: Date | null;
   refresh: () => Promise<void>;
   clearError: () => void;
 }
@@ -99,6 +100,7 @@ export const useDiagnostics = create<DiagnosticsStore>((set) => ({
   loading: false,
   error: null,
   updatedAt: 0,
+  lastUpdated: null,
 
   refresh: async () => {
     set({ loading: true, error: null });
@@ -119,10 +121,12 @@ export const useDiagnostics = create<DiagnosticsStore>((set) => ({
         };
       }
       
+      const now = new Date();
       set({ 
         data: mockData, 
         loading: false,
-        updatedAt: Date.now()
+        updatedAt: Date.now(),
+        lastUpdated: now
       });
     } catch (error) {
       set({ 

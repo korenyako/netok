@@ -56,7 +56,8 @@
     "copy": "Copy"
   },
   "meta": {
-    "updated": "Updated: {time}",
+    "updated": "Updated: {{time}}",
+    "never": "never",
     "no_data": "No data. Click 'Refresh'."
   },
   "geo": {

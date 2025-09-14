@@ -4,11 +4,12 @@ import { HeaderStatus } from './HeaderStatus';
 import { NodeCard } from './NodeCard';
 import { useDiagnostics } from '../store/useDiagnostics';
 import Spinner from './Spinner';
+import { formatUpdatedAt } from '../utils/formatUpdatedAt';
 
 export function MainPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const { data, loading, updatedAt, refresh } = useDiagnostics();
+  const { data, loading, lastUpdated } = useDiagnostics();
 
   const handleRefresh = async () => {
     if (!loading) {
@@ -21,10 +22,12 @@ export function MainPage() {
   };
 
   const getUpdatedTime = () => {
-    if (!updatedAt) return null;
-    return t('meta.updated', { 
-      time: new Date(updatedAt).toLocaleTimeString() 
-    });
+    const locale = i18n.language as "ru" | "en";
+    const timeText = lastUpdated
+      ? formatUpdatedAt(lastUpdated, locale)
+      : t('meta.never');
+    
+    return t('meta.updated', { time: timeText });
   };
 
   return (
