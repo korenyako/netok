@@ -1,0 +1,15 @@
+---
+# Cursor Rules (Netok)
+## Sources of Truth (SoT)
+- Use `docs/SoT-ARCH.md` (architecture, Tauri + Rust).
+- Use `docs/UI-SPEC.md` (UI/UX, tokens, i18n, copy).
+- Use `i18n/README.md` for localization policy.
+
+## Ignore
+- Do NOT use anything under `docs/deprecated/` or `/deprecated/` as context.
+
+## Guardrails
+- Keep PRs minimal. No heavy deps.
+- Extract all UI strings to i18n JSON (no hardcoded RU).
+- Respect UI-SPEC: fixed header, scrollable content, min 240×360, visible scrollbars, Inter/Roboto.
+---

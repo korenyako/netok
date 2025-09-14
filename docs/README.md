@@ -15,6 +15,6 @@ This directory contains the official documentation for the Netok project.
 
 The following files are deprecated but kept for reference:
 
-- **[SoT.md](SoT.md)** - Legacy Source of Truth (deprecated)
-- **[CODING_RULES.md](CODING_RULES.md)** - Legacy coding rules (deprecated)
-- **[TASK_TEMPLATE.md](TASK_TEMPLATE.md)** - Legacy task template (deprecated)
+- **[deprecated/SoT.md](deprecated/SoT.md)** - Legacy Source of Truth (deprecated)
+- **[deprecated/CODING_RULES.md](deprecated/CODING_RULES.md)** - Legacy coding rules (deprecated)
+- **[deprecated/TASK_TEMPLATE.md](deprecated/TASK_TEMPLATE.md)** - Legacy task template (deprecated)

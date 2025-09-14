@@ -2,13 +2,12 @@
 
 ## Project Docs
 
-UI-SPEC v1: docs/UI-SPEC.md — single source of truth for UI/UX. Cite sections like §1.
+- **Architecture:** [docs/SoT-ARCH.md](docs/SoT-ARCH.md) — Desktop = **Tauri (WebView)**, Core = **Rust**
+- **UI/UX:** [docs/UI-SPEC.md](docs/UI-SPEC.md) — UI specifications and design guidelines
+- **i18n:** [i18n/README.md](i18n/README.md) — Internationalization guidelines
+- **AI Assistants:** [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md) — Universal guide for all AI assistants
 
-AI Assistants Guide: AI_ASSISTANTS.md — how Gemini/Cursor/etc. should work with this repo.
-
-GEMINI.md: project-specific instructions for the VSCode Gemini extension.
-
-Mono-repo с двумя крейтами: `core` (Apache-2.0) и `desktop` (Iced UI).
+Mono-repo с двумя крейтами: `core` (Apache-2.0) и `desktop` (Tauri WebView).
 
 ## Сборка
 

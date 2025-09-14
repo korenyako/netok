@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { useTranslation } from 'react-i18next';
 import Settings from './components/Settings';
+import { useLanguage } from './hooks/useLanguage';
 
 type Overall = 'ok' | 'partial' | 'down';
 type NodeId = 'computer' | 'network' | 'dns' | 'internet';
@@ -31,6 +32,7 @@ interface SnapshotWithMeta extends Snapshot {
 
 export default function App() {
   const { t } = useTranslation();
+  useLanguage(); // Initialize language from localStorage
   const [snapshot, setSnapshot] = useState<SnapshotWithMeta | null>(null);
   const [loading, setLoading] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -51,10 +53,10 @@ export default function App() {
       const errorSnapshot: SnapshotWithMeta = {
         overall: 'down',
         nodes: [
-          { id: 'computer', label: 'Компьютер', status: 'down', details: 'Ошибка диагностики' },
-          { id: 'network',  label: 'Сеть',      status: 'down' },
-          { id: 'dns',      label: 'DNS',       status: 'down' },
-          { id: 'internet', label: 'Интернет',  status: 'down' },
+          { id: 'computer', label: t('nodes.computer.name'), status: 'down', details: t('error.diagnostics') },
+          { id: 'network',  label: t('nodes.network.name'),  status: 'down' },
+          { id: 'dns',      label: t('nodes.dns.name'),      status: 'down' },
+          { id: 'internet', label: t('nodes.internet.name'), status: 'down' },
         ],
         updated_at: Date.now(),
       };
@@ -152,7 +154,7 @@ export default function App() {
           </div>
         )}
 
-        {(!loading && !snapshot) && <div style={{opacity:0.8}}>Нет данных. Нажмите «Обновить».</div>}
+        {(!loading && !snapshot) && <div style={{opacity:0.8}}>{t('status.no_data')}</div>}
 
         {/* Speed line only if present */}
         {snapshot?.speed && (

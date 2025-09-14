@@ -1,0 +1,24 @@
+name: Docs Lint
+
+on:
+  pull_request:
+    paths:
+      - '**.md'
+
+jobs:
+  check-deprecated-links:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Check for deprecated doc links
+        run: |
+          if grep -r "](docs/deprecated/" . --include="*.md" || grep -r "](/deprecated/" . --include="*.md"; then
+            echo "❌ Found links to deprecated documentation!"
+            echo "Please update links to use current documentation instead."
+            echo "See PROJECT_CONTEXT.md for the correct Sources of Truth."
+            exit 1
+          else
+            echo "✅ No deprecated doc links found"
+          fi
