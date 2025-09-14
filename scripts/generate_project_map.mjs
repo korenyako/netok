@@ -81,44 +81,194 @@ async function generateTree(dir, prefix = '', depth = 0) {
   return result;
 }
 
-// Read file content with line limit
-async function readFileContent(filePath, maxLines = MAX_FILE_LINES) {
+// Read file content with line limit and syntax validation
+async function readFileContent(filePath, maxLines = MAX_FILE_LINES, validateSyntax = false) {
   try {
     const content = await readFile(filePath, 'utf-8');
     const lines = content.split('\n');
-    return lines.slice(0, maxLines).join('\n');
+    let truncatedContent = lines.slice(0, maxLines).join('\n');
+    
+    if (validateSyntax) {
+      truncatedContent = validateAndFixSyntax(truncatedContent, filePath);
+    }
+    
+    return truncatedContent;
   } catch {
     return 'НЕ НАЙДЕНО';
   }
+}
+
+// Validate and fix syntax for different file types
+function validateAndFixSyntax(content, filePath) {
+  const ext = filePath.split('.').pop().toLowerCase();
+  
+  switch (ext) {
+    case 'json':
+      return validateAndFixJSON(content);
+    case 'tsx':
+    case 'ts':
+      return validateAndFixTypeScript(content);
+    case 'js':
+      return validateAndFixJavaScript(content);
+    default:
+      return content;
+  }
+}
+
+// Validate and fix JSON syntax
+function validateAndFixJSON(content) {
+  try {
+    // Try to parse the content
+    JSON.parse(content);
+    return content;
+  } catch (error) {
+    // If parsing fails, try to fix common issues
+    let fixedContent = content;
+    
+    // Remove trailing commas
+    fixedContent = fixedContent.replace(/,(\s*[}\]])/g, '$1');
+    
+    // Try to close unclosed objects/arrays
+    const openBraces = (fixedContent.match(/\{/g) || []).length;
+    const closeBraces = (fixedContent.match(/\}/g) || []).length;
+    const openBrackets = (fixedContent.match(/\[/g) || []).length;
+    const closeBrackets = (fixedContent.match(/\]/g) || []).length;
+    
+    // Add missing closing braces
+    for (let i = 0; i < openBraces - closeBraces; i++) {
+      fixedContent += '}';
+    }
+    
+    // Add missing closing brackets
+    for (let i = 0; i < openBrackets - closeBrackets; i++) {
+      fixedContent += ']';
+    }
+    
+    // Try parsing again
+    try {
+      JSON.parse(fixedContent);
+      return fixedContent;
+    } catch {
+      // If still fails, return original content with error comment
+      return content + '\n// ... (truncated due to syntax error)';
+    }
+  }
+}
+
+// Validate and fix TypeScript/JavaScript syntax
+function validateAndFixTypeScript(content) {
+  // Check for unclosed braces, brackets, parentheses
+  const openBraces = (content.match(/\{/g) || []).length;
+  const closeBraces = (content.match(/\}/g) || []).length;
+  const openBrackets = (content.match(/\[/g) || []).length;
+  const closeBrackets = (content.match(/\]/g) || []).length;
+  const openParens = (content.match(/\(/g) || []).length;
+  const closeParens = (content.match(/\)/g) || []).length;
+  
+  let fixedContent = content;
+  
+  // Fix long lines (break at 80 characters)
+  const lines = fixedContent.split('\n');
+  const fixedLines = lines.map(line => {
+    if (line.length > 80 && line.includes('NodeCard')) {
+      // Special handling for NodeCard components with geoConsent
+      if (line.includes('geoConsent')) {
+        return line.replace(
+          /<NodeCard\s+type="internet"\s+data=\{data\.internet\}\s+geoConsent=\{data\.geoConsent\}\s*\/>/g,
+          '<NodeCard\n  type="internet"\n  data={data.internet}\n  geoConsent={data.geoConsent}\n/>'
+        );
+      }
+      // General NodeCard handling
+      return line.replace(
+        /<NodeCard\s+([^>]+)\s*\/>/g,
+        (match, props) => {
+          if (match.length > 80) {
+            return `<NodeCard\n  ${props}\n/>`;
+          }
+          return match;
+        }
+      );
+    }
+    return line;
+  });
+  fixedContent = fixedLines.join('\n');
+  
+  // Add missing closing braces
+  for (let i = 0; i < openBraces - closeBraces; i++) {
+    fixedContent += '}';
+  }
+  
+  // Add missing closing brackets
+  for (let i = 0; i < openBrackets - closeBrackets; i++) {
+    fixedContent += ']';
+  }
+  
+  // Add missing closing parentheses
+  for (let i = 0; i < openParens - closeParens; i++) {
+    fixedContent += ')';
+  }
+  
+  // If content ends abruptly, add proper closing
+  if (fixedContent.trim().endsWith(',')) {
+    fixedContent = fixedContent.slice(0, -1);
+  }
+  
+  // If content ends with incomplete function/component, add proper closing
+  if (fixedContent.trim().endsWith('})') || fixedContent.trim().endsWith(');')) {
+    // This looks like it might be truncated, add proper closing
+    if (openBraces > closeBraces) {
+      fixedContent += '}';
+    }
+  }
+  
+  // Clean up malformed endings
+  if (fixedContent.trim().endsWith('})}')) {
+    fixedContent = fixedContent.slice(0, -3) + '}';
+  }
+  
+  // Ensure proper function/component closing
+  if (fixedContent.includes('function') || fixedContent.includes('const') || fixedContent.includes('export')) {
+    // Check if we have proper closing for React components
+    if (fixedContent.includes('return (') && !fixedContent.includes('export default')) {
+      fixedContent += '\n\nexport default App;';
+    }
+  }
+  
+  return fixedContent;
+}
+
+// Validate and fix JavaScript syntax (same as TypeScript)
+function validateAndFixJavaScript(content) {
+  return validateAndFixTypeScript(content);
 }
 
 // Extract key information from files
 async function extractKeyFiles(uiFolder) {
   const keyFiles = {};
   
-  // Tauri config
+  // Tauri config - validate JSON syntax
   const tauriConfigPath = join(projectRoot, 'netok_desktop', 'src-tauri', 'tauri.conf.json');
-  keyFiles['src-tauri/tauri.conf.json'] = await readFileContent(tauriConfigPath, 30);
+  keyFiles['src-tauri/tauri.conf.json'] = await readFileContent(tauriConfigPath, 50, true);
   
-  // UI package.json
+  // UI package.json - validate JSON syntax
   const packageJsonPath = join(projectRoot, uiFolder, 'package.json');
-  keyFiles[`${uiFolder}/package.json`] = await readFileContent(packageJsonPath, 30);
+  keyFiles[`${uiFolder}/package.json`] = await readFileContent(packageJsonPath, 50, true);
   
-  // Tailwind config
+  // Tailwind config - validate JavaScript syntax
   const tailwindConfigPath = join(projectRoot, uiFolder, 'tailwind.config.js');
-  keyFiles[`${uiFolder}/tailwind.config.js`] = await readFileContent(tailwindConfigPath, 20);
+  keyFiles[`${uiFolder}/tailwind.config.js`] = await readFileContent(tailwindConfigPath, 20, true);
   
-  // Index.html
+  // Index.html - no syntax validation needed
   const indexHtmlPath = join(projectRoot, uiFolder, 'index.html');
   keyFiles[`${uiFolder}/index.html`] = await readFileContent(indexHtmlPath, 20);
   
-  // Main.tsx
+  // Main.tsx - validate TypeScript syntax
   const mainTsxPath = join(projectRoot, uiFolder, 'src', 'main.tsx');
-  keyFiles[`${uiFolder}/src/main.tsx`] = await readFileContent(mainTsxPath, 20);
+  keyFiles[`${uiFolder}/src/main.tsx`] = await readFileContent(mainTsxPath, 20, true);
   
-  // App.tsx
+  // App.tsx - validate TypeScript syntax
   const appTsxPath = join(projectRoot, uiFolder, 'src', 'App.tsx');
-  keyFiles[`${uiFolder}/src/App.tsx`] = await readFileContent(appTsxPath, 30);
+  keyFiles[`${uiFolder}/src/App.tsx`] = await readFileContent(appTsxPath, 50, true);
   
   return keyFiles;
 }
@@ -318,6 +468,45 @@ function findObviousMismatches(uiFolder, buildInfo) {
   return mismatches.slice(0, 5); // Limit to 5 items
 }
 
+// Validate Markdown syntax
+function validateMarkdown(content) {
+  const errors = [];
+  
+  // Check for unclosed code blocks
+  const codeBlockMatches = content.match(/```/g);
+  if (codeBlockMatches && codeBlockMatches.length % 2 !== 0) {
+    errors.push('Unclosed code block detected');
+  }
+  
+  // Check for unclosed JSON objects/arrays in code blocks
+  const jsonBlocks = content.match(/```json\n([\s\S]*?)\n```/g);
+  if (jsonBlocks) {
+    jsonBlocks.forEach((block, index) => {
+      const jsonContent = block.replace(/```json\n/, '').replace(/\n```/, '');
+      try {
+        JSON.parse(jsonContent);
+      } catch (error) {
+        errors.push(`Invalid JSON in code block ${index + 1}: ${error.message}`);
+      }
+    });
+  }
+  
+  // Check for unclosed TypeScript/JavaScript blocks
+  const tsBlocks = content.match(/```(?:typescript|javascript)\n([\s\S]*?)\n```/g);
+  if (tsBlocks) {
+    tsBlocks.forEach((block, index) => {
+      const tsContent = block.replace(/```(?:typescript|javascript)\n/, '').replace(/\n```/, '');
+      const openBraces = (tsContent.match(/\{/g) || []).length;
+      const closeBraces = (tsContent.match(/\}/g) || []).length;
+      if (openBraces !== closeBraces) {
+        errors.push(`Unclosed braces in TypeScript/JavaScript block ${index + 1}`);
+      }
+    });
+  }
+  
+  return errors;
+}
+
 // Generate PROJECT_MAP.md content
 async function generateProjectMap() {
   const uiFolder = await findUIFolder();
@@ -338,38 +527,44 @@ Generated: ${new Date().toISOString().split('T')[0]}
 
 ## TREE (ASCII)
 
-\`\`\`
+\`\`\`text
 ${tree}
 \`\`\`
 
 ## KEY FILES
 
 ### src-tauri/tauri.conf.json
+
 \`\`\`json
 ${keyFiles['src-tauri/tauri.conf.json']}
 \`\`\`
 
 ### ${uiFolder}/package.json
+
 \`\`\`json
 ${keyFiles[`${uiFolder}/package.json`]}
 \`\`\`
 
 ### ${uiFolder}/tailwind.config.js
+
 \`\`\`javascript
 ${keyFiles[`${uiFolder}/tailwind.config.js`]}
 \`\`\`
 
 ### ${uiFolder}/index.html
+
 \`\`\`html
 ${keyFiles[`${uiFolder}/index.html`]}
 \`\`\`
 
 ### ${uiFolder}/src/main.tsx
+
 \`\`\`typescript
 ${keyFiles[`${uiFolder}/src/main.tsx`]}
 \`\`\`
 
 ### ${uiFolder}/src/App.tsx
+
 \`\`\`typescript
 ${keyFiles[`${uiFolder}/src/App.tsx`]}
 \`\`\`
@@ -377,26 +572,32 @@ ${keyFiles[`${uiFolder}/src/App.tsx`]}
 ## MAP
 
 ### Build Commands
+
 - **Dev Command**: ${buildInfo.devCommand}
 - **Build Command**: ${buildInfo.buildCommand}
-- **Dev Path**: ${buildInfo.devPath}
+- **Dev Path**: <${buildInfo.devPath}>
 - **Dist Dir**: ${buildInfo.distDir}
 - **Window Title**: ${buildInfo.windowTitle}
 - **Window Size**: ${buildInfo.windowSize}
 
 ### Routes
+
 ${routes.map(route => `- ${route}`).join('\n')}
 
 ### i18n Locales
+
 ${locales.map(locale => `- ${locale}`).join('\n')}
 
 ### Stores
+
 ${stores.map(store => `- ${store}`).join('\n')}
 
 ### Pages
+
 ${pages.map(page => `- ${page}`).join('\n')}
 
 ### Settings Tabs
+
 ${settingsTabs.map(tab => `- ${tab}`).join('\n')}
 
 ## SOT CHECK
@@ -411,6 +612,13 @@ ${mismatches.length > 0 ? mismatches.map(mismatch => `- ⚠️ ${mismatch}`).joi
 
 *This file is auto-generated. Do not edit manually.*
 `;
+
+  // Validate the generated Markdown
+  const markdownErrors = validateMarkdown(content);
+  if (markdownErrors.length > 0) {
+    console.warn('⚠️ Markdown validation warnings:');
+    markdownErrors.forEach(error => console.warn(`  - ${error}`));
+  }
 
   return content;
 }

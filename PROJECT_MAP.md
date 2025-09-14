@@ -4,7 +4,7 @@ Generated: 2025-09-14
 
 ## TREE (ASCII)
 
-```
+```text
 ├── .github
 │   ├── ISSUE_TEMPLATE
 │   │   └── feature_request.md
@@ -197,6 +197,7 @@ Generated: 2025-09-14
 ## KEY FILES
 
 ### src-tauri/tauri.conf.json
+
 ```json
 {
   "$schema": "https://schema.tauri.app/config/2",
@@ -228,9 +229,19 @@ Generated: 2025-09-14
     "active": true,
     "targets": "all",
     "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
+  }
+}
+
 ```
 
 ### ui/package.json
+
 ```json
 {
   "name": "ui",
@@ -262,9 +273,16 @@ Generated: 2025-09-14
     "globals": "^16.3.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.17",
+    "typescript": "~5.8.3",
+    "typescript-eslint": "^8.39.1",
+    "vite": "^7.1.2"
+  }
+}
+
 ```
 
 ### ui/tailwind.config.js
+
 ```javascript
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -282,6 +300,7 @@ export default {
 ```
 
 ### ui/index.html
+
 ```html
 <!doctype html>
 <html lang="en">
@@ -300,6 +319,7 @@ export default {
 ```
 
 ### ui/src/main.tsx
+
 ```typescript
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -316,6 +336,7 @@ createRoot(document.getElementById('root')!).render(
 ```
 
 ### ui/src/App.tsx
+
 ```typescript
 import { useTranslation } from 'react-i18next';
 import { HeaderStatus } from './components/HeaderStatus';
@@ -347,32 +368,64 @@ function App() {
       </header>
       
       <main className="flex-1 overflow-y-auto p-3">
+        <div className="space-y-3">
+          {/* Header Status */}
+          {data && (
+            <HeaderStatus 
+              internetStatus={data.overall}
+              speed={data.speed}
+              vpnDetected={data.vpnDetected}
+            />
+          )}
+          
+          {/* Node Cards */}
+          {data && (
+            <div>
+              <NodeCard type="computer" data={data.computer} />
+              <NodeCard type="network" data={data.network} />
+              <NodeCard type="router" data={data.router} />
+              <NodeCard
+  type="internet"
+  data={data.internet}
+  geoConsent={data.geoConsent}
+/>
+            </div>
+          )}
+}
+
+export default App;
 ```
 
 ## MAP
 
 ### Build Commands
+
 - **Dev Command**: npm --prefix ../ui run dev
 - **Build Command**: npm --prefix ../ui run build
-- **Dev Path**: http://localhost:5173
+- **Dev Path**: <http://localhost:5173>
 - **Dist Dir**: ../ui/dist
 - **Window Title**: Netok
 - **Window Size**: 320×560
 
 ### Routes
+
 - НЕ НАЙДЕНО
 
 ### i18n Locales
+
 - en
 - ru
 
 ### Stores
+
 - useDiagnostics
 
 ### Pages
+
 - НЕ НАЙДЕНО
 
 ### Settings Tabs
+
 - НЕ НАЙДЕНО
 
 ## SOT CHECK
