@@ -102,40 +102,55 @@ export default function App() {
       minWidth: 260, 
       maxWidth: 420, 
       margin: '16px auto', 
-      padding: '0 16px',
+      padding: '0 20px',
       height: '100vh',
       display: 'flex',
       flexDirection: 'column',
     }}>
-      {/* Header - fixed height */}
+      {/* Header and buttons row - fixed height, no shrinking */}
       <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center', 
-        marginBottom: 16,
         flexShrink: 0,
+        marginBottom: 20,
       }}>
-        <h1 style={{ margin: 0 }}>Netok</h1>
-        <button 
-          onClick={() => setSettingsOpen(true)} 
-          style={{ 
-            padding: '8px 12px', 
-            borderRadius: 6, 
-            border: '1px solid #ccc',
-            backgroundColor: '#f5f5f5',
-            cursor: 'pointer',
-            fontSize: 14,
-          }}
-        >
-          {t('button.settings')}
-        </button>
-      </div>
+        {/* Header */}
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          marginBottom: 16,
+        }}>
+          <h1 style={{ margin: 0 }}>Netok</h1>
+          <button 
+            onClick={() => setSettingsOpen(true)} 
+            style={{ 
+              padding: '8px 12px', 
+              borderRadius: 6, 
+              border: '1px solid #ccc',
+              backgroundColor: '#f5f5f5',
+              cursor: 'pointer',
+              fontSize: 14,
+              minWidth: 'fit-content',
+            }}
+          >
+            {t('button.settings')}
+          </button>
+        </div>
 
-      {/* Refresh button - fixed height */}
-      <div style={{ flexShrink: 0, marginBottom: 16 }}>
-        <button onClick={refresh} disabled={loading} style={{ padding: '10px 16px', borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-          {loading ? t('button.loading') : t('button.refresh')}
-        </button>
+        {/* Refresh button */}
+        <div>
+          <button 
+            onClick={refresh} 
+            disabled={loading} 
+            style={{ 
+              padding: '10px 16px', 
+              borderRadius: 8, 
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              minWidth: 'fit-content',
+            }}
+          >
+            {loading ? t('button.loading') : t('button.refresh')}
+          </button>
+        </div>
       </div>
 
       {/* Scrollable content area */}
@@ -143,6 +158,7 @@ export default function App() {
         overflowY: 'auto', 
         flex: 1,
         minHeight: 0, // Important for flex child to shrink
+        paddingRight: 4, // Space for scrollbar
       }}>
         <div style={{ fontWeight: 600 }}>
           {overallToText(snapshot?.overall)}
@@ -186,6 +202,9 @@ export default function App() {
             );
           })}
         </ul>
+
+        {/* Bottom padding for scroll */}
+        <div style={{ height: 24 }} />
       </div>
 
       <Settings 
