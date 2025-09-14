@@ -1,0 +1,80 @@
+{
+  "app": {
+    "name": "Netok",
+    "title": "Диагностика сети"
+  },
+  "status": {
+    "internet_ok": "Интернет работает.",
+    "internet_down": "Интернет недоступен.",
+    "internet_partial": "Интернет частично доступен.",
+    "speed": "Скорость: {down}/{up} Мбит/с",
+    "connection_no_vpn": "Соединение без VPN. Настроить VPN",
+    "connection_vpn_detected": "VPN соединение обнаружено",
+    "waiting": "Проверяем соединение…"
+  },
+  "nodes": {
+    "computer": {
+      "name": "Компьютер",
+      "name_field": "Имя",
+      "model_field": "Модель",
+      "adapter_field": "Сетевой адаптер",
+      "local_ip_field": "IP в локальной сети"
+    },
+    "network": {
+      "name": "Сеть",
+      "type_wifi": "Wi-Fi",
+      "type_cable": "Кабель",
+      "type_usb_modem": "USB-модем",
+      "type_bt": "Bluetooth",
+      "type_mobile": "Мобильный модем",
+      "signal_field": "Сигнал",
+      "signal_excellent": "отличный",
+      "signal_good": "хороший",
+      "signal_fair": "средний",
+      "signal_weak": "слабый",
+      "link_field": "Линк"
+    },
+    "router": {
+      "name": "Роутер/Точка доступа",
+      "model_field": "Модель/бренд",
+      "local_ip_field": "IP в локальной сети"
+    },
+    "internet": {
+      "name": "Интернет",
+      "provider_field": "Оператор",
+      "ip_field": "IP"
+    }
+  },
+  "buttons": {
+    "refresh": "Обновить",
+    "settings": "Настройки",
+    "close": "Закрыть",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "apply": "Применить",
+    "copy": "Копировать"
+  },
+  "meta": {
+    "updated": "Обновлено: {time}",
+    "no_data": "Нет данных. Нажмите «Обновить»."
+  },
+  "geo": {
+    "consent_label": "Показывать местоположение",
+    "consent_description": "Разрешить показ страны и города по IP-адресу",
+    "location_hidden": "Местоположение скрыто"
+  },
+  "errors": {
+    "diagnostics": "Ошибка диагностики",
+    "network_error": "Ошибка сети"
+  },
+  "mock_data": {
+    "computer_name": "DESKTOP-ABC123",
+    "computer_model": "Dell OptiPlex 7090",
+    "adapter_name": "Intel Wi-Fi 6 AX201",
+    "router_model": "Archer AX73",
+    "router_brand": "TP-Link",
+    "provider_name": "Rostelecom",
+    "country_name": "Россия",
+    "city_name": "Москва"
+  }
+}

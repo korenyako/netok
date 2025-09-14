@@ -1,0 +1,80 @@
+{
+  "app": {
+    "name": "Netok",
+    "title": "Network Diagnostics"
+  },
+  "status": {
+    "internet_ok": "Internet works.",
+    "internet_down": "Internet unavailable.",
+    "internet_partial": "Internet partially available.",
+    "speed": "Speed: {down}/{up} Mbps",
+    "connection_no_vpn": "Connection without VPN. Configure VPN",
+    "connection_vpn_detected": "VPN connection detected",
+    "waiting": "Checking connection..."
+  },
+  "nodes": {
+    "computer": {
+      "name": "Computer",
+      "name_field": "Name",
+      "model_field": "Model",
+      "adapter_field": "Network adapter",
+      "local_ip_field": "IP in local network"
+    },
+    "network": {
+      "name": "Network",
+      "type_wifi": "Wi-Fi",
+      "type_cable": "Cable",
+      "type_usb_modem": "USB modem",
+      "type_bt": "Bluetooth",
+      "type_mobile": "Mobile modem",
+      "signal_field": "Signal",
+      "signal_excellent": "excellent",
+      "signal_good": "good",
+      "signal_fair": "fair",
+      "signal_weak": "weak",
+      "link_field": "Link"
+    },
+    "router": {
+      "name": "Router/Access Point",
+      "model_field": "Model/Brand",
+      "local_ip_field": "IP in local network"
+    },
+    "internet": {
+      "name": "Internet",
+      "provider_field": "Provider",
+      "ip_field": "IP"
+    }
+  },
+  "buttons": {
+    "refresh": "Refresh",
+    "settings": "Settings",
+    "close": "Close",
+    "save": "Save",
+    "cancel": "Cancel",
+    "apply": "Apply",
+    "copy": "Copy"
+  },
+  "meta": {
+    "updated": "Updated: {time}",
+    "no_data": "No data. Click 'Refresh'."
+  },
+  "geo": {
+    "consent_label": "Show location",
+    "consent_description": "Allow showing country and city by IP address",
+    "location_hidden": "Location hidden"
+  },
+  "errors": {
+    "diagnostics": "Diagnostics error",
+    "network_error": "Network error"
+  },
+  "mock_data": {
+    "computer_name": "DESKTOP-ABC123",
+    "computer_model": "Dell OptiPlex 7090",
+    "adapter_name": "Intel Wi-Fi 6 AX201",
+    "router_model": "Archer AX73",
+    "router_brand": "TP-Link",
+    "provider_name": "Rostelecom",
+    "country_name": "Russia",
+    "city_name": "Moscow"
+  }
+}

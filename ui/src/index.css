@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Ensure full height for proper scrolling */
+html, body, #root {
+  height: 100%;
+}
+
+/* Compact base styles */
+body {
+  @apply text-[14px] leading-6 text-neutral-900 bg-white;
+}

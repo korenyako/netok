@@ -1,20 +1,23 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "netok_desktop",
+  "productName": "Netok",
   "version": "0.1.0",
   "identifier": "com.netok.desktop",
   "build": {
-    "beforeDevCommand": "npm run dev",
-    "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "npm run build",
-    "frontendDist": "../dist"
+    "beforeDevCommand": "npm --prefix ../ui run dev",
+    "devUrl": "http://localhost:5173",
+    "beforeBuildCommand": "npm --prefix ../ui run build",
+    "frontendDist": "../ui/dist"
   },
   "app": {
     "windows": [
       {
-        "title": "netok_desktop",
-        "width": 800,
-        "height": 600
+        "title": "Netok",
+        "width": 320,
+        "height": 560,
+        "minWidth": 280,
+        "minHeight": 480,
+        "resizable": true
       }
     ],
     "security": {
