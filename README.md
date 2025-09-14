@@ -23,6 +23,28 @@ cargo build --release -p netok-desktop
 cargo run -p desktop
 ```
 
+## Project Map
+
+Автоматическая генерация карты проекта:
+
+```bash
+npm run map
+```
+
+### Pre-commit Hook
+
+При каждом коммите автоматически обновляется `PROJECT_MAP.md` через husky pre-commit hook.
+
+### Скрипт генерации
+
+- **Файл**: `scripts/generate_project_map.mjs`
+- **Игнорируемые папки**: `node_modules`, `.git`, `target`, `dist`, `.next`, `.turbo`, `.pnpm-store`, `.cache`
+- **Проверка**: `npm run map:check` — сравнивает с текущим PROJECT_MAP.md
+
+### VS Code Task
+
+Доступна задача "Update Project Map" для ручного обновления карты проекта.
+
 ## Лицензии
 
 - core: Apache-2.0 (см. LICENSE.Apache-2.0)

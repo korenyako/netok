@@ -1,1 +1,17 @@
-{}
+{
+  "name": "netok",
+  "version": "0.1.0",
+  "description": "Network diagnostics desktop app",
+  "scripts": {
+    "map": "node scripts/generate_project_map.mjs",
+    "map:check": "node scripts/generate_project_map.mjs --check"
+  },
+  "devDependencies": {
+    "husky": "^8.0.3"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run map && git add PROJECT_MAP.md"
+    }
+  }
+}
