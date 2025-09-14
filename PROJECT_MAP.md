@@ -153,7 +153,6 @@ Generated: 2025-09-14
 │   │   │   └── react.svg
 │   │   ├── components
 │   │   │   ├── HeaderStatus.tsx
-│   │   │   ├── LanguageToggle.tsx
 │   │   │   ├── MainPage.tsx
 │   │   │   ├── NodeCard.tsx
 │   │   │   ├── SettingsPage.tsx

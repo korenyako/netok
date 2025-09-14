@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { LanguageToggle } from './LanguageToggle';
 
 type SettingsTab = 'general' | 'dns' | 'geo' | 'tools';
 
 export function SettingsPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<SettingsTab>('general');
   
@@ -37,6 +36,11 @@ export function SettingsPage() {
     console.log(`Tool action: ${action}`);
   };
 
+  const handleLanguageChange = (lang: string) => {
+    i18n.changeLanguage(lang);
+    localStorage.setItem('netok.lang', lang);
+  };
+
   const tabs: { key: SettingsTab; label: string }[] = [
     { key: 'general', label: t('settings.tabs.general') },
     { key: 'dns', label: t('settings.tabs.dns') },
@@ -50,7 +54,14 @@ export function SettingsPage() {
         <h3 className="text-sm font-semibold text-neutral-900 mb-3">
           {t('settings.general.language')}
         </h3>
-        <LanguageToggle />
+        <select 
+          value={i18n.language}
+          onChange={(e) => handleLanguageChange(e.target.value)}
+          className="h-9 px-3 rounded-md border bg-white text-sm w-32"
+        >
+          <option value="ru">{t('settings.general.language_ru')}</option>
+          <option value="en">{t('settings.general.language_en')}</option>
+        </select>
       </div>
       
       <div>
@@ -175,16 +186,16 @@ export function SettingsPage() {
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
-      <header className="p-3 bg-white border-b border-neutral-200">
-        <div className="flex justify-between items-center">
+      <header className="bg-white border-b border-neutral-200">
+        <div className="flex justify-between items-center px-4 py-2">
           <h1 className="text-lg font-semibold text-neutral-900">
             {t('settings.title')}
           </h1>
           <button
             onClick={handleClose}
-            className="w-8 h-8 flex items-center justify-center text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100 rounded-lg"
+            className="h-8 px-3 rounded-md border border-neutral-300 bg-white text-sm text-neutral-700 hover:bg-neutral-50 hover:border-neutral-400"
           >
-            ✕
+            {t('buttons.back')}
           </button>
         </div>
       </header>
