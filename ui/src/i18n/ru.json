@@ -67,6 +67,42 @@
     "diagnostics": "Ошибка диагностики",
     "network_error": "Ошибка сети"
   },
+  "settings": {
+    "title": "Настройки",
+    "tabs": {
+      "general": "Общие",
+      "dns": "DNS",
+      "geo": "Geo",
+      "tools": "Инструменты"
+    },
+    "general": {
+      "language": "Язык",
+      "language_ru": "Русский",
+      "language_en": "English",
+      "remember_window_size": "Запоминать размер окна"
+    },
+    "dns": {
+      "mode": "Режим DNS",
+      "mode_auto": "Автоматически",
+      "mode_cloudflare": "Cloudflare 1.1.1.1",
+      "mode_google": "Google 8.8.8.8",
+      "mode_custom": "Свой вариант",
+      "custom_dns": "Свои DNS-серверы",
+      "custom_dns_placeholder": "Введите DNS-серверы (например, 1.1.1.1, 8.8.8.8)",
+      "flush_cache": "Очистить DNS-кэш"
+    },
+    "geo": {
+      "show_location": "Показывать страну и город для публичного IP",
+      "description": "Если отключено, геоинформация будет скрыта на узле Интернет"
+    },
+    "tools": {
+      "speed_test": "Короткий тест скорости",
+      "flush_dns": "Очистить DNS-кэш",
+      "open_captive": "Открыть страницу входа Wi-Fi (каптив)",
+      "open_router": "Открыть страницу роутера",
+      "copy_diagnostics": "Скопировать диагностику"
+    }
+  },
   "mock_data": {
     "computer_name": "DESKTOP-ABC123",
     "computer_model": "Dell OptiPlex 7090",

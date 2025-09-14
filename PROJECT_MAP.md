@@ -154,7 +154,9 @@ Generated: 2025-09-14
 │   │   ├── components
 │   │   │   ├── HeaderStatus.tsx
 │   │   │   ├── LanguageToggle.tsx
-│   │   │   └── NodeCard.tsx
+│   │   │   ├── MainPage.tsx
+│   │   │   ├── NodeCard.tsx
+│   │   │   └── SettingsPage.tsx
 │   │   ├── i18n
 │   │   │   ├── en.json
 │   │   │   └── ru.json
@@ -259,6 +261,7 @@ Generated: 2025-09-14
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-i18next": "^15.7.3",
+    "react-router-dom": "^7.9.1",
     "zustand": "^5.0.8"
   },
   "devDependencies": {
@@ -338,62 +341,25 @@ createRoot(document.getElementById('root')!).render(
 ### ui/src/App.tsx
 
 ```typescript
-import { useTranslation } from 'react-i18next';
-import { HeaderStatus } from './components/HeaderStatus';
-import { NodeCard } from './components/NodeCard';
-import { LanguageToggle } from './components/LanguageToggle';
-import { useDiagnostics } from './store/useDiagnostics';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { MainPage } from './components/MainPage';
+import { SettingsPage } from './components/SettingsPage';
 
 function App() {
-  const { t } = useTranslation();
-  const { data, loading, updatedAt, refresh } = useDiagnostics();
-
-  const handleRefresh = () => {
-    refresh();
-  };
-
-  const getUpdatedTime = () => {
-    if (!updatedAt) return null;
-    return t('meta.updated', { 
-      time: new Date(updatedAt).toLocaleTimeString() 
-    });
-  };
-
   return (
-    <div id="app" className="h-full flex flex-col">
-      <header className="p-3 bg-white border-b border-neutral-200">
-        <div className="flex justify-end items-center">
-          <LanguageToggle />
-        </div>
-      </header>
-      
-      <main className="flex-1 overflow-y-auto p-3">
-        <div className="space-y-3">
-          {/* Header Status */}
-          {data && (
-            <HeaderStatus 
-              internetStatus={data.overall}
-              speed={data.speed}
-              vpnDetected={data.vpnDetected}
-            />
-          )}
-          
-          {/* Node Cards */}
-          {data && (
-            <div>
-              <NodeCard type="computer" data={data.computer} />
-              <NodeCard type="network" data={data.network} />
-              <NodeCard type="router" data={data.router} />
-              <NodeCard
-  type="internet"
-  data={data.internet}
-  geoConsent={data.geoConsent}
-/>
-            </div>
-          )}
+    <Router>
+      <div id="app" className="h-full">
+        <Routes>
+          <Route path="/" element={<MainPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+        </Routes>
+      </div>
+    </Router>
+  );
 }
 
 export default App;
+
 ```
 
 ## MAP

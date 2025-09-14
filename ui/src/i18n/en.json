@@ -67,6 +67,42 @@
     "diagnostics": "Diagnostics error",
     "network_error": "Network error"
   },
+  "settings": {
+    "title": "Settings",
+    "tabs": {
+      "general": "General",
+      "dns": "DNS",
+      "geo": "Geo",
+      "tools": "Tools"
+    },
+    "general": {
+      "language": "Language",
+      "language_ru": "Russian",
+      "language_en": "English",
+      "remember_window_size": "Remember window size"
+    },
+    "dns": {
+      "mode": "DNS mode",
+      "mode_auto": "Automatic",
+      "mode_cloudflare": "Cloudflare 1.1.1.1",
+      "mode_google": "Google 8.8.8.8",
+      "mode_custom": "Custom",
+      "custom_dns": "Custom DNS servers",
+      "custom_dns_placeholder": "Enter DNS servers (e.g., 1.1.1.1, 8.8.8.8)",
+      "flush_cache": "Flush DNS cache"
+    },
+    "geo": {
+      "show_location": "Show country and city for public IP",
+      "description": "If disabled, geo info will be hidden on Internet node"
+    },
+    "tools": {
+      "speed_test": "Quick speed test",
+      "flush_dns": "Clear DNS cache",
+      "open_captive": "Open Wi-Fi login page (captive)",
+      "open_router": "Open router page",
+      "copy_diagnostics": "Copy diagnostics"
+    }
+  },
   "mock_data": {
     "computer_name": "DESKTOP-ABC123",
     "computer_model": "Dell OptiPlex 7090",
