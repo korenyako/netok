@@ -15,14 +15,14 @@
   "settings.language_en": "English",
   "error.diagnostics": "Diagnostics error",
   "status.no_data": "No data. Click 'Refresh'.",
-  "status.internet_ok": "Internet is working",
-  "status.internet_partial": "Internet partially working",
-  "status.internet_down": "Internet is down",
-  "status.waiting": "Waiting...",
-  "status.ok_short": "OK",
+  "status.internet_ok": "Internet is up",
+  "status.internet_partial": "Internet partially available",
+  "status.internet_down": "Internet unavailable",
+  "status.waiting": "Checking connection...",
+  "status.ok_short": "Ok",
   "status.partial_short": "Partial",
   "status.down_short": "Down",
   "status.unknown": "Unknown",
   "meta.updated": "Updated: {{time}}",
-  "speed.line": "Speed: {{down}} Mbps ↓ / {{up}} Mbps ↑"
+  "speed.line": "Speed: {{down}}/{{up}} Mbps"
 }

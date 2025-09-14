@@ -16,13 +16,13 @@
   "error.diagnostics": "Ошибка диагностики",
   "status.no_data": "Нет данных. Нажмите «Обновить».",
   "status.internet_ok": "Интернет работает",
-  "status.internet_partial": "Интернет работает частично",
-  "status.internet_down": "Интернет не работает",
-  "status.waiting": "Ожидание...",
-  "status.ok_short": "ОК",
+  "status.internet_partial": "Интернет частично доступен",
+  "status.internet_down": "Интернет недоступен",
+  "status.waiting": "Проверяем соединение…",
+  "status.ok_short": "Ok",
   "status.partial_short": "Частично",
-  "status.down_short": "Не работает",
+  "status.down_short": "Нет",
   "status.unknown": "Неизвестно",
   "meta.updated": "Обновлено: {{time}}",
-  "speed.line": "Скорость: {{down}} Мбит/с ↓ / {{up}} Мбит/с ↑"
+  "speed.line": "Скорость: {{down}}/{{up}} Мбит/с"
 }
