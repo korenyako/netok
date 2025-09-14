@@ -3,14 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { HeaderStatus } from './HeaderStatus';
 import { NodeCard } from './NodeCard';
 import { useDiagnostics } from '../store/useDiagnostics';
+import Spinner from './Spinner';
 
 export function MainPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { data, loading, updatedAt, refresh } = useDiagnostics();
 
-  const handleRefresh = () => {
-    refresh();
+  const handleRefresh = async () => {
+    if (!loading) {
+      await refresh();
+    }
   };
 
   const handleSettings = () => {
@@ -70,11 +73,21 @@ export function MainPage() {
           </span>
           <div className="flex gap-2">
             <button
+              type="button"
               onClick={handleRefresh}
               disabled={loading}
-              className="h-10 px-4 shrink-0 bg-neutral-600 text-white rounded-lg hover:bg-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+              className="relative h-10 px-4 shrink-0 rounded-lg border bg-neutral-600 text-white hover:bg-neutral-700 disabled:opacity-60 disabled:cursor-not-allowed font-medium"
+              aria-live="polite"
+              aria-busy={loading}
             >
-              {loading ? t('status.waiting') : t('buttons.refresh')}
+              <span className={loading ? "opacity-0" : "opacity-100"}>
+                {t('buttons.refresh')}
+              </span>
+              {loading && (
+                <span className="absolute inset-0 grid place-items-center">
+                  <Spinner className="size-4 animate-spin text-white" />
+                </span>
+              )}
             </button>
             <button 
               onClick={handleSettings}

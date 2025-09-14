@@ -156,7 +156,8 @@ Generated: 2025-09-14
 │   │   │   ├── LanguageToggle.tsx
 │   │   │   ├── MainPage.tsx
 │   │   │   ├── NodeCard.tsx
-│   │   │   └── SettingsPage.tsx
+│   │   │   ├── SettingsPage.tsx
+│   │   │   └── Spinner.tsx
 │   │   ├── i18n
 │   │   │   ├── en.json
 │   │   │   └── ru.json
