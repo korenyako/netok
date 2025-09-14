@@ -20,7 +20,14 @@ const resources = {
       "status.down_short": "Нет",
       "status.unknown": "Неизвестно",
       "status.waiting": "Проверяем соединение…",
-      "speed.line": "Скорость: {{down}}/{{up}} Мбит/с"
+      "speed.line": "Скорость: {{down}}/{{up}} Мбит/с",
+      "meta.updated": "Обновлено: {{time}}",
+      "button.settings": "Настройки",
+      "button.close": "Закрыть",
+      "settings.title": "Настройки",
+      "settings.language": "Язык",
+      "settings.language_ru": "Русский",
+      "settings.language_en": "English"
     }
   },
   en: {
@@ -40,16 +47,26 @@ const resources = {
       "status.down_short": "Down",
       "status.unknown": "Unknown",
       "status.waiting": "Checking connection…",
-      "speed.line": "Speed: {{down}}/{{up}} Mbps"
+      "speed.line": "Speed: {{down}}/{{up}} Mbps",
+      "meta.updated": "Updated: {{time}}",
+      "button.settings": "Settings",
+      "button.close": "Close",
+      "settings.title": "Settings",
+      "settings.language": "Language",
+      "settings.language_ru": "Русский",
+      "settings.language_en": "English"
     }
   }
 };
+
+// Read saved language from localStorage
+const savedLang = localStorage.getItem('netok.lang') || 'ru';
 
 i18next
   .use(initReactI18next)
   .init({
     resources,
-    lng: 'ru',           // temp default; later read saved user setting
+    lng: savedLang,
     fallbackLng: 'en',
     ns: ['common'],
     defaultNS: 'common',

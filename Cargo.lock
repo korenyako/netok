@@ -2069,6 +2069,7 @@ dependencies = [
 name = "netok_bridge"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "netok_core",
  "serde",
  "serde_json",

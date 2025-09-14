@@ -1,32 +1,12 @@
-use netok_core::{run_diagnostics, get_default_settings, Settings, NodeId, Status};
-use serde::{Deserialize, Serialize};
+use netok_core::{run_diagnostics, get_default_settings, Settings};
+
+mod types;
+pub use types::{Overall, NodeId, NodeResult, Speed, Snapshot};
 
 #[derive(thiserror::Error, Debug)]
 pub enum BridgeError {
     #[error("invalid json: {0}")]
     InvalidJson(String),
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct NodeResult {
-    pub id: String,
-    pub label: String,
-    pub status: String,
-    pub latency_ms: Option<u32>,
-    pub details: Option<String>,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct Snapshot {
-    pub overall: String,
-    pub nodes: Vec<NodeResult>,
-    pub speed: Option<SpeedInfo>,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct SpeedInfo {
-    pub down_mbps: Option<f64>,
-    pub up_mbps: Option<f64>,
 }
 
 pub fn get_settings_json() -> String {
@@ -46,54 +26,44 @@ pub fn run_diagnostics_json(settings_json: Option<&str>) -> Result<String, Bridg
     Ok(serde_json::to_string(&snapshot).unwrap())
 }
 
-pub async fn run_diagnostics_struct() -> Result<Snapshot, BridgeError> {
-    let settings = get_default_settings();
-    let diagnostics = run_diagnostics(&settings);
-    
-    // Convert from DiagnosticsSnapshot to Snapshot
-    let nodes: Vec<NodeResult> = diagnostics.nodes.into_iter().map(|node| {
-        let id = match node.id {
-            NodeId::Computer => "computer",
-            NodeId::Wifi => "network", 
-            NodeId::RouterUpnp => "router",
-            NodeId::Dns => "dns",
-            NodeId::Internet => "internet",
-        }.to_string();
-        
-        let label = match node.id {
-            NodeId::Computer => "Компьютер",
-            NodeId::Wifi => "Wi-Fi",
-            NodeId::RouterUpnp => "Роутер",
-            NodeId::Dns => "DNS",
-            NodeId::Internet => "Интернет",
-        }.to_string();
-        
-        let status = match node.status {
-            Status::Ok => "ok",
-            Status::Warn => "partial",
-            Status::Fail => "down",
-            Status::Unknown => "unknown",
-        }.to_string();
-        
-        NodeResult {
-            id,
-            label,
-            status,
-            latency_ms: node.latency_ms,
-            details: node.hint_key,
-        }
-    }).collect();
-    
-    let overall = match diagnostics.summary_key.as_str() {
-        "summary.ok" => "ok",
-        "summary.partial" => "partial", 
-        "summary.down" => "down",
-        _ => "unknown",
-    }.to_string();
-    
+pub async fn run_diagnostics_struct() -> Result<Snapshot, anyhow::Error> {
+    // TODO: собрать реальные данные из netok_core.
+    // Временно вернём мок, чтобы сшить фронт.
     Ok(Snapshot {
-        overall,
-        nodes,
-        speed: None, // TODO: add speed info if needed
+        overall: Overall::Ok,
+        nodes: vec![
+            NodeResult { 
+                id: NodeId::Computer, 
+                label: "Компьютер".into(), 
+                status: Overall::Ok, 
+                latency_ms: Some(3), 
+                details: None 
+            },
+            NodeResult { 
+                id: NodeId::Network,  
+                label: "Wi-Fi".into(),    
+                status: Overall::Ok, 
+                latency_ms: Some(12), 
+                details: None 
+            },
+            NodeResult { 
+                id: NodeId::Dns,      
+                label: "DNS".into(),      
+                status: Overall::Ok, 
+                latency_ms: Some(28), 
+                details: None 
+            },
+            NodeResult { 
+                id: NodeId::Internet, 
+                label: "Интернет".into(), 
+                status: Overall::Ok, 
+                latency_ms: Some(45), 
+                details: None 
+            },
+        ],
+        speed: Some(Speed { 
+            down_mbps: Some(73.0), 
+            up_mbps: Some(18.0) 
+        }),
     })
 }
