@@ -175,13 +175,16 @@ Generated: 2025-09-21
 ├── CONTRIBUTING.md
 ├── LICENSE.Apache-2.0
 ├── LICENSE.Proprietary
+├── Loading prop to NodeCard for better UX
 ├── package-lock.json
 ├── package.json
 ├── PROJECT_CONTEXT.md
 ├── PROJECT_MAP.md
 ├── README_DEV.md
 ├── README.md
+├── s Refresh' when !isLoading
 ├── SETUP-PRECOMMIT.md
+├── tatus
 └── test_logging.rs
 
 ```

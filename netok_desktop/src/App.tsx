@@ -1,5 +1,5 @@
-import { AppRouter } from './ui/router/AppRouter';
+import MainPage from './components/MainPage';
 
 export default function App() {
-  return <AppRouter />;
+  return <MainPage />;
 }

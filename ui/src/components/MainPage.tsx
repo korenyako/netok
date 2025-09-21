@@ -9,10 +9,11 @@ import { formatUpdatedAt } from '../utils/formatUpdatedAt';
 export function MainPage() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const { data, loading, lastUpdated } = useDiagnostics();
+  const { snapshot, isLoading, lastUpdated, refresh } = useDiagnostics();
 
   const handleRefresh = async () => {
-    if (!loading) {
+    console.log('[handleRefresh] button clicked');
+    if (!isLoading) {
       await refresh();
     }
   };
@@ -35,33 +36,33 @@ export function MainPage() {
       <main className="flex-1 overflow-y-auto p-3">
         <div className="space-y-3">
           {/* Header Status */}
-          {data && (
+          {snapshot && snapshot.overall !== 'checking' && (
             <HeaderStatus 
-              internetStatus={data.overall}
-              speed={data.speed}
-              vpnDetected={data.vpnDetected}
+              internetStatus={snapshot.overall as 'ok' | 'partial' | 'down'}
+              speed={snapshot.speed}
+              vpnDetected={snapshot.vpnDetected}
             />
           )}
           
           {/* Node Cards */}
-          {data && (
+          {snapshot && (
             <div>
-              <NodeCard type="computer" data={data.computer} />
-              <NodeCard type="network" data={data.network} />
-              <NodeCard type="router" data={data.router} />
-              <NodeCard type="internet" data={data.internet} geoConsent={data.geoConsent} />
+              <NodeCard type="computer" data={snapshot.computer} isLoading={isLoading} />
+              <NodeCard type="network" data={snapshot.network} isLoading={isLoading} />
+              <NodeCard type="router" data={snapshot.router} isLoading={isLoading} />
+              <NodeCard type="internet" data={snapshot.internet} geoConsent={snapshot.geoConsent} isLoading={isLoading} />
             </div>
           )}
 
-          {/* Loading state */}
-          {loading && (
+          {/* Loading state - show when isLoading */}
+          {isLoading && (
             <div className="text-center py-8">
               <div className="text-neutral-500">{t('status.waiting')}</div>
             </div>
           )}
 
-          {/* No data state */}
-          {!loading && !data && (
+          {/* No data state - only show when not loading and no snapshot */}
+          {!isLoading && !snapshot && (
             <div className="text-center py-8">
               <div className="text-neutral-500">{t('meta.no_data')}</div>
             </div>
@@ -69,7 +70,7 @@ export function MainPage() {
         </div>
       </main>
       
-      <footer className="sticky bottom-0 border-t border-neutral-200 bg-white p-3">
+      <footer className="sticky bottom-0 border-t border-neutral-200 bg-white p-3 z-10">
         <div className="flex justify-between items-center">
           <span className="text-neutral-500 text-[13px] self-center">
             {getUpdatedTime()}
@@ -78,15 +79,15 @@ export function MainPage() {
             <button
               type="button"
               onClick={handleRefresh}
-              disabled={loading}
+              disabled={isLoading}
               className="relative h-10 px-4 shrink-0 rounded-lg border bg-neutral-600 text-white hover:bg-neutral-700 disabled:opacity-60 disabled:cursor-not-allowed font-medium"
               aria-live="polite"
-              aria-busy={loading}
+              aria-busy={isLoading}
             >
-              <span className={loading ? "opacity-0" : "opacity-100"}>
+              <span className={isLoading ? "opacity-0" : "opacity-100"}>
                 {t('buttons.refresh')}
               </span>
-              {loading && (
+              {isLoading && (
                 <span className="absolute inset-0 grid place-items-center">
                   <Spinner className="size-4 animate-spin text-white" />
                 </span>

@@ -4,7 +4,9 @@
   "description": "Network diagnostics desktop app",
   "scripts": {
     "map": "node scripts/generate_project_map.mjs",
-    "map:check": "node scripts/generate_project_map.mjs --check"
+    "map:check": "node scripts/generate_project_map.mjs --check",
+    "dev:ui": "npm --prefix ./ui run dev",
+    "build:ui": "npm --prefix ./ui ci && npm --prefix ./ui run build"
   },
   "devDependencies": {
     "husky": "^8.0.3"

@@ -33,8 +33,17 @@ pub struct Speed {
 }
 
 #[derive(Debug, Serialize)]
+pub struct ComputerInfo {
+    pub hostname: Option<String>,
+    pub model: Option<String>,
+    pub adapter: Option<String>,
+    pub local_ip: Option<String>,
+}
+
+#[derive(Debug, Serialize)]
 pub struct Snapshot {
     pub overall: Overall,
     pub nodes:   Vec<NodeResult>,
     pub speed:   Option<Speed>,
+    pub computer: ComputerInfo,
 }

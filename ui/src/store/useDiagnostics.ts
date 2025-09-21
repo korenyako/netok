@@ -13,10 +13,10 @@ export interface NetworkInfo {
 }
 
 export interface ComputerInfo {
-  name: string;
-  model: string;
-  adapter: string;
-  localIp: string;
+  hostname?: string;
+  model?: string;
+  adapter?: string;
+  local_ip?: string;
 }
 
 export interface RouterInfo {
@@ -39,7 +39,7 @@ export interface SpeedInfo {
 
 export interface DiagnosticsData {
   overall: OverallStatus;
-  computer: ComputerInfo;
+  computer: ComputerInfo | null;
   network: NetworkInfo;
   router: RouterInfo;
   internet: InternetInfo;
@@ -49,24 +49,57 @@ export interface DiagnosticsData {
   updatedAt: number;
 }
 
+// Alias for clarity
+export type DiagnosticsSnapshot = DiagnosticsData;
+
 interface DiagnosticsStore {
-  data: DiagnosticsData | null;
-  loading: boolean;
-  error: string | null;
-  updatedAt: number;
+  snapshot: DiagnosticsSnapshot | null;
   lastUpdated: Date | null;
+  isLoading: boolean;
   refresh: () => Promise<void>;
-  clearError: () => void;
 }
+
+// Parse backend diagnostics data
+const parseBackendData = (backendData: any): DiagnosticsData => {
+  return {
+    overall: 'ok', // TODO: Parse from backend
+    computer: backendData.computer || null,
+    network: {
+      type: 'wifi', // TODO: Parse from backend
+      signal: {
+        level: 'excellent',
+        dbm: -45
+      }
+    },
+    router: {
+      model: i18next.t('mock_data.router_model'),
+      brand: i18next.t('mock_data.router_brand'),
+      localIp: '192.168.1.1'
+    },
+    internet: {
+      provider: i18next.t('mock_data.provider_name'),
+      publicIp: '95.84.123.45',
+      country: i18next.t('mock_data.country_name'),
+      city: i18next.t('mock_data.city_name')
+    },
+    speed: {
+      down: 95,
+      up: 45
+    },
+    vpnDetected: false,
+    geoConsent: true,
+    updatedAt: Date.now()
+  };
+};
 
 // Realistic placeholder data
 const createMockData = (): DiagnosticsData => ({
   overall: 'ok',
   computer: {
-    name: i18next.t('mock_data.computer_name'),
-    model: i18next.t('mock_data.computer_model'),
-    adapter: i18next.t('mock_data.adapter_name'),
-    localIp: '192.168.1.105'
+    hostname: 'DESKTOP-ABC123',
+    model: 'Dell OptiPlex 7090',
+    adapter: 'Intel Wi-Fi 6 AX201',
+    local_ip: '192.168.1.105'
   },
   network: {
     type: 'wifi',
@@ -95,21 +128,30 @@ const createMockData = (): DiagnosticsData => ({
   updatedAt: Date.now()
 });
 
-export const useDiagnostics = create<DiagnosticsStore>((set) => ({
-  data: null,
-  loading: false,
-  error: null,
-  updatedAt: 0,
+export const useDiagnostics = create<DiagnosticsStore>((set, get) => ({
+  snapshot: null,
   lastUpdated: null,
+  isLoading: false,
 
   refresh: async () => {
-    set({ loading: true, error: null });
+    console.log('[refresh] start');
+    
+    if (get().isLoading) {
+      console.log('[refresh] already loading, skipping');
+      return;
+    }
+    
+    set({ isLoading: true });
     
     try {
-      // Simulate network delay
+      // TODO: Replace with actual Tauri invoke call
+      // const data = await invoke<DiagnosticsSnapshot>("run_diagnostics");
+      
+      // Simulate network delay and data generation
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Generate new mock data with slight variations
+      // For now, use mock data but with real computer info structure
+      // In the future, this will be replaced with actual backend data
       const mockData = createMockData();
       
       // Add some randomness to make it feel realistic
@@ -121,20 +163,18 @@ export const useDiagnostics = create<DiagnosticsStore>((set) => ({
         };
       }
       
-      const now = new Date();
-      set({ 
-        data: mockData, 
-        loading: false,
-        updatedAt: Date.now(),
-        lastUpdated: now
+      set({
+        snapshot: mockData,
+        lastUpdated: new Date(),
       });
-    } catch (error) {
-      set({ 
-        error: error instanceof Error ? error.message : 'Unknown error',
-        loading: false 
-      });
+      
+      console.log('[refresh] success');
+    } catch (e) {
+      console.error('[refresh] failed', e);
+      // keep previous snapshot and lastUpdated on error
+    } finally {
+      set({ isLoading: false });
+      console.log('[refresh] end');
     }
   },
-
-  clearError: () => set({ error: null })
 }));

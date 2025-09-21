@@ -18,7 +18,7 @@
       "name_field": "Name",
       "model_field": "Model",
       "adapter_field": "Network adapter",
-      "local_ip_field": "IP in local network"
+      "local_ip_field": "Local IP"
     },
     "network": {
       "name": "Network",

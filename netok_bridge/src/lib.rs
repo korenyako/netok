@@ -1,7 +1,7 @@
 use netok_core::{run_diagnostics, get_default_settings, Settings};
 
 mod types;
-pub use types::{Overall, NodeId, NodeResult, Speed, Snapshot};
+pub use types::{Overall, NodeId, NodeResult, Speed, Snapshot, ComputerInfo};
 
 #[derive(thiserror::Error, Debug)]
 pub enum BridgeError {
@@ -65,5 +65,11 @@ pub async fn run_diagnostics_struct() -> Result<Snapshot, anyhow::Error> {
             down_mbps: Some(73.0), 
             up_mbps: Some(18.0) 
         }),
+        computer: ComputerInfo {
+            hostname: Some("DESKTOP-ABC123".to_string()),
+            model: Some("Dell OptiPlex 7090".to_string()),
+            adapter: Some("Intel Wi-Fi 6 AX201".to_string()),
+            local_ip: Some("192.168.1.105".to_string()),
+        },
     })
 }
