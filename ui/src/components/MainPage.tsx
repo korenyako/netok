@@ -47,10 +47,49 @@ export function MainPage() {
           {/* Node Cards */}
           {snapshot && (
             <div>
-              <NodeCard type="computer" data={snapshot.computer} isLoading={isLoading} />
-              <NodeCard type="network" data={snapshot.network} isLoading={isLoading} />
-              <NodeCard type="router" data={snapshot.router} isLoading={isLoading} />
-              <NodeCard type="internet" data={snapshot.internet} geoConsent={snapshot.geoConsent} isLoading={isLoading} />
+              {/* Computer Card */}
+              {snapshot.computer && (
+                <NodeCard 
+                  title={t('nodes.computer.name')}
+                  lines={[
+                    snapshot.computer.hostname && ['Имя', snapshot.computer.hostname],
+                    snapshot.computer.model && ['Модель', snapshot.computer.model],
+                    snapshot.computer.adapter && ['Сетевой адаптер', snapshot.computer.adapter],
+                    snapshot.computer.local_ip && ['IP в локальной сети', snapshot.computer.local_ip],
+                  ].filter(Boolean) as (string | [string, string])[]}
+                />
+              )}
+              
+              {/* Network Card */}
+              <NodeCard 
+                title={t('nodes.network.name')}
+                lines={[
+                  ['Тип', snapshot.network.type],
+                  snapshot.network.signal && ['Сигнал', `${snapshot.network.signal.level} (${snapshot.network.signal.dbm} dBm)`],
+                ].filter(Boolean) as (string | [string, string])[]}
+              />
+              
+              {/* Router Card */}
+              <NodeCard 
+                title={t('nodes.router.name')}
+                lines={[
+                  snapshot.router.brand && ['Бренд', snapshot.router.brand],
+                  snapshot.router.model && ['Модель', snapshot.router.model],
+                  ['Локальный IP', snapshot.router.localIp],
+                ].filter(Boolean) as (string | [string, string])[]}
+              />
+              
+              {/* Internet Card */}
+              <NodeCard 
+                title={t('nodes.internet.name')}
+                lines={[
+                  snapshot.internet.provider && ['Оператор', snapshot.internet.provider],
+                  ['Публичный IP', snapshot.internet.publicIp],
+                  snapshot.internet.country && ['Страна', snapshot.internet.country],
+                  snapshot.internet.city && ['Город', snapshot.internet.city],
+                  snapshot.speed && ['Скорость', `${snapshot.speed.down}↓ / ${snapshot.speed.up}↑ Мбит/с`],
+                ].filter(Boolean) as (string | [string, string])[]}
+              />
             </div>
           )}
 
