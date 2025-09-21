@@ -101,6 +101,7 @@ Generated: 2025-09-21
 │   │   │   ├── Square89x89Logo.png
 │   │   │   └── StoreLogo.png
 │   │   ├── src
+│   │   │   ├── commands.rs
 │   │   │   ├── lib.rs
 │   │   │   └── main.rs
 │   │   ├── .gitignore

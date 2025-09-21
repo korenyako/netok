@@ -1,6 +1,8 @@
 // Re-export types from netok_bridge
 pub use netok_bridge::{Snapshot, NodeResult, Speed};
 
+mod commands;
+
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
 fn get_settings() -> String {
@@ -23,7 +25,7 @@ async fn run_diagnostics() -> Result<netok_bridge::Snapshot, String> {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![get_settings, set_settings, run_diagnostics])
+        .invoke_handler(tauri::generate_handler![get_settings, set_settings, run_diagnostics, commands::get_snapshot])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
