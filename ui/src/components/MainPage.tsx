@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDiagnostics } from "../store/useDiagnostics";
 import { useSettings } from "../store/useSettings";
 import { NodeCard } from "../components/NodeCard";
+import Spinner from "./Spinner";
 
 export default function MainPage() {
   const navigate = useNavigate();
@@ -81,7 +82,7 @@ export default function MainPage() {
               </span>
               {isLoading && (
                 <span className="absolute inset-0 grid place-items-center">
-                  <div className="size-4 animate-spin text-white">⟳</div>
+                  <Spinner className="size-4 animate-spin text-white" />
                 </span>
               )}
             </button>
