@@ -123,6 +123,8 @@ Generated: 2025-09-21
 ├── src
 │   └── i18n.ts
 ├── ui
+│   ├── .husky
+│   │   └── pre-commit
 │   ├── public
 │   │   └── vite.svg
 │   ├── src
@@ -131,6 +133,7 @@ Generated: 2025-09-21
 │   │   ├── components
 │   │   │   ├── DNSTab.tsx
 │   │   │   ├── HeaderStatus.tsx
+│   │   │   ├── MainPage.i18n.test.tsx
 │   │   │   ├── MainPage.tsx
 │   │   │   ├── NodeCard.tsx
 │   │   │   ├── SettingsPage.tsx
@@ -143,6 +146,8 @@ Generated: 2025-09-21
 │   │   ├── store
 │   │   │   ├── useDiagnostics.ts
 │   │   │   └── useSettings.ts
+│   │   ├── test
+│   │   │   └── setup.ts
 │   │   ├── types
 │   │   │   └── diagnostics.ts
 │   │   ├── utils
@@ -163,7 +168,8 @@ Generated: 2025-09-21
 │   ├── tsconfig.app.json
 │   ├── tsconfig.json
 │   ├── tsconfig.node.json
-│   └── vite.config.ts
+│   ├── vite.config.ts
+│   └── vitest.config.ts
 ├── ui_legacy
 │   ├── assets
 │   ├── src
@@ -239,7 +245,23 @@ Generated: 2025-09-21
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "lint:i18n": "eslint src/**/*.{ts,tsx}",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:i18n": "vitest run --reporter=verbose MainPage.i18n.test.tsx",
+    "i18n:scan": "powershell -Command \"Get-ChildItem -Path src -Recurse -Include *.ts,*.tsx,*.js,*.jsx | Where-Object { $_.FullName -notlike '*i18n*' -and $_.FullName -notlike '*node_modules*' -and $_.FullName -notlike '*dist*' } | ForEach-Object { Select-String -Path $_.FullName -Pattern '[А-Яа-яЁё]' -SimpleMatch:$false }\"",
+    "i18n:enforce": "powershell -Command \"$found = Get-ChildItem -Path src -Recurse -Include *.ts,*.tsx,*.js,*.jsx | Where-Object { $_.FullName -notlike '*i18n*' -and $_.FullName -notlike '*node_modules*' -and $_.FullName -notlike '*dist*' } | ForEach-Object { Select-String -Path $_.FullName -Pattern '[А-Яа-яЁё]' -SimpleMatch:$false } | Select-Object -First 1; if ($found) { echo '🔴 Cyrillic found outside i18n'; exit 1 } else { echo '✅ i18n clean' }\"",
+    "i18n:scan:rg": "rg -n --glob '!src/i18n/**' --glob '!node_modules/**' --glob '!dist/**' -e '[А-Яа-яЁё]' src || echo 'No Cyrillic found'",
+    "i18n:enforce:rg": "rg -n --glob '!src/i18n/**' --glob '!node_modules/**' --glob '!dist/**' -e '[А-Яа-яЁё]' src && echo '🔴 Cyrillic found outside i18n' && exit 1 || echo '✅ i18n clean'",
+    "preview": "vite preview",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "src/**/*.{ts,tsx}": [
+      "eslint --fix",
+      "npm run i18n:enforce"
+    ],
+    "!src/**/*.test.{ts,tsx}": []
   },
   "dependencies": {
     "@tauri-apps/api": "^2.8.0",
@@ -253,6 +275,9 @@ Generated: 2025-09-21
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",
+    "@testing-library/jest-dom": "^6.4.2",
+    "@testing-library/react": "^16.0.0",
+    "@testing-library/user-event": "^14.5.2",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
     "@vitejs/plugin-react": "^5.0.0",
@@ -261,14 +286,7 @@ Generated: 2025-09-21
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.3.0",
-    "postcss": "^8.5.6",
-    "tailwindcss": "^3.4.17",
-    "typescript": "~5.8.3",
-    "typescript-eslint": "^8.39.1",
-    "vite": "^7.1.2"
-  }
-}
-
+// ... (truncated due to syntax error)
 ```
 
 ### ui/tailwind.config.js

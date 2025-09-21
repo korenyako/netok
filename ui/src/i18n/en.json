@@ -10,8 +10,9 @@
     "speed": "Speed: {down}/{up} Mbps",
     "connection_no_vpn": "Connection without VPN. Configure VPN",
     "connection_vpn_detected": "VPN connection detected",
-    "waiting": "Checking connection...",
-    "applying_settings": "Applying settings..."
+    "waiting": "Refreshing…",
+    "applying_settings": "Applying settings...",
+    "error_prefix": "Error"
   },
   "internet": {
     "full": "Internet available.",
@@ -19,7 +20,9 @@
     "down": "Internet unavailable."
   },
   "speed": {
-    "label": "Speed: {speed}"
+    "label": "Speed: {{speed}}",
+    "value": "{{down}}/{{up}} Mbps",
+    "unit": "Mbps"
   },
   "nodes": {
     "computer": {
@@ -37,10 +40,10 @@
       "type_bt": "Bluetooth",
       "type_mobile": "Mobile modem",
       "signal_field": "Signal",
-      "signal_excellent": "excellent",
-      "signal_good": "good",
-      "signal_fair": "fair",
-      "signal_weak": "weak",
+      "signal_excellent": "Signal: excellent",
+      "signal_good": "Signal: good",
+      "signal_fair": "Signal: fair",
+      "signal_weak": "Signal: weak",
       "link_field": "Link",
       "link_up": "up",
       "link_down": "down"
@@ -57,6 +60,8 @@
     }
   },
   "unknown": "unknown",
+  "dash": "—",
+  "updated_at": "Updated",
   "buttons": {
     "refresh": "Refresh",
     "settings": "Settings",

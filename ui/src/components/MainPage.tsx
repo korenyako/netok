@@ -6,6 +6,15 @@ import { useSettings } from "../store/useSettings";
 import { NodeCard } from "../components/NodeCard";
 import Spinner from "./Spinner";
 
+function UpdatedAt({ time }: { time?: string | number }) {
+  const { t } = useTranslation();
+  return (
+    <span className="text-xs mt-3 opacity-70">
+      {t('updated_at')} {time ? new Date(time).toLocaleTimeString() : t('dash')}
+    </span>
+  );
+}
+
 export default function MainPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -19,10 +28,12 @@ export default function MainPage() {
     : snapshot?.overall === "partial" ? t('internet.partial')
     : t('internet.down');
 
-  const speed =
-    snapshot?.speed
-      ? `${snapshot.speed.down ?? "–"}/${snapshot.speed.up ?? "–"} Мбит/с`
-      : "—";
+  const speed = snapshot?.speed
+    ? t('speed.value', { 
+        down: snapshot.speed.down ?? t('dash'), 
+        up: snapshot.speed.up ?? t('dash') 
+      })
+    : t('dash');
 
   const handleSettings = () => {
     navigate('/settings');
@@ -43,8 +54,8 @@ export default function MainPage() {
           ]} />
 
           <NodeCard title={t('nodes.network.name')} lines={[
-            renderNetworkKind(snapshot),
-            renderNetworkMetric(snapshot),
+            renderNetworkKind(snapshot, t),
+            renderNetworkMetric(snapshot, t),
           ]} />
 
           <NodeCard title={t('nodes.router.name')} lines={[
@@ -55,20 +66,18 @@ export default function MainPage() {
           <NodeCard title={t('nodes.internet.name')} lines={[
             snapshot?.internet.provider ?? t('unknown'),
             `${t('nodes.internet.ip_field')}: ${snapshot?.internet.publicIp ?? t('unknown')}`,
-            ...(geoEnabled ? [renderGeo(snapshot)] : []),
+            ...(geoEnabled ? [renderGeo(snapshot, t)] : []),
           ]} />
 
-          {error && <div className="mt-2 text-red-500">Ошибка: {error}</div>}
-          <div className="text-xs mt-3 opacity-70">
-            Обновлено: {snapshot?.updatedAt ? new Date(snapshot.updatedAt).toLocaleTimeString() : "—"}
-          </div>
+          {error && <div className="mt-2 text-red-500">{t('status.error_prefix')} {error}</div>}
+          <UpdatedAt time={snapshot?.updatedAt} />
         </div>
       </main>
       
       <footer className="sticky bottom-0 border-t border-neutral-200 bg-white p-3 z-10">
         <div className="flex justify-between items-center">
           <span className="text-neutral-500 text-[13px] self-center">
-            {snapshot?.updatedAt ? new Date(snapshot.updatedAt).toLocaleTimeString() : "—"}
+            {snapshot?.updatedAt ? new Date(snapshot.updatedAt).toLocaleTimeString() : t('dash')}
           </span>
           <div className="flex gap-2">
             <button
@@ -101,8 +110,7 @@ export default function MainPage() {
   );
 }
 
-function renderNetworkKind(s?: any) {
-  const { t } = useTranslation();
+function renderNetworkKind(s: { network?: { type?: string } } | undefined, t: (key: string) => string) {
   const map: Record<string, string> = {
     wifi: t('nodes.network.type_wifi'),
     ethernet: t('nodes.network.type_cable'),
@@ -114,10 +122,9 @@ function renderNetworkKind(s?: any) {
   return map[s?.network?.type ?? "unknown"];
 }
 
-function renderNetworkMetric(s?: any) {
-  const { t } = useTranslation();
+function renderNetworkMetric(s: { network?: { signal?: { dbm?: number } } } | undefined, t: (key: string) => string) {
   const signal = s?.network?.signal;
-  if (!signal) return "—";
+  if (!signal) return t('dash');
   if (signal.dbm) {
     const lvl =
       signal.dbm >= -55 ? t('nodes.network.signal_excellent')
@@ -126,13 +133,13 @@ function renderNetworkMetric(s?: any) {
       : t('nodes.network.signal_weak');
     return `${t('nodes.network.signal_field')}: ${lvl} (${signal.dbm} dBm)`;
   }
-  return "—";
+  return t('dash');
 }
 
-function renderGeo(s?: any) {
+function renderGeo(s: { internet?: { country?: string; city?: string } } | undefined, t: (key: string) => string) {
   const country = s?.internet?.country;
   const city = s?.internet?.city;
-  if (!country && !city) return "—";
+  if (!country && !city) return t('dash');
   const place = [city, country].filter(Boolean).join(", ");
-  return place || "—";
+  return place || t('dash');
 }

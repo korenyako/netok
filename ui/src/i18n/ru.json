@@ -10,8 +10,9 @@
     "speed": "Скорость: {down}/{up} Мбит/с",
     "connection_no_vpn": "Соединение без VPN. Настроить VPN",
     "connection_vpn_detected": "VPN соединение обнаружено",
-    "waiting": "Проверяем соединение…",
-    "applying_settings": "Применяем настройки…"
+    "waiting": "Обновляю…",
+    "applying_settings": "Применяем настройки…",
+    "error_prefix": "Ошибка"
   },
   "internet": {
     "full": "Интернет доступен.",
@@ -19,7 +20,9 @@
     "down": "Интернет недоступен."
   },
   "speed": {
-    "label": "Скорость: {speed}"
+    "label": "Скорость: {{speed}}",
+    "value": "{{down}}/{{up}} Мбит/с",
+    "unit": "Мбит/с"
   },
   "nodes": {
     "computer": {
@@ -37,10 +40,10 @@
       "type_bt": "Bluetooth",
       "type_mobile": "Мобильный модем",
       "signal_field": "Сигнал",
-      "signal_excellent": "отличный",
-      "signal_good": "хороший",
-      "signal_fair": "средний",
-      "signal_weak": "слабый",
+      "signal_excellent": "Сигнал: отличный",
+      "signal_good": "Сигнал: хороший",
+      "signal_fair": "Сигнал: средний",
+      "signal_weak": "Сигнал: слабый",
       "link_field": "Линк",
       "link_up": "есть",
       "link_down": "нет"
@@ -57,6 +60,8 @@
     }
   },
   "unknown": "неизвестно",
+  "dash": "—",
+  "updated_at": "Обновлено",
   "buttons": {
     "refresh": "Обновить",
     "settings": "Настройки",
