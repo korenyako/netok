@@ -12,6 +12,14 @@
     "connection_vpn_detected": "VPN соединение обнаружено",
     "waiting": "Проверяем соединение…"
   },
+  "internet": {
+    "full": "Интернет доступен.",
+    "partial": "Интернет частично доступен.",
+    "down": "Интернет недоступен."
+  },
+  "speed": {
+    "label": "Скорость: {speed}"
+  },
   "nodes": {
     "computer": {
       "name": "Компьютер",
@@ -32,7 +40,9 @@
       "signal_good": "хороший",
       "signal_fair": "средний",
       "signal_weak": "слабый",
-      "link_field": "Линк"
+      "link_field": "Линк",
+      "link_up": "есть",
+      "link_down": "нет"
     },
     "router": {
       "name": "Роутер/Точка доступа",
@@ -45,6 +55,7 @@
       "ip_field": "IP"
     }
   },
+  "unknown": "неизвестно",
   "buttons": {
     "refresh": "Обновить",
     "settings": "Настройки",

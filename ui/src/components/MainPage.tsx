@@ -1,11 +1,13 @@
 import { useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useDiagnostics } from "../store/useDiagnostics";
 import { useSettings } from "../store/useSettings";
 import { NodeCard } from "../components/NodeCard";
 import Spinner from "./Spinner";
 
 export default function MainPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { snapshot, isLoading, refresh, error } = useDiagnostics();
   const { geoEnabled } = useSettings();
@@ -13,9 +15,9 @@ export default function MainPage() {
   useEffect(() => { refresh(); }, [refresh]);
 
   const title =
-    snapshot?.overall === "ok" ? "Интернет доступен."
-    : snapshot?.overall === "partial" ? "Интернет частично доступен."
-    : "Интернет недоступен.";
+    snapshot?.overall === "ok" ? t('internet.full')
+    : snapshot?.overall === "partial" ? t('internet.partial')
+    : t('internet.down');
 
   const speed =
     snapshot?.speed
@@ -31,28 +33,28 @@ export default function MainPage() {
       <main className="flex-1 overflow-y-auto p-4">
         <div className="space-y-3">
           <div className="mb-2">{title}</div>
-          <div className="mb-4">Скорость: {speed}</div>
+          <div className="mb-4">{t('speed.label', { speed })}</div>
 
-          <NodeCard title="Компьютер" lines={[
-            ["Имя", snapshot?.computer?.hostname ?? "неизвестно"],
-            ["Модель", snapshot?.computer?.model ?? "неизвестно"],
-            ["Сетевой адаптер", snapshot?.computer?.adapter ?? "неизвестно"],
-            ["IP в локальной сети", snapshot?.computer?.local_ip ?? "неизвестно"],
+          <NodeCard title={t('nodes.computer.name')} lines={[
+            [t('nodes.computer.name_field'), snapshot?.computer?.hostname ?? t('unknown')],
+            [t('nodes.computer.model_field'), snapshot?.computer?.model ?? t('unknown')],
+            [t('nodes.computer.adapter_field'), snapshot?.computer?.adapter ?? t('unknown')],
+            [t('nodes.computer.local_ip_field'), snapshot?.computer?.local_ip ?? t('unknown')],
           ]} />
 
-          <NodeCard title="Сеть" lines={[
+          <NodeCard title={t('nodes.network.name')} lines={[
             renderNetworkKind(snapshot),
             renderNetworkMetric(snapshot),
           ]} />
 
-          <NodeCard title="Роутер/Точка доступа" lines={[
-            `${snapshot?.router.brand ?? ""} ${snapshot?.router.model ?? ""}`.trim() || "неизвестно",
-            `IP в локальной сети: ${snapshot?.router.localIp ?? "неизвестно"}`,
+          <NodeCard title={t('nodes.router.name')} lines={[
+            `${snapshot?.router.brand ?? ""} ${snapshot?.router.model ?? ""}`.trim() || t('unknown'),
+            `${t('nodes.router.local_ip_field')}: ${snapshot?.router.localIp ?? t('unknown')}`,
           ]} />
 
-          <NodeCard title="Интернет" lines={[
-            snapshot?.internet.provider ?? "неизвестно",
-            `IP: ${snapshot?.internet.publicIp ?? "неизвестно"}`,
+          <NodeCard title={t('nodes.internet.name')} lines={[
+            snapshot?.internet.provider ?? t('unknown'),
+            `${t('nodes.internet.ip_field')}: ${snapshot?.internet.publicIp ?? t('unknown')}`,
             ...(geoEnabled ? [renderGeo(snapshot)] : []),
           ]} />
 
@@ -78,7 +80,7 @@ export default function MainPage() {
               aria-busy={isLoading}
             >
               <span className={isLoading ? "opacity-0" : "opacity-100"}>
-                {isLoading ? "Обновляю…" : "Обновить"}
+                {isLoading ? t('status.waiting') : t('buttons.refresh')}
               </span>
               {isLoading && (
                 <span className="absolute inset-0 grid place-items-center">
@@ -90,7 +92,7 @@ export default function MainPage() {
               onClick={handleSettings}
               className="h-10 px-4 shrink-0 border border-neutral-300 rounded-lg hover:bg-neutral-50 font-medium"
             >
-              Настройки
+              {t('buttons.settings')}
             </button>
           </div>
         </div>
@@ -100,27 +102,29 @@ export default function MainPage() {
 }
 
 function renderNetworkKind(s?: any) {
+  const { t } = useTranslation();
   const map: Record<string, string> = {
-    wifi: "Wi-Fi",
-    ethernet: "Кабель",
-    usb_modem: "USB-модем",
-    bt: "Bluetooth",
-    cellular: "Мобильный модем",
-    unknown: "Неизвестно",
+    wifi: t('nodes.network.type_wifi'),
+    ethernet: t('nodes.network.type_cable'),
+    usb_modem: t('nodes.network.type_usb_modem'),
+    bt: t('nodes.network.type_bt'),
+    cellular: t('nodes.network.type_mobile'),
+    unknown: t('unknown'),
   };
   return map[s?.network?.type ?? "unknown"];
 }
 
 function renderNetworkMetric(s?: any) {
+  const { t } = useTranslation();
   const signal = s?.network?.signal;
   if (!signal) return "—";
   if (signal.dbm) {
     const lvl =
-      signal.dbm >= -55 ? "Сигнал: отличный"
-      : signal.dbm >= -67 ? "Сигнал: хороший"
-      : signal.dbm >= -75 ? "Сигнал: средний"
-      : "Сигнал: слабый";
-    return `${lvl} (${signal.dbm} dBm)`;
+      signal.dbm >= -55 ? t('nodes.network.signal_excellent')
+      : signal.dbm >= -67 ? t('nodes.network.signal_good')
+      : signal.dbm >= -75 ? t('nodes.network.signal_fair')
+      : t('nodes.network.signal_weak');
+    return `${t('nodes.network.signal_field')}: ${lvl} (${signal.dbm} dBm)`;
   }
   return "—";
 }

@@ -12,6 +12,14 @@
     "connection_vpn_detected": "VPN connection detected",
     "waiting": "Checking connection..."
   },
+  "internet": {
+    "full": "Internet available.",
+    "partial": "Internet partially available.",
+    "down": "Internet unavailable."
+  },
+  "speed": {
+    "label": "Speed: {speed}"
+  },
   "nodes": {
     "computer": {
       "name": "Computer",
@@ -32,7 +40,9 @@
       "signal_good": "good",
       "signal_fair": "fair",
       "signal_weak": "weak",
-      "link_field": "Link"
+      "link_field": "Link",
+      "link_up": "up",
+      "link_down": "down"
     },
     "router": {
       "name": "Router/Access Point",
@@ -45,6 +55,7 @@
       "ip_field": "IP"
     }
   },
+  "unknown": "unknown",
   "buttons": {
     "refresh": "Refresh",
     "settings": "Settings",
