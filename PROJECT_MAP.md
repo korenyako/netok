@@ -139,6 +139,8 @@ Generated: 2025-09-21
 │   │   │   └── ru.json
 │   │   ├── store
 │   │   │   └── useDiagnostics.ts
+│   │   ├── types
+│   │   │   └── diagnostics.ts
 │   │   ├── utils
 │   │   │   └── formatUpdatedAt.ts
 │   │   ├── App.tsx
