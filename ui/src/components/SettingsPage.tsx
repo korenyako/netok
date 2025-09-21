@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useSettings } from '../store/useSettings';
+import { DNSTab } from './DNSTab';
 
 type SettingsTab = 'general' | 'dns' | 'geo' | 'tools';
 
@@ -14,10 +15,6 @@ export function SettingsPage() {
   const { 
     geoEnabled, 
     setGeoEnabled, 
-    dnsMode, 
-    setDnsMode, 
-    customDns, 
-    setCustomDns, 
     rememberWindowSize, 
     setRememberWindowSize 
   } = useSettings();
@@ -26,17 +23,6 @@ export function SettingsPage() {
     navigate('/');
   };
 
-  const handleDnsModeChange = (mode: typeof dnsMode) => {
-    setDnsMode(mode);
-    if (mode === 'auto') {
-      setCustomDns('');
-      // TODO: Reset to system DNS and flush cache
-    } else if (mode === 'custom') {
-      // TODO: Apply custom DNS and flush cache
-    } else {
-      // TODO: Apply predefined DNS and flush cache
-    }
-  };
 
   const handleToolAction = (action: string) => {
     // TODO: Implement tool actions
@@ -87,50 +73,7 @@ export function SettingsPage() {
     </div>
   );
 
-  const renderDnsTab = () => (
-    <div className="space-y-6">
-      <div>
-        <h3 className="text-sm font-semibold text-neutral-900 mb-3">
-          {t('settings.dns.mode')}
-        </h3>
-        <div className="space-y-2">
-          {[
-            { value: 'auto', label: t('settings.dns.mode_auto') },
-            { value: 'cloudflare', label: t('settings.dns.mode_cloudflare') },
-            { value: 'google', label: t('settings.dns.mode_google') },
-            { value: 'custom', label: t('settings.dns.mode_custom') },
-          ].map((option) => (
-            <label key={option.value} className="flex items-center space-x-3">
-              <input
-                type="radio"
-                name="dns-mode"
-                value={option.value}
-                checked={dnsMode === option.value}
-                onChange={() => handleDnsModeChange(option.value as typeof dnsMode)}
-                className="w-4 h-4 text-neutral-600 border-neutral-300 focus:ring-neutral-500"
-              />
-              <span className="text-sm text-neutral-700">{option.label}</span>
-            </label>
-          ))}
-        </div>
-      </div>
-
-      {dnsMode === 'custom' && (
-        <div>
-          <h3 className="text-sm font-semibold text-neutral-900 mb-3">
-            {t('settings.dns.custom_dns')}
-          </h3>
-          <input
-            type="text"
-            value={customDns}
-            onChange={(e) => setCustomDns(e.target.value)}
-            placeholder={t('settings.dns.custom_dns_placeholder')}
-            className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:border-transparent"
-          />
-        </div>
-      )}
-    </div>
-  );
+  const renderDnsTab = () => <DNSTab />;
 
   const renderGeoTab = () => (
     <div className="space-y-6">

@@ -129,6 +129,7 @@ Generated: 2025-09-21
 │   │   ├── assets
 │   │   │   └── react.svg
 │   │   ├── components
+│   │   │   ├── DNSTab.tsx
 │   │   │   ├── HeaderStatus.tsx
 │   │   │   ├── MainPage.tsx
 │   │   │   ├── NodeCard.tsx

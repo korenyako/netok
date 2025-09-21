@@ -10,7 +10,8 @@
     "speed": "Speed: {down}/{up} Mbps",
     "connection_no_vpn": "Connection without VPN. Configure VPN",
     "connection_vpn_detected": "VPN connection detected",
-    "waiting": "Checking connection..."
+    "waiting": "Checking connection...",
+    "applying_settings": "Applying settings..."
   },
   "internet": {
     "full": "Internet available.",
@@ -78,7 +79,8 @@
   },
   "errors": {
     "diagnostics": "Diagnostics error",
-    "network_error": "Network error"
+    "network_error": "Network error",
+    "dns_operation_failed": "DNS operation failed"
   },
   "settings": {
     "title": "Settings",
@@ -102,7 +104,9 @@
       "mode_custom": "Custom",
       "custom_dns": "Custom DNS servers",
       "custom_dns_placeholder": "Enter DNS servers (e.g., 1.1.1.1, 8.8.8.8)",
-      "flush_cache": "Flush DNS cache"
+      "flush_cache": "Flush DNS cache",
+      "applied_successfully": "DNS settings applied successfully",
+      "cache_flushed": "DNS cache flushed"
     },
     "geo": {
       "show_location": "Show country and city for public IP",

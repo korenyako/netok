@@ -25,7 +25,7 @@ async fn run_diagnostics() -> Result<netok_bridge::Snapshot, String> {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![get_settings, set_settings, run_diagnostics, commands::get_snapshot])
+        .invoke_handler(tauri::generate_handler![get_settings, set_settings, run_diagnostics, commands::get_snapshot, commands::set_dns, commands::flush_dns_cache])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

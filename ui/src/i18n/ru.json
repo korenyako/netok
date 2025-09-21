@@ -10,7 +10,8 @@
     "speed": "Скорость: {down}/{up} Мбит/с",
     "connection_no_vpn": "Соединение без VPN. Настроить VPN",
     "connection_vpn_detected": "VPN соединение обнаружено",
-    "waiting": "Проверяем соединение…"
+    "waiting": "Проверяем соединение…",
+    "applying_settings": "Применяем настройки…"
   },
   "internet": {
     "full": "Интернет доступен.",
@@ -78,7 +79,8 @@
   },
   "errors": {
     "diagnostics": "Ошибка диагностики",
-    "network_error": "Ошибка сети"
+    "network_error": "Ошибка сети",
+    "dns_operation_failed": "Ошибка операции DNS"
   },
   "settings": {
     "title": "Настройки",
@@ -102,7 +104,9 @@
       "mode_custom": "Свой вариант",
       "custom_dns": "Свои DNS-серверы",
       "custom_dns_placeholder": "Введите DNS-серверы (например, 1.1.1.1, 8.8.8.8)",
-      "flush_cache": "Очистить DNS-кэш"
+      "flush_cache": "Очистить DNS-кэш",
+      "applied_successfully": "Настройки DNS применены успешно",
+      "cache_flushed": "DNS-кэш очищен"
     },
     "geo": {
       "show_location": "Показывать страну и город для публичного IP",
