@@ -22,7 +22,8 @@
     "src/**/*.{ts,tsx}": [
       "eslint --fix",
       "npm run i18n:enforce"
-    ]
+    ],
+    "!src/**/*.test.{ts,tsx}": []
   },
   "dependencies": {
     "@tauri-apps/api": "^2.8.0",

@@ -21,8 +21,8 @@
     "operator": "Rostelecom",
     "publicIp": "95.84.123.45",
     "geolocation": {
-      "city": "Москва",
-      "country": "Россия"
+      "city": "Moscow",
+      "country": "Russia"
     },
     "reachable": "full",
     "speed": {

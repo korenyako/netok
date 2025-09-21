@@ -43,9 +43,18 @@ export default tseslint.config([
   },
   // Allow test files to have hardcoded strings
   {
-    files: ['**/*.test.{ts,tsx}', '**/*.spec.{ts,tsx}'],
+    files: ['**/*.test.{ts,tsx}', '**/*.spec.{ts,tsx}', 'src/test/**/*'],
+    extends: [
+      js.configs.recommended,
+      tseslint.configs.recommended,
+    ],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.browser,
+    },
     rules: {
       'no-restricted-syntax': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
     },
   },
   // Allow config files to have hardcoded strings

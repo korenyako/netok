@@ -17,7 +17,7 @@ vi.mock('react-router-dom', () => ({
 // Mock i18next with proper English translations
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string, options?: any) => {
+    t: (key: string, options?: Record<string, string>) => {
       const translations: Record<string, string> = {
         'internet.full': 'Internet available.',
         'internet.partial': 'Internet partially available.',
