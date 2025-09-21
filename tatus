@@ -1,0 +1,3 @@
+[33m235542e[m[33m ([m[1;36mHEAD -> [m[1;32mchore/remove-pnet[m[33m)[m feat: implement cross-platform ComputerInfo using sysinfo + get_if_addrs
+[33mb113bd5[m chore: remove pnet dependencies and add sysinfo and get_if_addrs
+[33m271fa4b[m[33m ([m[1;31morigin/main[m[33m, [m[1;32mmain[m[33m)[m feat: add "last updated" timestamp display to MainPage

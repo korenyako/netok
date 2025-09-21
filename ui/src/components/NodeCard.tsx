@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next';
 
 interface ComputerData {
-  name: string;
-  model: string;
-  adapter: string;
-  localIp: string;
+  hostname?: string;
+  model?: string;
+  adapter?: string;
+  local_ip?: string;
 }
 
 interface NetworkData {
@@ -33,22 +33,39 @@ type NodeData = ComputerData | NetworkData | RouterData | InternetData;
 
 interface NodeCardProps {
   type: 'computer' | 'network' | 'router' | 'internet';
-  data: NodeData;
+  data: NodeData | null;
   geoConsent?: boolean;
+  isLoading?: boolean;
 }
 
-export function NodeCard({ type, data, geoConsent = false }: NodeCardProps) {
+export function NodeCard({ type, data, geoConsent = false, isLoading = false }: NodeCardProps) {
   const { t } = useTranslation();
 
-  const renderComputer = (data: ComputerData) => (
+  const renderComputer = (data: ComputerData | null) => (
     <div>
       <h3 className="text-[15px] font-semibold text-neutral-900 mb-2">{t('nodes.computer.name')}</h3>
-      <div className="grid gap-1 text-[14px] text-neutral-600">
-        <div>{data.name}</div>
-        <div>{data.model}</div>
-        <div>{t('nodes.computer.adapter_field')}: {data.adapter}</div>
-        <div>{t('nodes.computer.local_ip_field')}: {data.localIp}</div>
-      </div>
+      {data ? (
+        <div className="grid gap-1 text-[14px] text-neutral-600">
+          {data.hostname && (
+            <div>{t('nodes.computer.name_field')}: {data.hostname}</div>
+          )}
+          {data.model && (
+            <div>{t('nodes.computer.model_field')}: {data.model}</div>
+          )}
+          {data.adapter && (
+            <div>{t('nodes.computer.adapter_field')}: {data.adapter}</div>
+          )}
+          {data.local_ip && (
+            <div>{t('nodes.computer.local_ip_field')}: {data.local_ip}</div>
+          )}
+        </div>
+      ) : (
+        !isLoading && (
+          <div className="text-[14px] text-neutral-500 italic">
+            {t('meta.no_data')}
+          </div>
+        )
+      )}
     </div>
   );
 
@@ -118,7 +135,7 @@ export function NodeCard({ type, data, geoConsent = false }: NodeCardProps) {
   const renderContent = () => {
     switch (type) {
       case 'computer':
-        return renderComputer(data as ComputerData);
+        return renderComputer(data as ComputerData | null);
       case 'network':
         return renderNetwork(data as NetworkData);
       case 'router':
