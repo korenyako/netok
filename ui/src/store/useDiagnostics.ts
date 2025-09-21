@@ -79,15 +79,15 @@ const convertSnapshot = (rustSnapshot: Snapshot): DiagnosticsData => {
       }
     },
     router: {
-      model: 'FAKE_ROUTER_MODEL',
-      brand: 'FAKE_ROUTER_BRAND',
-      localIp: '0.0.0.1 (FAKE)'
+      model: 'неизвестно',
+      brand: 'неизвестно',
+      localIp: 'неизвестно'
     },
     internet: {
-      provider: 'FAKE_OPERATOR',
-      publicIp: '0.0.0.0 (FAKE_IP)',
-      country: 'FAKE_LOCATION',
-      city: 'FAKE_LOCATION'
+      provider: 'неизвестно',
+      publicIp: 'неизвестно',
+      country: 'неизвестно',
+      city: 'неизвестно'
     },
     speed: {
       down: 999,
