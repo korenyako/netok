@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { useSettings } from '../store/useSettings';
 
 type SettingsTab = 'general' | 'dns' | 'geo' | 'tools';
 
@@ -9,11 +10,17 @@ export function SettingsPage() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<SettingsTab>('general');
   
-  // Settings state
-  const [rememberWindowSize, setRememberWindowSize] = useState(true);
-  const [dnsMode, setDnsMode] = useState<'auto' | 'cloudflare' | 'google' | 'custom'>('auto');
-  const [customDns, setCustomDns] = useState('');
-  const [showGeoLocation, setShowGeoLocation] = useState(true);
+  // Settings from centralized store
+  const { 
+    geoEnabled, 
+    setGeoEnabled, 
+    dnsMode, 
+    setDnsMode, 
+    customDns, 
+    setCustomDns, 
+    rememberWindowSize, 
+    setRememberWindowSize 
+  } = useSettings();
 
   const handleClose = () => {
     navigate('/');
@@ -131,8 +138,8 @@ export function SettingsPage() {
         <label className="flex items-center space-x-3">
           <input
             type="checkbox"
-            checked={showGeoLocation}
-            onChange={(e) => setShowGeoLocation(e.target.checked)}
+            checked={geoEnabled}
+            onChange={(e) => setGeoEnabled(e.target.checked)}
             className="w-4 h-4 text-neutral-600 border-neutral-300 rounded focus:ring-neutral-500"
           />
           <div>

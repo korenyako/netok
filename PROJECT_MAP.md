@@ -138,7 +138,8 @@ Generated: 2025-09-21
 │   │   │   ├── en.json
 │   │   │   └── ru.json
 │   │   ├── store
-│   │   │   └── useDiagnostics.ts
+│   │   │   ├── useDiagnostics.ts
+│   │   │   └── useSettings.ts
 │   │   ├── types
 │   │   │   └── diagnostics.ts
 │   │   ├── utils
@@ -368,6 +369,7 @@ export default App;
 ### Stores
 
 - useDiagnostics
+- useSettings
 
 ### Pages
 

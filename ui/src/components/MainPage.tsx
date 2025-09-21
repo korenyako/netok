@@ -1,11 +1,13 @@
 import { useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import { useDiagnostics } from "../store/useDiagnostics";
+import { useSettings } from "../store/useSettings";
 import { NodeCard } from "../components/NodeCard";
 
 export default function MainPage() {
   const navigate = useNavigate();
   const { snapshot, isLoading, refresh, error } = useDiagnostics();
+  const { geoEnabled } = useSettings();
 
   useEffect(() => { refresh(); }, [refresh]);
 
@@ -50,7 +52,7 @@ export default function MainPage() {
           <NodeCard title="Интернет" lines={[
             snapshot?.internet.provider ?? "неизвестно",
             `IP: ${snapshot?.internet.publicIp ?? "неизвестно"}`,
-            renderGeo(snapshot),
+            ...(geoEnabled ? [renderGeo(snapshot)] : []),
           ]} />
 
           {error && <div className="mt-2 text-red-500">Ошибка: {error}</div>}
