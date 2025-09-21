@@ -116,8 +116,13 @@ export const useDiagnostics = create<DiagnosticsStore>((set, get) => ({
     set({ isLoading: true, error: undefined });
 
     try {
-      // Call the Tauri command to get real diagnostics data
-      const rustSnapshot = await invoke<Snapshot>("get_snapshot");
+      // Check if mock mode is enabled
+      const useMock = import.meta.env.VITE_USE_MOCK === "1";
+      
+      // Get snapshot data (mock or real)
+      const rustSnapshot = useMock
+        ? (await import("../mocks/snapshot.json")).default as Snapshot
+        : await invoke<Snapshot>("get_snapshot");
       
       // Convert Rust format to expected UI format
       const diagnosticsData = convertSnapshot(rustSnapshot);

@@ -137,6 +137,8 @@ Generated: 2025-09-21
 │   │   ├── i18n
 │   │   │   ├── en.json
 │   │   │   └── ru.json
+│   │   ├── mocks
+│   │   │   └── snapshot.json
 │   │   ├── store
 │   │   │   ├── useDiagnostics.ts
 │   │   │   └── useSettings.ts
