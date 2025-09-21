@@ -131,11 +131,22 @@ pub fn run_diagnostics(_settings: &Settings) -> DiagnosticsSnapshot {
             hint_key: None 
         },
     ];
+    
+    // FAKE_* values are placeholders for development until real system integration is implemented
+    // TODO: Add NetworkInfo, RouterInfo, InternetInfo fields to DiagnosticsSnapshot
+    // TODO: Implement real network detection, router discovery, internet connectivity tests
+    let fake_computer_info = ComputerInfo {
+        hostname: Some("FAKE_HOSTNAME".to_string()),
+        model: Some("FAKE_MODEL".to_string()),
+        adapter: Some("FAKE_ADAPTER".to_string()),
+        local_ip: Some("0.0.0.0 (FAKE)".to_string()),
+    };
+    
     DiagnosticsSnapshot { 
         at_utc: now, 
         nodes, 
         summary_key: "summary.ok".into(),
-        computer: get_computer_info(),
+        computer: fake_computer_info,
     }
 }
 

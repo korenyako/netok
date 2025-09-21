@@ -92,36 +92,36 @@ const parseBackendData = (backendData: any): DiagnosticsData => {
   };
 };
 
-// Realistic placeholder data
+// FAKE_* values are placeholders for development until real system integration is implemented
 const createMockData = (): DiagnosticsData => ({
   overall: 'ok',
   computer: {
-    hostname: 'DESKTOP-ABC123',
-    model: 'Dell OptiPlex 7090',
-    adapter: 'Intel Wi-Fi 6 AX201',
-    local_ip: '192.168.1.105'
+    hostname: 'FAKE_HOSTNAME',
+    model: 'FAKE_MODEL',
+    adapter: 'FAKE_ADAPTER',
+    local_ip: '0.0.0.0 (FAKE)'
   },
   network: {
-    type: 'wifi',
+    type: 'FAKE_NETWORK_TYPE' as any,
     signal: {
-      level: 'excellent',
-      dbm: -45
+      level: 'FAKE_SIGNAL' as any,
+      dbm: -999
     }
   },
   router: {
-    model: i18next.t('mock_data.router_model'),
-    brand: i18next.t('mock_data.router_brand'),
-    localIp: '192.168.1.1'
+    model: 'FAKE_ROUTER_MODEL',
+    brand: 'FAKE_ROUTER_BRAND',
+    localIp: '0.0.0.1 (FAKE)'
   },
   internet: {
-    provider: i18next.t('mock_data.provider_name'),
-    publicIp: '95.84.123.45',
-    country: i18next.t('mock_data.country_name'),
-    city: i18next.t('mock_data.city_name')
+    provider: 'FAKE_OPERATOR',
+    publicIp: '0.0.0.0 (FAKE_IP)',
+    country: 'FAKE_LOCATION',
+    city: 'FAKE_LOCATION'
   },
   speed: {
-    down: 95,
-    up: 45
+    down: 999,
+    up: 999
   },
   vpnDetected: false,
   geoConsent: true, // Default to true for demo, but can be changed
