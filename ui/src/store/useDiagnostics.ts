@@ -1,4 +1,6 @@
-import { create } from 'zustand';
+import { create } from "zustand";
+import { invoke } from "@tauri-apps/api/core";
+import type { Snapshot } from "../types/diagnostics";
 
 export type OverallStatus = 'ok' | 'partial' | 'down' | 'checking';
 
@@ -55,91 +57,80 @@ interface DiagnosticsStore {
   snapshot: DiagnosticsSnapshot | null;
   lastUpdated: Date | null;
   isLoading: boolean;
+  error?: string;
   refresh: () => Promise<void>;
 }
 
-// TODO: Parse backend diagnostics data when real backend integration is implemented
-// const parseBackendData = (backendData: any): DiagnosticsData => { ... }
-
-// FAKE_* values are placeholders for development until real system integration is implemented
-const createMockData = (): DiagnosticsData => ({
-  overall: 'ok',
-  computer: {
-    hostname: 'FAKE_HOSTNAME',
-    model: 'FAKE_MODEL',
-    adapter: 'FAKE_ADAPTER',
-    local_ip: '0.0.0.0 (FAKE)'
-  },
-  network: {
-    type: 'FAKE_NETWORK_TYPE' as any,
-    signal: {
-      level: 'FAKE_SIGNAL' as any,
-      dbm: -999
-    }
-  },
-  router: {
-    model: 'FAKE_ROUTER_MODEL',
-    brand: 'FAKE_ROUTER_BRAND',
-    localIp: '0.0.0.1 (FAKE)'
-  },
-  internet: {
-    provider: 'FAKE_OPERATOR',
-    publicIp: '0.0.0.0 (FAKE_IP)',
-    country: 'FAKE_LOCATION',
-    city: 'FAKE_LOCATION'
-  },
-  speed: {
-    down: 999,
-    up: 999
-  },
-  vpnDetected: false,
-  geoConsent: true, // Default to true for demo, but can be changed
-  updatedAt: Date.now()
-});
+// Convert Rust Snapshot to DiagnosticsData format
+const convertSnapshot = (rustSnapshot: Snapshot): DiagnosticsData => {
+  return {
+    overall: 'ok', // TODO: Parse from Rust snapshot when available
+    computer: rustSnapshot.computer ? {
+      hostname: rustSnapshot.computer.hostname || undefined,
+      model: rustSnapshot.computer.model || undefined,
+      adapter: rustSnapshot.computer.adapter || undefined,
+      local_ip: rustSnapshot.computer.localIp || undefined,
+    } : null,
+    network: {
+      type: 'wifi', // TODO: Parse from Rust snapshot when available
+      signal: {
+        level: 'excellent',
+        dbm: -45
+      }
+    },
+    router: {
+      model: 'FAKE_ROUTER_MODEL',
+      brand: 'FAKE_ROUTER_BRAND',
+      localIp: '0.0.0.1 (FAKE)'
+    },
+    internet: {
+      provider: 'FAKE_OPERATOR',
+      publicIp: '0.0.0.0 (FAKE_IP)',
+      country: 'FAKE_LOCATION',
+      city: 'FAKE_LOCATION'
+    },
+    speed: {
+      down: 999,
+      up: 999
+    },
+    vpnDetected: false,
+    geoConsent: true,
+    updatedAt: Date.now()
+  };
+};
 
 export const useDiagnostics = create<DiagnosticsStore>((set, get) => ({
   snapshot: null,
   lastUpdated: null,
   isLoading: false,
+  error: undefined,
 
   refresh: async () => {
     console.log('[refresh] start');
-    
+
     if (get().isLoading) {
       console.log('[refresh] already loading, skipping');
       return;
     }
-    
-    set({ isLoading: true });
-    
+
+    set({ isLoading: true, error: undefined });
+
     try {
-      // TODO: Replace with actual Tauri invoke call
-      // const data = await invoke<DiagnosticsSnapshot>("run_diagnostics");
+      // Call the Tauri command to get real diagnostics data
+      const rustSnapshot = await invoke<Snapshot>("get_snapshot");
       
-      // Simulate network delay and data generation
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // For now, use mock data but with real computer info structure
-      // In the future, this will be replaced with actual backend data
-      const mockData = createMockData();
-      
-      // Add some randomness to make it feel realistic
-      if (Math.random() > 0.8) {
-        mockData.overall = 'partial';
-        mockData.speed = {
-          down: Math.floor(Math.random() * 50) + 20,
-          up: Math.floor(Math.random() * 20) + 10
-        };
-      }
-      
+      // Convert Rust format to expected UI format
+      const diagnosticsData = convertSnapshot(rustSnapshot);
+
       set({
-        snapshot: mockData,
+        snapshot: diagnosticsData,
         lastUpdated: new Date(),
       });
-      
+
       console.log('[refresh] success');
-    } catch (e) {
+    } catch (e: any) {
       console.error('[refresh] failed', e);
+      set({ error: String(e) });
       // keep previous snapshot and lastUpdated on error
     } finally {
       set({ isLoading: false });

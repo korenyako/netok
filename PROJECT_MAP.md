@@ -238,6 +238,7 @@ Generated: 2025-09-21
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tauri-apps/api": "^2.8.0",
     "i18next": "^25.5.2",
     "netok": "file:..",
     "react": "^19.1.1",
