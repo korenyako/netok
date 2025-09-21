@@ -1,6 +1,6 @@
 # Project Map - Netok
 
-Generated: 2025-09-14
+Generated: 2025-09-21
 
 ## TREE (ASCII)
 
@@ -29,16 +29,6 @@ Generated: 2025-09-14
 │   ├── CLAUDE.md
 │   ├── COPILOT.md
 │   └── GEMINI.md
-├── desktop
-│   ├── assets
-│   ├── src
-│   │   ├── computer.svg
-│   │   ├── globe.svg
-│   │   ├── i18n.rs
-│   │   ├── main.rs
-│   │   ├── router.svg
-│   │   └── wifi.svg
-│   └── Cargo.toml
 ├── docs
 │   ├── deprecated
 │   │   ├── CODING_RULES.md
@@ -68,6 +58,7 @@ Generated: 2025-09-14
 │   │   ├── assets
 │   │   │   └── react.svg
 │   │   ├── components
+│   │   │   ├── MainPage.tsx
 │   │   │   └── Settings.tsx
 │   │   ├── hooks
 │   │   │   └── useLanguage.ts
@@ -76,21 +67,6 @@ Generated: 2025-09-14
 │   │   │   │   └── common.json
 │   │   │   └── ru
 │   │   │       └── common.json
-│   │   ├── ui
-│   │   │   ├── components
-│   │   │   │   ├── HeaderStatus.tsx
-│   │   │   │   └── NodeCard.tsx
-│   │   │   ├── i18n
-│   │   │   │   ├── en.json
-│   │   │   │   └── ru.json
-│   │   │   ├── pages
-│   │   │   │   ├── Settings
-│   │   │   │   ├── MainPage.tsx
-│   │   │   │   └── SettingsPage.tsx
-│   │   │   ├── router
-│   │   │   │   └── AppRouter.tsx
-│   │   │   └── store
-│   │   │       └── useDiagnostics.ts
 │   │   ├── App.css
 │   │   ├── App.tsx
 │   │   ├── i18n-config.ts
@@ -181,6 +157,17 @@ Generated: 2025-09-14
 │   ├── tsconfig.json
 │   ├── tsconfig.node.json
 │   └── vite.config.ts
+├── ui_legacy
+│   ├── assets
+│   ├── src
+│   │   ├── computer.svg
+│   │   ├── globe.svg
+│   │   ├── i18n.rs
+│   │   ├── main.rs
+│   │   ├── router.svg
+│   │   └── wifi.svg
+│   ├── Cargo.toml
+│   └── README.md
 ├── .cursorrules
 ├── .gitignore
 ├── Cargo.lock
@@ -192,6 +179,7 @@ Generated: 2025-09-14
 ├── package.json
 ├── PROJECT_CONTEXT.md
 ├── PROJECT_MAP.md
+├── README_DEV.md
 ├── README.md
 ├── SETUP-PRECOMMIT.md
 └── test_logging.rs
@@ -206,12 +194,11 @@ Generated: 2025-09-14
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "Netok",
-  "version": "0.1.0",
-  "identifier": "com.netok.desktop",
+  "identifier": "netok",
   "build": {
-    "beforeDevCommand": "npm --prefix ../ui run dev",
+    "beforeDevCommand": "npm run dev:ui",
+    "beforeBuildCommand": "npm run build:ui",
     "devUrl": "http://localhost:5173",
-    "beforeBuildCommand": "npm --prefix ../ui run build",
     "frontendDist": "../ui/dist"
   },
   "app": {
@@ -224,20 +211,6 @@ Generated: 2025-09-14
         "minHeight": 480,
         "resizable": true
       }
-    ],
-    "security": {
-      "csp": null
-    }
-  },
-  "bundle": {
-    "active": true,
-    "targets": "all",
-    "icon": [
-      "icons/32x32.png",
-      "icons/128x128.png",
-      "icons/128x128@2x.png",
-      "icons/icon.icns",
-      "icons/icon.ico"
     ]
   }
 }
@@ -260,6 +233,7 @@ Generated: 2025-09-14
   },
   "dependencies": {
     "i18next": "^25.5.2",
+    "netok": "file:..",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-i18next": "^15.7.3",
@@ -368,8 +342,8 @@ export default App;
 
 ### Build Commands
 
-- **Dev Command**: npm --prefix ../ui run dev
-- **Build Command**: npm --prefix ../ui run build
+- **Dev Command**: npm run dev:ui
+- **Build Command**: npm run build:ui
 - **Dev Path**: <http://localhost:5173>
 - **Dist Dir**: ../ui/dist
 - **Window Title**: Netok
