@@ -8,6 +8,5 @@ serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 time = { workspace = true }
 thiserror = { workspace = true }
-sysinfo = "0.29"
 get_if_addrs = "0.5"
 hostname = "0.3"

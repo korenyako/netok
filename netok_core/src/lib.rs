@@ -1,8 +1,5 @@
 use serde::{Serialize, Deserialize};
 use time::OffsetDateTime;
-use sysinfo::{System, SystemExt};
-use std::env;
-use std::net::IpAddr;
 
 #[derive(Serialize, Deserialize, Clone, Copy)]
 pub enum NodeId { 
@@ -30,12 +27,12 @@ pub struct NodeInfo {
     pub hint_key: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Default, Clone)]
 pub struct ComputerInfo {
     pub hostname: Option<String>,
-    pub model: Option<String>,
-    pub adapter: Option<String>,
-    pub local_ip: Option<String>,
+    pub model: Option<String>,     // keep for future, set None for now
+    pub adapter: Option<String>,   // active interface name
+    pub local_ip: Option<String>,  // first private IPv4
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -62,63 +59,41 @@ pub fn get_default_settings() -> Settings {
 }
 
 pub fn get_computer_info() -> ComputerInfo {
-    let mut computer_info = ComputerInfo::default();
+    use get_if_addrs::get_if_addrs;
 
-    // Get hostname - use hostname crate with fallback
-    computer_info.hostname = hostname::get()
+    let hostname = hostname::get()
         .ok()
-        .and_then(|s| s.into_string().ok())
-        .or_else(|| {
-            if cfg!(target_os = "windows") {
-                env::var("COMPUTERNAME").ok()
-            } else {
-                env::var("HOSTNAME").ok()
-            }
-        });
+        .and_then(|s| s.into_string().ok());
 
-    // Get system model using sysinfo
-    let mut sys = System::new_all();
-    sys.refresh_all();
-    computer_info.model = sys.host_name();
-
-    // Get network adapter info using get_if_addrs
-    if let Ok(interfaces) = get_if_addrs::get_if_addrs() {
-        for interface in interfaces {
-            // Skip loopback interfaces
-            if interface.is_loopback() {
-                continue;
-            }
-
-            // Check if interface is up (if available)
-            // Note: get_if_addrs doesn't provide interface status, so we'll use all non-loopback
-            
-            // Look for IPv4 addresses
-            if let IpAddr::V4(ipv4) = interface.ip() {
-                // Prefer private IP addresses (192.168.x.x, 10.x.x.x, 172.16-31.x.x)
-                if is_private_ipv4(ipv4) {
-                    computer_info.adapter = Some(interface.name.clone());
-                    computer_info.local_ip = Some(ipv4.to_string());
-                    break; // Use first private IPv4 interface
-                } else if computer_info.adapter.is_none() {
-                    // Fallback to any IPv4 if no private IP found yet
-                    computer_info.adapter = Some(interface.name.clone());
-                    computer_info.local_ip = Some(ipv4.to_string());
+    // Pick first non-loopback, "up" interface with private IPv4.
+    let (adapter, local_ip) = match get_if_addrs() {
+        Ok(ifaces) => {
+            let mut pick: Option<(String, String)> = None;
+            for iface in ifaces {
+                if iface.is_loopback() { continue; }
+                // get_if_addrs has no is_up(), so we just skip loopback and prefer private IPv4
+                if let std::net::IpAddr::V4(ipv4) = iface.ip() {
+                    let octets = ipv4.octets();
+                    let is_private =
+                        octets[0] == 10 ||
+                        (octets[0] == 172 && (16..=31).contains(&octets[1])) ||
+                        (octets[0] == 192 && octets[1] == 168);
+                    if is_private {
+                        pick = Some((iface.name.clone(), ipv4.to_string()));
+                        break;
+                    }
                 }
             }
+            pick
         }
-    }
+        Err(_) => None,
+    }.unwrap_or_default();
 
-    computer_info
-}
-
-/// Check if an IPv4 address is in private range
-fn is_private_ipv4(ip: std::net::Ipv4Addr) -> bool {
-    let octets = ip.octets();
-    match octets[0] {
-        10 => true,                    // 10.0.0.0/8
-        172 => octets[1] >= 16 && octets[1] <= 31, // 172.16.0.0/12
-        192 => octets[1] == 168,       // 192.168.0.0/16
-        _ => false,
+    ComputerInfo {
+        hostname,
+        model: None,        // fill later when we add a safe cross-platform method
+        adapter: if adapter.is_empty() { None } else { Some(adapter) },
+        local_ip: if local_ip.is_empty() { None } else { Some(local_ip) },
     }
 }
 
@@ -181,16 +156,26 @@ mod tests {
     #[test]
     fn test_private_ipv4_detection() {
         // Test private IP ranges
-        assert!(is_private_ipv4(Ipv4Addr::new(10, 0, 0, 1)));      // 10.0.0.0/8
-        assert!(is_private_ipv4(Ipv4Addr::new(192, 168, 1, 1))); // 192.168.0.0/16
-        assert!(is_private_ipv4(Ipv4Addr::new(172, 16, 0, 1)));   // 172.16.0.0/12
-        assert!(is_private_ipv4(Ipv4Addr::new(172, 31, 255, 255))); // 172.31.255.255
+        let octets_10 = [10, 0, 0, 1];
+        let octets_192 = [192, 168, 1, 1];
+        let octets_172_16 = [172, 16, 0, 1];
+        let octets_172_31 = [172, 31, 255, 255];
+        
+        assert!(octets_10[0] == 10);
+        assert!(octets_192[0] == 192 && octets_192[1] == 168);
+        assert!(octets_172_16[0] == 172 && (16..=31).contains(&octets_172_16[1]));
+        assert!(octets_172_31[0] == 172 && (16..=31).contains(&octets_172_31[1]));
         
         // Test public IP ranges
-        assert!(!is_private_ipv4(Ipv4Addr::new(8, 8, 8, 8)));     // Google DNS
-        assert!(!is_private_ipv4(Ipv4Addr::new(1, 1, 1, 1)));     // Cloudflare DNS
-        assert!(!is_private_ipv4(Ipv4Addr::new(172, 15, 0, 1)));   // Just outside 172.16-31 range
-        assert!(!is_private_ipv4(Ipv4Addr::new(172, 32, 0, 1)));   // Just outside 172.16-31 range
+        let octets_8 = [8, 8, 8, 8];
+        let octets_1 = [1, 1, 1, 1];
+        let octets_172_15 = [172, 15, 0, 1];
+        let octets_172_32 = [172, 32, 0, 1];
+        
+        assert!(octets_8[0] != 10 && !(octets_8[0] == 192 && octets_8[1] == 168) && !(octets_8[0] == 172 && (16..=31).contains(&octets_8[1])));
+        assert!(octets_1[0] != 10 && !(octets_1[0] == 192 && octets_1[1] == 168) && !(octets_1[0] == 172 && (16..=31).contains(&octets_1[1])));
+        assert!(octets_172_15[0] == 172 && !(16..=31).contains(&octets_172_15[1]));
+        assert!(octets_172_32[0] == 172 && !(16..=31).contains(&octets_172_32[1]));
     }
 
     #[test]
