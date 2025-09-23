@@ -79,13 +79,13 @@ const convertSnapshot = (rustSnapshot: Snapshot): DiagnosticsData => {
       }
     },
     router: {
-      model: rustSnapshot.router?.model || undefined,
-      brand: rustSnapshot.router?.brand || undefined,
-      localIp: rustSnapshot.router?.localIp || undefined
+      model: rustSnapshot.router?.model ?? "",
+      brand: rustSnapshot.router?.brand ?? "",
+      localIp: rustSnapshot.router?.localIp ?? ""
     },
     internet: {
-      provider: rustSnapshot.internet?.operator || undefined,
-      publicIp: rustSnapshot.internet?.publicIp || undefined,
+      provider: rustSnapshot.internet?.operator ?? "",
+      publicIp: rustSnapshot.internet?.publicIp ?? "",
       country: rustSnapshot.internet?.geolocation?.country || undefined,
       city: rustSnapshot.internet?.geolocation?.city || undefined
     },
