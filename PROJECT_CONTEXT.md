@@ -8,9 +8,67 @@ This file is the **single entry point** for any AI assistant (Cursor, Gemini, Cl
 
 - **Architecture:** `docs/SoT-ARCH.md` — Desktop = **Tauri (WebView)**, Core = **Rust**. Mobile = native via Rust FFI.
 - **UI/UX:** `docs/UI-SPEC.md` — Window behavior, settings sidebar, scroll rules, tokens, copy, i18n policy.
+- **Main Screen Design:** See section below — **SoT v1.4 (Актуально)**.
 - **i18n:** `i18n/README.md` — Keys, JSON structure, fallback, usage patterns.
 
 > Only use the files above as the canonical reference. Ignore anything in `docs/deprecated/` and `/deprecated/`.
+
+# Netok — SoT (UI): Главный экран — v1.4 (Актуально)
+
+## Верхний блок (шапка)
+- RU:  
+  - «Интернет работает»  
+  - «IP: 93.45.121.87 (Турин, Италия)»  
+  - «Соединение без VPN»
+- EN:  
+  - "Internet available"  
+  - "IP: 93.45.121.87 (Turin, Italy)"  
+  - "Connection without VPN"
+
+## Узлы (вертикальный путь)
+- **Компьютер (ANTON-PC)**  
+  - RU: «Сетевой адаптер: Intel I217-V», «IP в локальной сети: 192.168.0.24»  
+  - EN: "Network adapter: Intel I217-V", "Local IP: 192.168.0.24"
+- **Сеть (Wi-Fi: MyHome5G)**  
+  - RU: «Сигнал: хороший (-65 dBm)»  
+  - EN: "Signal: good (-65 dBm)"
+- **Роутер (TP-Link Archer C6)**  
+  - RU: «IP в локальной сети: 192.168.0.1»  
+  - EN: "Local IP: 192.168.0.1"
+- **Интернет (TIM)**  
+  - RU: «Скорость: 120/95 Мбит/с»  
+  - EN: "Speed: 120/95 Mbps"
+
+## Нижний блок
+- RU: кнопки «[Обновить] [Настройки]», затем «Обновлено 12:20:22»
+- EN: buttons "[Refresh] [Settings]", then "Updated 12:20:22"
+
+## ASCII-эскиз (референс)
+```
+Интернет работает
+IP: 93.45.121.87 (Турин, Италия)
+Соединение без VPN
+
+● Компьютер (ANTON-PC)
+Сетевой адаптер: Intel I217-V
+IP в локальной сети: 192.168.0.24
+
+● Сеть (Wi-Fi: MyHome5G)
+Сигнал: хороший (-65 dBm)
+
+● Роутер (TP-Link Archer C6)
+IP в локальной сети: 192.168.0.1
+
+● Интернет (TIM)
+Скорость: 120/95 Мбит/с
+
+[Обновить] [Настройки]
+
+Обновлено 12:20:22
+```
+
+## Changelog (дизайн экрана)
+- v1.4: скорость перенесена в «Интернет»; в шапке только статус + внешний IP + VPN; убрана «Модель»; имя/название — рядом с заголовком узла; единственный timestamp внизу.
 
 ## Guardrails (must)
 

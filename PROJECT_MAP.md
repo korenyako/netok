@@ -1,6 +1,6 @@
 # Project Map - Netok
 
-Generated: 2025-09-23
+Generated: 2025-09-24
 
 ## TREE (ASCII)
 
@@ -32,10 +32,11 @@ Generated: 2025-09-23
 ├── docs
 │   ├── deprecated
 │   │   ├── CODING_RULES.md
-│   │   ├── SoT.md
+│   │   ├── SoT_legacy.md
 │   │   └── TASK_TEMPLATE.md
 │   ├── README.md
 │   ├── SoT-ARCH.md
+│   ├── SoT.md
 │   └── UI-SPEC.md
 ├── i18n
 │   ├── en.json
@@ -215,7 +216,7 @@ Generated: 2025-09-23
     "beforeDevCommand": "npm run dev:ui",
     "beforeBuildCommand": "npm run build:ui",
     "devUrl": "http://localhost:5173",
-    "frontendDist": "../ui/dist"
+    "frontendDist": "../../ui/dist"
   },
   "app": {
     "windows": [
@@ -374,7 +375,7 @@ export default App;
 - **Dev Command**: npm run dev:ui
 - **Build Command**: npm run build:ui
 - **Dev Path**: <http://localhost:5173>
-- **Dist Dir**: ../ui/dist
+- **Dist Dir**: ../../ui/dist
 - **Window Title**: Netok
 - **Window Size**: 320×560
 
