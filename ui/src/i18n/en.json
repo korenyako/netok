@@ -14,6 +14,18 @@
     "applying_settings": "Applying settings...",
     "error_prefix": "Error"
   },
+  "header": {
+    "status": {
+      "available": "Internet available",
+      "unavailable": "Internet unavailable",
+      "partial": "Internet partially available"
+    },
+    "ip": "IP: {{ip}} ({{city}}, {{country}})",
+    "vpn": {
+      "on": "Connection via VPN",
+      "off": "Connection without VPN"
+    }
+  },
   "internet": {
     "full": "Internet available.",
     "partial": "Internet partially available.",
@@ -59,6 +71,44 @@
       "ip_field": "IP"
     }
   },
+  "node": {
+    "computer": {
+      "title": "Computer",
+      "adapter": "Network adapter: {{name}}",
+      "lan_ip": "Local IP: {{ip}}"
+    },
+    "network": {
+      "title": {
+        "wifi": "Network",
+        "ethernet": "Network"
+      },
+      "signal": "Signal: {{grade}} ({{dbm}} dBm)",
+      "link": "Link: {{text}}"
+    },
+    "router": {
+      "title": "Router/Access Point",
+      "lan_ip": "Local IP: {{ip}}"
+    },
+    "internet": {
+      "title": "Internet",
+      "speed": "Speed: {{down}}/{{up}} Mbps"
+    }
+  },
+  "signal": {
+    "grade": {
+      "excellent": "excellent",
+      "good": "good",
+      "average": "average",
+      "weak": "weak"
+    }
+  },
+  "meta": {
+    "computer": "{{hostname}}",
+    "wifi": "Wi-Fi: {{ssid}}",
+    "ethernet": "Ethernet",
+    "router": "{{name}}",
+    "internet": "{{operator}}"
+  },
   "unknown": "unknown",
   "dash": "—",
   "updated_at": "Updated",
@@ -72,10 +122,12 @@
     "apply": "Apply",
     "copy": "Copy"
   },
-  "meta": {
-    "updated": "Updated: {{time}}",
-    "never": "never",
-    "no_data": "No data. Click 'Refresh'."
+  "actions": {
+    "refresh": "Refresh",
+    "settings": "Settings"
+  },
+  "footer": {
+    "updated": "Updated {{time}}"
   },
   "geo": {
     "consent_label": "Show location",

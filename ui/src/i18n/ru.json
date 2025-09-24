@@ -14,6 +14,18 @@
     "applying_settings": "Применяем настройки…",
     "error_prefix": "Ошибка"
   },
+  "header": {
+    "status": {
+      "available": "Интернет работает",
+      "unavailable": "Интернет недоступен",
+      "partial": "Интернет частично доступен"
+    },
+    "ip": "IP: {{ip}} ({{city}}, {{country}})",
+    "vpn": {
+      "on": "Соединение через VPN",
+      "off": "Соединение без VPN"
+    }
+  },
   "internet": {
     "full": "Интернет доступен.",
     "partial": "Интернет частично доступен.",
@@ -59,6 +71,44 @@
       "ip_field": "IP"
     }
   },
+  "node": {
+    "computer": {
+      "title": "Компьютер",
+      "adapter": "Сетевой адаптер: {{name}}",
+      "lan_ip": "IP в локальной сети: {{ip}}"
+    },
+    "network": {
+      "title": {
+        "wifi": "Сеть",
+        "ethernet": "Сеть"
+      },
+      "signal": "Сигнал: {{grade}} ({{dbm}} dBm)",
+      "link": "Линк: {{text}}"
+    },
+    "router": {
+      "title": "Роутер",
+      "lan_ip": "IP в локальной сети: {{ip}}"
+    },
+    "internet": {
+      "title": "Интернет",
+      "speed": "Скорость: {{down}}/{{up}} Мбит/с"
+    }
+  },
+  "signal": {
+    "grade": {
+      "excellent": "отличный",
+      "good": "хороший",
+      "average": "средний",
+      "weak": "слабый"
+    }
+  },
+  "meta": {
+    "computer": "{{hostname}}",
+    "wifi": "Wi-Fi: {{ssid}}",
+    "ethernet": "Кабель",
+    "router": "{{name}}",
+    "internet": "{{operator}}"
+  },
   "unknown": "неизвестно",
   "dash": "—",
   "updated_at": "Обновлено",
@@ -72,10 +122,12 @@
     "apply": "Применить",
     "copy": "Копировать"
   },
-  "meta": {
-    "updated": "Обновлено: {{time}}",
-    "never": "никогда",
-    "no_data": "Нет данных. Нажмите «Обновить»."
+  "actions": {
+    "refresh": "Обновить",
+    "settings": "Настройки"
+  },
+  "footer": {
+    "updated": "Обновлено {{time}}"
   },
   "geo": {
     "consent_label": "Показывать местоположение",

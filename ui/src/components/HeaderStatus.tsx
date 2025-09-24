@@ -2,36 +2,38 @@ import { useTranslation } from 'react-i18next';
 
 interface HeaderStatusProps {
   internetStatus: 'ok' | 'partial' | 'down';
-  speed?: { down: number; up: number };
+  publicIp?: string;
+  city?: string;
+  country?: string;
   vpnDetected?: boolean;
 }
 
-export function HeaderStatus({ internetStatus, speed, vpnDetected = false }: HeaderStatusProps) {
+export function HeaderStatus({ internetStatus, publicIp, city, country, vpnDetected = false }: HeaderStatusProps) {
   const { t } = useTranslation();
 
   const getStatusText = () => {
     switch (internetStatus) {
       case 'ok':
-        return t('status.internet_ok');
+        return t('header.status.available');
       case 'partial':
-        return t('status.internet_partial');
+        return t('header.status.partial');
       case 'down':
-        return t('status.internet_down');
+        return t('header.status.unavailable');
       default:
-        return t('status.internet_down');
+        return t('header.status.unavailable');
     }
   };
 
-  const getSpeedText = () => {
-    if (!speed) return null;
-    return t('status.speed', { down: speed.down, up: speed.up });
+  const getIpText = () => {
+    return t('header.ip', { 
+      ip: publicIp ?? t('dash'), 
+      city: city ?? t('dash'), 
+      country: country ?? t('dash') 
+    });
   };
 
   const getVpnText = () => {
-    if (vpnDetected) {
-      return t('status.connection_vpn_detected');
-    }
-    return null;
+    return vpnDetected ? t('header.vpn.on') : t('header.vpn.off');
   };
 
   return (
@@ -40,17 +42,13 @@ export function HeaderStatus({ internetStatus, speed, vpnDetected = false }: Hea
         {getStatusText()}
       </div>
       
-      {getSpeedText() && (
-        <div className="text-sm text-neutral-700 mb-1">
-          {getSpeedText()}
-        </div>
-      )}
+      <div className="text-sm text-neutral-700 mb-1">
+        {getIpText()}
+      </div>
       
-      {getVpnText() && (
-        <div className="text-sm text-neutral-700">
-          {getVpnText()}
-        </div>
-      )}
+      <div className="text-sm text-neutral-700">
+        {getVpnText()}
+      </div>
     </div>
   );
 }

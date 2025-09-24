@@ -48,7 +48,13 @@ Generated: 2025-09-24
 │   │   └── types.rs
 │   └── Cargo.toml
 ├── netok_core
+│   ├── examples
+│   │   └── internet_demo.rs
 │   ├── src
+│   │   ├── collect
+│   │   │   ├── computer.rs
+│   │   │   ├── internet.rs
+│   │   │   └── mod.rs
 │   │   └── lib.rs
 │   └── Cargo.toml
 ├── netok_desktop
