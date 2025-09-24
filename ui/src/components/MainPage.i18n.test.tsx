@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { useTranslation } from 'react-i18next'
 import MainPage from './MainPage'
 import { useDiagnostics } from '../store/useDiagnostics'
 import { useSettings } from '../store/useSettings'

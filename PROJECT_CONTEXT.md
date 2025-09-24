@@ -13,9 +13,10 @@ This file is the **single entry point** for any AI assistant (Cursor, Gemini, Cl
 
 > Only use the files above as the canonical reference. Ignore anything in `docs/deprecated/` and `/deprecated/`.
 
-# Netok — SoT (UI): Главный экран — v1.4 (Актуально)
+## Netok — SoT (UI): Главный экран — v1.4 (Актуально)
 
 ## Верхний блок (шапка)
+
 - RU:  
   - «Интернет работает»  
   - «IP: 93.45.121.87 (Турин, Италия)»  
@@ -26,6 +27,7 @@ This file is the **single entry point** for any AI assistant (Cursor, Gemini, Cl
   - "Connection without VPN"
 
 ## Узлы (вертикальный путь)
+
 - **Компьютер (ANTON-PC)**  
   - RU: «Сетевой адаптер: Intel I217-V», «IP в локальной сети: 192.168.0.24»  
   - EN: "Network adapter: Intel I217-V", "Local IP: 192.168.0.24"
@@ -40,11 +42,13 @@ This file is the **single entry point** for any AI assistant (Cursor, Gemini, Cl
   - EN: "Speed: 120/95 Mbps"
 
 ## Нижний блок
+
 - RU: кнопки «[Обновить] [Настройки]», затем «Обновлено 12:20:22»
 - EN: buttons "[Refresh] [Settings]", then "Updated 12:20:22"
 
 ## ASCII-эскиз (референс)
-```
+
+```text
 Интернет работает
 IP: 93.45.121.87 (Турин, Италия)
 Соединение без VPN
@@ -68,6 +72,7 @@ IP в локальной сети: 192.168.0.1
 ```
 
 ## Changelog (дизайн экрана)
+
 - v1.4: скорость перенесена в «Интернет»; в шапке только статус + внешний IP + VPN; убрана «Модель»; имя/название — рядом с заголовком узла; единственный timestamp внизу.
 
 ## Guardrails (must)

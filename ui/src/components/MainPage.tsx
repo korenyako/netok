@@ -54,8 +54,8 @@ export default function MainPage() {
           ]} />
 
           <NodeCard title={t('nodes.network.name')} lines={[
-            renderNetworkKind(snapshot, t),
-            renderNetworkMetric(snapshot, t),
+            renderNetworkKind(snapshot || undefined, t),
+            renderNetworkMetric(snapshot || undefined, t),
           ]} />
 
           <NodeCard title={t('nodes.router.name')} lines={[
@@ -66,7 +66,7 @@ export default function MainPage() {
           <NodeCard title={t('nodes.internet.name')} lines={[
             snapshot?.internet.provider ?? t('unknown'),
             `${t('nodes.internet.ip_field')}: ${snapshot?.internet.publicIp ?? t('unknown')}`,
-            ...(geoEnabled ? [renderGeo(snapshot, t)] : []),
+            ...(geoEnabled ? [renderGeo(snapshot || undefined, t)] : []),
           ]} />
 
           {error && <div className="mt-2 text-red-500">{t('status.error_prefix')} {error}</div>}
