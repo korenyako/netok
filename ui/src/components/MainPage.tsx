@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useDiagnostics } from "../store/useDiagnostics";
@@ -12,6 +12,7 @@ export default function MainPage() {
   const navigate = useNavigate();
   const { snapshot, isLoading, refresh, error } = useDiagnostics();
   const { geoEnabled } = useSettings();
+  const [showDebug, setShowDebug] = useState(false);
 
   useEffect(() => { refresh(); }, [refresh]);
 
@@ -33,7 +34,7 @@ export default function MainPage() {
         <div className="space-y-3">
           <HeaderStatus 
             internetStatus={snapshot?.overall === 'checking' ? 'down' : snapshot?.overall || 'down'}
-            publicIp={snapshot?.internet?.publicIp}
+            publicIp={snapshot?.internet?.public_ip}
             city={geoEnabled ? snapshot?.internet?.city : undefined}
             country={geoEnabled ? snapshot?.internet?.country : undefined}
             vpnDetected={vpnDetected}
@@ -43,7 +44,7 @@ export default function MainPage() {
             baseTitleKey="node.computer.title"
             metaText={snapshot?.computer?.hostname ? t('meta.computer', { hostname: snapshot.computer.hostname }) : undefined}
             facts={[
-              t('node.computer.adapter', { name: snapshot?.computer?.adapter ?? t('unknown') }),
+              t('node.computer.adapter', { name: snapshot?.computer?.primary_adapter ?? t('unknown') }),
               t('node.computer.lan_ip', { ip: snapshot?.computer?.local_ip ?? t('unknown') }),
             ]} 
           />
@@ -76,9 +77,9 @@ export default function MainPage() {
 
           <NodeCard 
             baseTitleKey="node.router.title"
-            metaText={snapshot?.router?.brand || snapshot?.router?.model ? t('meta.router', { name: `${snapshot?.router?.brand ?? ''} ${snapshot?.router?.model ?? ''}`.trim() }) : undefined}
+            metaText={undefined}
             facts={[
-              t('node.router.lan_ip', { ip: snapshot?.router?.localIp ?? t('unknown') }),
+              t('node.router.lan_ip', { ip: snapshot?.router?.local_ip ?? t('unknown') }),
             ]} 
           />
 
@@ -86,12 +87,23 @@ export default function MainPage() {
             baseTitleKey="node.internet.title"
             metaText={snapshot?.internet?.provider ? t('meta.internet', { operator: snapshot.internet.provider }) : undefined}
             facts={[
-              t('node.internet.speed', { 
-                down: snapshot?.speed?.down ?? t('unknown'), 
-                up: snapshot?.speed?.up ?? t('unknown') 
-              }),
+              t('node.internet.public_ip', { ip: snapshot?.internet?.public_ip ?? t('unknown') }),
+              t('node.internet.operator', { operator: snapshot?.internet?.operator ?? t('unknown') }),
+              ...(geoEnabled && snapshot?.internet?.city && snapshot?.internet?.country ? [
+                t('node.internet.location', { 
+                  city: snapshot.internet.city, 
+                  country: snapshot.internet.country 
+                })
+              ] : []),
             ]} 
           />
+          
+          {/* Provider indicator */}
+          {snapshot?.internet?.provider && (
+            <div className="text-xs text-gray-500 text-center mt-1">
+              {t('node.internet.source', { provider: snapshot.internet.provider })}
+            </div>
+          )}
 
           {error && <div className="mt-2 text-red-500">{t('status.error_prefix')} {error}</div>}
         </div>
@@ -126,6 +138,24 @@ export default function MainPage() {
         <div className="text-xs opacity-70 text-center">
           {t('footer.updated', { time: updatedAtHMS })}
         </div>
+        
+        {/* Debug section */}
+        <div className="mt-2 text-center">
+          <button
+            onClick={() => setShowDebug(!showDebug)}
+            className="text-xs text-gray-500 hover:text-gray-700 underline"
+          >
+            Debug → {showDebug ? 'hide' : 'show'} raw JSON
+          </button>
+        </div>
+        
+        {showDebug && snapshot?.rawSnapshot && (
+          <div className="mt-2 p-2 bg-gray-100 rounded text-xs">
+            <pre className="whitespace-pre-wrap overflow-auto max-h-40">
+              {snapshot.rawSnapshot}
+            </pre>
+          </div>
+        )}
       </footer>
     </div>
   );

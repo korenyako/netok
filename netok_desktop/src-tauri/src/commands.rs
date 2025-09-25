@@ -1,10 +1,15 @@
-use netok_core::{run_diagnostics, get_default_settings, DiagnosticsSnapshot};
+use netok_core::{run_diagnostics, get_default_settings, Snapshot, snapshot_json_for_debug};
 use std::process::Command;
 
 #[tauri::command]
-pub fn get_snapshot() -> Result<DiagnosticsSnapshot, String> {
+pub fn get_snapshot() -> Result<Snapshot, String> {
     let settings = get_default_settings();
     Ok(run_diagnostics(&settings))
+}
+
+#[tauri::command]
+pub fn get_snapshot_json_debug(geo_enabled: bool) -> String {
+    snapshot_json_for_debug(geo_enabled)
 }
 
 #[tauri::command]

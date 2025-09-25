@@ -2,33 +2,20 @@
   "computer": {
     "hostname": "DESKTOP-MOCK123",
     "model": "Dell OptiPlex 7090",
-    "adapter": "Intel Wi-Fi 6 AX201",
-    "localIp": "192.168.1.100"
-  },
-  "network": {
-    "kind": "wifi",
-    "metric": {
-      "kind": "wifi",
-      "rssiDbm": -45
-    }
+    "primary_adapter": "Intel Wi-Fi 6 AX201",
+    "local_ip": "192.168.1.100"
   },
   "router": {
-    "brand": "TP-Link",
-    "model": "Archer AX73",
-    "localIp": "192.168.1.1"
+    "local_ip": "192.168.1.1"
   },
   "internet": {
+    "reachable": true,
+    "public_ip": "95.84.123.45",
     "operator": "Rostelecom",
-    "publicIp": "95.84.123.45",
-    "geolocation": {
-      "city": "Moscow",
-      "country": "Russia"
-    },
-    "reachable": "full",
-    "speed": {
-      "downMbps": 95,
-      "upMbps": 45
-    }
+    "city": "Moscow",
+    "country": "Russia",
+    "provider": "ipify",
+    "timestamp": "2024-01-15T10:30:00Z"
   },
-  "updatedAtIso": "2024-01-15T10:30:00Z"
+  "version": 1
 }

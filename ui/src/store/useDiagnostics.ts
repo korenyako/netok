@@ -16,21 +16,21 @@ export interface NetworkInfo {
 export interface ComputerInfo {
   hostname?: string;
   model?: string;
-  adapter?: string;
+  primary_adapter?: string;
   local_ip?: string;
 }
 
 export interface RouterInfo {
-  model?: string;
-  brand?: string;
-  localIp: string;
+  local_ip?: string;
 }
 
 export interface InternetInfo {
   provider?: string;
-  publicIp: string;
+  public_ip?: string;
+  operator?: string;
   country?: string;
   city?: string;
+  reachable?: boolean;
 }
 
 export interface SpeedInfo {
@@ -42,12 +42,13 @@ export interface DiagnosticsData {
   overall: OverallStatus;
   computer: ComputerInfo | null;
   network: NetworkInfo;
-  router: RouterInfo;
-  internet: InternetInfo;
+  router: RouterInfo | null;
+  internet: InternetInfo | null;
   speed?: SpeedInfo;
   vpnDetected: boolean;
   geoConsent: boolean;
   updatedAt: number;
+  rawSnapshot?: string; // For debug display
 }
 
 // Alias for clarity
@@ -68,8 +69,8 @@ const convertSnapshot = (rustSnapshot: Snapshot): DiagnosticsData => {
     computer: rustSnapshot.computer ? {
       hostname: rustSnapshot.computer.hostname || undefined,
       model: rustSnapshot.computer.model || undefined,
-      adapter: rustSnapshot.computer.adapter || undefined,
-      local_ip: rustSnapshot.computer.localIp || undefined,
+      primary_adapter: rustSnapshot.computer.primary_adapter || undefined,
+      local_ip: rustSnapshot.computer.local_ip || undefined,
     } : null,
     network: {
       type: 'wifi', // TODO: Parse from Rust snapshot when available
@@ -78,17 +79,16 @@ const convertSnapshot = (rustSnapshot: Snapshot): DiagnosticsData => {
         dbm: -45
       }
     },
-    router: {
-      model: rustSnapshot.router?.model ?? "",
-      brand: rustSnapshot.router?.brand ?? "",
-      localIp: rustSnapshot.router?.localIp ?? ""
-    },
-    internet: {
-      provider: rustSnapshot.internet?.operator ?? "",
-      publicIp: rustSnapshot.internet?.publicIp ?? "",
-      country: rustSnapshot.internet?.geolocation?.country || undefined,
-      city: rustSnapshot.internet?.geolocation?.city || undefined
-    },
+    router: rustSnapshot.router ? {
+      local_ip: rustSnapshot.router.local_ip || undefined,
+    } : null,
+    internet: rustSnapshot.internet ? {
+      provider: rustSnapshot.internet.provider || undefined,
+      public_ip: rustSnapshot.internet.public_ip || undefined,
+      country: rustSnapshot.internet.country || undefined,
+      city: rustSnapshot.internet.city || undefined,
+      reachable: rustSnapshot.internet.reachable,
+    } : null,
     speed: {
       down: 999,
       up: 999
@@ -119,13 +119,24 @@ export const useDiagnostics = create<DiagnosticsStore>((set, get) => ({
       // Check if mock mode is enabled
       const useMock = import.meta.env.VITE_USE_MOCK === "1";
       
-      // Get snapshot data (mock or real)
-      const rustSnapshot = useMock
-        ? (await import("../mocks/snapshot.json")).default as Snapshot
-        : await invoke<Snapshot>("get_snapshot");
+      let rustSnapshot: Snapshot;
+      let rawSnapshot: string;
+      
+      if (useMock) {
+        rustSnapshot = (await import("../mocks/snapshot.json")).default as Snapshot;
+        rawSnapshot = JSON.stringify(rustSnapshot, null, 2);
+      } else {
+        // Get raw JSON for debug
+        rawSnapshot = await invoke<string>("get_snapshot_json_debug", { geoEnabled: false });
+        console.log("[Netok] Snapshot:", rawSnapshot);
+        
+        // Parse the JSON
+        rustSnapshot = JSON.parse(rawSnapshot);
+      }
       
       // Convert Rust format to expected UI format
       const diagnosticsData = convertSnapshot(rustSnapshot);
+      diagnosticsData.rawSnapshot = rawSnapshot;
 
       set({
         snapshot: diagnosticsData,

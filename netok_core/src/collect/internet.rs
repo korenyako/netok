@@ -12,9 +12,19 @@ struct IpifyResp {
 struct IpinfoResp {
     #[allow(dead_code)]
     ip: Option<String>,
-    org: Option<String>,     // ISP/ASN, например "AS1234 Vodafone"
+    org: Option<String>,     // "AS1234 Vodafone ..."
     city: Option<String>,
-    country: Option<String>, // двухбуквенный код или название
+    country: Option<String>, // "IT" или полное имя
+}
+
+#[derive(Deserialize)]
+struct IpapiResp {
+    #[allow(dead_code)]
+    ip: Option<String>,
+    org: Option<String>,     // иногда пусто
+    asn: Option<String>,     // "AS1234"
+    city: Option<String>,
+    country_name: Option<String>,
 }
 
 pub async fn collect_internet(geo_enabled: bool) -> crate::InternetNode {
@@ -24,30 +34,27 @@ pub async fn collect_internet(geo_enabled: bool) -> crate::InternetNode {
         .build()
         .ok();
 
-    // 1) Публичный IP
+    let mut provider: Option<String> = None;
     let mut public_ip: Option<String> = None;
-    let mut provider = None;
 
     if let Some(c) = &client {
-        // Try ipify.org first
-        if let Ok(resp) = c.get("https://api.ipify.org?format=json").send().await {
-            if resp.status() == StatusCode::OK {
-                if let Ok(parsed) = resp.json::<IpifyResp>().await {
-                    public_ip = Some(parsed.ip);
-                    provider = Some("ipify".to_string());
+        // 1) публичный IP
+        if let Ok(r) = c.get("https://api.ipify.org?format=json").send().await {
+            if r.status() == StatusCode::OK {
+                if let Ok(p) = r.json::<IpifyResp>().await {
+                    public_ip = Some(p.ip);
+                    provider = Some("ipify".into());
                 }
             }
         }
-        
-        // fallback icanhazip.com (plaintext)
         if public_ip.is_none() {
-            if let Ok(resp) = c.get("https://icanhazip.com").send().await {
-                if resp.status() == StatusCode::OK {
-                    if let Ok(text) = resp.text().await {
-                        let ip = text.trim().to_string();
+            if let Ok(r) = c.get("https://icanhazip.com").send().await {
+                if r.status() == StatusCode::OK {
+                    if let Ok(t) = r.text().await {
+                        let ip = t.trim();
                         if !ip.is_empty() {
-                            public_ip = Some(ip);
-                            provider = Some("icanhazip".to_string());
+                            public_ip = Some(ip.to_string());
+                            provider.get_or_insert("icanhazip".into());
                         }
                     }
                 }
@@ -55,23 +62,41 @@ pub async fn collect_internet(geo_enabled: bool) -> crate::InternetNode {
         }
     }
 
-    // 2) Гео/оператор (по согласию)
-    let mut operator = None;
-    let mut city = None;
-    let mut country = None;
-
-    if geo_enabled {
-        if let (Some(c), Some(ip)) = (&client, &public_ip) {
-            // ipinfo
-            let url = format!("https://ipinfo.io/{ip}/json");
-            if let Ok(resp) = c.get(url).send().await {
-                if resp.status() == StatusCode::OK {
-                    if let Ok(meta) = resp.json::<IpinfoResp>().await {
-                        operator = meta.org;
+    // 2) метаданные
+    let (mut operator, mut city, mut country) = (None, None, None);
+    if let (Some(c), Some(ip)) = (&client, &public_ip) {
+        // ipinfo сначала
+        if let Ok(r) = c.get(format!("https://ipinfo.io/{ip}/json")).send().await {
+            if r.status() == StatusCode::OK {
+                if let Ok(meta) = r.json::<IpinfoResp>().await {
+                    operator = meta.org;
+                    if geo_enabled {
                         city = meta.city;
                         country = meta.country;
-                        if provider.is_none() { 
-                            provider = Some("ipinfo".to_string()); 
+                    }
+                    if operator.is_some() || city.is_some() || country.is_some() {
+                        provider.get_or_insert("ipinfo".into());
+                    }
+                }
+            }
+        }
+        // fallback ipapi
+        if operator.is_none() && (geo_enabled && (city.is_none() || country.is_none())) {
+            if let Ok(r) = c.get(format!("https://ipapi.co/{ip}/json")).send().await {
+                if r.status() == StatusCode::OK {
+                    if let Ok(meta) = r.json::<IpapiResp>().await {
+                        // попытка собрать operator
+                        if meta.org.is_some() {
+                            operator = meta.org;
+                        } else if let Some(asn) = meta.asn {
+                            operator = Some(asn);
+                        }
+                        if geo_enabled {
+                            if city.is_none() { city = meta.city; }
+                            if country.is_none() { country = meta.country_name; }
+                        }
+                        if operator.is_some() || city.is_some() || country.is_some() {
+                            provider.get_or_insert("ipapi".into());
                         }
                     }
                 }

@@ -13,7 +13,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     if let Some(hostname) = &snapshot.computer.hostname {
         println!("  Hostname: {}", hostname);
     }
-    if let Some(adapter) = &snapshot.computer.adapter {
+    if let Some(adapter) = &snapshot.computer.primary_adapter {
         println!("  Adapter: {}", adapter);
     }
     if let Some(local_ip) = &snapshot.computer.local_ip {

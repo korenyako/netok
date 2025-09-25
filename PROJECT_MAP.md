@@ -1,6 +1,6 @@
 # Project Map - Netok
 
-Generated: 2025-09-24
+Generated: 2025-09-25
 
 ## TREE (ASCII)
 
@@ -54,8 +54,10 @@ Generated: 2025-09-24
 │   │   ├── collect
 │   │   │   ├── computer.rs
 │   │   │   ├── internet.rs
-│   │   │   └── mod.rs
-│   │   └── lib.rs
+│   │   │   ├── mod.rs
+│   │   │   └── router.rs
+│   │   ├── lib.rs
+│   │   └── model.rs
 │   └── Cargo.toml
 ├── netok_desktop
 │   ├── public

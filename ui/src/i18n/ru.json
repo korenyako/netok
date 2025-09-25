@@ -91,7 +91,10 @@
     },
     "internet": {
       "title": "Интернет",
-      "speed": "Скорость: {{down}}/{{up}} Мбит/с"
+      "public_ip": "Публичный IP: {{ip}}",
+      "operator": "Оператор: {{operator}}",
+      "location": "Локация: {{city}}, {{country}}",
+      "source": "Источник: {{provider}}"
     }
   },
   "signal": {
