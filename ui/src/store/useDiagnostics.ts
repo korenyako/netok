@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { invoke } from "@tauri-apps/api/core";
 import type { Snapshot } from "../types/diagnostics";
+import { useSettings } from "./useSettings";
 
 export type OverallStatus = 'ok' | 'partial' | 'down' | 'checking';
 
@@ -126,8 +127,11 @@ export const useDiagnostics = create<DiagnosticsStore>((set, get) => ({
         rustSnapshot = (await import("../mocks/snapshot.json")).default as Snapshot;
         rawSnapshot = JSON.stringify(rustSnapshot, null, 2);
       } else {
+        // Get current geo setting from store
+        const geoEnabled = useSettings.getState().geoEnabled;
+        
         // Get raw JSON for debug
-        rawSnapshot = await invoke<string>("get_snapshot_json_debug", { geoEnabled: false });
+        rawSnapshot = await invoke<string>("get_snapshot_json_debug", { geoEnabled });
         console.log("[Netok] Snapshot:", rawSnapshot);
         
         // Parse the JSON

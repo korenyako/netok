@@ -169,8 +169,8 @@
       "cache_flushed": "DNS cache flushed"
     },
     "geo": {
-      "show_location": "Show country and city for public IP",
-      "description": "If disabled, geo info will be hidden on Internet node"
+      "show_location": "Show country and city (by public IP)",
+      "description": "Information is determined by public IP, exact address is not used"
     },
     "tools": {
       "speed_test": "Quick speed test",
