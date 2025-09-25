@@ -27,10 +27,29 @@ pub fn collect_computer() -> crate::ComputerNode {
         }
     }
 
+    let mut primary_adapter_friendly: Option<String> = None;
+
+    #[cfg(target_os = "windows")]
+    {
+        if let Some(ip) = &local_ip {
+            primary_adapter_friendly = crate::collect::adapter_friendly::win::friendly_by_local_ip(ip);
+        }
+    }
+
+    #[cfg(any(target_os = "linux", target_os = "macos"))]
+    {
+        // На Unix — friendly = имя интерфейса (или эвристика по типу)
+        primary_adapter_friendly = crate::collect::adapter_friendly::unix::friendly_by_local_ip(
+            local_ip.as_deref().unwrap_or(""),
+            adapter.as_deref(),
+        );
+    }
+
     crate::ComputerNode {
         hostname,
         model: None,        // fill later when we add a safe cross-platform method
-        primary_adapter: adapter,
+        primary_adapter: adapter,                 // как раньше (GUID/имя)
+        primary_adapter_friendly,                 // новое поле для UI
         local_ip,
     }
 }

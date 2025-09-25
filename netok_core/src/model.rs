@@ -32,7 +32,10 @@ pub struct NodeInfo {
 pub struct ComputerNode {
     pub hostname: Option<String>,
     pub model: Option<String>,
+    /// Технический идентификатор (как раньше): имя/ид интерфейса
     pub primary_adapter: Option<String>,
+    /// Новое поле для отображения: дружелюбное имя адаптера
+    pub primary_adapter_friendly: Option<String>,
     pub local_ip: Option<String>,
 }
 

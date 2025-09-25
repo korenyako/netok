@@ -52,9 +52,11 @@ Generated: 2025-09-25
 │   │   └── internet_demo.rs
 │   ├── src
 │   │   ├── collect
+│   │   │   ├── adapter_friendly.rs
 │   │   │   ├── computer.rs
 │   │   │   ├── internet.rs
 │   │   │   ├── mod.rs
+│   │   │   ├── netutil.rs
 │   │   │   └── router.rs
 │   │   ├── lib.rs
 │   │   └── model.rs

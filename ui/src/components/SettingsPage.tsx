@@ -1,32 +1,30 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { invoke } from '@tauri-apps/api/core';
 import { useSettings } from '../store/useSettings';
-import { DNSTab } from './DNSTab';
-
-type SettingsTab = 'general' | 'dns' | 'geo' | 'tools';
 
 export function SettingsPage() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<SettingsTab>('general');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   
   // Settings from centralized store
   const { 
     geoEnabled, 
     setGeoEnabled, 
     rememberWindowSize, 
-    setRememberWindowSize 
+    setRememberWindowSize,
+    dnsMode,
+    setDnsMode,
+    customDns,
+    setCustomDns
   } = useSettings();
 
   const handleClose = () => {
     navigate('/');
-  };
-
-
-  const handleToolAction = (action: string) => {
-    // TODO: Implement tool actions
-    console.log(`Tool action: ${action}`);
   };
 
   const handleLanguageChange = (lang: string) => {
@@ -34,29 +32,94 @@ export function SettingsPage() {
     localStorage.setItem('netok.lang', lang);
   };
 
-  const tabs: { key: SettingsTab; label: string }[] = [
-    { key: 'general', label: t('settings.tabs.general') },
-    { key: 'dns', label: t('settings.tabs.dns') },
-    { key: 'geo', label: t('settings.tabs.geo') },
-    { key: 'tools', label: t('settings.tabs.tools') },
-  ];
+  const handleDnsModeChange = async (mode: typeof dnsMode) => {
+    setIsLoading(true);
+    setError(null);
+    setSuccess(null);
 
-  const renderGeneralTab = () => (
-    <div className="space-y-6">
+    try {
+      // Apply DNS settings
+      await invoke('set_dns', { 
+        mode, 
+        customDns: mode === 'custom' ? customDns : null 
+      });
+
+      // Flush DNS cache
+      await invoke('flush_dns_cache');
+
+      setDnsMode(mode);
+      setSuccess(t('settings.dns.applied_successfully'));
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (e: any) {
+      setError(e.toString());
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleFlushCache = async () => {
+    setIsLoading(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      await invoke('flush_dns_cache');
+      setSuccess(t('settings.dns.cache_flushed'));
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (e: any) {
+      setError(e.toString());
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="h-full flex flex-col">
+      {/* Header */}
+      <header className="bg-white border-b border-neutral-200">
+        <div className="flex justify-between items-center px-4 py-3">
+          <h1 className="text-lg font-semibold text-neutral-900">
+            {t('settings.title')}
+          </h1>
+          <button
+            onClick={handleClose}
+            className="h-8 px-3 rounded-md border border-neutral-300 bg-white text-sm text-neutral-700 hover:bg-neutral-50 hover:border-neutral-400"
+          >
+            {t('buttons.close')}
+          </button>
+        </div>
+      </header>
+
+      {/* Main content - Vertical scrollable list */}
+      <main className="flex-1 overflow-y-auto p-4 space-y-8">
+        
+        {/* General Section */}
+        <section>
+          <h2 className="text-base font-semibold text-neutral-900 mb-4">
+            {t('settings.tabs.general')}
+          </h2>
+          
+          <div className="space-y-4">
+            {/* Language Dropdown */}
       <div>
-        <h3 className="text-sm font-semibold text-neutral-900 mb-3">
+              <label className="block text-sm font-medium text-neutral-700 mb-2">
           {t('settings.general.language')}
-        </h3>
+              </label>
         <select 
           value={i18n.language}
           onChange={(e) => handleLanguageChange(e.target.value)}
-          className="h-9 px-3 rounded-md border bg-white text-sm w-32"
+                className="w-full h-10 px-3 rounded-md border border-neutral-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:border-transparent"
         >
+                <option value="en">{t('settings.general.language_en')}</option>
           <option value="ru">{t('settings.general.language_ru')}</option>
-          <option value="en">{t('settings.general.language_en')}</option>
         </select>
       </div>
       
+            {/* Remember Window Size Checkbox */}
       <div>
         <label className="flex items-center space-x-3">
           <input
@@ -71,12 +134,81 @@ export function SettingsPage() {
         </label>
       </div>
     </div>
-  );
+        </section>
 
-  const renderDnsTab = () => <DNSTab />;
+        {/* DNS Section */}
+        <section>
+          <h2 className="text-base font-semibold text-neutral-900 mb-4">
+            {t('settings.tabs.dns')}
+          </h2>
+          
+          <div className="space-y-4">
+            {/* DNS Mode Radio Group */}
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-3">
+                {t('settings.dns.mode')}
+              </label>
+              <div className="space-y-2">
+                {[
+                  { value: 'auto', label: t('settings.dns.mode_auto') },
+                  { value: 'cloudflare', label: t('settings.dns.mode_cloudflare') },
+                  { value: 'google', label: t('settings.dns.mode_google') },
+                  { value: 'custom', label: t('settings.dns.mode_custom') },
+                ].map((option) => (
+                  <label key={option.value} className="flex items-center space-x-3">
+                    <input
+                      type="radio"
+                      name="dns-mode"
+                      value={option.value}
+                      checked={dnsMode === option.value}
+                      onChange={() => handleDnsModeChange(option.value as typeof dnsMode)}
+                      disabled={isLoading}
+                      className="w-4 h-4 text-neutral-600 border-neutral-300 focus:ring-neutral-500 disabled:opacity-50"
+                    />
+                    <span className="text-sm text-neutral-700">{option.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
 
-  const renderGeoTab = () => (
-    <div className="space-y-6">
+            {/* Custom DNS Input */}
+            {dnsMode === 'custom' && (
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  {t('settings.dns.custom_dns')}
+                </label>
+                <input
+                  type="text"
+                  value={customDns}
+                  onChange={(e) => setCustomDns(e.target.value)}
+                  placeholder={t('settings.dns.custom_dns_placeholder')}
+                  disabled={isLoading}
+                  className="w-full h-10 px-3 rounded-md border border-neutral-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:border-transparent disabled:opacity-50"
+                />
+              </div>
+            )}
+
+            {/* Clear DNS Cache Button */}
+            <div>
+              <button
+                onClick={handleFlushCache}
+                disabled={isLoading}
+                className="w-full h-10 px-4 rounded-md border border-neutral-300 bg-white text-sm text-neutral-700 hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {t('settings.dns.flush_cache')}
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* Geo Section */}
+        <section>
+          <h2 className="text-base font-semibold text-neutral-900 mb-4">
+            {t('settings.tabs.geo')}
+          </h2>
+          
+          <div className="space-y-4">
+            {/* Geolocation Toggle */}
       <div>
         <label className="flex items-center space-x-3">
           <input
@@ -96,88 +228,34 @@ export function SettingsPage() {
         </label>
       </div>
     </div>
-  );
+        </section>
 
-  const renderToolsTab = () => (
-    <div className="space-y-4">
-      {[
-        { key: 'speed_test', label: t('settings.tools.speed_test') },
-        { key: 'flush_dns', label: t('settings.tools.flush_dns') },
-        { key: 'open_captive', label: t('settings.tools.open_captive') },
-        { key: 'open_router', label: t('settings.tools.open_router') },
-        { key: 'copy_diagnostics', label: t('settings.tools.copy_diagnostics') },
-      ].map((tool) => (
-        <button
-          key={tool.key}
-          onClick={() => handleToolAction(tool.key)}
-          className="w-full px-4 py-3 text-left border border-neutral-300 rounded-lg hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:border-transparent text-sm text-neutral-700"
-        >
-          {tool.label}
-        </button>
-      ))}
+        {/* Status Messages */}
+        {error && (
+          <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+            <div className="text-sm text-red-600">
+              {t('errors.dns_operation_failed')}: {error}
+            </div>
     </div>
-  );
+        )}
 
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'general':
-        return renderGeneralTab();
-      case 'dns':
-        return renderDnsTab();
-      case 'geo':
-        return renderGeoTab();
-      case 'tools':
-        return renderToolsTab();
-      default:
-        return null;
-    }
-  };
-
-  return (
-    <div className="h-full flex flex-col">
-      {/* Header */}
-      <header className="bg-white border-b border-neutral-200">
-        <div className="flex justify-between items-center px-4 py-2">
-          <h1 className="text-lg font-semibold text-neutral-900">
-            {t('settings.title')}
-          </h1>
-          <button
-            onClick={handleClose}
-            className="h-8 px-3 rounded-md border border-neutral-300 bg-white text-sm text-neutral-700 hover:bg-neutral-50 hover:border-neutral-400"
-          >
-            {t('buttons.back')}
-          </button>
+        {success && (
+          <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+            <div className="text-sm text-green-600">
+              {success}
+            </div>
         </div>
-      </header>
+        )}
 
-      {/* Main content */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Sidebar */}
-        <aside className="w-48 bg-neutral-50 border-r border-neutral-200 p-3">
-          <nav className="space-y-1">
-            {tabs.map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => setActiveTab(tab.key)}
-                className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  activeTab === tab.key
-                    ? 'bg-white text-neutral-900 shadow-sm border border-neutral-200'
-                    : 'text-neutral-600 hover:text-neutral-900 hover:bg-white'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </nav>
-        </aside>
-
-        {/* Content panel */}
-        <main className="flex-1 overflow-y-auto p-6">
-          <div className="max-w-2xl">
-            {renderTabContent()}
+        {isLoading && (
+          <div className="flex items-center justify-center py-4">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-neutral-600"></div>
+            <span className="ml-2 text-sm text-neutral-600">
+              {t('status.applying_settings')}
+            </span>
           </div>
+        )}
         </main>
-      </div>
     </div>
   );
 }

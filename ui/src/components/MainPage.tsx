@@ -44,7 +44,7 @@ export default function MainPage() {
             baseTitleKey="node.computer.title"
             metaText={snapshot?.computer?.hostname ? t('meta.computer', { hostname: snapshot.computer.hostname }) : undefined}
             facts={[
-              t('node.computer.adapter', { name: snapshot?.computer?.primary_adapter ?? t('unknown') }),
+              t('node.computer.adapter', { name: snapshot?.computer?.primary_adapter_friendly ?? snapshot?.computer?.primary_adapter ?? t('unknown') }),
               t('node.computer.lan_ip', { ip: snapshot?.computer?.local_ip ?? t('unknown') }),
             ]} 
           />

@@ -18,6 +18,7 @@ export interface ComputerInfo {
   hostname?: string;
   model?: string;
   primary_adapter?: string;
+  primary_adapter_friendly?: string;
   local_ip?: string;
 }
 

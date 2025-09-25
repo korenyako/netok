@@ -10,6 +10,7 @@ export interface ComputerNode {
   hostname?: string | null;
   model?: string | null;
   primary_adapter?: string | null;
+  primary_adapter_friendly?: string | null;
   local_ip?: string | null;
 }
 
