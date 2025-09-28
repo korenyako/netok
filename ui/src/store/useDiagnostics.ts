@@ -17,8 +17,10 @@ export interface NetworkInfo {
 export interface ComputerInfo {
   hostname?: string;
   model?: string;
-  primary_adapter?: string;
-  primary_adapter_friendly?: string;
+  interface_name?: string;
+  adapter_friendly?: string;
+  adapter_model?: string;
+  connection_type: 'wifi' | 'ethernet' | 'usb_modem' | 'tethering' | 'vpn' | 'unknown';
   local_ip?: string;
 }
 
@@ -71,7 +73,10 @@ const convertSnapshot = (rustSnapshot: Snapshot): DiagnosticsData => {
     computer: rustSnapshot.computer ? {
       hostname: rustSnapshot.computer.hostname || undefined,
       model: rustSnapshot.computer.model || undefined,
-      primary_adapter: rustSnapshot.computer.primary_adapter || undefined,
+      interface_name: rustSnapshot.computer.interface_name || undefined,
+      adapter_friendly: rustSnapshot.computer.adapter_friendly || undefined,
+      adapter_model: rustSnapshot.computer.adapter_model || undefined,
+      connection_type: rustSnapshot.computer.connection_type || 'unknown',
       local_ip: rustSnapshot.computer.local_ip || undefined,
     } : null,
     network: {

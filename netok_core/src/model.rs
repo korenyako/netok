@@ -1,3 +1,14 @@
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ConnectionType { 
+    Wifi, 
+    Ethernet, 
+    UsbModem, 
+    Tethering, 
+    Vpn, 
+    Unknown 
+}
+
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum NodeId { 
@@ -32,11 +43,13 @@ pub struct NodeInfo {
 pub struct ComputerNode {
     pub hostname: Option<String>,
     pub model: Option<String>,
-    /// Технический идентификатор (как раньше): имя/ид интерфейса
-    pub primary_adapter: Option<String>,
-    /// Новое поле для отображения: дружелюбное имя адаптера
-    pub primary_adapter_friendly: Option<String>,
+
+    pub interface_name: Option<String>,           // en0 / wlan0 / Ethernet
+    pub adapter_friendly: Option<String>,         // Windows: "Беспроводная сеть"
+    pub adapter_model: Option<String>,            // Windows: "Realtek 8822CE ...", иначе best-effort
+    pub connection_type: ConnectionType,          // для узла "Сеть"
     pub local_ip: Option<String>,
+    pub rssi_dbm: Option<i32>,                   // Signal strength for Wi-Fi
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]

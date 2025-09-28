@@ -180,6 +180,14 @@
       "copy_diagnostics": "Скопировать диагностику"
     }
   },
+  "connection_types": {
+    "wifi": "Wi-Fi",
+    "ethernet": "Кабель", 
+    "usb_modem": "USB-модем",
+    "tethering": "Тетеринг",
+    "vpn": "VPN",
+    "unknown": "Неизвестно"
+  },
   "mock_data": {
     "computer_name": "DESKTOP-ABC123",
     "computer_model": "Dell OptiPlex 7090",

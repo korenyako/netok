@@ -2,8 +2,10 @@
   "computer": {
     "hostname": "DESKTOP-MOCK123",
     "model": "Dell OptiPlex 7090",
-    "primary_adapter": "{0F5DB974-BAE8-4DC5-B2DA-BC793FCB9461}",
-    "primary_adapter_friendly": "Intel Wi-Fi 6 AX201",
+    "interface_name": "wlan0",
+    "adapter_friendly": "Wi-Fi",
+    "adapter_model": "Intel Wi-Fi 6 AX201",
+    "connection_type": "wifi",
     "local_ip": "192.168.1.100"
   },
   "router": {

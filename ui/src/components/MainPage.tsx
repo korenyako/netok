@@ -6,6 +6,7 @@ import { useSettings } from "../store/useSettings";
 import { NodeCard } from "../components/NodeCard";
 import { HeaderStatus } from "../components/HeaderStatus";
 import Spinner from "./Spinner";
+import { formatOperator } from "../utils/formatOperator";
 
 export default function MainPage() {
   const { t } = useTranslation();
@@ -15,6 +16,14 @@ export default function MainPage() {
   const [showDebug, setShowDebug] = useState(false);
 
   useEffect(() => { refresh(); }, [refresh]);
+
+  // Debug logging for verification
+  useEffect(() => {
+    if (snapshot) {
+      console.log("[Netok UI] Internet:", snapshot.internet);
+      console.log("[Netok UI] Computer:", snapshot.computer);
+    }
+  }, [snapshot]);
 
   const handleSettings = () => {
     navigate('/settings');
@@ -44,7 +53,14 @@ export default function MainPage() {
             baseTitleKey="node.computer.title"
             metaText={snapshot?.computer?.hostname ? t('meta.computer', { hostname: snapshot.computer.hostname }) : undefined}
             facts={[
-              t('node.computer.adapter', { name: snapshot?.computer?.primary_adapter_friendly ?? snapshot?.computer?.primary_adapter ?? t('unknown') }),
+              (() => {
+                const comp = snapshot?.computer;
+                const adapter = comp?.adapter_model?.trim() || 
+                               comp?.adapter_friendly?.trim() || 
+                               comp?.interface_name?.trim() || 
+                               t('unknown');
+                return t('node.computer.adapter', { name: adapter });
+              })(),
               t('node.computer.lan_ip', { ip: snapshot?.computer?.local_ip ?? t('unknown') }),
             ]} 
           />
@@ -88,7 +104,11 @@ export default function MainPage() {
             metaText={snapshot?.internet?.provider ? t('meta.internet', { operator: snapshot.internet.provider }) : undefined}
             facts={[
               t('node.internet.public_ip', { ip: snapshot?.internet?.public_ip ?? t('unknown') }),
-              t('node.internet.operator', { operator: snapshot?.internet?.operator ?? t('unknown') }),
+              (() => {
+                const net = snapshot?.internet;
+                const operator = formatOperator(net?.operator);
+                return t('node.internet.operator', { operator: operator ?? t('unknown') });
+              })(),
               ...(geoEnabled && snapshot?.internet?.city && snapshot?.internet?.country ? [
                 t('node.internet.location', { 
                   city: snapshot.internet.city, 

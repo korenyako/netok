@@ -1,6 +1,6 @@
 # Project Map - Netok
 
-Generated: 2025-09-25
+Generated: 2025-09-28
 
 ## TREE (ASCII)
 
@@ -52,12 +52,20 @@ Generated: 2025-09-25
 │   │   └── internet_demo.rs
 │   ├── src
 │   │   ├── collect
+│   │   │   ├── active_interface
+│   │   │   │   ├── linux.rs
+│   │   │   │   ├── macos.rs
+│   │   │   │   ├── mod.rs
+│   │   │   │   └── windows.rs
 │   │   │   ├── adapter_friendly.rs
 │   │   │   ├── computer.rs
+│   │   │   ├── connectivity.rs
 │   │   │   ├── internet.rs
 │   │   │   ├── mod.rs
 │   │   │   ├── netutil.rs
-│   │   │   └── router.rs
+│   │   │   ├── platform_adapter.rs
+│   │   │   ├── router.rs
+│   │   │   └── win_wlan.rs
 │   │   ├── lib.rs
 │   │   └── model.rs
 │   └── Cargo.toml
@@ -162,7 +170,10 @@ Generated: 2025-09-25
 │   │   ├── types
 │   │   │   └── diagnostics.ts
 │   │   ├── utils
-│   │   │   └── formatUpdatedAt.ts
+│   │   │   ├── formatOperator.ts
+│   │   │   ├── formatUpdatedAt.ts
+│   │   │   ├── netFormat.ts
+│   │   │   └── netStatus.ts
 │   │   ├── App.tsx
 │   │   ├── i18n.ts
 │   │   ├── index.css

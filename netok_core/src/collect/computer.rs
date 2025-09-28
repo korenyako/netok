@@ -1,55 +1,23 @@
-use get_if_addrs::get_if_addrs;
-use std::net::IpAddr;
+use hostname::get as get_hostname;
+use crate::model::ComputerNode;
+use crate::collect::active_interface::get_active_interface;
 
-pub fn collect_computer() -> crate::ComputerNode {
-    let hostname = hostname::get()
+pub fn collect_computer() -> ComputerNode {
+    let hostname = get_hostname()
         .ok()
         .and_then(|s| s.into_string().ok());
 
-    let mut local_ip: Option<String> = None;
-    let mut adapter: Option<String> = None;
+    // Get the active network interface with enriched information
+    let active_interface = get_active_interface();
 
-    if let Ok(ifaces) = get_if_addrs() {
-        // First try to find IPv4 interface
-        if let Some(ifa) = ifaces.iter().find(|i| {
-            !i.is_loopback() && matches!(i.ip(), IpAddr::V4(_))
-        }) {
-            local_ip = Some(ifa.ip().to_string());
-            adapter = Some(ifa.name.clone());
-        } else {
-            // Fallback to IPv6 if no IPv4 found
-            if let Some(ifa) = ifaces.iter().find(|i| {
-                !i.is_loopback() && matches!(i.ip(), IpAddr::V6(_))
-            }) {
-                local_ip = Some(ifa.ip().to_string());
-                adapter = Some(ifa.name.clone());
-            }
-        }
-    }
-
-    let mut primary_adapter_friendly: Option<String> = None;
-
-    #[cfg(target_os = "windows")]
-    {
-        if let Some(ip) = &local_ip {
-            primary_adapter_friendly = crate::collect::adapter_friendly::win::friendly_by_local_ip(ip);
-        }
-    }
-
-    #[cfg(any(target_os = "linux", target_os = "macos"))]
-    {
-        // На Unix — friendly = имя интерфейса (или эвристика по типу)
-        primary_adapter_friendly = crate::collect::adapter_friendly::unix::friendly_by_local_ip(
-            local_ip.as_deref().unwrap_or(""),
-            adapter.as_deref(),
-        );
-    }
-
-    crate::ComputerNode {
+    ComputerNode {
         hostname,
-        model: None,        // fill later when we add a safe cross-platform method
-        primary_adapter: adapter,                 // как раньше (GUID/имя)
-        primary_adapter_friendly,                 // новое поле для UI
-        local_ip,
+        model: None, // Will be implemented later
+        interface_name: active_interface.interface_name,
+        adapter_friendly: active_interface.adapter_friendly,
+        adapter_model: active_interface.adapter_model,
+        connection_type: active_interface.connection_type,
+        local_ip: active_interface.local_ip,
+        rssi_dbm: active_interface.rssi_dbm,
     }
 }

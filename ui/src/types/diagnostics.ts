@@ -6,11 +6,15 @@ export type LinkQuality =
   | { kind: "ethernet"; link: "up" | "down" }
   | { kind: "other"; note?: string };
 
+export type ConnectionType = 'wifi' | 'ethernet' | 'usb_modem' | 'tethering' | 'vpn' | 'unknown';
+
 export interface ComputerNode {
-  hostname?: string | null;
-  model?: string | null;
-  primary_adapter?: string | null;
-  primary_adapter_friendly?: string | null;
+    hostname?: string | null;
+    model?: string | null;
+  interface_name?: string | null;           // en0 / wlan0 / Ethernet
+  adapter_friendly?: string | null;         // Windows: "Беспроводная сеть"
+  adapter_model?: string | null;            // Windows: "Realtek 8822CE ...", иначе best-effort
+  connection_type: ConnectionType;          // для узла "Сеть"
   local_ip?: string | null;
 }
 
@@ -21,7 +25,7 @@ export interface RouterNode {
 export interface InternetNode {
   reachable: boolean;
   public_ip?: string | null;
-  operator?: string | null;
+    operator?: string | null;
   city?: string | null;
   country?: string | null;
   provider?: string | null;
