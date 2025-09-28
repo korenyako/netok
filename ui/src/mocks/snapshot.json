@@ -6,7 +6,9 @@
     "adapter_friendly": "Wi-Fi",
     "adapter_model": "Intel Wi-Fi 6 AX201",
     "connection_type": "wifi",
-    "local_ip": "192.168.1.100"
+    "local_ip": "192.168.1.100",
+    "rssi_dbm": -45,
+    "oper_up": true
   },
   "router": {
     "local_ip": "192.168.1.1"
@@ -20,5 +22,6 @@
     "provider": "ipify",
     "timestamp": "2024-01-15T10:30:00Z"
   },
+  "connectivity": "online",
   "version": 1
 }

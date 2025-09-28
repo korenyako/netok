@@ -10,10 +10,10 @@ use crate::model::ConnectionType;
 pub fn enrich_windows_interface(
     _interface_name: &Option<String>,
     local_ip: &Option<String>,
-) -> (Option<String>, Option<String>, ConnectionType, Option<i32>) {
+) -> (Option<String>, Option<String>, ConnectionType, Option<i32>, bool) {
     let local_ip = match local_ip {
         Some(ip) => ip,
-        None => return (None, None, ConnectionType::Unknown, None),
+        None => return (None, None, ConnectionType::Unknown, None, false),
     };
 
     // Get adapter information using GetAdaptersAddresses
@@ -25,9 +25,9 @@ pub fn enrich_windows_interface(
                 None
             };
             
-            (info.friendly_name, info.model, info.connection_type, rssi)
+            (info.friendly_name, info.model, info.connection_type, rssi, info.oper_up)
         }
-        None => (None, None, ConnectionType::Unknown, None),
+        None => (None, None, ConnectionType::Unknown, None, false),
     }
 }
 
@@ -36,6 +36,7 @@ struct AdapterInfo {
     model: Option<String>,
     connection_type: ConnectionType,
     adapter_guid: Option<String>,
+    oper_up: bool,
 }
 
 /// Get adapter information for Windows using WinAPI
@@ -141,11 +142,15 @@ fn get_adapter_info(local_ip: &str) -> Option<AdapterInfo> {
                     _ => ConnectionType::Unknown,
                 };
 
+                // Determine operational status from OperStatus
+                let oper_up = (*cur).OperStatus == windows::Win32::NetworkManagement::Ndis::IF_OPER_STATUS(1); // IfOperStatusUp = 1
+
                 return Some(AdapterInfo {
                     friendly_name,
                     model,
                     connection_type,
                     adapter_guid,
+                    oper_up,
                 });
             }
 

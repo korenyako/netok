@@ -9,6 +9,16 @@ pub enum ConnectionType {
     Unknown 
 }
 
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum Connectivity {
+    Offline,           // нет активного интерфейса / нет маршрута
+    NoRouter,          // интерфейс есть, но до шлюза не достучались
+    CaptiveOrNoDns,    // до шлюза достучались, но DNS/HTTP вовне не проходят
+    Online,            // всё ок
+    Unknown,           // неизвестно (для синхронных версий)
+}
+
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum NodeId { 
@@ -49,7 +59,12 @@ pub struct ComputerNode {
     pub adapter_model: Option<String>,            // Windows: "Realtek 8822CE ...", иначе best-effort
     pub connection_type: ConnectionType,          // для узла "Сеть"
     pub local_ip: Option<String>,
+    
+    // Wi-Fi details (if connected)
     pub rssi_dbm: Option<i32>,                   // Signal strength for Wi-Fi
+    pub wifi_ssid: Option<String>,               // Network name
+    pub wifi_bssid: Option<String>,              // Access point MAC address (AA:BB:CC:DD:EE:FF)
+    pub oper_up: bool,                            // Operational state (up/down)
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -76,6 +91,7 @@ pub struct Snapshot {
     pub computer: ComputerNode,
     pub router: Option<RouterNode>,
     pub internet: Option<InternetNode>,
+    pub connectivity: Connectivity,
     pub version: u32, // schema version
 }
 

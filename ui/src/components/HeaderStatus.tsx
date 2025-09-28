@@ -1,50 +1,43 @@
 import { useTranslation } from 'react-i18next';
+import { statusTitle, statusHint, isOnline, type Connectivity } from '../utils/netStatus';
 
 interface HeaderStatusProps {
-  internetStatus: 'ok' | 'partial' | 'down';
+  connectivity: Connectivity;
   publicIp?: string;
   city?: string;
   country?: string;
   vpnDetected?: boolean;
 }
 
-export function HeaderStatus({ internetStatus, publicIp, city, country, vpnDetected = false }: HeaderStatusProps) {
+export function HeaderStatus({ connectivity, publicIp, city, country, vpnDetected = false }: HeaderStatusProps) {
   const { t } = useTranslation();
-
-  const getStatusText = () => {
-    switch (internetStatus) {
-      case 'ok':
-        return t('header.status.available');
-      case 'partial':
-        return t('header.status.partial');
-      case 'down':
-        return t('header.status.unavailable');
-      default:
-        return t('header.status.unavailable');
-    }
-  };
-
-  const getIpText = () => {
-    return t('header.ip', { 
-      ip: publicIp ?? t('dash'), 
-      city: city ?? t('dash'), 
-      country: country ?? t('dash') 
-    });
-  };
 
   const getVpnText = () => {
     return vpnDetected ? t('header.vpn.on') : t('header.vpn.off');
   };
 
+  const hint = statusHint(t, connectivity);
+  const online = isOnline(connectivity);
+
   return (
-    <div className="mb-3">
-      <div className="text-neutral-900 mb-1">
-        {getStatusText()}
-      </div>
+    <div className={`mb-3 status ${!online ? 'status--warning' : ''}`}>
+      <h4 className="text-neutral-900 mb-1">
+        {statusTitle(t, connectivity)}
+      </h4>
       
-      <div className="text-sm text-neutral-700 mb-1">
-        {getIpText()}
-      </div>
+      {hint && (
+        <p className="text-muted text-sm text-neutral-600 mb-1">
+          {hint}
+        </p>
+      )}
+      
+      <p className="text-sm text-neutral-700 mb-1">
+        {t('header.ip', { 
+          ip: online ? (publicIp ?? t('unknown')) : '—', 
+          city: online ? (city ?? t('dash')) : t('dash'), 
+          country: online ? (country ?? t('dash')) : t('dash')
+        })}
+      </p>
       
       <div className="text-sm text-neutral-700">
         {getVpnText()}

@@ -4,6 +4,15 @@
     "title": "Network Diagnostics"
   },
   "status": {
+    "online": "Internet available",
+    "offline": "No Internet",
+    "no_router": "Router unreachable",
+    "captive_or_no_dns": "Limited access",
+    "hint": {
+      "offline": "No network connection.",
+      "no_router": "Gateway in the local network is not responding.",
+      "captive_or_no_dns": "Captive portal required or DNS issues."
+    },
     "internet_ok": "Internet works.",
     "internet_down": "Internet unavailable.",
     "internet_partial": "Internet partially available.",
@@ -79,11 +88,25 @@
     },
     "network": {
       "title": {
-        "wifi": "Network",
-        "ethernet": "Network"
+        "wifi": "Wi-Fi",
+        "ethernet": "Ethernet",
+        "usb_modem": "USB modem",
+        "tethering": "Tethering",
+        "vpn": "VPN",
+        "unknown": "Network"
       },
+      "title_wifi": "Wi-Fi",
+      "title_ethernet": "Ethernet",
+      "title_usb_modem": "USB modem",
+      "title_tethering": "Tethering",
+      "title_vpn": "VPN",
+      "title_unknown": "Network",
       "signal": "Signal: {{grade}} ({{dbm}} dBm)",
-      "link": "Link: {{text}}"
+      "link": "Link: {{text}}",
+      "ssid": "SSID",
+      "bssid": "BSSID: {{bssid}}",
+      "type": "Type: {{type}}",
+      "type.ethernet": "Ethernet"
     },
     "router": {
       "title": "Router/Access Point",
@@ -103,7 +126,11 @@
       "good": "good",
       "average": "average",
       "weak": "weak"
-    }
+    },
+    "excellent": "excellent",
+    "good": "good",
+    "fair": "fair",
+    "poor": "poor"
   },
   "meta": {
     "computer": "{{hostname}}",

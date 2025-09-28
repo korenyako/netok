@@ -83,5 +83,9 @@
   "nodes.wifi.name": "Wi-Fi",
   "nodes.dns.name": "DNS",
   "nodes.internet.name": "Интернет",
-  "summary.ok": "Всё в порядке"
+  "summary.ok": "Всё в порядке",
+  "ConnectivityOffline": "Интернет недоступен",
+  "ConnectivityNoRouter": "Роутер недоступен",
+  "ConnectivityCaptiveOrNoDns": "Доступ ограничен (требуется вход в сеть или проблемы с DNS)",
+  "ConnectivityOnline": "Интернет работает"
 }

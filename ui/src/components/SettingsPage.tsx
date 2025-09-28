@@ -81,16 +81,16 @@ export function SettingsPage() {
     <div className="h-full flex flex-col">
       {/* Header */}
       <header className="bg-white border-b border-neutral-200">
-        <div className="flex justify-between items-center px-4 py-3">
+        <div className="flex items-center px-4 py-3">
+          <button
+            onClick={handleClose}
+            className="h-8 px-3 rounded-md border border-neutral-300 bg-white text-sm text-neutral-700 hover:bg-neutral-50 hover:border-neutral-400 mr-3"
+          >
+            {t('buttons.back')}
+          </button>
           <h1 className="text-lg font-semibold text-neutral-900">
             {t('settings.title')}
           </h1>
-          <button
-            onClick={handleClose}
-            className="h-8 px-3 rounded-md border border-neutral-300 bg-white text-sm text-neutral-700 hover:bg-neutral-50 hover:border-neutral-400"
-          >
-            {t('buttons.close')}
-          </button>
         </div>
       </header>
 

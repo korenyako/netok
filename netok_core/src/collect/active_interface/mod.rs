@@ -21,6 +21,7 @@ pub struct ActiveInterface {
     pub adapter_model: Option<String>,      // Windows Description or best-effort
     pub connection_type: ConnectionType,    // Wifi/Ethernet/UsbModem/...
     pub rssi_dbm: Option<i32>,              // Signal strength for Wi-Fi
+    pub oper_up: bool,                      // Operational state (up/down)
 }
 
 /// Determine the local IP address used for outgoing connections
@@ -86,6 +87,7 @@ pub fn get_active_interface() -> ActiveInterface {
                 adapter_model: None,
                 connection_type: ConnectionType::Unknown,
                 rssi_dbm: None,
+                oper_up: false,
             };
         }
     };
@@ -102,12 +104,13 @@ pub fn get_active_interface() -> ActiveInterface {
                 adapter_model: None,
                 connection_type: ConnectionType::Unknown,
                 rssi_dbm: None,
+                oper_up: false,
             };
         }
     };
 
     // Step C: Platform-specific enrichment
-    let (adapter_friendly, adapter_model, connection_type, rssi_dbm) = 
+    let (adapter_friendly, adapter_model, connection_type, rssi_dbm, oper_up) = 
         enrich_interface_info(&interface_name, &local_ip);
 
     let result = ActiveInterface {
@@ -117,6 +120,7 @@ pub fn get_active_interface() -> ActiveInterface {
         adapter_model,
         connection_type,
         rssi_dbm,
+        oper_up,
     };
 
     // Debug logging
@@ -131,7 +135,7 @@ pub fn get_active_interface() -> ActiveInterface {
 fn enrich_interface_info(
     interface_name: &Option<String>,
     local_ip: &Option<String>,
-) -> (Option<String>, Option<String>, ConnectionType, Option<i32>) {
+) -> (Option<String>, Option<String>, ConnectionType, Option<i32>, bool) {
     #[cfg(target_os = "windows")]
     {
         crate::collect::active_interface::windows::enrich_windows_interface(interface_name, local_ip)
@@ -150,6 +154,6 @@ fn enrich_interface_info(
     #[cfg(not(any(target_os = "windows", target_os = "linux", target_os = "macos")))]
     {
         eprintln!("[Netok core] Unsupported platform for interface enrichment");
-        (None, None, ConnectionType::Unknown, None)
+        (None, None, ConnectionType::Unknown, None, false)
     }
 }

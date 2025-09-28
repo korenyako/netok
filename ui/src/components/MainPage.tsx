@@ -7,6 +7,8 @@ import { NodeCard } from "../components/NodeCard";
 import { HeaderStatus } from "../components/HeaderStatus";
 import Spinner from "./Spinner";
 import { formatOperator } from "../utils/formatOperator";
+import { isOnline, type Connectivity } from "../utils/netStatus";
+import { signalLabel } from "../utils/netFormat";
 
 export default function MainPage() {
   const { t } = useTranslation();
@@ -42,7 +44,7 @@ export default function MainPage() {
       <main className="flex-1 overflow-y-auto p-4">
         <div className="space-y-3">
           <HeaderStatus 
-            internetStatus={snapshot?.overall === 'checking' ? 'down' : snapshot?.overall || 'down'}
+            connectivity={snapshot?.connectivity || 'unknown'}
             publicIp={snapshot?.internet?.public_ip}
             city={geoEnabled ? snapshot?.internet?.city : undefined}
             country={geoEnabled ? snapshot?.internet?.country : undefined}
@@ -61,41 +63,55 @@ export default function MainPage() {
                                t('unknown');
                 return t('node.computer.adapter', { name: adapter });
               })(),
-              t('node.computer.lan_ip', { ip: snapshot?.computer?.local_ip ?? t('unknown') }),
+              // Only show local IP if connectivity is not offline
+              ...(snapshot?.connectivity !== 'offline' ? [
+                t('node.computer.lan_ip', { ip: snapshot?.computer?.local_ip ?? t('unknown') })
+              ] : []),
             ]} 
           />
 
-          {snapshot?.network?.type === 'wifi' ? (
-            <NodeCard 
-              baseTitleKey="node.network.title.wifi"
-              metaText={undefined} // SSID not available in current data structure
-              facts={[
-                (() => {
-                  const rawGrade = getSignalGrade(snapshot?.network?.signal?.dbm);
-                  const gradeKey = `signal.grade.${rawGrade}` as const;
-                  const gradeText = t(gradeKey);
-                  return t('node.network.signal', { 
-                    grade: gradeText,
-                    dbm: snapshot?.network?.signal?.dbm ?? t('unknown')
-                  });
-                })(),
-              ]} 
-            />
-          ) : (
-            <NodeCard 
-              baseTitleKey="node.network.title.ethernet"
-              metaText={t('meta.ethernet')}
-              facts={[
-                t('node.network.link', { text: snapshot?.network?.link ? 'up' : 'down' }),
-              ]} 
-            />
-          )}
+          <NodeCard 
+            title={(() => {
+              type Conn = "wifi" | "ethernet" | "usb_modem" | "tethering" | "vpn" | "unknown";
+              
+              const titleKeyMap: Record<Conn, string> = {
+                wifi: "node.network.title.wifi",
+                ethernet: "node.network.title.ethernet", 
+                usb_modem: "node.network.title.usb_modem",
+                tethering: "node.network.title.tethering",
+                vpn: "node.network.title.vpn",
+                unknown: "node.network.title.unknown",
+              };
+              
+              const connType = (snapshot?.computer?.connection_type ?? "unknown") as Conn;
+              const title = t(titleKeyMap[connType]);
+              
+              console.log("[Netok UI] connection_type:", connType, "title:", title);
+              
+              return title;
+            })()}
+            subtitle={snapshot?.computer?.connection_type === 'wifi' && snapshot?.computer?.wifi_ssid ? snapshot.computer.wifi_ssid : undefined}
+            facts={[
+              // Show signal only for Wi-Fi when RSSI is available and connectivity is not offline
+              ...(snapshot?.computer?.connection_type === 'wifi' && 
+                  snapshot?.connectivity !== 'offline' && 
+                  typeof snapshot?.computer?.rssi_dbm === 'number' ? [
+                    t('node.network.signal', { 
+                      grade: signalLabel(t, snapshot.computer.rssi_dbm),
+                      dbm: snapshot.computer.rssi_dbm
+                    })
+                  ] : []),
+            ]} 
+          />
 
           <NodeCard 
             baseTitleKey="node.router.title"
             metaText={undefined}
             facts={[
-              t('node.router.lan_ip', { ip: snapshot?.router?.local_ip ?? t('unknown') }),
+              // Only show router IP if connectivity is not offline
+              ...(snapshot?.connectivity !== 'offline' ? [
+                t('node.router.lan_ip', { ip: snapshot?.router?.local_ip ?? t('unknown') })
+              ] : []),
             ]} 
           />
 
@@ -103,27 +119,26 @@ export default function MainPage() {
             baseTitleKey="node.internet.title"
             metaText={snapshot?.internet?.provider ? t('meta.internet', { operator: snapshot.internet.provider }) : undefined}
             facts={[
-              t('node.internet.public_ip', { ip: snapshot?.internet?.public_ip ?? t('unknown') }),
-              (() => {
-                const net = snapshot?.internet;
-                const operator = formatOperator(net?.operator);
-                return t('node.internet.operator', { operator: operator ?? t('unknown') });
-              })(),
-              ...(geoEnabled && snapshot?.internet?.city && snapshot?.internet?.country ? [
-                t('node.internet.location', { 
-                  city: snapshot.internet.city, 
-                  country: snapshot.internet.country 
-                })
-              ] : []),
+              // Only show internet data if connectivity is online
+              ...(isOnline(snapshot?.connectivity as Connectivity) ? [
+                t('node.internet.public_ip', { ip: snapshot?.internet?.public_ip ?? t('unknown') }),
+                (() => {
+                  const net = snapshot?.internet;
+                  const operator = formatOperator(net?.operator);
+                  return t('node.internet.operator', { operator: operator ?? t('unknown') });
+                })(),
+                ...(geoEnabled && snapshot?.internet?.city && snapshot?.internet?.country ? [
+                  t('node.internet.location', { 
+                    city: snapshot.internet.city, 
+                    country: snapshot.internet.country 
+                  })
+                ] : []),
+              ] : [
+                t('node.internet.public_ip', { ip: t('unknown') }),
+                t('node.internet.operator', { operator: t('unknown') }),
+              ]),
             ]} 
           />
-          
-          {/* Provider indicator */}
-          {snapshot?.internet?.provider && (
-            <div className="text-xs text-gray-500 text-center mt-1">
-              {t('node.internet.source', { provider: snapshot.internet.provider })}
-            </div>
-          )}
 
           {error && <div className="mt-2 text-red-500">{t('status.error_prefix')} {error}</div>}
         </div>
@@ -181,10 +196,3 @@ export default function MainPage() {
   );
 }
 
-function getSignalGrade(dbm?: number): string {
-  if (!dbm) return 'unknown';
-  if (dbm >= -55) return 'excellent';
-  if (dbm >= -67) return 'good';
-  if (dbm >= -75) return 'fair';
-  return 'weak';
-}

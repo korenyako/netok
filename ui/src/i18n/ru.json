@@ -4,6 +4,15 @@
     "title": "Диагностика сети"
   },
   "status": {
+    "online": "Интернет работает",
+    "offline": "Интернет недоступен",
+    "no_router": "Роутер недоступен",
+    "captive_or_no_dns": "Доступ ограничен",
+    "hint": {
+      "offline": "Нет подключения к сети.",
+      "no_router": "Шлюз в локальной сети не отвечает.",
+      "captive_or_no_dns": "Нужен вход через портал или проблемы с DNS."
+    },
     "internet_ok": "Интернет работает.",
     "internet_down": "Интернет недоступен.",
     "internet_partial": "Интернет частично доступен.",
@@ -79,11 +88,25 @@
     },
     "network": {
       "title": {
-        "wifi": "Сеть",
-        "ethernet": "Сеть"
+        "wifi": "Wi-Fi",
+        "ethernet": "Кабель",
+        "usb_modem": "USB-модем",
+        "tethering": "Тетеринг",
+        "vpn": "VPN",
+        "unknown": "Сеть"
       },
+      "title_wifi": "Wi-Fi",
+      "title_ethernet": "Кабель",
+      "title_usb_modem": "USB-модем",
+      "title_tethering": "Тетеринг",
+      "title_vpn": "VPN",
+      "title_unknown": "Сеть",
       "signal": "Сигнал: {{grade}} ({{dbm}} dBm)",
-      "link": "Линк: {{text}}"
+      "link": "Линк: {{text}}",
+      "ssid": "SSID",
+      "bssid": "BSSID: {{bssid}}",
+      "type": "Тип: {{type}}",
+      "type.ethernet": "Кабель"
     },
     "router": {
       "title": "Роутер",
@@ -103,7 +126,11 @@
       "good": "хороший",
       "average": "средний",
       "weak": "слабый"
-    }
+    },
+    "excellent": "отличный",
+    "good": "хороший",
+    "fair": "средний",
+    "poor": "слабый"
   },
   "meta": {
     "computer": "{{hostname}}",

@@ -5,22 +5,23 @@ use crate::model::ConnectionType;
 /// Enrich Linux interface information using filesystem and CLI tools
 pub fn enrich_linux_interface(
     interface_name: &Option<String>,
-) -> (Option<String>, Option<String>, ConnectionType, Option<i32>) {
+) -> (Option<String>, Option<String>, ConnectionType, Option<i32>, bool) {
     let interface_name = match interface_name {
         Some(name) => name,
-        None => return (None, None, ConnectionType::Unknown, None),
+        None => return (None, None, ConnectionType::Unknown, None, false),
     };
 
     let connection_type = determine_connection_type(interface_name);
     let adapter_friendly = get_friendly_name(&connection_type, interface_name);
     let adapter_model = get_adapter_model(interface_name);
-    let rssi_dbm = if connection_type == ConnectionType::Wifi {
+    let oper_up = get_oper_up(interface_name);
+    let rssi_dbm = if connection_type == ConnectionType::Wifi && oper_up {
         get_wifi_rssi(interface_name)
     } else {
         None
     };
 
-    (adapter_friendly, adapter_model, connection_type, rssi_dbm)
+    (adapter_friendly, adapter_model, connection_type, rssi_dbm, oper_up)
 }
 
 fn determine_connection_type(interface_name: &str) -> ConnectionType {
@@ -102,6 +103,22 @@ fn get_adapter_model(interface_name: &str) -> Option<String> {
     }
 
     None
+}
+
+fn get_oper_up(interface_name: &str) -> bool {
+    // Check /sys/class/net/<iface>/operstate
+    let operstate_path = format!("/sys/class/net/{}/operstate", interface_name);
+    if let Ok(content) = std::fs::read_to_string(&operstate_path) {
+        return content.trim() == "up";
+    }
+    
+    // Fallback: check carrier status
+    let carrier_path = format!("/sys/class/net/{}/carrier", interface_name);
+    if let Ok(content) = std::fs::read_to_string(&carrier_path) {
+        return content.trim() == "1";
+    }
+    
+    false
 }
 
 fn get_wifi_rssi(interface_name: &str) -> Option<i32> {

@@ -4,21 +4,22 @@ use crate::model::ConnectionType;
 /// Enrich macOS interface information using system commands
 pub fn enrich_macos_interface(
     interface_name: &Option<String>,
-) -> (Option<String>, Option<String>, ConnectionType, Option<i32>) {
+) -> (Option<String>, Option<String>, ConnectionType, Option<i32>, bool) {
     let interface_name = match interface_name {
         Some(name) => name,
-        None => return (None, None, ConnectionType::Unknown, None),
+        None => return (None, None, ConnectionType::Unknown, None, false),
     };
 
     let (adapter_friendly, connection_type) = get_hardware_port_info(interface_name);
     let adapter_model = None; // Skip for v1 as requested
-    let rssi_dbm = if connection_type == ConnectionType::Wifi {
+    let oper_up = get_oper_up(interface_name);
+    let rssi_dbm = if connection_type == ConnectionType::Wifi && oper_up {
         get_wifi_rssi(interface_name)
     } else {
         None
     };
 
-    (adapter_friendly, adapter_model, connection_type, rssi_dbm)
+    (adapter_friendly, adapter_model, connection_type, rssi_dbm, oper_up)
 }
 
 fn get_hardware_port_info(interface_name: &str) -> (Option<String>, ConnectionType) {
@@ -81,6 +82,35 @@ fn get_hardware_port_info(interface_name: &str) -> (Option<String>, ConnectionTy
     };
 
     (adapter_friendly, connection_type)
+}
+
+fn get_oper_up(interface_name: &str) -> bool {
+    // Use ifconfig to check interface status
+    if let Ok(output) = Command::new("ifconfig")
+        .arg(interface_name)
+        .output()
+    {
+        if output.status.success() {
+            let output_str = String::from_utf8_lossy(&output.stdout);
+            // Check if interface is up and running
+            return output_str.contains("status: active") || 
+                   (output_str.contains("UP") && output_str.contains("RUNNING"));
+        }
+    }
+    
+    // Fallback: check netstat
+    if let Ok(output) = Command::new("netstat")
+        .args(&["-rn"])
+        .output()
+    {
+        if output.status.success() {
+            let output_str = String::from_utf8_lossy(&output.stdout);
+            // Look for default route using this interface
+            return output_str.contains(&format!("{}", interface_name));
+        }
+    }
+    
+    false
 }
 
 fn get_wifi_rssi(interface_name: &str) -> Option<i32> {

@@ -22,6 +22,10 @@ export interface ComputerInfo {
   adapter_model?: string;
   connection_type: 'wifi' | 'ethernet' | 'usb_modem' | 'tethering' | 'vpn' | 'unknown';
   local_ip?: string;
+  rssi_dbm?: number;
+  wifi_ssid?: string;
+  wifi_bssid?: string;
+  oper_up: boolean;
 }
 
 export interface RouterInfo {
@@ -53,6 +57,7 @@ export interface DiagnosticsData {
   geoConsent: boolean;
   updatedAt: number;
   rawSnapshot?: string; // For debug display
+  connectivity: 'offline' | 'no_router' | 'captive_or_no_dns' | 'online' | 'unknown';
 }
 
 // Alias for clarity
@@ -78,13 +83,18 @@ const convertSnapshot = (rustSnapshot: Snapshot): DiagnosticsData => {
       adapter_model: rustSnapshot.computer.adapter_model || undefined,
       connection_type: rustSnapshot.computer.connection_type || 'unknown',
       local_ip: rustSnapshot.computer.local_ip || undefined,
+      rssi_dbm: rustSnapshot.computer.rssi_dbm || undefined,
+      wifi_ssid: rustSnapshot.computer.wifi_ssid || undefined,
+      wifi_bssid: rustSnapshot.computer.wifi_bssid || undefined,
+      oper_up: rustSnapshot.computer.oper_up || false,
     } : null,
     network: {
-      type: 'wifi', // TODO: Parse from Rust snapshot when available
-      signal: {
-        level: 'excellent',
-        dbm: -45
-      }
+      type: rustSnapshot.computer.connection_type === 'wifi' ? 'wifi' : 'cable',
+      signal: rustSnapshot.computer.connection_type === 'wifi' && rustSnapshot.computer.rssi_dbm ? {
+        level: 'excellent', // TODO: Calculate based on RSSI
+        dbm: rustSnapshot.computer.rssi_dbm
+      } : undefined,
+      link: rustSnapshot.computer.oper_up
     },
     router: rustSnapshot.router ? {
       local_ip: rustSnapshot.router.local_ip || undefined,
@@ -92,17 +102,16 @@ const convertSnapshot = (rustSnapshot: Snapshot): DiagnosticsData => {
     internet: rustSnapshot.internet ? {
       provider: rustSnapshot.internet.provider || undefined,
       public_ip: rustSnapshot.internet.public_ip || undefined,
+      operator: rustSnapshot.internet.operator || undefined,
       country: rustSnapshot.internet.country || undefined,
       city: rustSnapshot.internet.city || undefined,
       reachable: rustSnapshot.internet.reachable,
     } : null,
-    speed: {
-      down: 999,
-      up: 999
-    },
-    vpnDetected: false,
+    speed: undefined, // TODO: Implement speed test
+    vpnDetected: false, // TODO: Implement VPN detection
     geoConsent: true,
-    updatedAt: Date.now()
+    updatedAt: Date.now(),
+    connectivity: rustSnapshot.connectivity || 'unknown',
   };
 };
 

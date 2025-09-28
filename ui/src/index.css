@@ -2,6 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Connectivity status styling */
+.status--warning {
+  opacity: 0.8;
+}
+
+.status--warning h4 {
+  color: #dc2626; /* red-600 */
+}
+
+.status--warning .text-muted {
+  color: #dc2626; /* red-600 */
+}
+
 /* Ensure full height for proper scrolling */
 html, body, #root {
   height: 100%;

@@ -7,14 +7,72 @@ pub use model::*;
 
 
 pub async fn run_all(geo_enabled: bool) -> Snapshot {
-    let computer = collect::computer::collect_computer();
-    let router = Some(collect::router::collect_router());
-    let internet = Some(collect::internet::collect_internet(geo_enabled).await);
+    use collect::connectivity::{detect_connectivity, get_gateway};
+    use model::Connectivity;
+    use std::net::IpAddr;
+    use std::str::FromStr;
+    
+    // Collect computer info first
+    let mut computer = collect::computer::collect_computer();
+    let mut router = Some(collect::router::collect_router());
+    let mut internet = Some(collect::internet::collect_internet(geo_enabled).await);
+    
+    // Determine connectivity status
+    let active_ip = computer.local_ip.as_ref()
+        .and_then(|ip| IpAddr::from_str(ip).ok());
+    let gateway = get_gateway();
+    
+    let connectivity = detect_connectivity(active_ip, gateway).await;
+    
+    // Clear data based on connectivity status
+    match connectivity {
+        Connectivity::Offline => {
+            // Clear all network data
+            computer.local_ip = None;
+            computer.rssi_dbm = None;
+            router = None;
+            if let Some(ref mut internet) = internet {
+                internet.reachable = false;
+                internet.public_ip = None;
+                internet.operator = None;
+                internet.city = None;
+                internet.country = None;
+            }
+        }
+        Connectivity::NoRouter => {
+            // Clear internet data and RSSI
+            computer.rssi_dbm = None;
+            if let Some(ref mut internet) = internet {
+                internet.reachable = false;
+                internet.public_ip = None;
+                internet.operator = None;
+                internet.city = None;
+                internet.country = None;
+            }
+        }
+        Connectivity::CaptiveOrNoDns => {
+            // Clear internet data but keep local network info
+            if let Some(ref mut internet) = internet {
+                internet.reachable = false;
+                internet.public_ip = None;
+                internet.operator = None;
+                internet.city = None;
+                internet.country = None;
+            }
+        }
+        Connectivity::Online => {
+            // Keep all data as is
+        }
+        Connectivity::Unknown => {
+            // Default case - keep all data as is
+        }
+    }
 
     Snapshot { 
         computer,
         router,
         internet,
+        connectivity,
         version: 1,
     }
 }
@@ -27,6 +85,7 @@ pub fn run_diagnostics(_settings: &Settings) -> Snapshot {
         computer,
         router,
         internet: None, // Keep None for sync version
+        connectivity: Connectivity::Unknown, // Default for sync version
         version: 1,
     }
 }
@@ -46,12 +105,17 @@ mod tests {
         let node = ComputerNode {
             hostname: None,
             model: None,
-            primary_adapter: None,
+            interface_name: None,
+            adapter_friendly: None,
+            adapter_model: None,
+            connection_type: model::ConnectionType::Unknown,
             local_ip: None,
+            rssi_dbm: None,
+            oper_up: false,
         };
         assert!(node.hostname.is_none());
         assert!(node.model.is_none());
-        assert!(node.primary_adapter.is_none());
+        assert!(node.interface_name.is_none());
         assert!(node.local_ip.is_none());
     }
 
@@ -61,7 +125,7 @@ mod tests {
         
         assert!(info.hostname.is_some() || info.hostname.is_none());
         assert!(info.model.is_some() || info.model.is_none());
-        assert!(info.primary_adapter.is_some() || info.primary_adapter.is_none());
+        assert!(info.interface_name.is_some() || info.interface_name.is_none());
         assert!(info.local_ip.is_some() || info.local_ip.is_none());
     }
 
@@ -72,7 +136,7 @@ mod tests {
         
         assert_eq!(snapshot.computer.hostname.is_some() || snapshot.computer.hostname.is_none(), true);
         assert_eq!(snapshot.computer.model.is_some() || snapshot.computer.model.is_none(), true);
-        assert_eq!(snapshot.computer.primary_adapter.is_some() || snapshot.computer.primary_adapter.is_none(), true);
+        assert_eq!(snapshot.computer.interface_name.is_some() || snapshot.computer.interface_name.is_none(), true);
         assert_eq!(snapshot.computer.local_ip.is_some() || snapshot.computer.local_ip.is_none(), true);
         assert_eq!(snapshot.version, 1);
     }

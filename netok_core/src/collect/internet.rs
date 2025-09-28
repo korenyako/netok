@@ -1,7 +1,7 @@
 use chrono::Utc;
-use reqwest::{Client, StatusCode};
+use reqwest::StatusCode;
 use serde::Deserialize;
-use std::time::Duration;
+use crate::collect::connectivity::make_http_client;
 
 #[derive(Deserialize)]
 struct IpifyResp { 
@@ -28,11 +28,7 @@ struct IpapiResp {
 }
 
 pub async fn collect_internet(geo_enabled: bool) -> crate::InternetNode {
-    let client = Client::builder()
-        .use_rustls_tls()
-        .timeout(Duration::from_secs(3))
-        .build()
-        .ok();
+    let client = make_http_client();
 
     let mut provider: Option<String> = None;
     let mut public_ip: Option<String> = None;
