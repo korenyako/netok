@@ -1,6 +1,6 @@
 # Project Map - Netok
 
-Generated: 2025-09-21
+Generated: 2025-10-29
 
 ## TREE (ASCII)
 
@@ -158,7 +158,6 @@ Generated: 2025-09-21
 │   ├── tsconfig.node.json
 │   └── vite.config.ts
 ├── ui_legacy
-│   ├── assets
 │   ├── src
 │   │   ├── computer.svg
 │   │   ├── globe.svg
@@ -168,6 +167,102 @@ Generated: 2025-09-21
 │   │   └── wifi.svg
 │   ├── Cargo.toml
 │   └── README.md
+├── ui-new
+│   ├── src
+│   │   ├── components
+│   │   │   ├── figma
+│   │   │   │   └── ImageWithFallback.tsx
+│   │   │   ├── screens
+│   │   │   │   ├── LanguageScreen.tsx
+│   │   │   │   ├── NetworkScreen.tsx
+│   │   │   │   ├── SecurityScreen.tsx
+│   │   │   │   ├── SettingsScreen.tsx
+│   │   │   │   ├── ThemeScreen.tsx
+│   │   │   │   └── ToolsScreen.tsx
+│   │   │   ├── ui
+│   │   │   │   ├── accordion.tsx
+│   │   │   │   ├── alert-dialog.tsx
+│   │   │   │   ├── alert.tsx
+│   │   │   │   ├── aspect-ratio.tsx
+│   │   │   │   ├── avatar.tsx
+│   │   │   │   ├── badge.tsx
+│   │   │   │   ├── breadcrumb.tsx
+│   │   │   │   ├── button.tsx
+│   │   │   │   ├── calendar.tsx
+│   │   │   │   ├── card.tsx
+│   │   │   │   ├── carousel.tsx
+│   │   │   │   ├── chart.tsx
+│   │   │   │   ├── checkbox.tsx
+│   │   │   │   ├── collapsible.tsx
+│   │   │   │   ├── command.tsx
+│   │   │   │   ├── context-menu.tsx
+│   │   │   │   ├── dialog.tsx
+│   │   │   │   ├── drawer.tsx
+│   │   │   │   ├── dropdown-menu.tsx
+│   │   │   │   ├── form.tsx
+│   │   │   │   ├── hover-card.tsx
+│   │   │   │   ├── input-otp.tsx
+│   │   │   │   ├── input.tsx
+│   │   │   │   ├── label.tsx
+│   │   │   │   ├── menubar.tsx
+│   │   │   │   ├── navigation-menu.tsx
+│   │   │   │   ├── pagination.tsx
+│   │   │   │   ├── popover.tsx
+│   │   │   │   ├── progress.tsx
+│   │   │   │   ├── radio-group.tsx
+│   │   │   │   ├── resizable.tsx
+│   │   │   │   ├── scroll-area.tsx
+│   │   │   │   ├── select.tsx
+│   │   │   │   ├── separator.tsx
+│   │   │   │   ├── sheet.tsx
+│   │   │   │   ├── sidebar.tsx
+│   │   │   │   ├── skeleton.tsx
+│   │   │   │   ├── slider.tsx
+│   │   │   │   ├── sonner.tsx
+│   │   │   │   ├── switch.tsx
+│   │   │   │   ├── table.tsx
+│   │   │   │   ├── tabs.tsx
+│   │   │   │   ├── textarea.tsx
+│   │   │   │   ├── toggle-group.tsx
+│   │   │   │   ├── toggle.tsx
+│   │   │   │   ├── tooltip.tsx
+│   │   │   │   ├── use-mobile.ts
+│   │   │   │   └── utils.ts
+│   │   │   ├── DetailedPathCard.tsx
+│   │   │   └── MainStatusCard.tsx
+│   │   ├── guidelines
+│   │   │   └── Guidelines.md
+│   │   ├── imports
+│   │   │   ├── Card-31-242.tsx
+│   │   │   ├── Card-33-466.tsx
+│   │   │   ├── Card-33-569.tsx
+│   │   │   ├── Card-37-829.tsx
+│   │   │   ├── Card-42-1026.tsx
+│   │   │   ├── Card-42-1119.tsx
+│   │   │   ├── Card-9-130.tsx
+│   │   │   ├── Card-9-292.tsx
+│   │   │   ├── Card.tsx
+│   │   │   ├── Check.tsx
+│   │   │   ├── svg-7mtmmw9lcd.ts
+│   │   │   ├── svg-awoydyzf8i.ts
+│   │   │   ├── svg-egvceuz6nw.ts
+│   │   │   ├── svg-exnfuwyo3q.ts
+│   │   │   ├── svg-gjkejt3b1w.ts
+│   │   │   ├── svg-gt5503apnm.ts
+│   │   │   ├── svg-havri7zc8r.ts
+│   │   │   ├── svg-nfe8ucn0br.ts
+│   │   │   ├── svg-qf6f52nkak.ts
+│   │   │   └── svg-urvarrlt82.ts
+│   │   ├── styles
+│   │   │   └── globals.css
+│   │   ├── App.tsx
+│   │   ├── Attributions.md
+│   │   ├── index.css
+│   │   └── main.tsx
+│   ├── index.html
+│   ├── package.json
+│   ├── README.md
+│   └── vite.config.ts
 ├── .cursorrules
 ├── .gitignore
 ├── Cargo.lock
