@@ -2,13 +2,13 @@
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "Netok",
   "identifier": "netok",
+
   "build": {
-    "beforeDevCommand": "npm run dev --prefix ../../ui-new",
-    "beforeBuildCommand": "npm run build --prefix ../../ui-new",
-    "devUrl": "http://localhost:5173",
-    "frontendDist": "../../ui-new/dist"
-}
-,
+    "beforeDevCommand": "npm run dev --prefix ../ui-new",
+    "beforeBuildCommand": "npm run build --prefix ../ui-new",
+    "frontendDist": "../ui-new/dist"
+  },
+
   "app": {
     "windows": [
       {

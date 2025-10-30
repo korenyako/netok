@@ -295,13 +295,13 @@ Generated: 2025-10-30
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "Netok",
   "identifier": "netok",
+
   "build": {
-    "beforeDevCommand": "npm run dev --prefix ../../ui-new",
-    "beforeBuildCommand": "npm run build --prefix ../../ui-new",
-    "devUrl": "http://localhost:5173",
-    "frontendDist": "../../ui-new/dist"
-}
-,
+    "beforeDevCommand": "npm run dev --prefix ../ui-new",
+    "beforeBuildCommand": "npm run build --prefix ../ui-new",
+    "frontendDist": "../ui-new/dist"
+  },
+
   "app": {
     "windows": [
       {
@@ -443,10 +443,10 @@ export default App;
 
 ### Build Commands
 
-- **Dev Command**: npm run dev --prefix ../../ui-new
-- **Build Command**: npm run build --prefix ../../ui-new
-- **Dev Path**: <http://localhost:5173>
-- **Dist Dir**: ../../ui-new/dist
+- **Dev Command**: npm run dev --prefix ../ui-new
+- **Build Command**: npm run build --prefix ../ui-new
+- **Dev Path**: <НЕ НАЙДЕНО>
+- **Dist Dir**: ../ui-new/dist
 - **Window Title**: Netok
 - **Window Size**: 320×560
 
@@ -481,7 +481,7 @@ export default App;
 
 ## Obvious SoT Mismatches
 
-- ✅ No obvious mismatches found
+- ⚠️ devPath (НЕ НАЙДЕНО) может указывать на неправильный порт
 
 ---
 

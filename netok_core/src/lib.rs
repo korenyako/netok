@@ -142,7 +142,6 @@ pub fn run_diagnostics(_settings: &Settings) -> DiagnosticsSnapshot {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::net::Ipv4Addr;
 
     #[test]
     fn test_computer_info_default() {
