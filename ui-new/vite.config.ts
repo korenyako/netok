@@ -8,6 +8,7 @@
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
       alias: {
+        '@tauri-apps/api': '@tauri-apps/api',
         'vaul@1.1.2': 'vaul',
         'sonner@2.0.3': 'sonner',
         'recharts@2.15.2': 'recharts',
@@ -52,6 +53,9 @@
     build: {
       target: 'esnext',
       outDir: 'build',
+      rollupOptions: {
+        external: ['@tauri-apps/api'],
+      },
     },
     server: {
       port: 3000,

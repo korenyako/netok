@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import StatusHeader from './components/StatusHeader';
 import NetworkScreen from './components/screens/NetworkScreen';
 import SecurityScreen from './components/screens/SecurityScreen';
 import ToolsScreen from './components/screens/ToolsScreen';
@@ -20,6 +21,7 @@ export default function App() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-neutral-100 p-4">
       <div className="w-[320px] h-[600px]">
+        <StatusHeader />
         {currentScreen === 'network' && <NetworkScreen onNavigate={handleNavigate} />}
         {currentScreen === 'security' && <SecurityScreen onNavigate={setCurrentScreen} openDNSDirectly={openDNSDirectly} />}
         {currentScreen === 'tools' && <ToolsScreen onNavigate={setCurrentScreen} />}

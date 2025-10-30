@@ -3,11 +3,12 @@
   "productName": "Netok",
   "identifier": "netok",
   "build": {
-    "beforeDevCommand": "npm run dev:ui",
-    "beforeBuildCommand": "npm run build:ui",
+    "beforeDevCommand": "npm run dev --prefix ../../ui-new",
+    "beforeBuildCommand": "npm run build --prefix ../../ui-new",
     "devUrl": "http://localhost:5173",
-    "frontendDist": "../ui/dist"
-  },
+    "frontendDist": "../../ui-new/dist"
+}
+,
   "app": {
     "windows": [
       {

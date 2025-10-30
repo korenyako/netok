@@ -6,7 +6,8 @@
     "map": "node scripts/generate_project_map.mjs",
     "map:check": "node scripts/generate_project_map.mjs --check",
     "dev:ui": "npm --prefix ./ui run dev",
-    "build:ui": "npm --prefix ./ui ci && npm --prefix ./ui run build"
+    "build:ui": "npm --prefix ./ui ci && npm --prefix ./ui run build",
+    "tauri": "tauri"
   },
   "devDependencies": {
     "husky": "^8.0.3"
