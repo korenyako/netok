@@ -1,6 +1,6 @@
 # Project Map - Netok
 
-Generated: 2025-10-29
+Generated: 2025-10-30
 
 ## TREE (ASCII)
 
@@ -229,7 +229,8 @@ Generated: 2025-10-29
 │   │   │   │   ├── use-mobile.ts
 │   │   │   │   └── utils.ts
 │   │   │   ├── DetailedPathCard.tsx
-│   │   │   └── MainStatusCard.tsx
+│   │   │   ├── MainStatusCard.tsx
+│   │   │   └── StatusHeader.tsx
 │   │   ├── guidelines
 │   │   │   └── Guidelines.md
 │   │   ├── imports
@@ -260,6 +261,7 @@ Generated: 2025-10-29
 │   │   ├── index.css
 │   │   └── main.tsx
 │   ├── index.html
+│   ├── package-lock.json
 │   ├── package.json
 │   ├── README.md
 │   └── vite.config.ts
@@ -294,11 +296,12 @@ Generated: 2025-10-29
   "productName": "Netok",
   "identifier": "netok",
   "build": {
-    "beforeDevCommand": "npm run dev:ui",
-    "beforeBuildCommand": "npm run build:ui",
+    "beforeDevCommand": "npm run dev --prefix ../../ui-new",
+    "beforeBuildCommand": "npm run build --prefix ../../ui-new",
     "devUrl": "http://localhost:5173",
-    "frontendDist": "../ui/dist"
-  },
+    "frontendDist": "../../ui-new/dist"
+}
+,
   "app": {
     "windows": [
       {
@@ -440,10 +443,10 @@ export default App;
 
 ### Build Commands
 
-- **Dev Command**: npm run dev:ui
-- **Build Command**: npm run build:ui
+- **Dev Command**: npm run dev --prefix ../../ui-new
+- **Build Command**: npm run build --prefix ../../ui-new
 - **Dev Path**: <http://localhost:5173>
-- **Dist Dir**: ../ui/dist
+- **Dist Dir**: ../../ui-new/dist
 - **Window Title**: Netok
 - **Window Size**: 320×560
 
