@@ -59,38 +59,6 @@ interface DiagnosticsStore {
   refresh: () => Promise<void>;
 }
 
-// Parse backend diagnostics data
-const parseBackendData = (backendData: any): DiagnosticsData => {
-  return {
-    overall: 'ok', // TODO: Parse from backend
-    computer: backendData.computer || null,
-    network: {
-      type: 'wifi', // TODO: Parse from backend
-      signal: {
-        level: 'excellent',
-        dbm: -45
-      }
-    },
-    router: {
-      model: i18next.t('mock_data.router_model'),
-      brand: i18next.t('mock_data.router_brand'),
-      localIp: '192.168.1.1'
-    },
-    internet: {
-      provider: i18next.t('mock_data.provider_name'),
-      publicIp: '95.84.123.45',
-      country: i18next.t('mock_data.country_name'),
-      city: i18next.t('mock_data.city_name')
-    },
-    speed: {
-      down: 95,
-      up: 45
-    },
-    vpnDetected: false,
-    geoConsent: true,
-    updatedAt: Date.now()
-  };
-};
 
 // Realistic placeholder data
 const createMockData = (): DiagnosticsData => ({

@@ -1,6 +1,6 @@
 # Project Map - Netok
 
-Generated: 2025-10-30
+Generated: 2025-10-31
 
 ## TREE (ASCII)
 
@@ -297,8 +297,9 @@ Generated: 2025-10-30
   "identifier": "netok",
 
   "build": {
-    "beforeDevCommand": "npm run dev --prefix ../ui-new",
-    "beforeBuildCommand": "npm run build --prefix ../ui-new",
+    "beforeDevCommand": "npm run dev --prefix ../ui",
+    "beforeBuildCommand": "npm run build --prefix ../ui",
+    "devUrl": "http://localhost:5173",
     "frontendDist": "../ui-new/dist"
   },
 
@@ -443,9 +444,9 @@ export default App;
 
 ### Build Commands
 
-- **Dev Command**: npm run dev --prefix ../ui-new
-- **Build Command**: npm run build --prefix ../ui-new
-- **Dev Path**: <НЕ НАЙДЕНО>
+- **Dev Command**: npm run dev --prefix ../ui
+- **Build Command**: npm run build --prefix ../ui
+- **Dev Path**: <http://localhost:5173>
 - **Dist Dir**: ../ui-new/dist
 - **Window Title**: Netok
 - **Window Size**: 320×560
@@ -481,7 +482,7 @@ export default App;
 
 ## Obvious SoT Mismatches
 
-- ⚠️ devPath (НЕ НАЙДЕНО) может указывать на неправильный порт
+- ✅ No obvious mismatches found
 
 ---
 
