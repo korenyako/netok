@@ -3,14 +3,106 @@
     "name": "Netok",
     "title": "Диагностика сети"
   },
+  "placeholders": {
+    "tools_title": "Инструменты",
+    "tools_description": "Раздел в разработке"
+  },
+  "security": {
+    "title": "Безопасность"
+  },
+  "dns_providers": {
+    "title": "Защита DNS",
+    "description": "Выберите DNS-сервер для повышения безопасности и блокировки нежелательного контента",
+    "auto": "Отключена",
+    "auto_desc": "DNS вашего провайдера",
+    "cloudflare": "Cloudflare",
+    "cloudflare_desc": "Самый быстрый публичный DNS, ориентированный на приватность, проверен KPMG",
+    "adguard": "AdGuard",
+    "adguard_desc": "Гибкая блокировка рекламы и трекеров",
+    "dns4eu": "DNS4EU",
+    "dns4eu_desc": "DNS сообщества ЕС с упором на приватность и безопасность",
+    "cleanbrowsing": "CleanBrowsing",
+    "cleanbrowsing_desc": "Бесплатная DNS-фильтрация для безопасного просмотра и родительского контроля",
+    "quad9": "Quad9",
+    "quad9_desc": "Фокус на безопасности с блокировкой вредоносного ПО и DNSSEC",
+    "opendns": "OpenDNS",
+    "opendns_desc": "Защита от фишинга и фильтрация от Cisco",
+    "google": "Google",
+    "google_desc": "Надёжная и простая замена DNS провайдера",
+    "custom": "Пользовательский"
+  },
+  "dns_detail": {
+    "choose_protection": "Выберите вариант защиты",
+    "apply": "Применить",
+    "cloudflare": {
+      "standard": "Стандартный",
+      "standard_desc": "Быстрый и надёжный DNS",
+      "malware": "Блокировка вредоносных сайтов",
+      "malware_desc": "Защита от фишинга и вредоносного ПО",
+      "family": "Семейная защита",
+      "family_desc": "Блокировка контента для взрослых"
+    },
+    "adguard": {
+      "standard": "Стандартный",
+      "standard_desc": "Блокировка рекламы",
+      "family": "Семейная защита",
+      "family_desc": "Блокировка контента для взрослых",
+      "unfiltered": "Без фильтрации",
+      "unfiltered_desc": "Только DNS без блокировок"
+    },
+    "dns4eu": {
+      "protective": "Защита",
+      "protective_desc": "Блокирует мошеннический и вредоносный контент",
+      "protective_child": "Защита + Детская",
+      "protective_child_desc": "Блокирует неподходящий контент для детей",
+      "protective_ad": "Защита + Реклама",
+      "protective_ad_desc": "Добавляет блокировку рекламы к защитным функциям",
+      "protective_child_ad": "Защита + Детская и реклама",
+      "protective_child_ad_desc": "Комбинирует детскую защиту с блокировкой рекламы",
+      "unfiltered": "Без фильтрации",
+      "unfiltered_desc": "Без фильтрации для безопасного, анонимного и быстрого разрешения"
+    },
+    "cleanbrowsing": {
+      "family": "Семейный фильтр",
+      "family_desc": "Блокирует все сайты для взрослых, порно, прокси, VPN; Google, Bing и Youtube SafeSearch",
+      "adult": "Фильтр для взрослых",
+      "adult_desc": "Блокирует сайты для взрослых; разрешает прокси и смешанный контент",
+      "security": "Фильтр безопасности",
+      "security_desc": "Блокирует фишинг, спам, вредоносное ПО; не блокирует контент для взрослых"
+    },
+    "quad9": {
+      "recommended": "Рекомендуемый",
+      "recommended_desc": "Блокирует известные вредоносные домены",
+      "secured_ecs": "Защищённый с ECS",
+      "secured_ecs_desc": "Добавляет функцию ECS к рекомендуемому",
+      "unsecured": "Незащищённый",
+      "unsecured_desc": "Для опытных пользователей"
+    },
+    "opendns": {
+      "familyshield": "FamilyShield",
+      "familyshield_desc": "Автоматически блокирует контент для взрослых и вредоносные сайты",
+      "home": "Домашний",
+      "home_desc": "Настраиваемая фильтрация и защита от вредоносного ПО"
+    }
+  },
+  "diagnostics": {
+    "computer": "Компьютер",
+    "router": "Роутер",
+    "wifi": "Wi-Fi",
+    "internet": "Интернет"
+  },
   "status": {
-    "internet_ok": "Интернет работает.",
-    "internet_down": "Интернет недоступен.",
-    "internet_partial": "Интернет частично доступен.",
+    "internet_ok": "Подключено",
+    "internet_down": "Нет подключения",
+    "internet_partial": "Ограниченное подключение",
     "speed": "Скорость: {down}/{up} Мбит/с",
     "connection_no_vpn": "Соединение без VPN. Настроить VPN",
     "connection_vpn_detected": "VPN соединение обнаружено",
-    "waiting": "Проверяем соединение…"
+    "waiting": "Проверяем соединение…",
+    "dns_protection": "Защита DNS",
+    "dns_protection_enabled": "Блокировка нежелательного контента включена",
+    "dns_protection_disabled": "Защита DNS отключена",
+    "dns_protection_disabled_desc": "Стандартный DNS провайдера"
   },
   "nodes": {
     "computer": {
@@ -81,6 +173,13 @@
       "language": "Язык",
       "language_ru": "Русский",
       "language_en": "English",
+      "theme": "Тема",
+      "theme_light": "Светлая",
+      "theme_dark": "Тёмная",
+      "theme_system": "Системная",
+      "theme_light_desc": "Всегда использовать светлый режим интерфейса",
+      "theme_dark_desc": "Всегда использовать тёмный режим интерфейса",
+      "theme_system_desc": "Следовать настройкам системы автоматически",
       "remember_window_size": "Запоминать размер окна"
     },
     "dns": {

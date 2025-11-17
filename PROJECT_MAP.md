@@ -1,10 +1,12 @@
 # Project Map - Netok
 
-Generated: 2025-10-31
+Generated: 2025-11-17
 
 ## TREE (ASCII)
 
 ```text
+├── .claude
+│   └── settings.local.json
 ├── .github
 │   ├── ISSUE_TEMPLATE
 │   │   └── feature_request.md
@@ -34,6 +36,7 @@ Generated: 2025-10-31
 │   │   ├── CODING_RULES.md
 │   │   ├── SoT.md
 │   │   └── TASK_TEMPLATE.md
+│   ├── IMPLEMENTATION-PLAN.md
 │   ├── README.md
 │   ├── SoT-ARCH.md
 │   └── UI-SPEC.md
@@ -125,19 +128,43 @@ Generated: 2025-10-31
 │   ├── public
 │   │   └── vite.svg
 │   ├── src
+│   │   ├── api
+│   │   │   └── tauri.ts
 │   │   ├── assets
 │   │   │   └── react.svg
 │   │   ├── components
+│   │   │   ├── icons
+│   │   │   │   └── NavigationIcons.tsx
 │   │   │   ├── HeaderStatus.tsx
 │   │   │   ├── MainPage.tsx
 │   │   │   ├── NodeCard.tsx
 │   │   │   ├── SettingsPage.tsx
-│   │   │   └── Spinner.tsx
+│   │   │   ├── Spinner.tsx
+│   │   │   └── ThemeProvider.tsx
 │   │   ├── i18n
 │   │   │   ├── en.json
 │   │   │   └── ru.json
+│   │   ├── screens
+│   │   │   ├── AdGuardDetailScreen.tsx
+│   │   │   ├── CleanBrowsingDetailScreen.tsx
+│   │   │   ├── CloudflareDetailScreen.tsx
+│   │   │   ├── DiagnosticsScreen.tsx
+│   │   │   ├── Dns4EuDetailScreen.tsx
+│   │   │   ├── DnsProvidersScreen.tsx
+│   │   │   ├── GoogleDetailScreen.tsx
+│   │   │   ├── LanguageSettingsScreen.tsx
+│   │   │   ├── OpenDnsDetailScreen.tsx
+│   │   │   ├── Quad9DetailScreen.tsx
+│   │   │   ├── SecurityScreen.tsx
+│   │   │   ├── SettingsScreen.tsx
+│   │   │   ├── StatusScreen.tsx
+│   │   │   └── ThemeSettingsScreen.tsx
 │   │   ├── store
 │   │   │   └── useDiagnostics.ts
+│   │   ├── stores
+│   │   │   ├── dnsStore.ts
+│   │   │   ├── themeStore.ts
+│   │   │   └── useDnsStore.ts
 │   │   ├── utils
 │   │   │   └── formatUpdatedAt.ts
 │   │   ├── App.tsx
@@ -308,9 +335,9 @@ Generated: 2025-10-31
       {
         "title": "Netok",
         "width": 320,
-        "height": 560,
-        "minWidth": 280,
-        "minHeight": 480,
+        "height": 600,
+        "minWidth": 320,
+        "minHeight": 600,
         "resizable": true
       }
     ]
@@ -334,6 +361,7 @@ Generated: 2025-10-31
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tauri-apps/api": "^2.9.0",
     "i18next": "^25.5.2",
     "netok": "file:..",
     "react": "^19.1.1",
@@ -368,16 +396,23 @@ Generated: 2025-10-31
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ["./index.html", "./src/**/*.{ts,tsx}"],
+  darkMode: 'class',
   theme: {
     extend: {
       fontFamily: {
         sans: ['system-ui', 'sans-serif'],
+        mono: ['"Share Tech Mono"', 'monospace'],
       },
-    },
-  },
-  plugins: [],
-}
-
+      colors: {
+        background: {
+          DEFAULT: 'var(--color-background)',
+          secondary: 'var(--color-background-secondary)',
+          tertiary: 'var(--color-background-tertiary)',
+          hover: 'var(--color-background-hover)',
+        },
+        foreground: {
+          DEFAULT: 'var(--color-foreground)',
+          secondary: 'var(--color-foreground-secondary)',}}}}}
 ```
 
 ### ui/index.html
@@ -389,6 +424,9 @@ export default {
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <title>Vite + React + TS</title>
   </head>
   <body>
@@ -419,25 +457,58 @@ createRoot(document.getElementById('root')!).render(
 ### ui/src/App.tsx
 
 ```typescript
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { MainPage } from './components/MainPage';
-import { SettingsPage } from './components/SettingsPage';
+import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { ThemeProvider } from './components/ThemeProvider';
+import { StatusScreen } from './screens/StatusScreen';
+import { DiagnosticsScreen } from './screens/DiagnosticsScreen';
+import { DnsProvidersScreen } from './screens/DnsProvidersScreen';
+import { CloudflareDetailScreen } from './screens/CloudflareDetailScreen';
+import { AdGuardDetailScreen } from './screens/AdGuardDetailScreen';
+import { Dns4EuDetailScreen } from './screens/Dns4EuDetailScreen';
+import { CleanBrowsingDetailScreen } from './screens/CleanBrowsingDetailScreen';
+import { Quad9DetailScreen } from './screens/Quad9DetailScreen';
+import { OpenDnsDetailScreen } from './screens/OpenDnsDetailScreen';
+import { GoogleDetailScreen } from './screens/GoogleDetailScreen';
+import { SettingsScreen } from './screens/SettingsScreen';
+import { ThemeSettingsScreen } from './screens/ThemeSettingsScreen';
+import { LanguageSettingsScreen } from './screens/LanguageSettingsScreen';
+import { WaypointsIcon, ShieldIcon, WrenchIcon, SettingsIcon } from './components/icons/NavigationIcons';
+import { runDiagnostics, type DiagnosticsSnapshot } from './api/tauri';
+import { dnsStore } from './stores/dnsStore';
+
+type Screen = 'home' | 'security' | 'tools' | 'settings';
+type SettingsSubScreen = 'main' | 'theme' | 'language';
+type SecuritySubScreen = 'dns-providers' | 'cloudflare-detail' | 'adguard-detail' | 'dns4eu-detail' | 'cleanbrowsing-detail' | 'quad9-detail' | 'opendns-detail' | 'google-detail';
 
 function App() {
-  return (
-    <Router>
-      <div id="app" className="h-full">
-        <Routes>
-          <Route path="/" element={<MainPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
-        </Routes>
-      </div>
-    </Router>
-  );
-}
+  const { t } = useTranslation();
+  const [currentScreen, setCurrentScreen] = useState<Screen>('home');
+  const [showDiagnostics, setShowDiagnostics] = useState(false);
+  const [settingsSubScreen, setSettingsSubScreen] = useState<SettingsSubScreen>('main');
+  const [securitySubScreen, setSecuritySubScreen] = useState<SecuritySubScreen>('dns-providers');
+  const [diagnosticsData, setDiagnosticsData] = useState<DiagnosticsSnapshot | null>(null);
+
+  // Load diagnostics data once on mount
+  useEffect(() => {
+    fetchDiagnosticsData();
+  }, []);
+
+  const fetchDiagnosticsData = async () => {
+    try {
+      const snapshot = await runDiagnostics();
+      setDiagnosticsData(snapshot);
+    } catch (err) {
+      console.error('Failed to fetch diagnostics:', err);
+    }
+  };
+
+  // If diagnostics is shown, render it without the nav
+  if (showDiagnostics) {
+    return (
+      <ThemeProvider>}}
 
 export default App;
-
 ```
 
 ## MAP
@@ -449,7 +520,7 @@ export default App;
 - **Dev Path**: <http://localhost:5173>
 - **Dist Dir**: ../ui-new/dist
 - **Window Title**: Netok
-- **Window Size**: 320×560
+- **Window Size**: 320×600
 
 ### Routes
 

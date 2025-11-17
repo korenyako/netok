@@ -1,7 +1,7 @@
 use netok_core::{run_diagnostics, get_default_settings, Settings};
 
 mod types;
-pub use types::{Overall, NodeId, NodeResult, Speed, Snapshot, ComputerInfo};
+pub use types::{Overall, NodeId, NodeResult, Speed, Snapshot, ComputerInfo, ConnectionType, NetworkInfo, RouterInfo, InternetInfo};
 
 #[derive(thiserror::Error, Debug)]
 pub enum BridgeError {
@@ -27,49 +27,305 @@ pub fn run_diagnostics_json(settings_json: Option<&str>) -> Result<String, Bridg
 }
 
 pub async fn run_diagnostics_struct() -> Result<Snapshot, anyhow::Error> {
-    // TODO: собрать реальные данные из netok_core.
-    // Временно вернём мок, чтобы сшить фронт.
-    Ok(Snapshot {
-        overall: Overall::Ok,
-        nodes: vec![
-            NodeResult { 
-                id: NodeId::Computer, 
-                label: "Компьютер".into(), 
-                status: Overall::Ok, 
-                latency_ms: Some(3), 
-                details: None 
+    // Run blocking diagnostics in a separate thread to avoid blocking async runtime
+    let core_snapshot = tokio::task::spawn_blocking(|| {
+        let settings = get_default_settings();
+        run_diagnostics(&settings)
+    }).await?;
+
+    // Convert netok_core types to bridge types
+    let nodes: Vec<NodeResult> = core_snapshot.nodes.iter().map(|node| {
+        let id = match node.id {
+            netok_core::NodeId::Computer => NodeId::Computer,
+            netok_core::NodeId::Wifi => NodeId::Network,
+            netok_core::NodeId::RouterUpnp => NodeId::Dns,
+            netok_core::NodeId::Dns => NodeId::Dns,
+            netok_core::NodeId::Internet => NodeId::Internet,
+        };
+
+        let status = match node.status {
+            netok_core::Status::Ok => Overall::Ok,
+            netok_core::Status::Warn => Overall::Partial,
+            netok_core::Status::Fail => Overall::Down,
+            netok_core::Status::Unknown => Overall::Partial,
+        };
+
+        NodeResult {
+            id,
+            label: match id {
+                NodeId::Computer => "diagnostics.computer".to_string(),
+                NodeId::Network => "diagnostics.wifi".to_string(),
+                NodeId::Dns => "diagnostics.router".to_string(),
+                NodeId::Internet => "diagnostics.internet".to_string(),
             },
-            NodeResult { 
-                id: NodeId::Network,  
-                label: "Wi-Fi".into(),    
-                status: Overall::Ok, 
-                latency_ms: Some(12), 
-                details: None 
-            },
-            NodeResult { 
-                id: NodeId::Dns,      
-                label: "DNS".into(),      
-                status: Overall::Ok, 
-                latency_ms: Some(28), 
-                details: None 
-            },
-            NodeResult { 
-                id: NodeId::Internet, 
-                label: "Интернет".into(), 
-                status: Overall::Ok, 
-                latency_ms: Some(45), 
-                details: None 
-            },
-        ],
-        speed: Some(Speed { 
-            down_mbps: Some(73.0), 
-            up_mbps: Some(18.0) 
-        }),
-        computer: ComputerInfo {
-            hostname: Some("DESKTOP-ABC123".to_string()),
-            model: Some("Dell OptiPlex 7090".to_string()),
-            adapter: Some("Intel Wi-Fi 6 AX201".to_string()),
-            local_ip: Some("192.168.1.105".to_string()),
+            status,
+            latency_ms: node.latency_ms.map(|ms| ms as u64),
+            details: None,
+        }
+    }).collect();
+
+    // Convert computer info
+    let computer = ComputerInfo {
+        hostname: core_snapshot.computer.hostname,
+        model: core_snapshot.computer.model,
+        adapter: core_snapshot.computer.adapter,
+        local_ip: core_snapshot.computer.local_ip,
+    };
+
+    // Convert network info
+    let network = NetworkInfo {
+        connection_type: match core_snapshot.network.connection_type {
+            netok_core::ConnectionType::Wifi => ConnectionType::Wifi,
+            netok_core::ConnectionType::Ethernet => ConnectionType::Ethernet,
+            netok_core::ConnectionType::Usb => ConnectionType::Usb,
+            netok_core::ConnectionType::Mobile => ConnectionType::Mobile,
+            netok_core::ConnectionType::Unknown => ConnectionType::Unknown,
         },
+        ssid: core_snapshot.network.ssid,
+        rssi: core_snapshot.network.rssi,
+        signal_quality: core_snapshot.network.signal_quality,
+        channel: core_snapshot.network.channel,
+        frequency: core_snapshot.network.frequency,
+    };
+
+    // Convert router info
+    let router = RouterInfo {
+        gateway_ip: core_snapshot.router.gateway_ip,
+        gateway_mac: core_snapshot.router.gateway_mac,
+        vendor: core_snapshot.router.vendor,
+        model: core_snapshot.router.model,
+    };
+
+    // Convert internet info
+    let internet = InternetInfo {
+        public_ip: core_snapshot.internet.public_ip,
+        isp: core_snapshot.internet.isp,
+        country: core_snapshot.internet.country,
+        city: core_snapshot.internet.city,
+        dns_ok: core_snapshot.internet.dns_ok,
+        http_ok: core_snapshot.internet.http_ok,
+        latency_ms: core_snapshot.internet.latency_ms,
+        speed_down_mbps: core_snapshot.internet.speed_down_mbps,
+        speed_up_mbps: core_snapshot.internet.speed_up_mbps,
+    };
+
+    // Determine overall status
+    let overall = if core_snapshot.nodes.iter().all(|n| matches!(n.status, netok_core::Status::Ok)) {
+        Overall::Ok
+    } else if core_snapshot.nodes.iter().any(|n| matches!(n.status, netok_core::Status::Fail)) {
+        Overall::Down
+    } else {
+        Overall::Partial
+    };
+
+    Ok(Snapshot {
+        overall,
+        nodes,
+        speed: None,  // TODO: implement speed test
+        computer,
+        network,
+        router,
+        internet,
     })
+}
+
+// DNS Provider types for Tauri
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+#[serde(tag = "type")]
+pub enum DnsProviderType {
+    Auto,
+    Cloudflare { variant: CloudflareVariant },
+    Google,
+    AdGuard { variant: AdGuardVariant },
+    Dns4Eu { variant: Dns4EuVariant },
+    CleanBrowsing { variant: CleanBrowsingVariant },
+    Quad9 { variant: Quad9Variant },
+    OpenDns { variant: OpenDnsVariant },
+    Custom { primary: String, secondary: String },
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+pub enum CloudflareVariant {
+    Standard,       // 1.1.1.1
+    Malware,        // 1.1.1.2
+    Family,         // 1.1.1.3
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+pub enum AdGuardVariant {
+    Standard,       // 94.140.14.14
+    NonFiltering,   // 94.140.14.140
+    Family,         // 94.140.14.15
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+pub enum Dns4EuVariant {
+    Protective,         // 86.54.11.1
+    ProtectiveChild,    // 86.54.11.12
+    ProtectiveAd,       // 86.54.11.13
+    ProtectiveChildAd,  // 86.54.11.11
+    Unfiltered,         // 86.54.11.100
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+pub enum CleanBrowsingVariant {
+    Family,     // 185.228.168.168
+    Adult,      // TBD
+    Security,   // TBD
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+pub enum Quad9Variant {
+    Recommended,    // 9.9.9.9
+    SecuredEcs,     // 9.9.9.11
+    Unsecured,      // 9.9.9.10
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+pub enum OpenDnsVariant {
+    FamilyShield,   // 208.67.222.123
+    Home,           // 208.67.222.222
+}
+
+// Convert bridge type to core type
+fn dns_provider_to_core(provider: DnsProviderType) -> netok_core::DnsProvider {
+    match provider {
+        DnsProviderType::Auto => netok_core::DnsProvider::Auto,
+        DnsProviderType::Cloudflare { variant } => match variant {
+            CloudflareVariant::Standard => netok_core::DnsProvider::Cloudflare,
+            CloudflareVariant::Malware => netok_core::DnsProvider::CloudflareMalware,
+            CloudflareVariant::Family => netok_core::DnsProvider::CloudflareFamily,
+        },
+        DnsProviderType::Google => netok_core::DnsProvider::Google,
+        DnsProviderType::AdGuard { variant } => match variant {
+            AdGuardVariant::Standard => netok_core::DnsProvider::AdGuard,
+            AdGuardVariant::NonFiltering => netok_core::DnsProvider::AdGuardNonFiltering,
+            AdGuardVariant::Family => netok_core::DnsProvider::AdGuardFamily,
+        },
+        DnsProviderType::Dns4Eu { variant } => match variant {
+            Dns4EuVariant::Protective => netok_core::DnsProvider::Dns4EuProtective,
+            Dns4EuVariant::ProtectiveChild => netok_core::DnsProvider::Dns4EuProtectiveChild,
+            Dns4EuVariant::ProtectiveAd => netok_core::DnsProvider::Dns4EuProtectiveAd,
+            Dns4EuVariant::ProtectiveChildAd => netok_core::DnsProvider::Dns4EuProtectiveChildAd,
+            Dns4EuVariant::Unfiltered => netok_core::DnsProvider::Dns4EuUnfiltered,
+        },
+        DnsProviderType::CleanBrowsing { variant } => match variant {
+            CleanBrowsingVariant::Family => netok_core::DnsProvider::CleanBrowsingFamily,
+            CleanBrowsingVariant::Adult => netok_core::DnsProvider::CleanBrowsingAdult,
+            CleanBrowsingVariant::Security => netok_core::DnsProvider::CleanBrowsingSecurity,
+        },
+        DnsProviderType::Quad9 { variant } => match variant {
+            Quad9Variant::Recommended => netok_core::DnsProvider::Quad9Recommended,
+            Quad9Variant::SecuredEcs => netok_core::DnsProvider::Quad9SecuredEcs,
+            Quad9Variant::Unsecured => netok_core::DnsProvider::Quad9Unsecured,
+        },
+        DnsProviderType::OpenDns { variant } => match variant {
+            OpenDnsVariant::FamilyShield => netok_core::DnsProvider::OpenDnsFamilyShield,
+            OpenDnsVariant::Home => netok_core::DnsProvider::OpenDnsHome,
+        },
+        DnsProviderType::Custom { primary, secondary } => {
+            netok_core::DnsProvider::Custom(primary, secondary)
+        }
+    }
+}
+
+// Convert core DNS provider to bridge type
+fn dns_provider_from_core(provider: netok_core::DnsProvider) -> DnsProviderType {
+    match provider {
+        netok_core::DnsProvider::Auto => DnsProviderType::Auto,
+        // Cloudflare
+        netok_core::DnsProvider::Cloudflare => DnsProviderType::Cloudflare {
+            variant: CloudflareVariant::Standard,
+        },
+        netok_core::DnsProvider::CloudflareMalware => DnsProviderType::Cloudflare {
+            variant: CloudflareVariant::Malware,
+        },
+        netok_core::DnsProvider::CloudflareFamily => DnsProviderType::Cloudflare {
+            variant: CloudflareVariant::Family,
+        },
+        // Google
+        netok_core::DnsProvider::Google => DnsProviderType::Google,
+        // AdGuard
+        netok_core::DnsProvider::AdGuard => DnsProviderType::AdGuard {
+            variant: AdGuardVariant::Standard,
+        },
+        netok_core::DnsProvider::AdGuardNonFiltering => DnsProviderType::AdGuard {
+            variant: AdGuardVariant::NonFiltering,
+        },
+        netok_core::DnsProvider::AdGuardFamily => DnsProviderType::AdGuard {
+            variant: AdGuardVariant::Family,
+        },
+        // DNS4EU
+        netok_core::DnsProvider::Dns4EuProtective => DnsProviderType::Dns4Eu {
+            variant: Dns4EuVariant::Protective,
+        },
+        netok_core::DnsProvider::Dns4EuProtectiveChild => DnsProviderType::Dns4Eu {
+            variant: Dns4EuVariant::ProtectiveChild,
+        },
+        netok_core::DnsProvider::Dns4EuProtectiveAd => DnsProviderType::Dns4Eu {
+            variant: Dns4EuVariant::ProtectiveAd,
+        },
+        netok_core::DnsProvider::Dns4EuProtectiveChildAd => DnsProviderType::Dns4Eu {
+            variant: Dns4EuVariant::ProtectiveChildAd,
+        },
+        netok_core::DnsProvider::Dns4EuUnfiltered => DnsProviderType::Dns4Eu {
+            variant: Dns4EuVariant::Unfiltered,
+        },
+        // CleanBrowsing
+        netok_core::DnsProvider::CleanBrowsingFamily => DnsProviderType::CleanBrowsing {
+            variant: CleanBrowsingVariant::Family,
+        },
+        netok_core::DnsProvider::CleanBrowsingAdult => DnsProviderType::CleanBrowsing {
+            variant: CleanBrowsingVariant::Adult,
+        },
+        netok_core::DnsProvider::CleanBrowsingSecurity => DnsProviderType::CleanBrowsing {
+            variant: CleanBrowsingVariant::Security,
+        },
+        // Quad9
+        netok_core::DnsProvider::Quad9Recommended => DnsProviderType::Quad9 {
+            variant: Quad9Variant::Recommended,
+        },
+        netok_core::DnsProvider::Quad9SecuredEcs => DnsProviderType::Quad9 {
+            variant: Quad9Variant::SecuredEcs,
+        },
+        netok_core::DnsProvider::Quad9Unsecured => DnsProviderType::Quad9 {
+            variant: Quad9Variant::Unsecured,
+        },
+        // OpenDNS
+        netok_core::DnsProvider::OpenDnsFamilyShield => DnsProviderType::OpenDns {
+            variant: OpenDnsVariant::FamilyShield,
+        },
+        netok_core::DnsProvider::OpenDnsHome => DnsProviderType::OpenDns {
+            variant: OpenDnsVariant::Home,
+        },
+        // Custom
+        netok_core::DnsProvider::Custom(primary, secondary) => DnsProviderType::Custom {
+            primary,
+            secondary,
+        },
+    }
+}
+
+// Set DNS provider (async wrapper)
+pub async fn set_dns_provider(provider: DnsProviderType) -> Result<(), String> {
+    let core_provider = dns_provider_to_core(provider);
+
+    // Run blocking DNS configuration in a separate thread
+    tokio::task::spawn_blocking(move || {
+        netok_core::set_dns(core_provider)
+    })
+    .await
+    .map_err(|e| format!("Failed to run DNS configuration task: {}", e))?
+}
+
+// Get current DNS provider (async wrapper)
+pub async fn get_dns_provider() -> Result<DnsProviderType, String> {
+    // Run blocking DNS detection in a separate thread
+    tokio::task::spawn_blocking(|| {
+        let dns_servers = netok_core::get_current_dns()?;
+        let core_provider = netok_core::detect_dns_provider(&dns_servers);
+        Ok(dns_provider_from_core(core_provider))
+    })
+    .await
+    .map_err(|e| format!("Failed to run DNS detection task: {}", e))?
 }

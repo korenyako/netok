@@ -3,14 +3,106 @@
     "name": "Netok",
     "title": "Network Diagnostics"
   },
+  "placeholders": {
+    "tools_title": "Tools",
+    "tools_description": "Coming soon"
+  },
+  "security": {
+    "title": "Security"
+  },
+  "dns_providers": {
+    "title": "DNS Protection",
+    "description": "Select a DNS server to enhance security and block unwanted content",
+    "auto": "Disabled",
+    "auto_desc": "Your ISP's DNS",
+    "cloudflare": "Cloudflare",
+    "cloudflare_desc": "Fastest public DNS, privacy-focused, audited by KPMG",
+    "adguard": "AdGuard",
+    "adguard_desc": "Flexible ad and tracker blocking",
+    "dns4eu": "DNS4EU",
+    "dns4eu_desc": "EU community DNS with privacy and security focus",
+    "cleanbrowsing": "CleanBrowsing",
+    "cleanbrowsing_desc": "Free DNS filtering for safe browsing and parental controls",
+    "quad9": "Quad9",
+    "quad9_desc": "Security-focused with malware blocking and DNSSEC",
+    "opendns": "OpenDNS",
+    "opendns_desc": "Cisco anti-phishing and filtering",
+    "google": "Google",
+    "google_desc": "Reliable, simple replacement for ISP DNS",
+    "custom": "Custom"
+  },
+  "dns_detail": {
+    "choose_protection": "Choose protection variant",
+    "apply": "Apply",
+    "cloudflare": {
+      "standard": "Standard",
+      "standard_desc": "Fast and reliable DNS",
+      "malware": "Malware blocking",
+      "malware_desc": "Protection from phishing and malware",
+      "family": "Family protection",
+      "family_desc": "Block adult content"
+    },
+    "adguard": {
+      "standard": "Standard",
+      "standard_desc": "Ad blocking",
+      "family": "Family protection",
+      "family_desc": "Block adult content",
+      "unfiltered": "Non-filtering",
+      "unfiltered_desc": "DNS only without blocking"
+    },
+    "dns4eu": {
+      "protective": "Protective",
+      "protective_desc": "Blocks fraudulent and malicious content",
+      "protective_child": "Protective + Child",
+      "protective_child_desc": "Blocks inappropriate content for children",
+      "protective_ad": "Protective + Ad",
+      "protective_ad_desc": "Adds blocking of ads on top of protective features",
+      "protective_child_ad": "Protective + Child & Ads",
+      "protective_child_ad_desc": "Combines child protection with ad blocking",
+      "unfiltered": "Unfiltered",
+      "unfiltered_desc": "No filtering for secure, anonymized, and fast resolution"
+    },
+    "cleanbrowsing": {
+      "family": "Family Filter",
+      "family_desc": "Blocks all adult, pornographic, explicit sites, proxies, VPNs; Google, Bing and Youtube SafeSearch",
+      "adult": "Adult Filter",
+      "adult_desc": "Blocks adult and explicit sites; allows proxies and mixed content sites",
+      "security": "Security Filter",
+      "security_desc": "Blocks phishing, spam, malware and malicious domains; does not block adult content"
+    },
+    "quad9": {
+      "recommended": "Recommended",
+      "recommended_desc": "Blocks known malicious domains",
+      "secured_ecs": "Secured w/ECS",
+      "secured_ecs_desc": "Adds ECS feature on top of recommended",
+      "unsecured": "Unsecured",
+      "unsecured_desc": "For expert users"
+    },
+    "opendns": {
+      "familyshield": "FamilyShield",
+      "familyshield_desc": "Blocks adult content and malicious sites automatically",
+      "home": "Home",
+      "home_desc": "Custom filtering and malware protection"
+    }
+  },
+  "diagnostics": {
+    "computer": "Computer",
+    "router": "Router",
+    "wifi": "Wi-Fi",
+    "internet": "Internet"
+  },
   "status": {
-    "internet_ok": "Internet works.",
-    "internet_down": "Internet unavailable.",
-    "internet_partial": "Internet partially available.",
+    "internet_ok": "Connected",
+    "internet_down": "No Internet connection",
+    "internet_partial": "Limited connectivity",
     "speed": "Speed: {down}/{up} Mbps",
-    "connection_no_vpn": "Connection without VPN. Configure VPN",
-    "connection_vpn_detected": "VPN connection detected",
-    "waiting": "Checking connection..."
+    "connection_no_vpn": "Not using VPN. Configure VPN",
+    "connection_vpn_detected": "VPN connection active",
+    "waiting": "Checking connection...",
+    "dns_protection": "DNS Protection",
+    "dns_protection_enabled": "Blocking unwanted content",
+    "dns_protection_disabled": "DNS Protection disabled",
+    "dns_protection_disabled_desc": "Standard ISP DNS"
   },
   "nodes": {
     "computer": {
@@ -23,26 +115,26 @@
     "network": {
       "name": "Network",
       "type_wifi": "Wi-Fi",
-      "type_cable": "Cable",
+      "type_cable": "Ethernet",
       "type_usb_modem": "USB modem",
       "type_bt": "Bluetooth",
-      "type_mobile": "Mobile modem",
-      "signal_field": "Signal",
-      "signal_excellent": "excellent",
-      "signal_good": "good",
-      "signal_fair": "fair",
-      "signal_weak": "weak",
+      "type_mobile": "Mobile data",
+      "signal_field": "Signal strength",
+      "signal_excellent": "Excellent",
+      "signal_good": "Good",
+      "signal_fair": "Fair",
+      "signal_weak": "Weak",
       "link_field": "Link"
     },
     "router": {
-      "name": "Router/Access Point",
-      "model_field": "Model/Brand",
-      "local_ip_field": "IP in local network"
+      "name": "Router",
+      "model_field": "Model",
+      "local_ip_field": "Local IP address"
     },
     "internet": {
       "name": "Internet",
-      "provider_field": "Provider",
-      "ip_field": "IP"
+      "provider_field": "ISP",
+      "ip_field": "Public IP"
     }
   },
   "buttons": {
@@ -79,8 +171,15 @@
     },
     "general": {
       "language": "Language",
-      "language_ru": "Russian",
+      "language_ru": "Русский",
       "language_en": "English",
+      "theme": "Theme",
+      "theme_light": "Light",
+      "theme_dark": "Dark",
+      "theme_system": "System",
+      "theme_light_desc": "Always use light interface mode",
+      "theme_dark_desc": "Always use dark interface mode",
+      "theme_system_desc": "Follow system settings automatically",
       "remember_window_size": "Remember window size"
     },
     "dns": {

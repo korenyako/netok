@@ -9,6 +9,7 @@ This directory contains the official documentation for the Netok project.
 ## Current Documentation
 
 - **[UI-SPEC.md](UI-SPEC.md)** - UI/UX specifications and design guidelines
+- **[IMPLEMENTATION-PLAN.md](IMPLEMENTATION-PLAN.md)** - Network diagnostics implementation plan and roadmap
 - **[i18n/README.md](../i18n/README.md)** - Internationalization guidelines
 
 ## Deprecated Documentation

@@ -1,0 +1,194 @@
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { setDns } from '../api/tauri';
+import { useDnsStore } from '../stores/useDnsStore';
+import { dnsStore } from '../stores/dnsStore';
+
+interface DnsProvidersScreenProps {
+  onBack: () => void;
+  onSelectCloudflare: () => void;
+  onSelectAdGuard: () => void;
+  onSelectDns4Eu: () => void;
+  onSelectCleanBrowsing: () => void;
+  onSelectQuad9: () => void;
+  onSelectOpenDns: () => void;
+  onSelectGoogle: () => void;
+}
+
+type DnsProvider = 'auto' | 'cloudflare' | 'google' | 'adguard' | 'dns4eu' | 'cleanbrowsing' | 'quad9' | 'opendns';
+
+export function DnsProvidersScreen({ onBack, onSelectCloudflare, onSelectAdGuard, onSelectDns4Eu, onSelectCleanBrowsing, onSelectQuad9, onSelectOpenDns, onSelectGoogle }: DnsProvidersScreenProps) {
+  const { t } = useTranslation();
+  const { currentProvider: apiProvider, isLoading } = useDnsStore();
+  const [isApplying, setIsApplying] = useState(false);
+
+  // Map API provider to local type
+  const currentProvider: DnsProvider | null = apiProvider
+    ? apiProvider.type === 'Auto' ? 'auto'
+    : apiProvider.type === 'Cloudflare' ? 'cloudflare'
+    : apiProvider.type === 'Google' ? 'google'
+    : apiProvider.type === 'AdGuard' ? 'adguard'
+    : apiProvider.type === 'Dns4Eu' ? 'dns4eu'
+    : apiProvider.type === 'CleanBrowsing' ? 'cleanbrowsing'
+    : apiProvider.type === 'Quad9' ? 'quad9'
+    : apiProvider.type === 'OpenDns' ? 'opendns'
+    : 'auto'
+    : null;
+
+  const handleProviderClick = async (providerId: DnsProvider) => {
+    if (providerId === 'auto') {
+      try {
+        setIsApplying(true);
+        await setDns({ type: 'Auto' });
+        dnsStore.setProvider({ type: 'Auto' });
+      } catch (err) {
+        console.error('Failed to set DNS to Auto:', err);
+      } finally {
+        setIsApplying(false);
+      }
+    } else if (providerId === 'cloudflare') {
+      onSelectCloudflare();
+    } else if (providerId === 'google') {
+      onSelectGoogle();
+    } else if (providerId === 'adguard') {
+      onSelectAdGuard();
+    } else if (providerId === 'dns4eu') {
+      onSelectDns4Eu();
+    } else if (providerId === 'cleanbrowsing') {
+      onSelectCleanBrowsing();
+    } else if (providerId === 'quad9') {
+      onSelectQuad9();
+    } else if (providerId === 'opendns') {
+      onSelectOpenDns();
+    }
+  };
+
+  // All providers including 'auto' at the top
+  const allProviders: Array<{
+    id: DnsProvider;
+    name: string;
+  }> = [
+    { id: 'auto', name: t('dns_providers.auto') },
+  ];
+
+  // Other providers in alphabetical order
+  const otherProviders: Array<{
+    id: DnsProvider;
+    name: string;
+  }> = [
+    { id: 'adguard', name: t('dns_providers.adguard') },
+    { id: 'cleanbrowsing', name: t('dns_providers.cleanbrowsing') },
+    { id: 'cloudflare', name: t('dns_providers.cloudflare') },
+    { id: 'dns4eu', name: t('dns_providers.dns4eu') },
+    { id: 'google', name: t('dns_providers.google') },
+    { id: 'opendns', name: t('dns_providers.opendns') },
+    { id: 'quad9', name: t('dns_providers.quad9') },
+  ];
+
+  return (
+    <div className="flex flex-col h-full bg-background">
+      {/* Header with Back button */}
+      <div className="px-4 py-4">
+        <button
+          onClick={onBack}
+          className="w-6 h-6 flex items-center justify-center focus:outline-none"
+        >
+          <svg
+            className="w-6 h-6 text-foreground-tertiary"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 px-4">
+        {/* Title */}
+        <h1 className="text-2xl font-semibold text-foreground leading-[28.8px] mb-[16px]">
+          {t('dns_providers.title')}
+        </h1>
+
+        {/* "Disabled" Option */}
+        <div className="mb-[16px]">
+          {allProviders.map((provider) => {
+            const isSelected = !isLoading && currentProvider === provider.id;
+
+            return (
+              <button
+                key={provider.id}
+                onClick={() => handleProviderClick(provider.id)}
+                disabled={isApplying}
+                className="w-full rounded-[12px] px-4 h-[44px] flex items-center justify-between focus:outline-none hover:bg-background-hover transition-colors bg-background-tertiary disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <div className="flex-1 text-left">
+                  <div className="text-base font-medium text-foreground leading-5">
+                    {provider.name}
+                  </div>
+                </div>
+                {isSelected && (
+                  <svg
+                    className="w-4 h-4 text-primary flex-shrink-0 ml-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 16 16"
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M3 8l3 3 7-7" />
+                  </svg>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Description */}
+        <p className="text-sm text-foreground-secondary leading-[19.6px] mb-[16px] max-w-[269px]">
+          {t('dns_providers.description')}
+        </p>
+
+        {/* DNS Provider Options */}
+        <div className="space-y-2">
+          {otherProviders.map((provider) => {
+            const isSelected = !isLoading && currentProvider === provider.id;
+
+            return (
+              <button
+                key={provider.id}
+                onClick={() => handleProviderClick(provider.id)}
+                disabled={isApplying}
+                className="w-full rounded-[12px] px-4 h-[44px] flex items-center justify-between focus:outline-none hover:bg-background-hover transition-colors bg-background-tertiary disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <div className="flex-1 text-left">
+                  <div className="text-base font-medium text-foreground leading-5">
+                    {provider.name}
+                  </div>
+                </div>
+                {isSelected && (
+                  <svg
+                    className="w-4 h-4 text-primary flex-shrink-0 ml-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 16 16"
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M3 8l3 3 7-7" />
+                  </svg>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}

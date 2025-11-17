@@ -15,9 +15,9 @@
       {
         "title": "Netok",
         "width": 320,
-        "height": 560,
-        "minWidth": 280,
-        "minHeight": 480,
+        "height": 600,
+        "minWidth": 320,
+        "minHeight": 600,
         "resizable": true
       }
     ]

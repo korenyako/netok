@@ -8,6 +8,7 @@ This file is the **single entry point** for any AI assistant (Cursor, Gemini, Cl
 
 - **Architecture:** `docs/SoT-ARCH.md` — Desktop = **Tauri (WebView)**, Core = **Rust**. Mobile = native via Rust FFI.
 - **UI/UX:** `docs/UI-SPEC.md` — Window behavior, settings sidebar, scroll rules, tokens, copy, i18n policy.
+- **Implementation:** `docs/IMPLEMENTATION-PLAN.md` — Network diagnostics roadmap, data collection methods, API contracts.
 - **i18n:** `i18n/README.md` — Keys, JSON structure, fallback, usage patterns.
 
 > Only use the files above as the canonical reference. Ignore anything in `docs/deprecated/` and `/deprecated/`.

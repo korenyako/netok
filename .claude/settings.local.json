@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(claude mcp configure:*)",
+      "Bash(claude mcp add:*)",
+      "Bash(claude mcp:*)",
+      "Bash(npm run build)",
+      "Bash(npm install:*)",
+      "Bash(cargo build:*)",
+      "Bash(cargo check:*)",
+      "Bash(cargo test:*)",
+      "Bash(Select-String -Pattern \"Sample diagnostics|adapter|network|router|internet\" -Context 0,15)",
+      "Bash(npm run tauri:*)",
+      "Bash(find:*)",
+      "Bash(rustc:*)",
+      "Bash(cargo --version:*)",
+      "Bash(where:*)",
+      "Bash(for file in AdGuardDetailScreen.tsx Dns4EuDetailScreen.tsx CleanBrowsingDetailScreen.tsx Quad9DetailScreen.tsx OpenDnsDetailScreen.tsx)",
+      "Bash(do sed -i 's|{/\\* Subtitle \\*/}|{/\\* Provider Description \\*/}\\n        <p className=\"\"text-sm text-foreground-secondary leading-[19.6px] mb-[12px]\"\">\\n          {t(''''dns_providers.'''' + provider + ''''_desc'''')}\\n        </p>\\n\\n        {/\\* Subtitle \\*/}|' \"$file\")",
+      "Bash(done)",
+      "Bash(do)",
+      "Bash(echo:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

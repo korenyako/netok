@@ -1,5 +1,5 @@
 // Re-export types from netok_bridge
-pub use netok_bridge::{Snapshot, NodeResult, Speed};
+pub use netok_bridge::{Snapshot, NodeResult, Speed, DnsProviderType};
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
@@ -15,6 +15,20 @@ fn set_settings(json: String) -> Result<(), String> {
 #[tauri::command]
 async fn run_diagnostics() -> Result<netok_bridge::Snapshot, String> {
     netok_bridge::run_diagnostics_struct()
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+async fn set_dns(provider: DnsProviderType) -> Result<(), String> {
+    netok_bridge::set_dns_provider(provider)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+async fn get_dns_provider() -> Result<DnsProviderType, String> {
+    netok_bridge::get_dns_provider()
         .await
         .map_err(|e| e.to_string())
 }
@@ -36,7 +50,7 @@ fn run_all() -> Result<serde_json::Value, String> {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![get_settings, set_settings, run_diagnostics, run_all])
+        .invoke_handler(tauri::generate_handler![get_settings, set_settings, run_diagnostics, set_dns, get_dns_provider, run_all])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
