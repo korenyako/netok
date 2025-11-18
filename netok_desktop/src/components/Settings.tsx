@@ -38,12 +38,12 @@ export default function Settings({ open, onClose }: SettingsProps) {
         minWidth: 300,
         maxWidth: 400,
       }}>
-        <h2 style={{ margin: '0 0 20px 0', fontSize: 20, fontWeight: 600 }}>
+        <h2 className="text-2xl font-semibold mb-5">
           {t('settings.title')}
         </h2>
         
         <div style={{ marginBottom: 20 }}>
-          <label style={{ display: 'block', marginBottom: 8, fontWeight: 500 }}>
+          <label className="block mb-2 font-medium text-base">
             {t('settings.language')}
           </label>
           <select
@@ -54,8 +54,8 @@ export default function Settings({ open, onClose }: SettingsProps) {
               padding: '8px 12px',
               borderRadius: 6,
               border: '1px solid #ccc',
-              fontSize: 14,
             }}
+            className="text-base"
           >
             <option value="ru">{t('settings.language_ru')}</option>
             <option value="en">{t('settings.language_en')}</option>
@@ -71,8 +71,8 @@ export default function Settings({ open, onClose }: SettingsProps) {
               border: '1px solid #ccc',
               backgroundColor: '#f5f5f5',
               cursor: 'pointer',
-              fontSize: 14,
             }}
+            className="text-base"
           >
             {t('button.close')}
           </button>

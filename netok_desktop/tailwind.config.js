@@ -27,6 +27,9 @@ export default {
         'sm': ['13px', '1.4'],
         'base': ['14px', '1.4'],
         'lg': ['16px', '1.4'],
+        'xl': ['18px', '1.4'],
+        '2xl': ['20px', '1.3'],
+        '3xl': ['24px', '1.25'],
       },
       borderRadius: {
         'button': '10px',

@@ -43,9 +43,9 @@ export function NodeCard({ type, data, geoConsent = false, isLoading = false }: 
 
   const renderComputer = (data: ComputerData | null) => (
     <div>
-      <h3 className="text-[15px] font-semibold text-neutral-900 mb-2">{t('nodes.computer.name')}</h3>
+      <h3 className="text-base font-semibold text-neutral-900 mb-2">{t('nodes.computer.name')}</h3>
       {data ? (
-        <div className="grid gap-1 text-[14px] text-neutral-600">
+        <div className="grid gap-1 text-xs text-neutral-600">
           {data.hostname && (
             <div>{t('nodes.computer.name_field')}: {data.hostname}</div>
           )}
@@ -61,7 +61,7 @@ export function NodeCard({ type, data, geoConsent = false, isLoading = false }: 
         </div>
       ) : (
         !isLoading && (
-          <div className="text-[14px] text-neutral-500 italic">
+          <div className="text-xs text-neutral-500 italic">
             {t('meta.no_data')}
           </div>
         )
@@ -95,8 +95,8 @@ export function NodeCard({ type, data, geoConsent = false, isLoading = false }: 
 
     return (
       <div>
-        <h3 className="text-[15px] font-semibold text-neutral-900 mb-2">{t('nodes.network.name')}</h3>
-        <div className="grid gap-1 text-[14px] text-neutral-600">
+        <h3 className="text-base font-semibold text-neutral-900 mb-2">{t('nodes.network.name')}</h3>
+        <div className="grid gap-1 text-xs text-neutral-600">
           <div>{getNetworkTypeText()}</div>
           {getSignalText() && <div>{getSignalText()}</div>}
           {getLinkText() && <div>{getLinkText()}</div>}
@@ -107,8 +107,8 @@ export function NodeCard({ type, data, geoConsent = false, isLoading = false }: 
 
   const renderRouter = (data: RouterData) => (
     <div>
-      <h3 className="text-[15px] font-semibold text-neutral-900 mb-2">{t('nodes.router.name')}</h3>
-      <div className="grid gap-1 text-[14px] text-neutral-600">
+      <h3 className="text-base font-semibold text-neutral-900 mb-2">{t('nodes.router.name')}</h3>
+      <div className="grid gap-1 text-xs text-neutral-600">
         {(data.model || data.brand) && (
           <div>{data.brand ? `${data.brand} ${data.model}` : data.model}</div>
         )}
@@ -120,8 +120,8 @@ export function NodeCard({ type, data, geoConsent = false, isLoading = false }: 
   const renderInternet = (data: InternetData) => {
     return (
       <div>
-        <h3 className="text-[15px] font-semibold text-neutral-900 mb-2">{t('nodes.internet.name')}</h3>
-        <div className="grid gap-1 text-[14px] text-neutral-600">
+        <h3 className="text-base font-semibold text-neutral-900 mb-2">{t('nodes.internet.name')}</h3>
+        <div className="grid gap-1 text-xs text-neutral-600">
           {data.provider && <div>{data.provider}</div>}
           <div>{t('nodes.internet.ip_field')}: {data.publicIp}</div>
           {geoConsent && data.country && data.city && (

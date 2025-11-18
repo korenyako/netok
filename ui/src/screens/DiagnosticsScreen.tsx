@@ -2,12 +2,18 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { WaypointsIcon, ShieldIcon, WrenchIcon, SettingsIcon } from '../components/icons/NavigationIcons';
 import { runDiagnostics, type NodeResult } from '../api/tauri';
+import { DNS_IP_TEXT_CLASS } from '../constants/dnsVariantStyles';
+
+interface NodeDetail {
+  text: string;
+  isIp?: boolean;
+}
 
 interface NetworkNode {
   id: string;
   title: string;
   status: 'ok' | 'partial' | 'down' | 'loading';
-  details: string[];
+  details: NodeDetail[];
 }
 
 interface DiagnosticsScreenProps {
@@ -39,21 +45,25 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
 
         // Transform API data to UI format
         const transformedNodes: NetworkNode[] = snapshot.nodes.map((node: NodeResult) => {
-          const details: string[] = [];
+          const details: NodeDetail[] = [];
 
           // Add computer-specific details (matching screenshot format)
           if (node.id === 'computer' && snapshot.computer) {
             // First: Local IP
-            if (snapshot.computer.local_ip) details.push(snapshot.computer.local_ip);
+            if (snapshot.computer.local_ip) {
+              details.push({ text: snapshot.computer.local_ip, isIp: true });
+            }
             // Second: Adapter name
-            if (snapshot.computer.adapter) details.push(snapshot.computer.adapter);
+            if (snapshot.computer.adapter) {
+              details.push({ text: snapshot.computer.adapter });
+            }
           }
 
           // Add network-specific details (matching screenshot format for Wi-Fi)
           if (node.id === 'network' && snapshot.network) {
             // First: SSID (for Wi-Fi) without prefix
             if (snapshot.network.ssid) {
-              details.push(snapshot.network.ssid);
+              details.push({ text: snapshot.network.ssid });
             }
 
             // Second: Signal strength with quality description
@@ -72,32 +82,42 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
                 qualityKey = 'nodes.network.signal_weak';
               }
 
-              details.push(`${t('nodes.network.signal_field')} ${t(qualityKey)} (${rssi} dBm)`);
+              details.push({ text: `${t('nodes.network.signal_field')} ${t(qualityKey)} (${rssi} dBm)` });
             }
           }
 
           // Add router-specific details (matching screenshot format)
           if (node.id === 'dns' && snapshot.router) {
             // First: Gateway IP (without "Gateway:" prefix to match screenshot)
-            if (snapshot.router.gateway_ip) details.push(snapshot.router.gateway_ip);
+            if (snapshot.router.gateway_ip) {
+              details.push({ text: snapshot.router.gateway_ip, isIp: true });
+            }
             // Second: Vendor/Model
-            if (snapshot.router.vendor) details.push(snapshot.router.vendor);
-            if (snapshot.router.model) details.push(snapshot.router.model);
+            if (snapshot.router.vendor) {
+              details.push({ text: snapshot.router.vendor });
+            }
+            if (snapshot.router.model) {
+              details.push({ text: snapshot.router.model });
+            }
           }
 
           // Add internet-specific details (matching screenshot format)
           if (node.id === 'internet' && snapshot.internet) {
             // First: Public IP (without "IP:" prefix)
-            if (snapshot.internet.public_ip) details.push(snapshot.internet.public_ip);
+            if (snapshot.internet.public_ip) {
+              details.push({ text: snapshot.internet.public_ip, isIp: true });
+            }
             // Second: ISP/Provider (without AS number)
-            if (snapshot.internet.isp) details.push(cleanIspName(snapshot.internet.isp));
+            if (snapshot.internet.isp) {
+              details.push({ text: cleanIspName(snapshot.internet.isp) });
+            }
             // Third: City, Country
             if (snapshot.internet.city && snapshot.internet.country) {
-              details.push(`${snapshot.internet.city}, ${snapshot.internet.country}`);
+              details.push({ text: `${snapshot.internet.city}, ${snapshot.internet.country}` });
             } else if (snapshot.internet.country) {
-              details.push(snapshot.internet.country);
+              details.push({ text: snapshot.internet.country });
             } else if (snapshot.internet.city) {
-              details.push(snapshot.internet.city);
+              details.push({ text: snapshot.internet.city });
             }
           }
 
@@ -168,16 +188,20 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
 
       // Transform API data to UI format (same logic as in useEffect)
       const transformedNodes: NetworkNode[] = snapshot.nodes.map((node: NodeResult) => {
-        const details: string[] = [];
+        const details: NodeDetail[] = [];
 
         if (node.id === 'computer' && snapshot.computer) {
-          if (snapshot.computer.local_ip) details.push(snapshot.computer.local_ip);
-          if (snapshot.computer.adapter) details.push(snapshot.computer.adapter);
+          if (snapshot.computer.local_ip) {
+            details.push({ text: snapshot.computer.local_ip, isIp: true });
+          }
+          if (snapshot.computer.adapter) {
+            details.push({ text: snapshot.computer.adapter });
+          }
         }
 
         if (node.id === 'network' && snapshot.network) {
           if (snapshot.network.ssid) {
-            details.push(snapshot.network.ssid);
+            details.push({ text: snapshot.network.ssid });
           }
 
           if (snapshot.network.rssi !== null) {
@@ -194,25 +218,35 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
               qualityKey = 'nodes.network.signal_weak';
             }
 
-            details.push(`${t('nodes.network.signal_field')} ${t(qualityKey)} (${rssi} dBm)`);
+            details.push({ text: `${t('nodes.network.signal_field')} ${t(qualityKey)} (${rssi} dBm)` });
           }
         }
 
         if (node.id === 'dns' && snapshot.router) {
-          if (snapshot.router.gateway_ip) details.push(snapshot.router.gateway_ip);
-          if (snapshot.router.vendor) details.push(snapshot.router.vendor);
-          if (snapshot.router.model) details.push(snapshot.router.model);
+          if (snapshot.router.gateway_ip) {
+            details.push({ text: snapshot.router.gateway_ip, isIp: true });
+          }
+          if (snapshot.router.vendor) {
+            details.push({ text: snapshot.router.vendor });
+          }
+          if (snapshot.router.model) {
+            details.push({ text: snapshot.router.model });
+          }
         }
 
         if (node.id === 'internet' && snapshot.internet) {
-          if (snapshot.internet.public_ip) details.push(snapshot.internet.public_ip);
-          if (snapshot.internet.isp) details.push(cleanIspName(snapshot.internet.isp));
+          if (snapshot.internet.public_ip) {
+            details.push({ text: snapshot.internet.public_ip, isIp: true });
+          }
+          if (snapshot.internet.isp) {
+            details.push({ text: cleanIspName(snapshot.internet.isp) });
+          }
           if (snapshot.internet.city && snapshot.internet.country) {
-            details.push(`${snapshot.internet.city}, ${snapshot.internet.country}`);
+            details.push({ text: `${snapshot.internet.city}, ${snapshot.internet.country}` });
           } else if (snapshot.internet.country) {
-            details.push(snapshot.internet.country);
+            details.push({ text: snapshot.internet.country });
           } else if (snapshot.internet.city) {
-            details.push(snapshot.internet.city);
+            details.push({ text: snapshot.internet.city });
           }
         }
 
@@ -312,8 +346,15 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
               {/* Node Details */}
               <div className="pl-4 space-y-[6px]">
                 {node.details.map((detail, detailIndex) => (
-                  <p key={detailIndex} className="text-sm text-foreground-secondary leading-[19.6px]">
-                    {detail}
+                  <p
+                    key={detailIndex}
+                    className={
+                      detail.isIp
+                        ? DNS_IP_TEXT_CLASS
+                        : 'text-sm text-foreground-secondary leading-[19.6px]'
+                    }
+                  >
+                    {detail.text}
                   </p>
                 ))}
               </div>

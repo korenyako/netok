@@ -1,6 +1,6 @@
 # Project Map - Netok
 
-Generated: 2025-11-17
+Generated: 2025-11-18
 
 ## TREE (ASCII)
 
@@ -141,6 +141,8 @@ Generated: 2025-11-17
 │   │   │   ├── SettingsPage.tsx
 │   │   │   ├── Spinner.tsx
 │   │   │   └── ThemeProvider.tsx
+│   │   ├── constants
+│   │   │   └── dnsVariantStyles.ts
 │   │   ├── i18n
 │   │   │   ├── en.json
 │   │   │   └── ru.json
@@ -401,18 +403,18 @@ export default {
     extend: {
       fontFamily: {
         sans: ['system-ui', 'sans-serif'],
-        mono: ['"Share Tech Mono"', 'monospace'],
+        mono: ['"JetBrains Mono"', 'monospace'],
       },
-      colors: {
-        background: {
-          DEFAULT: 'var(--color-background)',
-          secondary: 'var(--color-background-secondary)',
-          tertiary: 'var(--color-background-tertiary)',
-          hover: 'var(--color-background-hover)',
-        },
-        foreground: {
-          DEFAULT: 'var(--color-foreground)',
-          secondary: 'var(--color-foreground-secondary)',}}}}}
+      fontSize: {
+        xs: ['12px', '1.4'],
+        sm: ['13px', '1.4'],
+        base: ['14px', '1.4'],
+        lg: ['16px', '1.4'],
+        xl: ['18px', '1.3'],
+        '2xl': ['20px', '1.3'],
+        '3xl': ['24px', '1.25'],
+      },
+      colors: {}}}}
 ```
 
 ### ui/index.html

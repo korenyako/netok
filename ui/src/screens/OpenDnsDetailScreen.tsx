@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { setDns, getDnsProvider, type OpenDnsVariant as ApiOpenDnsVariant } from '../api/tauri';
+import { DNS_VARIANT_IP_CLASS } from '../constants/dnsVariantStyles';
 
 interface OpenDnsDetailScreenProps {
   onBack: () => void;
@@ -162,7 +163,7 @@ export function OpenDnsDetailScreen({ onBack }: OpenDnsDetailScreenProps) {
                 <p className="text-sm text-foreground-secondary leading-[19.6px] mb-1">
                   {variant.description}
                 </p>
-                <p className="text-xs text-foreground-tertiary leading-[16.8px] font-mono mt-1.5">
+                <p className={DNS_VARIANT_IP_CLASS}>
                   {dnsAddresses}
                 </p>
               </button>

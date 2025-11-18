@@ -6,7 +6,16 @@ export default {
     extend: {
       fontFamily: {
         sans: ['system-ui', 'sans-serif'],
-        mono: ['"Share Tech Mono"', 'monospace'],
+        mono: ['"JetBrains Mono"', 'monospace'],
+      },
+      fontSize: {
+        xs: ['12px', '1.4'],
+        sm: ['13px', '1.4'],
+        base: ['14px', '1.4'],
+        lg: ['16px', '1.4'],
+        xl: ['18px', '1.3'],
+        '2xl': ['20px', '1.3'],
+        '3xl': ['24px', '1.25'],
       },
       colors: {
         background: {
