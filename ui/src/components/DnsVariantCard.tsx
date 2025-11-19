@@ -1,4 +1,4 @@
-import { useState, KeyboardEvent, MouseEvent } from 'react';
+import { useState, type KeyboardEvent, type MouseEvent } from 'react';
 import { DNS_VARIANT_IP_CLASS } from '../constants/dnsVariantStyles';
 
 interface DnsVariantCardProps {
