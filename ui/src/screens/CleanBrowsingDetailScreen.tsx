@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { setDns, getDnsProvider, type CleanBrowsingVariant as ApiCleanBrowsingVariant } from '../api/tauri';
-import { DNS_VARIANT_IP_CLASS } from '../constants/dnsVariantStyles';
+import { DnsVariantCard } from '../components/DnsVariantCard';
 
 interface CleanBrowsingDetailScreenProps {
   onBack: () => void;
@@ -11,9 +11,8 @@ type CleanBrowsingVariant = 'family' | 'adult' | 'security';
 
 export function CleanBrowsingDetailScreen({ onBack }: CleanBrowsingDetailScreenProps) {
   const { t } = useTranslation();
-  const [selectedVariant, setSelectedVariant] = useState<CleanBrowsingVariant>('family');
   const [currentVariant, setCurrentVariant] = useState<CleanBrowsingVariant | null>(null);
-  const [isApplying, setIsApplying] = useState(false);
+  const [applyingVariant, setApplyingVariant] = useState<CleanBrowsingVariant | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   // Load current DNS provider to detect which variant is active
@@ -25,13 +24,10 @@ export function CleanBrowsingDetailScreen({ onBack }: CleanBrowsingDetailScreenP
           const variant = provider.variant;
           if (variant === 'Family') {
             setCurrentVariant('family');
-            setSelectedVariant('family');
           } else if (variant === 'Adult') {
             setCurrentVariant('adult');
-            setSelectedVariant('adult');
           } else if (variant === 'Security') {
             setCurrentVariant('security');
-            setSelectedVariant('security');
           }
         }
       } catch (err) {
@@ -75,29 +71,27 @@ export function CleanBrowsingDetailScreen({ onBack }: CleanBrowsingDetailScreenP
     },
   ];
 
-  const handleApply = async () => {
+  const handleApplyVariant = async (variantId: CleanBrowsingVariant) => {
     try {
-      setIsApplying(true);
+      setApplyingVariant(variantId);
       setError(null);
 
       // Map UI variant to API variant
       const apiVariant: ApiCleanBrowsingVariant =
-        selectedVariant === 'family' ? 'Family' :
-        selectedVariant === 'adult' ? 'Adult' :
+        variantId === 'family' ? 'Family' :
+        variantId === 'adult' ? 'Adult' :
         'Security';
 
       await setDns({
         type: 'CleanBrowsing',
         variant: apiVariant,
       });
-
-      // Success - go back
-      onBack();
+      setCurrentVariant(variantId);
     } catch (err) {
       console.error('Failed to set DNS:', err);
       setError(err instanceof Error ? err.message : 'Failed to set DNS');
     } finally {
-      setIsApplying(false);
+      setApplyingVariant(null);
     }
   };
 
@@ -135,50 +129,23 @@ export function CleanBrowsingDetailScreen({ onBack }: CleanBrowsingDetailScreenP
           {t('dns_providers.cleanbrowsing_desc')}
         </p>
 
-        {/* Subtitle */}
-        <p className="text-sm text-foreground-secondary leading-[19.6px] mb-[16px]">
-          {t('dns_detail.choose_protection')}
-        </p>
-
         {/* Variant Options */}
         <div className="space-y-2 mb-[16px]">
           {variants.map((variant) => {
-            const isSelected = selectedVariant === variant.id;
-            const isActive = currentVariant === variant.id;
             const dnsAddresses = getDnsAddresses(variant.id);
             return (
-              <button
+              <DnsVariantCard
                 key={variant.id}
-                onClick={() => setSelectedVariant(variant.id)}
-                className={`w-full rounded-[12px] p-4 text-left focus:outline-none hover:bg-background-hover transition-colors bg-background-tertiary ${
-                  isActive ? 'ring-2 ring-primary' : ''
-                }`}
-              >
-                <div className="flex items-start justify-between mb-1">
-                  <h3 className="text-base font-medium text-foreground leading-5 flex-1">
-                    {variant.title}
-                  </h3>
-                  {isSelected && (
-                    <svg
-                      className="w-4 h-4 text-primary flex-shrink-0 ml-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 16 16"
-                      strokeWidth={2}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M3 8l3 3 7-7" />
-                    </svg>
-                  )}
-                </div>
-                <p className="text-sm text-foreground-secondary leading-[19.6px] mb-1">
-                  {variant.description}
-                </p>
-                <p className={DNS_VARIANT_IP_CLASS}>
-                  {dnsAddresses}
-                </p>
-              </button>
+                title={variant.title}
+                description={variant.description}
+                dnsAddresses={dnsAddresses}
+                isSelected={currentVariant === variant.id}
+                isActive={currentVariant === variant.id}
+                onApply={() => handleApplyVariant(variant.id)}
+                applyLabel={t('dns_detail.apply')}
+                isApplying={applyingVariant === variant.id}
+                applyDisabled={Boolean(applyingVariant && applyingVariant !== variant.id)}
+              />
             );
           })}
         </div>
@@ -190,23 +157,6 @@ export function CleanBrowsingDetailScreen({ onBack }: CleanBrowsingDetailScreenP
           </div>
         )}
 
-        {/* Apply Button */}
-        <button
-          onClick={handleApply}
-          disabled={isApplying}
-          className="w-full h-[44px] bg-primary hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed rounded-[12px] flex items-center justify-center focus:outline-none transition-colors"
-        >
-          {isApplying ? (
-            <svg className="w-5 h-5 text-white animate-spin" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeOpacity="0.25" />
-              <path d="M12 2 A10 10 0 0 1 22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-          ) : (
-            <span className="text-base font-medium text-white leading-5">
-              {t('dns_detail.apply')}
-            </span>
-          )}
-        </button>
       </div>
     </div>
   );

@@ -63,7 +63,7 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, diag
       <div className="px-4 pb-4">
         <button
           onClick={onNavigateToDnsProviders}
-          className="w-full bg-background-tertiary rounded-xl p-4 text-left focus:outline-none hover:opacity-80 transition-opacity"
+          className="w-full rounded-xl p-4 text-left focus:outline-none transition-colors bg-[#F2F2F2] hover:bg-[#E5E5E5] dark:bg-background-tertiary dark:hover:bg-background-hover"
         >
           {!isDnsLoading && (
             <>

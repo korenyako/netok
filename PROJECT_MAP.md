@@ -1,6 +1,6 @@
 # Project Map - Netok
 
-Generated: 2025-11-18
+Generated: 2025-11-19
 
 ## TREE (ASCII)
 
@@ -135,6 +135,7 @@ Generated: 2025-11-18
 │   │   ├── components
 │   │   │   ├── icons
 │   │   │   │   └── NavigationIcons.tsx
+│   │   │   ├── DnsVariantCard.tsx
 │   │   │   ├── HeaderStatus.tsx
 │   │   │   ├── MainPage.tsx
 │   │   │   ├── NodeCard.tsx

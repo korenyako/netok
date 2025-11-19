@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { setDns, getDnsProvider } from '../api/tauri';
-import { DNS_VARIANT_IP_CLASS } from '../constants/dnsVariantStyles';
+import { DnsVariantCard } from '../components/DnsVariantCard';
 
 interface GoogleDetailScreenProps {
   onBack: () => void;
@@ -9,7 +9,6 @@ interface GoogleDetailScreenProps {
 
 export function GoogleDetailScreen({ onBack }: GoogleDetailScreenProps) {
   const { t } = useTranslation();
-  const [isSelected, setIsSelected] = useState(false);
   const [isActive, setIsActive] = useState(false);
   const [isApplying, setIsApplying] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -21,7 +20,6 @@ export function GoogleDetailScreen({ onBack }: GoogleDetailScreenProps) {
         const provider = await getDnsProvider();
         if (provider.type === 'Google') {
           setIsActive(true);
-          setIsSelected(true);
         }
       } catch (err) {
         console.error('Failed to get current DNS provider:', err);
@@ -37,9 +35,7 @@ export function GoogleDetailScreen({ onBack }: GoogleDetailScreenProps) {
       setError(null);
 
       await setDns({ type: 'Google' });
-
-      // Success - go back
-      onBack();
+      setIsActive(true);
     } catch (err) {
       console.error('Failed to set DNS:', err);
       setError(err instanceof Error ? err.message : 'Failed to set DNS');
@@ -82,44 +78,19 @@ export function GoogleDetailScreen({ onBack }: GoogleDetailScreenProps) {
           {t('dns_providers.google_desc')}
         </p>
 
-        {/* Subtitle */}
-        <p className="text-sm text-foreground-secondary leading-[19.6px] mb-[16px]">
-          {t('dns_detail.choose_protection')}
-        </p>
-
         {/* Single Variant Option */}
         <div className="space-y-2 mb-[16px]">
-          <button
-            onClick={() => setIsSelected(true)}
-            className={`w-full rounded-[12px] p-4 text-left focus:outline-none bg-background-tertiary ${
-              isActive ? 'ring-2 ring-primary' : ''
-            }`}
-          >
-            <div className="flex items-start justify-between mb-1">
-              <h3 className="text-base font-medium text-foreground leading-5 flex-1">
-                Public DNS
-              </h3>
-              {isSelected && (
-                <svg
-                  className="w-4 h-4 text-primary flex-shrink-0 ml-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 16 16"
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M3 8l3 3 7-7" />
-                </svg>
-              )}
-            </div>
-            <p className="text-sm text-foreground-secondary leading-[19.6px] mb-1">
-              No content filtering, fast and reliable
-            </p>
-            <p className={DNS_VARIANT_IP_CLASS}>
-              8.8.8.8, 8.8.4.4
-            </p>
-          </button>
+          <DnsVariantCard
+            title="Public DNS"
+            description="No content filtering, fast and reliable"
+            dnsAddresses="8.8.8.8, 8.8.4.4"
+            isSelected={isActive}
+            isActive={isActive}
+            onApply={handleApply}
+            applyLabel={t('dns_detail.apply')}
+            isApplying={isApplying}
+            applyDisabled={isApplying}
+          />
         </div>
 
         {/* Error Message */}
@@ -129,23 +100,6 @@ export function GoogleDetailScreen({ onBack }: GoogleDetailScreenProps) {
           </div>
         )}
 
-        {/* Apply Button */}
-        <button
-          onClick={handleApply}
-          disabled={isApplying}
-          className="w-full h-[44px] bg-primary hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed rounded-[12px] flex items-center justify-center focus:outline-none transition-colors"
-        >
-          {isApplying ? (
-            <svg className="w-5 h-5 text-white animate-spin" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeOpacity="0.25" />
-              <path d="M12 2 A10 10 0 0 1 22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-          ) : (
-            <span className="text-base font-medium text-white leading-5">
-              {t('dns_detail.apply')}
-            </span>
-          )}
-        </button>
       </div>
     </div>
   );

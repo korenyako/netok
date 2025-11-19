@@ -50,8 +50,8 @@ export function SettingsPage() {
 
   const renderGeneralTab = () => (
     <div className="space-y-6">
-      <div>
-        <h3 className="text-sm font-semibold text-neutral-900 mb-3">
+      <div className="space-y-3">
+        <h3 className="text-sm font-semibold text-neutral-900">
           {t('settings.general.language')}
         </h3>
         <select 
@@ -109,8 +109,8 @@ export function SettingsPage() {
       </div>
 
       {dnsMode === 'custom' && (
-        <div>
-          <h3 className="text-sm font-semibold text-neutral-900 mb-3">
+        <div className="space-y-3">
+          <h3 className="text-sm font-semibold text-neutral-900">
             {t('settings.dns.custom_dns')}
           </h3>
           <input

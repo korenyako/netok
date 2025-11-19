@@ -13,8 +13,8 @@
   "dns_providers": {
     "title": "DNS Protection",
     "description": "Select a DNS server to enhance security and block unwanted content",
-    "auto": "Disabled",
-    "auto_desc": "Your ISP's DNS",
+    "auto": "System DNS",
+    "auto_desc": "DNS server provided by your ISP",
     "cloudflare": "Cloudflare",
     "cloudflare_desc": "Fastest public DNS, privacy-focused, audited by KPMG",
     "adguard": "AdGuard",

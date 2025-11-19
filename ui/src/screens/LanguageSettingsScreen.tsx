@@ -58,7 +58,9 @@ export function LanguageSettingsScreen({ onBack }: LanguageSettingsScreenProps) 
               <button
                 key={language.code}
                 onClick={() => handleLanguageChange(language.code)}
-                className="w-full h-[44px] rounded-[12px] px-4 flex items-center justify-between focus:outline-none hover:bg-background-hover transition-colors bg-background-tertiary"
+                className={`w-full rounded-[12px] px-4 py-3 flex items-center justify-between text-left focus:outline-none transition-colors border ${
+                  isSelected ? 'border-primary' : 'border-transparent'
+                } hover:bg-neutral-100 dark:hover:bg-background-hover`}
               >
                 <span className="text-base font-medium text-foreground leading-5">{language.name}</span>
 

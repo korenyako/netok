@@ -13,8 +13,8 @@
   "dns_providers": {
     "title": "Защита DNS",
     "description": "Выберите DNS-сервер для повышения безопасности и блокировки нежелательного контента",
-    "auto": "Отключена",
-    "auto_desc": "DNS вашего провайдера",
+    "auto": "Системный DNS",
+    "auto_desc": "DNS-сервер вашего провайдера",
     "cloudflare": "Cloudflare",
     "cloudflare_desc": "Самый быстрый публичный DNS, ориентированный на приватность, проверен KPMG",
     "adguard": "AdGuard",

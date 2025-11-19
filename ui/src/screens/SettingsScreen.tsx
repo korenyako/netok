@@ -46,25 +46,39 @@ export function SettingsScreen({ onNavigateToTheme, onNavigateToLanguage, onBack
           {/* Theme Setting Card */}
           <button
             onClick={onNavigateToTheme}
-            className="w-full bg-background-tertiary rounded-xl p-4 flex flex-col items-start focus:outline-none hover:opacity-80 transition-opacity"
+            className="w-full rounded-[12px] border border-transparent p-4 text-left focus:outline-none transition-colors bg-[#F2F2F2] hover:bg-[#E5E5E5] dark:bg-background-tertiary dark:hover:bg-background-hover"
           >
-            <span className="text-base font-medium text-foreground leading-5 mb-2">{t('settings.general.theme')}</span>
-            <span className="text-sm text-foreground-secondary leading-[19.6px]">
-              {currentTheme === 'light' && t('settings.general.theme_light')}
-              {currentTheme === 'dark' && t('settings.general.theme_dark')}
-              {currentTheme === 'system' && t('settings.general.theme_system')}
-            </span>
+            <div className="flex items-start gap-3">
+              <div className="flex-1">
+                <div className="text-base font-medium text-foreground leading-5">
+                  {t('settings.general.theme')}
+                </div>
+                <div className="text-sm text-foreground-secondary leading-[19.6px]">
+                  {currentTheme === 'light' && t('settings.general.theme_light')}
+                  {currentTheme === 'dark' && t('settings.general.theme_dark')}
+                  {currentTheme === 'system' && t('settings.general.theme_system')}
+                </div>
+              </div>
+            </div>
           </button>
 
           {/* Language Setting Card */}
           <button
             onClick={onNavigateToLanguage}
-            className="w-full bg-background-tertiary rounded-xl p-4 flex flex-col items-start focus:outline-none hover:opacity-80 transition-opacity"
+            className="w-full rounded-[12px] border border-transparent p-4 text-left focus:outline-none transition-colors bg-[#F2F2F2] hover:bg-[#E5E5E5] dark:bg-background-tertiary dark:hover:bg-background-hover"
           >
-            <span className="text-base font-medium text-foreground leading-5 mb-2">{t('settings.general.language')}</span>
-            <span className="text-sm text-foreground-secondary leading-[19.6px]">
-              {currentLanguage === 'ru' ? t('settings.general.language_ru') : t('settings.general.language_en')}
-            </span>
+            <div className="flex items-start gap-3">
+              <div className="flex-1">
+                <div className="text-base font-medium text-foreground leading-5">
+                  {t('settings.general.language')}
+                </div>
+                <div className="text-sm text-foreground-secondary leading-[19.6px]">
+                  {currentLanguage === 'ru'
+                    ? t('settings.general.language_ru')
+                    : t('settings.general.language_en')}
+                </div>
+              </div>
+            </div>
           </button>
         </div>
 

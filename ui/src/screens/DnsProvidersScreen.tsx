@@ -63,26 +63,19 @@ export function DnsProvidersScreen({ onBack, onSelectCloudflare, onSelectAdGuard
     }
   };
 
-  // All providers including 'auto' at the top
-  const allProviders: Array<{
+  const providers: Array<{
     id: DnsProvider;
     name: string;
+    description: string;
   }> = [
-    { id: 'auto', name: t('dns_providers.auto') },
-  ];
-
-  // Other providers in alphabetical order
-  const otherProviders: Array<{
-    id: DnsProvider;
-    name: string;
-  }> = [
-    { id: 'adguard', name: t('dns_providers.adguard') },
-    { id: 'cleanbrowsing', name: t('dns_providers.cleanbrowsing') },
-    { id: 'cloudflare', name: t('dns_providers.cloudflare') },
-    { id: 'dns4eu', name: t('dns_providers.dns4eu') },
-    { id: 'google', name: t('dns_providers.google') },
-    { id: 'opendns', name: t('dns_providers.opendns') },
-    { id: 'quad9', name: t('dns_providers.quad9') },
+    { id: 'auto', name: t('dns_providers.auto'), description: t('dns_providers.auto_desc') },
+    { id: 'adguard', name: t('dns_providers.adguard'), description: t('dns_providers.adguard_desc') },
+    { id: 'cleanbrowsing', name: t('dns_providers.cleanbrowsing'), description: t('dns_providers.cleanbrowsing_desc') },
+    { id: 'cloudflare', name: t('dns_providers.cloudflare'), description: t('dns_providers.cloudflare_desc') },
+    { id: 'dns4eu', name: t('dns_providers.dns4eu'), description: t('dns_providers.dns4eu_desc') },
+    { id: 'google', name: t('dns_providers.google'), description: t('dns_providers.google_desc') },
+    { id: 'opendns', name: t('dns_providers.opendns'), description: t('dns_providers.opendns_desc') },
+    { id: 'quad9', name: t('dns_providers.quad9'), description: t('dns_providers.quad9_desc') },
   ];
 
   return (
@@ -114,41 +107,6 @@ export function DnsProvidersScreen({ onBack, onSelectCloudflare, onSelectAdGuard
           {t('dns_providers.title')}
         </h1>
 
-        {/* "Disabled" Option */}
-        <div className="mb-[16px]">
-          {allProviders.map((provider) => {
-            const isSelected = !isLoading && currentProvider === provider.id;
-
-            return (
-              <button
-                key={provider.id}
-                onClick={() => handleProviderClick(provider.id)}
-                disabled={isApplying}
-                className="w-full rounded-[12px] px-4 h-[44px] flex items-center justify-between focus:outline-none hover:bg-background-hover transition-colors bg-background-tertiary disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <div className="flex-1 text-left">
-                  <div className="text-base font-medium text-foreground leading-5">
-                    {provider.name}
-                  </div>
-                </div>
-                {isSelected && (
-                  <svg
-                    className="w-4 h-4 text-primary flex-shrink-0 ml-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 16 16"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M3 8l3 3 7-7" />
-                  </svg>
-                )}
-              </button>
-            );
-          })}
-        </div>
-
         {/* Description */}
         <p className="text-sm text-foreground-secondary leading-[19.6px] mb-[16px] max-w-[269px]">
           {t('dns_providers.description')}
@@ -156,7 +114,7 @@ export function DnsProvidersScreen({ onBack, onSelectCloudflare, onSelectAdGuard
 
         {/* DNS Provider Options */}
         <div className="space-y-2">
-          {otherProviders.map((provider) => {
+          {providers.map((provider) => {
             const isSelected = !isLoading && currentProvider === provider.id;
 
             return (
@@ -164,26 +122,33 @@ export function DnsProvidersScreen({ onBack, onSelectCloudflare, onSelectAdGuard
                 key={provider.id}
                 onClick={() => handleProviderClick(provider.id)}
                 disabled={isApplying}
-                className="w-full rounded-[12px] px-4 h-[44px] flex items-center justify-between focus:outline-none hover:bg-background-hover transition-colors bg-background-tertiary disabled:opacity-50 disabled:cursor-not-allowed"
+                className={`w-full rounded-[12px] border px-4 py-3 text-left focus:outline-none transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                  isSelected ? 'border-primary' : 'border-transparent'
+                } hover:bg-neutral-100 dark:hover:bg-background-hover`}
               >
-                <div className="flex-1 text-left">
-                  <div className="text-base font-medium text-foreground leading-5">
-                    {provider.name}
+                <div className="flex items-start gap-3">
+                  <div className="flex-1">
+                    <div className="text-base font-medium text-foreground leading-5">
+                      {provider.name}
+                    </div>
+                    <p className="text-sm text-foreground-secondary leading-[19.6px]">
+                      {provider.description}
+                    </p>
                   </div>
+                  {isSelected && (
+                    <svg
+                      className="w-4 h-4 text-primary mt-[2px]"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 16 16"
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M3 8l3 3 7-7" />
+                    </svg>
+                  )}
                 </div>
-                {isSelected && (
-                  <svg
-                    className="w-4 h-4 text-primary flex-shrink-0 ml-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 16 16"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M3 8l3 3 7-7" />
-                  </svg>
-                )}
               </button>
             );
           })}

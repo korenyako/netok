@@ -100,7 +100,9 @@ export function ThemeSettingsScreen({ onBack }: ThemeSettingsScreenProps) {
               <button
                 key={theme.id}
                 onClick={() => handleThemeChange(theme.id)}
-                className="w-full rounded-[12px] flex flex-col items-start focus:outline-none hover:bg-background-hover transition-colors bg-background-tertiary"
+                className={`w-full rounded-[12px] border flex flex-col items-start focus:outline-none transition-colors ${
+                  isSelected ? 'border-primary' : 'border-transparent'
+                } hover:bg-neutral-100 dark:hover:bg-background-hover`}
               >
                 {/* Header with Icon, Title and Checkmark */}
                 <div className="flex items-center gap-3 w-full px-4 pt-3">
