@@ -423,6 +423,8 @@ fn get_default_gateway() -> Option<String> {
     use std::process::Command;
 
     // Run "route print" and parse the output
+    // LOCALE-INDEPENDENT: We parse IP addresses (0.0.0.0) which are not localized
+    // The route table format is consistent across locales
     let output = Command::new("cmd")
         .args(["/C", "route print 0.0.0.0"])
         .output()
@@ -432,6 +434,7 @@ fn get_default_gateway() -> Option<String> {
 
     // Look for lines with "0.0.0.0" and extract gateway IP
     // Format: "0.0.0.0  0.0.0.0  <gateway>  <interface>  <metric>"
+    // We rely on IP addresses, not text labels, making this locale-independent
     for line in text.lines() {
         let parts: Vec<&str> = line.split_whitespace().collect();
         if parts.len() >= 3 && parts[0] == "0.0.0.0" && parts[1] == "0.0.0.0" {
@@ -448,6 +451,8 @@ fn get_default_gateway() -> Option<String> {
     use std::process::Command;
 
     // Run "ip route" and parse the output
+    // LOCALE-INDEPENDENT: The `ip` command outputs English keywords regardless of system locale
+    // Keywords like "default" and "via" are not translated
     let output = Command::new("ip")
         .args(["route", "show", "default"])
         .output()
@@ -456,6 +461,7 @@ fn get_default_gateway() -> Option<String> {
     let text = String::from_utf8_lossy(&output.stdout);
 
     // Format: "default via <gateway> dev <interface>"
+    // Keywords "default" and "via" are part of the command's protocol, not user-facing text
     for line in text.lines() {
         let parts: Vec<&str> = line.split_whitespace().collect();
         if parts.len() >= 3 && parts[0] == "default" && parts[1] == "via" {
@@ -471,11 +477,14 @@ fn get_default_gateway() -> Option<String> {
     use std::process::Command;
 
     // Run "netstat -nr" and parse the output
+    // LOCALE-INDEPENDENT: netstat uses numeric format (-n) and standard keywords
+    // The keyword "default" and IP "0.0.0.0" are not localized
     let output = Command::new("netstat").args(&["-nr"]).output().ok()?;
 
     let text = String::from_utf8_lossy(&output.stdout);
 
     // Look for default route
+    // Using -n flag ensures numeric output, and "default" keyword is not translated
     for line in text.lines() {
         let parts: Vec<&str> = line.split_whitespace().collect();
         if parts.len() >= 2 && (parts[0] == "default" || parts[0] == "0.0.0.0") {
@@ -892,8 +901,13 @@ fn get_active_adapter_name() -> Option<String> {
     use std::process::Command;
 
     fn run_powershell(command: &str) -> Option<String> {
+        // Force English culture to ensure locale-independent output
+        // This prevents localized enum values like "Connected"/"Подключено"
+        let culture_prefix = "[System.Threading.Thread]::CurrentThread.CurrentUICulture = 'en-US'; ";
+        let full_command = format!("{}{}", culture_prefix, command);
+
         let output = Command::new("powershell")
-            .args(["-NoProfile", "-Command", command])
+            .args(["-NoProfile", "-Command", &full_command])
             .output()
             .ok()?;
 
@@ -945,16 +959,17 @@ pub fn get_current_dns() -> Result<Vec<String>, String> {
     let adapter_name = get_active_adapter_name()
         .ok_or_else(|| "Failed to find active network adapter".to_string())?;
 
+    // Force English culture for locale-independent output
+    let culture_prefix = "[System.Threading.Thread]::CurrentThread.CurrentUICulture = 'en-US'; ";
+    let command = format!(
+        "{}Get-DnsClientServerAddress -InterfaceAlias '{}' -AddressFamily IPv4 | Select-Object -ExpandProperty ServerAddresses",
+        culture_prefix,
+        adapter_name.replace("'", "''")
+    );
+
     // Use PowerShell to get DNS server addresses
     let output = Command::new("powershell")
-        .args([
-            "-NoProfile",
-            "-Command",
-            &format!(
-                "Get-DnsClientServerAddress -InterfaceAlias '{}' -AddressFamily IPv4 | Select-Object -ExpandProperty ServerAddresses",
-                adapter_name.replace("'", "''")
-            ),
-        ])
+        .args(["-NoProfile", "-Command", &command])
         .output()
         .map_err(|e| format!("Failed to execute PowerShell: {}", e))?;
 
