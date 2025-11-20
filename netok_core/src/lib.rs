@@ -903,7 +903,8 @@ fn get_active_adapter_name() -> Option<String> {
     fn run_powershell(command: &str) -> Option<String> {
         // Force English culture to ensure locale-independent output
         // This prevents localized enum values like "Connected"/"Подключено"
-        let culture_prefix = "[System.Threading.Thread]::CurrentThread.CurrentUICulture = 'en-US'; ";
+        let culture_prefix =
+            "[System.Threading.Thread]::CurrentThread.CurrentUICulture = 'en-US'; ";
         let full_command = format!("{}{}", culture_prefix, command);
 
         let output = Command::new("powershell")
@@ -1719,7 +1720,11 @@ mod tests {
         let snapshot = run_diagnostics(&settings);
 
         for node in &snapshot.nodes {
-            assert!(node.latency_ms.is_some(), "Node {:?} missing latency", node.id);
+            assert!(
+                node.latency_ms.is_some(),
+                "Node {:?} missing latency",
+                node.id
+            );
         }
     }
 
