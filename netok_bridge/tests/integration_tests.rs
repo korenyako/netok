@@ -17,11 +17,7 @@ fn test_get_settings_returns_valid_json() {
 
     // Should be valid JSON
     let parsed: Result<serde_json::Value, _> = serde_json::from_str(&json);
-    assert!(
-        parsed.is_ok(),
-        "Settings JSON should be valid: {}",
-        json
-    );
+    assert!(parsed.is_ok(), "Settings JSON should be valid: {}", json);
 
     // Should contain expected fields
     let settings = parsed.unwrap();
@@ -46,10 +42,7 @@ fn test_set_settings_with_invalid_json() {
     let invalid_json = "not valid json {";
 
     let result = set_settings_json(invalid_json);
-    assert!(
-        result.is_err(),
-        "Invalid JSON should return error"
-    );
+    assert!(result.is_err(), "Invalid JSON should return error");
 }
 
 #[test]
@@ -76,10 +69,7 @@ fn test_set_settings_with_incomplete_structure() {
 async fn test_run_diagnostics_returns_valid_snapshot() {
     let result = run_diagnostics_struct().await;
 
-    assert!(
-        result.is_ok(),
-        "Diagnostics should complete successfully"
-    );
+    assert!(result.is_ok(), "Diagnostics should complete successfully");
 
     let snapshot = result.unwrap();
 
@@ -163,15 +153,11 @@ async fn test_diagnostics_serialization() {
 
     // Should serialize to JSON
     let json = serde_json::to_string(&snapshot);
-    assert!(
-        json.is_ok(),
-        "Snapshot should serialize to JSON"
-    );
+    assert!(json.is_ok(), "Snapshot should serialize to JSON");
 
     // Verify JSON contains expected fields
     let json_str = json.unwrap();
-    let value: serde_json::Value = serde_json::from_str(&json_str)
-        .expect("Should parse as JSON");
+    let value: serde_json::Value = serde_json::from_str(&json_str).expect("Should parse as JSON");
 
     assert!(value.get("overall").is_some());
     assert!(value.get("nodes").is_some());
@@ -254,8 +240,8 @@ async fn test_set_dns_custom_provider() {
 #[test]
 fn test_dns_provider_all_variants_serialize() {
     use netok_bridge::{
-        AdGuardVariant, CleanBrowsingVariant, CloudflareVariant, Dns4EuVariant,
-        OpenDnsVariant, Quad9Variant,
+        AdGuardVariant, CleanBrowsingVariant, CloudflareVariant, Dns4EuVariant, OpenDnsVariant,
+        Quad9Variant,
     };
 
     let variants = vec![
@@ -320,10 +306,7 @@ fn test_dns_provider_deserialization() {
 
     let json = r#"{"type":"Cloudflare","variant":"Standard"}"#;
     let provider: Result<DnsProviderType, _> = serde_json::from_str(json);
-    assert!(
-        provider.is_ok(),
-        "Cloudflare provider should deserialize"
-    );
+    assert!(provider.is_ok(), "Cloudflare provider should deserialize");
 }
 
 // ============================================================================
@@ -348,20 +331,17 @@ fn test_settings_json_roundtrip() {
     let original_json = get_settings_json();
 
     // Parse them
-    let settings: serde_json::Value = serde_json::from_str(&original_json)
-        .expect("Original settings should be valid JSON");
+    let settings: serde_json::Value =
+        serde_json::from_str(&original_json).expect("Original settings should be valid JSON");
 
     // Set them back
     let result = set_settings_json(&original_json);
-    assert!(
-        result.is_ok(),
-        "Setting original settings should succeed"
-    );
+    assert!(result.is_ok(), "Setting original settings should succeed");
 
     // Get them again
     let new_json = get_settings_json();
-    let new_settings: serde_json::Value = serde_json::from_str(&new_json)
-        .expect("New settings should be valid JSON");
+    let new_settings: serde_json::Value =
+        serde_json::from_str(&new_json).expect("New settings should be valid JSON");
 
     // Compare key fields
     assert_eq!(
@@ -381,7 +361,10 @@ async fn test_diagnostics_nodes_contain_computer() {
     assert!(result.is_ok());
 
     let snapshot = result.unwrap();
-    let has_computer = snapshot.nodes.iter().any(|n| matches!(n.id, NodeId::Computer));
+    let has_computer = snapshot
+        .nodes
+        .iter()
+        .any(|n| matches!(n.id, NodeId::Computer));
 
     assert!(has_computer, "Snapshot should include Computer node");
 }
@@ -392,7 +375,10 @@ async fn test_diagnostics_nodes_contain_internet() {
     assert!(result.is_ok());
 
     let snapshot = result.unwrap();
-    let has_internet = snapshot.nodes.iter().any(|n| matches!(n.id, NodeId::Internet));
+    let has_internet = snapshot
+        .nodes
+        .iter()
+        .any(|n| matches!(n.id, NodeId::Internet));
 
     assert!(has_internet, "Snapshot should include Internet node");
 }
