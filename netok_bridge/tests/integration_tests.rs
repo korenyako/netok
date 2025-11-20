@@ -2,7 +2,6 @@ use netok_bridge::{
     get_dns_provider, get_settings_json, run_diagnostics_struct, set_dns_provider,
     set_settings_json, DnsProviderType, NodeId, Overall,
 };
-use serde_json;
 
 // ============================================================================
 // Settings Tests
