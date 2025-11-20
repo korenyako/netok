@@ -23,7 +23,7 @@ describe('dnsStore', () => {
 
   describe('initialize', () => {
     it('should load DNS provider on initialization', async () => {
-      const mockProvider = { type: 'Cloudflare' as const };
+      const mockProvider = { type: 'Google' as const };
       vi.mocked(tauriApi.getDnsProvider).mockResolvedValue(mockProvider);
 
       await dnsStore.initialize();
@@ -59,7 +59,7 @@ describe('dnsStore', () => {
     });
 
     it('should not reinitialize if already initialized', async () => {
-      const mockProvider = { type: 'Cloudflare' as const };
+      const mockProvider = { type: 'Google' as const };
       vi.mocked(tauriApi.getDnsProvider).mockResolvedValue(mockProvider);
 
       await dnsStore.initialize();
@@ -74,8 +74,8 @@ describe('dnsStore', () => {
 
   describe('refresh', () => {
     it('should reinitialize the store', async () => {
-      const firstProvider = { type: 'Cloudflare' as const };
-      const secondProvider = { type: 'Google' as const };
+      const firstProvider = { type: 'Google' as const };
+      const secondProvider = { type: 'Auto' as const };
 
       vi.mocked(tauriApi.getDnsProvider).mockResolvedValueOnce(firstProvider);
       await dnsStore.initialize();
@@ -89,7 +89,7 @@ describe('dnsStore', () => {
 
   describe('setProvider', () => {
     it('should update current provider', () => {
-      const provider = { type: 'Cloudflare' as const };
+      const provider = { type: 'Google' as const };
 
       dnsStore.setProvider(provider);
 
@@ -112,12 +112,12 @@ describe('dnsStore', () => {
       const listener = vi.fn();
 
       const unsubscribe = dnsStore.subscribe(listener);
-      dnsStore.setProvider({ type: 'Cloudflare' });
+      dnsStore.setProvider({ type: 'Google' });
 
       expect(listener).toHaveBeenCalledTimes(1);
 
       unsubscribe();
-      dnsStore.setProvider({ type: 'Google' });
+      dnsStore.setProvider({ type: 'Auto' });
 
       expect(listener).toHaveBeenCalledTimes(1);
     });
@@ -129,7 +129,7 @@ describe('dnsStore', () => {
       dnsStore.subscribe(listener1);
       dnsStore.subscribe(listener2);
 
-      dnsStore.setProvider({ type: 'Cloudflare' });
+      dnsStore.setProvider({ type: 'Google' });
 
       expect(listener1).toHaveBeenCalled();
       expect(listener2).toHaveBeenCalled();
