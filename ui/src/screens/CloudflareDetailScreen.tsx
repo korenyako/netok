@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { setDns, getDnsProvider, type CloudflareVariant as ApiCloudflareVariant } from '../api/tauri';
 import { DnsVariantCard } from '../components/DnsVariantCard';
+import { notifications } from '../utils/notifications';
 
 interface CloudflareDetailScreenProps {
   onBack: () => void;
@@ -89,9 +90,24 @@ export function CloudflareDetailScreen({ onBack }: CloudflareDetailScreenProps) 
         variant: apiVariant,
       });
       setCurrentVariant(variantId);
+
+      // Show success notification
+      notifications.success(
+        t('dns.apply_success', {
+          defaultValue: 'DNS settings applied successfully'
+        })
+      );
     } catch (err) {
       console.error('Failed to set DNS:', err);
-      setError(err instanceof Error ? err.message : 'Failed to set DNS');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to set DNS';
+      setError(errorMessage);
+
+      // Show error notification
+      notifications.error(
+        t('dns.apply_error', {
+          defaultValue: `Failed to apply DNS settings: ${errorMessage}`
+        })
+      );
     } finally {
       setApplyingVariant(null);
     }

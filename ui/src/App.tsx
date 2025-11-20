@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Toaster } from 'react-hot-toast';
 import { ThemeProvider } from './components/ThemeProvider';
+import { notifications } from './utils/notifications';
 import { StatusScreen } from './screens/StatusScreen';
 import { DiagnosticsScreen } from './screens/DiagnosticsScreen';
 import { DnsProvidersScreen } from './screens/DnsProvidersScreen';
@@ -41,6 +43,11 @@ function App() {
       setDiagnosticsData(snapshot);
     } catch (err) {
       console.error('Failed to fetch diagnostics:', err);
+      notifications.error(
+        t('errors.diagnostics_failed', {
+          defaultValue: 'Failed to run diagnostics. Please check your network connection.'
+        })
+      );
     }
   };
 
@@ -48,6 +55,7 @@ function App() {
   if (showDiagnostics) {
     return (
       <ThemeProvider>
+        <Toaster />
         <div id="app" className="h-full flex flex-col bg-background">
           <DiagnosticsScreen
             onBack={() => setShowDiagnostics(false)}
@@ -187,6 +195,7 @@ function App() {
 
   return (
     <ThemeProvider>
+      <Toaster />
       <div id="app" className="h-full flex flex-col bg-background">
         {/* Main Content */}
         <div className="flex-1 overflow-auto">
