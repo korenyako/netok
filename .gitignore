@@ -23,6 +23,4 @@ netok_desktop/node_modules
 netok_desktop/dist
 
 # UI build and dependencies
-ui-new/node_modules/
-ui-new/dist/
 **/node_modules/

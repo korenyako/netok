@@ -187,124 +187,7 @@ Generated: 2025-11-19
 │   ├── tsconfig.json
 │   ├── tsconfig.node.json
 │   └── vite.config.ts
-├── ui_legacy
-│   ├── src
-│   │   ├── computer.svg
-│   │   ├── globe.svg
-│   │   ├── i18n.rs
-│   │   ├── main.rs
-│   │   ├── router.svg
-│   │   └── wifi.svg
-│   ├── Cargo.toml
-│   └── README.md
-├── ui-new
-│   ├── src
-│   │   ├── components
-│   │   │   ├── figma
-│   │   │   │   └── ImageWithFallback.tsx
-│   │   │   ├── screens
-│   │   │   │   ├── LanguageScreen.tsx
-│   │   │   │   ├── NetworkScreen.tsx
-│   │   │   │   ├── SecurityScreen.tsx
-│   │   │   │   ├── SettingsScreen.tsx
-│   │   │   │   ├── ThemeScreen.tsx
-│   │   │   │   └── ToolsScreen.tsx
-│   │   │   ├── ui
-│   │   │   │   ├── accordion.tsx
-│   │   │   │   ├── alert-dialog.tsx
-│   │   │   │   ├── alert.tsx
-│   │   │   │   ├── aspect-ratio.tsx
-│   │   │   │   ├── avatar.tsx
-│   │   │   │   ├── badge.tsx
-│   │   │   │   ├── breadcrumb.tsx
-│   │   │   │   ├── button.tsx
-│   │   │   │   ├── calendar.tsx
-│   │   │   │   ├── card.tsx
-│   │   │   │   ├── carousel.tsx
-│   │   │   │   ├── chart.tsx
-│   │   │   │   ├── checkbox.tsx
-│   │   │   │   ├── collapsible.tsx
-│   │   │   │   ├── command.tsx
-│   │   │   │   ├── context-menu.tsx
-│   │   │   │   ├── dialog.tsx
-│   │   │   │   ├── drawer.tsx
-│   │   │   │   ├── dropdown-menu.tsx
-│   │   │   │   ├── form.tsx
-│   │   │   │   ├── hover-card.tsx
-│   │   │   │   ├── input-otp.tsx
-│   │   │   │   ├── input.tsx
-│   │   │   │   ├── label.tsx
-│   │   │   │   ├── menubar.tsx
-│   │   │   │   ├── navigation-menu.tsx
-│   │   │   │   ├── pagination.tsx
-│   │   │   │   ├── popover.tsx
-│   │   │   │   ├── progress.tsx
-│   │   │   │   ├── radio-group.tsx
-│   │   │   │   ├── resizable.tsx
-│   │   │   │   ├── scroll-area.tsx
-│   │   │   │   ├── select.tsx
-│   │   │   │   ├── separator.tsx
-│   │   │   │   ├── sheet.tsx
-│   │   │   │   ├── sidebar.tsx
-│   │   │   │   ├── skeleton.tsx
-│   │   │   │   ├── slider.tsx
-│   │   │   │   ├── sonner.tsx
-│   │   │   │   ├── switch.tsx
-│   │   │   │   ├── table.tsx
-│   │   │   │   ├── tabs.tsx
-│   │   │   │   ├── textarea.tsx
-│   │   │   │   ├── toggle-group.tsx
-│   │   │   │   ├── toggle.tsx
-│   │   │   │   ├── tooltip.tsx
-│   │   │   │   ├── use-mobile.ts
-│   │   │   │   └── utils.ts
-│   │   │   ├── DetailedPathCard.tsx
-│   │   │   ├── MainStatusCard.tsx
-│   │   │   └── StatusHeader.tsx
-│   │   ├── guidelines
-│   │   │   └── Guidelines.md
-│   │   ├── imports
-│   │   │   ├── Card-31-242.tsx
-│   │   │   ├── Card-33-466.tsx
-│   │   │   ├── Card-33-569.tsx
-│   │   │   ├── Card-37-829.tsx
-│   │   │   ├── Card-42-1026.tsx
-│   │   │   ├── Card-42-1119.tsx
-│   │   │   ├── Card-9-130.tsx
-│   │   │   ├── Card-9-292.tsx
-│   │   │   ├── Card.tsx
-│   │   │   ├── Check.tsx
-│   │   │   ├── svg-7mtmmw9lcd.ts
-│   │   │   ├── svg-awoydyzf8i.ts
-│   │   │   ├── svg-egvceuz6nw.ts
-│   │   │   ├── svg-exnfuwyo3q.ts
-│   │   │   ├── svg-gjkejt3b1w.ts
-│   │   │   ├── svg-gt5503apnm.ts
-│   │   │   ├── svg-havri7zc8r.ts
-│   │   │   ├── svg-nfe8ucn0br.ts
-│   │   │   ├── svg-qf6f52nkak.ts
-│   │   │   └── svg-urvarrlt82.ts
-│   │   ├── styles
-│   │   │   └── globals.css
-│   │   ├── App.tsx
-│   │   ├── Attributions.md
-│   │   ├── index.css
-│   │   └── main.tsx
-│   ├── index.html
-│   ├── package-lock.json
-│   ├── package.json
-│   ├── README.md
-│   └── vite.config.ts
 ├── .cursorrules
-├── .gitignore
-├── Cargo.lock
-├── Cargo.toml
-├── CONTRIBUTING.md
-├── LICENSE.Apache-2.0
-├── LICENSE.Proprietary
-├── Loading prop to NodeCard for better UX
-├── package-lock.json
-├── package.json
 ├── PROJECT_CONTEXT.md
 ├── PROJECT_MAP.md
 ├── README_DEV.md
@@ -330,7 +213,7 @@ Generated: 2025-11-19
     "beforeDevCommand": "npm run dev --prefix ../ui",
     "beforeBuildCommand": "npm run build --prefix ../ui",
     "devUrl": "http://localhost:5173",
-    "frontendDist": "../ui-new/dist"
+    "frontendDist": "../ui/dist"
   },
 
   "app": {
@@ -521,7 +404,7 @@ export default App;
 - **Dev Command**: npm run dev --prefix ../ui
 - **Build Command**: npm run build --prefix ../ui
 - **Dev Path**: <http://localhost:5173>
-- **Dist Dir**: ../ui-new/dist
+- **Dist Dir**: ../ui/dist
 - **Window Title**: Netok
 - **Window Size**: 320×600
 
