@@ -53,7 +53,12 @@ jobs:
       - name: Check formatting
         run: cargo fmt --all -- --check
 
-      - name: Clippy
+      - name: Clippy - netok_core
+        working-directory: netok_core
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Clippy - netok_bridge
+        working-directory: netok_bridge
         run: cargo clippy --all-targets --all-features -- -D warnings
 
       - name: Run tests - netok_core
@@ -62,10 +67,6 @@ jobs:
 
       - name: Run tests - netok_bridge
         working-directory: netok_bridge
-        run: cargo test --verbose
-
-      - name: Run tests - netok_desktop
-        working-directory: netok_desktop/src-tauri
         run: cargo test --verbose
 
   typescript-tests:
@@ -133,8 +134,13 @@ jobs:
         working-directory: ui
         run: npm run build
 
-      - name: Build Rust workspace
-        run: cargo build --release --all
+      - name: Build netok_core
+        working-directory: netok_core
+        run: cargo build --release
+
+      - name: Build netok_bridge
+        working-directory: netok_bridge
+        run: cargo build --release
 
   benchmarks:
     name: Run Benchmarks

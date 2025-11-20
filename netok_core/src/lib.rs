@@ -36,19 +36,14 @@ pub struct ComputerInfo {
     pub local_ip: Option<String>, // first private IPv4
 }
 
-#[derive(Serialize, Deserialize, Clone, Copy, Debug)]
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, Default)]
 pub enum ConnectionType {
     Wifi,
     Ethernet,
     Usb,
     Mobile,
+    #[default]
     Unknown,
-}
-
-impl Default for ConnectionType {
-    fn default() -> Self {
-        ConnectionType::Unknown
-    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Default, Clone)]
@@ -385,7 +380,7 @@ fn get_wifi_info() -> (Option<String>, Option<i32>, Option<String>) {
 // Get network information
 fn get_network_info(adapter_name: Option<&str>) -> NetworkInfo {
     let connection_type = adapter_name
-        .map(|name| detect_connection_type(name))
+        .map(detect_connection_type)
         .unwrap_or(ConnectionType::Unknown);
 
     // Try to get Wi-Fi info from system API
@@ -454,7 +449,7 @@ fn get_default_gateway() -> Option<String> {
 
     // Run "ip route" and parse the output
     let output = Command::new("ip")
-        .args(&["route", "show", "default"])
+        .args(["route", "show", "default"])
         .output()
         .ok()?;
 
@@ -991,7 +986,7 @@ pub fn detect_dns_provider(dns_servers: &[String]) -> DnsProvider {
         return DnsProvider::Auto;
     }
 
-    let primary = dns_servers.get(0).map(|s| s.as_str());
+    let primary = dns_servers.first().map(|s| s.as_str());
     let secondary = dns_servers.get(1).map(|s| s.as_str());
 
     match (primary, secondary) {
@@ -1098,15 +1093,8 @@ mod tests {
     #[test]
     fn test_get_computer_info_does_not_panic() {
         // This test ensures the function doesn't panic and returns valid data
-        let info = get_computer_info();
-
-        // The function should always return a valid ComputerInfo struct
-        // We can't assert specific values since they depend on the system
-        // but we can ensure it doesn't panic and returns reasonable structure
-        assert!(info.hostname.is_some() || info.hostname.is_none());
-        assert!(info.model.is_some() || info.model.is_none());
-        assert!(info.adapter.is_some() || info.adapter.is_none());
-        assert!(info.local_ip.is_some() || info.local_ip.is_none());
+        let _info = get_computer_info();
+        // If we reach here, the function didn't panic - test passes
     }
 
     #[test]
@@ -1114,23 +1102,14 @@ mod tests {
         let settings = get_default_settings();
         let snapshot = run_diagnostics(&settings);
 
-        // Verify that computer info is included in the snapshot
-        assert_eq!(
-            snapshot.computer.hostname.is_some() || snapshot.computer.hostname.is_none(),
-            true
-        );
-        assert_eq!(
-            snapshot.computer.model.is_some() || snapshot.computer.model.is_none(),
-            true
-        );
-        assert_eq!(
-            snapshot.computer.adapter.is_some() || snapshot.computer.adapter.is_none(),
-            true
-        );
-        assert_eq!(
-            snapshot.computer.local_ip.is_some() || snapshot.computer.local_ip.is_none(),
-            true
-        );
+        // Verify that computer info is included in the snapshot and serializable
+        // We can't assert specific values since they depend on the system,
+        // but we verify the structure is present
+        let _ = &snapshot.computer.hostname;
+        let _ = &snapshot.computer.model;
+        let _ = &snapshot.computer.adapter;
+        let _ = &snapshot.computer.local_ip;
+        // If we reach here, computer info structure is valid - test passes
     }
 
     #[test]
@@ -1162,15 +1141,7 @@ mod tests {
 
             let latency = node.latency_ms.unwrap();
 
-            // Latency should be non-zero (real measurement)
-            assert!(
-                latency >= 0,
-                "Node {:?} latency should be >= 0, got {}",
-                node.id,
-                latency
-            );
-
-            // Latency should be reasonable
+            // Latency should be reasonable (u32 is always >= 0, so just check upper bound)
             // Note: Internet node can take longer due to network timeouts (up to 60s in CI)
             let max_latency = match node.id {
                 NodeId::Internet => 60000, // 60 seconds for internet tests
@@ -1403,15 +1374,14 @@ mod tests {
         let settings = get_default_settings();
         let snapshot = run_diagnostics(&settings);
 
-        // Verify network info has expected structure
-        // connection_type is always present (ConnectionType enum)
-        assert!(snapshot.network.ssid.is_some() || snapshot.network.ssid.is_none());
-        assert!(snapshot.network.rssi.is_some() || snapshot.network.rssi.is_none());
-        assert!(
-            snapshot.network.signal_quality.is_some() || snapshot.network.signal_quality.is_none()
-        );
-        assert!(snapshot.network.channel.is_some() || snapshot.network.channel.is_none());
-        assert!(snapshot.network.frequency.is_some() || snapshot.network.frequency.is_none());
+        // Verify network info structure is present and accessible
+        let _ = &snapshot.network.connection_type;
+        let _ = &snapshot.network.ssid;
+        let _ = &snapshot.network.rssi;
+        let _ = &snapshot.network.signal_quality;
+        let _ = &snapshot.network.channel;
+        let _ = &snapshot.network.frequency;
+        // If we reach here, network info structure is valid - test passes
     }
 
     #[test]
@@ -1419,11 +1389,12 @@ mod tests {
         let settings = get_default_settings();
         let snapshot = run_diagnostics(&settings);
 
-        // Verify router info has expected structure
-        assert!(snapshot.router.gateway_ip.is_some() || snapshot.router.gateway_ip.is_none());
-        assert!(snapshot.router.gateway_mac.is_some() || snapshot.router.gateway_mac.is_none());
-        assert!(snapshot.router.vendor.is_some() || snapshot.router.vendor.is_none());
-        assert!(snapshot.router.model.is_some() || snapshot.router.model.is_none());
+        // Verify router info structure is present and accessible
+        let _ = &snapshot.router.gateway_ip;
+        let _ = &snapshot.router.gateway_mac;
+        let _ = &snapshot.router.vendor;
+        let _ = &snapshot.router.model;
+        // If we reach here, router info structure is valid - test passes
     }
 
     #[test]
@@ -1431,14 +1402,14 @@ mod tests {
         let settings = get_default_settings();
         let snapshot = run_diagnostics(&settings);
 
-        // Verify internet info has expected structure
-        assert!(snapshot.internet.public_ip.is_some() || snapshot.internet.public_ip.is_none());
-        assert!(snapshot.internet.isp.is_some() || snapshot.internet.isp.is_none());
-        assert!(snapshot.internet.city.is_some() || snapshot.internet.city.is_none());
-        assert!(snapshot.internet.country.is_some() || snapshot.internet.country.is_none());
-        // dns_ok and http_ok are booleans, not Options
-        assert!(snapshot.internet.dns_ok || !snapshot.internet.dns_ok);
-        assert!(snapshot.internet.http_ok || !snapshot.internet.http_ok);
+        // Verify internet info structure is present and accessible
+        let _ = &snapshot.internet.public_ip;
+        let _ = &snapshot.internet.isp;
+        let _ = &snapshot.internet.city;
+        let _ = &snapshot.internet.country;
+        let _ = &snapshot.internet.dns_ok;
+        let _ = &snapshot.internet.http_ok;
+        // If we reach here, internet info structure is valid - test passes
     }
 
     #[test]
