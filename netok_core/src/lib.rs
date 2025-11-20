@@ -424,7 +424,7 @@ fn get_default_gateway() -> Option<String> {
 
     // Run "route print" and parse the output
     let output = Command::new("cmd")
-        .args(&["/C", "route print 0.0.0.0"])
+        .args(["/C", "route print 0.0.0.0"])
         .output()
         .ok()?;
 
@@ -815,7 +815,7 @@ pub fn set_dns(provider: DnsProvider) -> Result<(), String> {
         DnsProvider::Auto => {
             // Set to obtain DNS automatically (DHCP)
             let output = Command::new("netsh")
-                .args(&["interface", "ip", "set", "dns", &adapter_name, "dhcp"])
+                .args(["interface", "ip", "set", "dns", &adapter_name, "dhcp"])
                 .output()
                 .map_err(|e| format!("Failed to execute netsh: {}", e))?;
 
@@ -834,7 +834,7 @@ pub fn set_dns(provider: DnsProvider) -> Result<(), String> {
 
             // Set primary DNS
             let output = Command::new("netsh")
-                .args(&[
+                .args([
                     "interface",
                     "ip",
                     "set",
@@ -856,7 +856,7 @@ pub fn set_dns(provider: DnsProvider) -> Result<(), String> {
             // Set secondary DNS if available
             if let Some(secondary) = provider.secondary() {
                 let output = Command::new("netsh")
-                    .args(&[
+                    .args([
                         "interface",
                         "ip",
                         "add",
@@ -893,7 +893,7 @@ fn get_active_adapter_name() -> Option<String> {
 
     fn run_powershell(command: &str) -> Option<String> {
         let output = Command::new("powershell")
-            .args(&["-NoProfile", "-Command", command])
+            .args(["-NoProfile", "-Command", command])
             .output()
             .ok()?;
 
@@ -947,7 +947,7 @@ pub fn get_current_dns() -> Result<Vec<String>, String> {
 
     // Use PowerShell to get DNS server addresses
     let output = Command::new("powershell")
-        .args(&[
+        .args([
             "-NoProfile",
             "-Command",
             &format!(
