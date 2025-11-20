@@ -1461,4 +1461,301 @@ mod tests {
             ));
         }
     }
+
+    // Additional IP validation tests
+    #[test]
+    fn test_private_ip_10_0_0_0() {
+        let ip: std::net::IpAddr = "10.0.0.0".parse().unwrap();
+        assert!(is_private_ip(&ip));
+    }
+
+    #[test]
+    fn test_private_ip_10_255_255_255() {
+        let ip: std::net::IpAddr = "10.255.255.255".parse().unwrap();
+        assert!(is_private_ip(&ip));
+    }
+
+    #[test]
+    fn test_private_ip_172_16_0_0() {
+        let ip: std::net::IpAddr = "172.16.0.0".parse().unwrap();
+        assert!(is_private_ip(&ip));
+    }
+
+    #[test]
+    fn test_private_ip_172_31_255_255() {
+        let ip: std::net::IpAddr = "172.31.255.255".parse().unwrap();
+        assert!(is_private_ip(&ip));
+    }
+
+    #[test]
+    fn test_not_private_ip_172_15() {
+        let ip: std::net::IpAddr = "172.15.255.255".parse().unwrap();
+        assert!(!is_private_ip(&ip));
+    }
+
+    #[test]
+    fn test_not_private_ip_172_32() {
+        let ip: std::net::IpAddr = "172.32.0.0".parse().unwrap();
+        assert!(!is_private_ip(&ip));
+    }
+
+    #[test]
+    fn test_private_ip_192_168_0_0() {
+        let ip: std::net::IpAddr = "192.168.0.0".parse().unwrap();
+        assert!(is_private_ip(&ip));
+    }
+
+    #[test]
+    fn test_private_ip_192_168_255_255() {
+        let ip: std::net::IpAddr = "192.168.255.255".parse().unwrap();
+        assert!(is_private_ip(&ip));
+    }
+
+    #[test]
+    fn test_private_ip_169_254() {
+        let ip: std::net::IpAddr = "169.254.1.1".parse().unwrap();
+        assert!(is_private_ip(&ip));
+    }
+
+    #[test]
+    fn test_public_ip_8_8_8_8() {
+        let ip: std::net::IpAddr = "8.8.8.8".parse().unwrap();
+        assert!(!is_private_ip(&ip));
+    }
+
+    #[test]
+    fn test_public_ip_1_1_1_1() {
+        let ip: std::net::IpAddr = "1.1.1.1".parse().unwrap();
+        assert!(!is_private_ip(&ip));
+    }
+
+    // Connection type detection tests
+    #[test]
+    fn test_detect_connection_type_wifi_lowercase() {
+        assert!(matches!(
+            detect_connection_type("wifi"),
+            ConnectionType::Wifi
+        ));
+    }
+
+    #[test]
+    fn test_detect_connection_type_wlan() {
+        assert!(matches!(
+            detect_connection_type("wlan0"),
+            ConnectionType::Wifi
+        ));
+    }
+
+    #[test]
+    fn test_detect_connection_type_wlp() {
+        // wlp contains "wlan"? No, so it should be Unknown
+        assert!(matches!(
+            detect_connection_type("wlp3s0"),
+            ConnectionType::Unknown
+        ));
+    }
+
+    #[test]
+    fn test_detect_connection_type_ethernet_lowercase() {
+        assert!(matches!(
+            detect_connection_type("ethernet"),
+            ConnectionType::Ethernet
+        ));
+    }
+
+    #[test]
+    fn test_detect_connection_type_eth0() {
+        assert!(matches!(
+            detect_connection_type("eth0"),
+            ConnectionType::Ethernet
+        ));
+    }
+
+    #[test]
+    fn test_detect_connection_type_enp() {
+        assert!(matches!(
+            detect_connection_type("enp0s25"),
+            ConnectionType::Ethernet
+        ));
+    }
+
+    #[test]
+    fn test_detect_connection_type_en0() {
+        assert!(matches!(
+            detect_connection_type("en0"),
+            ConnectionType::Ethernet
+        ));
+    }
+
+    #[test]
+    fn test_detect_connection_type_usb_ethernet() {
+        // After lowercasing, "usb ethernet" contains both "usb" AND "ethernet"
+        // Function checks "ethernet" BEFORE "usb", so it returns Ethernet
+        assert!(matches!(
+            detect_connection_type("USB Ethernet"),
+            ConnectionType::Ethernet
+        ));
+    }
+
+    #[test]
+    fn test_detect_connection_type_usb0() {
+        assert!(matches!(
+            detect_connection_type("usb0"),
+            ConnectionType::Usb
+        ));
+    }
+
+    #[test]
+    fn test_detect_connection_type_mobile() {
+        assert!(matches!(
+            detect_connection_type("Mobile"),
+            ConnectionType::Mobile
+        ));
+    }
+
+    #[test]
+    fn test_detect_connection_type_cellular() {
+        assert!(matches!(
+            detect_connection_type("Cellular"),
+            ConnectionType::Mobile
+        ));
+    }
+
+    #[test]
+    fn test_detect_connection_type_ppp0() {
+        // ppp is not checked in detect_connection_type, so should be Unknown
+        assert!(matches!(
+            detect_connection_type("ppp0"),
+            ConnectionType::Unknown
+        ));
+    }
+
+    #[test]
+    fn test_detect_connection_type_unknown_string() {
+        assert!(matches!(
+            detect_connection_type("SomeWeirdAdapter"),
+            ConnectionType::Unknown
+        ));
+    }
+
+    #[test]
+    fn test_detect_connection_type_empty_string() {
+        assert!(matches!(
+            detect_connection_type(""),
+            ConnectionType::Unknown
+        ));
+    }
+
+    // Settings tests
+    #[test]
+    fn test_settings_with_multiple_dns() {
+        let settings = Settings {
+            language: "en".to_string(),
+            test_timeout_ms: 3000,
+            dns_servers: vec!["1.1.1.1".to_string(), "8.8.8.8".to_string()],
+        };
+
+        let json = serde_json::to_string(&settings).unwrap();
+        let deserialized: Settings = serde_json::from_str(&json).unwrap();
+
+        assert_eq!(deserialized.dns_servers.len(), 2);
+        assert_eq!(deserialized.dns_servers[0], "1.1.1.1");
+        assert_eq!(deserialized.dns_servers[1], "8.8.8.8");
+    }
+
+    #[test]
+    fn test_settings_language_ru() {
+        let settings = Settings {
+            language: "ru".to_string(),
+            test_timeout_ms: 5000,
+            dns_servers: vec![],
+        };
+
+        assert_eq!(settings.language, "ru");
+    }
+
+    #[test]
+    fn test_settings_custom_timeout() {
+        let settings = Settings {
+            language: "en".to_string(),
+            test_timeout_ms: 10000,
+            dns_servers: vec![],
+        };
+
+        assert_eq!(settings.test_timeout_ms, 10000);
+    }
+
+    // Snapshot tests
+    #[test]
+    fn test_snapshot_has_summary_key() {
+        let settings = get_default_settings();
+        let snapshot = run_diagnostics(&settings);
+
+        assert!(
+            snapshot.summary_key == "summary.ok"
+                || snapshot.summary_key == "summary.warn"
+                || snapshot.summary_key == "summary.fail"
+        );
+    }
+
+    #[test]
+    fn test_snapshot_nodes_have_latency() {
+        let settings = get_default_settings();
+        let snapshot = run_diagnostics(&settings);
+
+        for node in &snapshot.nodes {
+            assert!(node.latency_ms.is_some(), "Node {:?} missing latency", node.id);
+        }
+    }
+
+    #[test]
+    fn test_snapshot_timestamp_format() {
+        let settings = get_default_settings();
+        let snapshot = run_diagnostics(&settings);
+
+        // Should contain 'T' separator and 'Z' or timezone offset
+        assert!(snapshot.at_utc.contains('T'));
+        assert!(snapshot.at_utc.contains('Z') || snapshot.at_utc.contains('+'));
+    }
+
+    // Node info tests
+    #[test]
+    fn test_node_info_computer_id() {
+        let node = NodeInfo {
+            id: NodeId::Computer,
+            name_key: "nodes.computer".to_string(),
+            status: Status::Ok,
+            latency_ms: Some(10),
+            hint_key: None,
+        };
+
+        assert!(matches!(node.id, NodeId::Computer));
+    }
+
+    #[test]
+    fn test_node_info_with_hint() {
+        let node = NodeInfo {
+            id: NodeId::Internet,
+            name_key: "nodes.internet".to_string(),
+            status: Status::Warn,
+            latency_ms: Some(100),
+            hint_key: Some("hints.slow_connection".to_string()),
+        };
+
+        assert!(node.hint_key.is_some());
+        assert_eq!(node.hint_key.unwrap(), "hints.slow_connection");
+    }
+
+    #[test]
+    fn test_node_status_unknown() {
+        let node = NodeInfo {
+            id: NodeId::RouterUpnp,
+            name_key: "nodes.router".to_string(),
+            status: Status::Unknown,
+            latency_ms: None,
+            hint_key: None,
+        };
+
+        assert!(matches!(node.status, Status::Unknown));
+    }
 }
