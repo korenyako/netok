@@ -60,8 +60,7 @@ cargo tauri build
 /netok_core          # Rust business logic
 /netok_bridge        # Tauri commands + FFI
 /netok_desktop       # Tauri application (Rust + UI)
-/ui                  # React frontend (canonical)
-/ui_legacy           # Deprecated Rust + Iced UI
+/ui                  # React frontend (Vite + React 19 + TypeScript)
 ```
 
 ## Development Workflow
