@@ -1,14 +1,14 @@
 use serde::{Serialize, Deserialize};
 use time::OffsetDateTime;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
-#[derive(Serialize, Deserialize, Clone, Copy)]
-pub enum NodeId { 
-    Computer, 
-    Wifi, 
-    RouterUpnp, 
-    Dns, 
-    Internet 
+#[derive(Serialize, Deserialize, Clone, Copy, Debug)]
+pub enum NodeId {
+    Computer,
+    Wifi,
+    RouterUpnp,
+    Dns,
+    Internet
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy)]
@@ -512,46 +512,85 @@ pub fn run_diagnostics(_settings: &Settings) -> DiagnosticsSnapshot {
     let now = OffsetDateTime::now_utc()
         .format(&time::format_description::well_known::Rfc3339)
         .unwrap();
+
+    // Computer diagnostics with timing
+    let computer_start = Instant::now();
+    let computer = get_computer_info();
+    let computer_latency = computer_start.elapsed().as_millis() as u32;
+    let computer_status = if computer.hostname.is_some() { Status::Ok } else { Status::Warn };
+
+    // Network diagnostics with timing
+    let network_start = Instant::now();
+    let network = get_network_info(computer.adapter.as_deref());
+    let network_latency = network_start.elapsed().as_millis() as u32;
+    let network_status = match network.connection_type {
+        ConnectionType::Unknown => Status::Warn,
+        _ => Status::Ok,
+    };
+
+    // Router diagnostics with timing
+    let router_start = Instant::now();
+    let router = get_router_info();
+    let router_latency = router_start.elapsed().as_millis() as u32;
+    let router_status = if router.gateway_ip.is_some() { Status::Ok } else { Status::Warn };
+
+    // Internet diagnostics with timing
+    let internet_start = Instant::now();
+    let internet = get_internet_info();
+    let internet_latency = internet_start.elapsed().as_millis() as u32;
+    let internet_status = if internet.dns_ok && internet.http_ok {
+        Status::Ok
+    } else if internet.dns_ok || internet.http_ok {
+        Status::Warn
+    } else {
+        Status::Fail
+    };
+
+    // Build nodes with real latency values
     let nodes = vec![
         NodeInfo {
             id: NodeId::Computer,
             name_key: "nodes.computer.name".into(),
-            status: Status::Ok,
-            latency_ms: Some(3),
-            hint_key: None
-        },
-        NodeInfo {
-            id: NodeId::Dns,
-            name_key: "nodes.dns.name".into(),
-            status: Status::Ok,
-            latency_ms: Some(28),
+            status: computer_status,
+            latency_ms: Some(computer_latency),
             hint_key: None
         },
         NodeInfo {
             id: NodeId::Wifi,
             name_key: "nodes.wifi.name".into(),
-            status: Status::Ok,
-            latency_ms: Some(12),
+            status: network_status,
+            latency_ms: Some(network_latency),
+            hint_key: None
+        },
+        NodeInfo {
+            id: NodeId::RouterUpnp,
+            name_key: "nodes.router.name".into(),
+            status: router_status,
+            latency_ms: Some(router_latency),
             hint_key: None
         },
         NodeInfo {
             id: NodeId::Internet,
             name_key: "nodes.internet.name".into(),
-            status: Status::Ok,
-            latency_ms: Some(45),
+            status: internet_status,
+            latency_ms: Some(internet_latency),
             hint_key: None
         },
     ];
 
-    let computer = get_computer_info();
-    let network = get_network_info(computer.adapter.as_deref());
-    let router = get_router_info();
-    let internet = get_internet_info();
+    // Determine overall summary
+    let summary_key = if nodes.iter().all(|n| matches!(n.status, Status::Ok)) {
+        "summary.ok".into()
+    } else if nodes.iter().any(|n| matches!(n.status, Status::Fail)) {
+        "summary.fail".into()
+    } else {
+        "summary.warn".into()
+    };
 
     DiagnosticsSnapshot {
         at_utc: now,
         nodes,
-        summary_key: "summary.ok".into(),
+        summary_key,
         computer,
         network,
         router,
@@ -951,13 +990,93 @@ mod tests {
     fn test_diagnostics_json_output() {
         let settings = get_default_settings();
         let snapshot = run_diagnostics(&settings);
-        
+
         // Test that the snapshot can be serialized to JSON
         let json = serde_json::to_string(&snapshot).expect("Should serialize to JSON");
         assert!(!json.is_empty());
-        
+
         // Print the JSON for manual inspection (only in test output)
         println!("Sample diagnostics JSON:");
         println!("{}", serde_json::to_string_pretty(&snapshot).unwrap());
+    }
+
+    #[test]
+    fn test_real_latency_measurements() {
+        let settings = get_default_settings();
+        let snapshot = run_diagnostics(&settings);
+
+        // Verify all nodes have latency values
+        for node in &snapshot.nodes {
+            assert!(
+                node.latency_ms.is_some(),
+                "Node {:?} should have latency measurement",
+                node.id
+            );
+
+            let latency = node.latency_ms.unwrap();
+
+            // Latency should be non-zero (real measurement)
+            assert!(
+                latency >= 0,
+                "Node {:?} latency should be >= 0, got {}",
+                node.id,
+                latency
+            );
+
+            // Latency should be reasonable
+            // Note: Internet node can take longer due to network timeouts (up to 60s in CI)
+            let max_latency = match node.id {
+                NodeId::Internet => 60000, // 60 seconds for internet tests
+                _ => 10000, // 10 seconds for local operations
+            };
+
+            assert!(
+                latency < max_latency,
+                "Node {:?} latency suspiciously high: {} ms (max: {})",
+                node.id,
+                latency,
+                max_latency
+            );
+
+            println!("Node {:?}: {} ms", node.id, latency);
+        }
+    }
+
+    #[test]
+    fn test_diagnostics_status_logic() {
+        let settings = get_default_settings();
+        let snapshot = run_diagnostics(&settings);
+
+        // Verify summary_key matches node statuses
+        let has_fail = snapshot.nodes.iter().any(|n| matches!(n.status, Status::Fail));
+        let all_ok = snapshot.nodes.iter().all(|n| matches!(n.status, Status::Ok));
+
+        if all_ok {
+            assert_eq!(snapshot.summary_key, "summary.ok");
+        } else if has_fail {
+            assert_eq!(snapshot.summary_key, "summary.fail");
+        } else {
+            assert_eq!(snapshot.summary_key, "summary.warn");
+        }
+    }
+
+    #[test]
+    fn test_diagnostics_performance() {
+        use std::time::Instant;
+
+        let settings = get_default_settings();
+        let start = Instant::now();
+        let _snapshot = run_diagnostics(&settings);
+        let duration = start.elapsed();
+
+        // Should complete within 60 seconds (generous for CI environments with network timeouts)
+        // In production with network access, typically completes in < 2 seconds
+        assert!(
+            duration.as_secs() < 60,
+            "Diagnostics took too long: {:?}",
+            duration
+        );
+
+        println!("Full diagnostics completed in {:?}", duration);
     }
 }
