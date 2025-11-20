@@ -25,3 +25,6 @@ serde_json = { workspace = true }
 netok_bridge = { path = "../../netok_bridge" }
 netok_core = { path = "../../netok_core" }
 
+[dev-dependencies]
+tokio = { version = "1", features = ["rt", "macros"] }
+
