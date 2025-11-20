@@ -26,6 +26,11 @@ jobs:
           toolchain: stable
           targets: x86_64-pc-windows-msvc
 
+      - name: Install UI dependencies
+        working-directory: ui
+        run: |
+          npm ci
+
       - name: Install frontend deps
         working-directory: netok_desktop
         run: |
