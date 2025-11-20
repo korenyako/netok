@@ -1,4 +1,5 @@
 import { getDnsProvider, type DnsProvider } from '../api/tauri';
+import { notifications } from '../utils/notifications';
 
 type DnsStoreListener = () => void;
 
@@ -23,6 +24,13 @@ class DnsStore {
     } catch (err) {
       console.error('Failed to get DNS provider:', err);
       this.currentProvider = { type: 'Auto' };
+
+      // Show notification only if this is a refresh (not first load)
+      if (this.hasInitialized) {
+        notifications.error(
+          'Failed to get current DNS provider. Showing default.'
+        );
+      }
     } finally {
       this.isLoading = false;
       this.notifyListeners();

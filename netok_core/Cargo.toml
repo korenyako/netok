@@ -16,3 +16,10 @@ csv = "1.3"
 
 [target.'cfg(windows)'.dependencies]
 windows = { version = "0.58", features = ["Win32_NetworkManagement_WiFi", "Win32_Foundation"] }
+
+[dev-dependencies]
+criterion = "0.5"
+
+[[bench]]
+name = "diagnostics_benchmark"
+harness = false

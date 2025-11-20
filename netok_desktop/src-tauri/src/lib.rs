@@ -1,5 +1,5 @@
 // Re-export types from netok_bridge
-pub use netok_bridge::{Snapshot, NodeResult, Speed, DnsProviderType};
+pub use netok_bridge::{DnsProviderType, NodeResult, Snapshot, Speed};
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
@@ -9,7 +9,9 @@ fn get_settings() -> String {
 
 #[tauri::command]
 fn set_settings(json: String) -> Result<(), String> {
-    netok_bridge::set_settings_json(&json).map(|_| ()).map_err(|e| e.to_string())
+    netok_bridge::set_settings_json(&json)
+        .map(|_| ())
+        .map_err(|e| e.to_string())
 }
 
 #[tauri::command]
@@ -50,7 +52,14 @@ fn run_all() -> Result<serde_json::Value, String> {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![get_settings, set_settings, run_diagnostics, set_dns, get_dns_provider, run_all])
+        .invoke_handler(tauri::generate_handler![
+            get_settings,
+            set_settings,
+            run_diagnostics,
+            set_dns,
+            get_dns_provider,
+            run_all
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
