@@ -1,7 +1,10 @@
-use netok_core::{run_diagnostics, get_default_settings, Settings};
+use netok_core::{get_default_settings, run_diagnostics, Settings};
 
 mod types;
-pub use types::{Overall, NodeId, NodeResult, Speed, Snapshot, ComputerInfo, ConnectionType, NetworkInfo, RouterInfo, InternetInfo};
+pub use types::{
+    ComputerInfo, ConnectionType, InternetInfo, NetworkInfo, NodeId, NodeResult, Overall,
+    RouterInfo, Snapshot, Speed,
+};
 
 #[derive(thiserror::Error, Debug)]
 pub enum BridgeError {
@@ -31,38 +34,43 @@ pub async fn run_diagnostics_struct() -> Result<Snapshot, anyhow::Error> {
     let core_snapshot = tokio::task::spawn_blocking(|| {
         let settings = get_default_settings();
         run_diagnostics(&settings)
-    }).await?;
+    })
+    .await?;
 
     // Convert netok_core types to bridge types
-    let nodes: Vec<NodeResult> = core_snapshot.nodes.iter().map(|node| {
-        let id = match node.id {
-            netok_core::NodeId::Computer => NodeId::Computer,
-            netok_core::NodeId::Wifi => NodeId::Network,
-            netok_core::NodeId::RouterUpnp => NodeId::Dns,
-            netok_core::NodeId::Dns => NodeId::Dns,
-            netok_core::NodeId::Internet => NodeId::Internet,
-        };
+    let nodes: Vec<NodeResult> = core_snapshot
+        .nodes
+        .iter()
+        .map(|node| {
+            let id = match node.id {
+                netok_core::NodeId::Computer => NodeId::Computer,
+                netok_core::NodeId::Wifi => NodeId::Network,
+                netok_core::NodeId::RouterUpnp => NodeId::Dns,
+                netok_core::NodeId::Dns => NodeId::Dns,
+                netok_core::NodeId::Internet => NodeId::Internet,
+            };
 
-        let status = match node.status {
-            netok_core::Status::Ok => Overall::Ok,
-            netok_core::Status::Warn => Overall::Partial,
-            netok_core::Status::Fail => Overall::Down,
-            netok_core::Status::Unknown => Overall::Partial,
-        };
+            let status = match node.status {
+                netok_core::Status::Ok => Overall::Ok,
+                netok_core::Status::Warn => Overall::Partial,
+                netok_core::Status::Fail => Overall::Down,
+                netok_core::Status::Unknown => Overall::Partial,
+            };
 
-        NodeResult {
-            id,
-            label: match id {
-                NodeId::Computer => "diagnostics.computer".to_string(),
-                NodeId::Network => "diagnostics.wifi".to_string(),
-                NodeId::Dns => "diagnostics.router".to_string(),
-                NodeId::Internet => "diagnostics.internet".to_string(),
-            },
-            status,
-            latency_ms: node.latency_ms.map(|ms| ms as u64),
-            details: None,
-        }
-    }).collect();
+            NodeResult {
+                id,
+                label: match id {
+                    NodeId::Computer => "diagnostics.computer".to_string(),
+                    NodeId::Network => "diagnostics.wifi".to_string(),
+                    NodeId::Dns => "diagnostics.router".to_string(),
+                    NodeId::Internet => "diagnostics.internet".to_string(),
+                },
+                status,
+                latency_ms: node.latency_ms.map(|ms| ms as u64),
+                details: None,
+            }
+        })
+        .collect();
 
     // Convert computer info
     let computer = ComputerInfo {
@@ -110,9 +118,17 @@ pub async fn run_diagnostics_struct() -> Result<Snapshot, anyhow::Error> {
     };
 
     // Determine overall status
-    let overall = if core_snapshot.nodes.iter().all(|n| matches!(n.status, netok_core::Status::Ok)) {
+    let overall = if core_snapshot
+        .nodes
+        .iter()
+        .all(|n| matches!(n.status, netok_core::Status::Ok))
+    {
         Overall::Ok
-    } else if core_snapshot.nodes.iter().any(|n| matches!(n.status, netok_core::Status::Fail)) {
+    } else if core_snapshot
+        .nodes
+        .iter()
+        .any(|n| matches!(n.status, netok_core::Status::Fail))
+    {
         Overall::Down
     } else {
         Overall::Partial
@@ -121,7 +137,7 @@ pub async fn run_diagnostics_struct() -> Result<Snapshot, anyhow::Error> {
     Ok(Snapshot {
         overall,
         nodes,
-        speed: None,  // TODO: implement speed test
+        speed: None, // TODO: implement speed test
         computer,
         network,
         router,
@@ -146,45 +162,45 @@ pub enum DnsProviderType {
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub enum CloudflareVariant {
-    Standard,       // 1.1.1.1
-    Malware,        // 1.1.1.2
-    Family,         // 1.1.1.3
+    Standard, // 1.1.1.1
+    Malware,  // 1.1.1.2
+    Family,   // 1.1.1.3
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub enum AdGuardVariant {
-    Standard,       // 94.140.14.14
-    NonFiltering,   // 94.140.14.140
-    Family,         // 94.140.14.15
+    Standard,     // 94.140.14.14
+    NonFiltering, // 94.140.14.140
+    Family,       // 94.140.14.15
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub enum Dns4EuVariant {
-    Protective,         // 86.54.11.1
-    ProtectiveChild,    // 86.54.11.12
-    ProtectiveAd,       // 86.54.11.13
-    ProtectiveChildAd,  // 86.54.11.11
-    Unfiltered,         // 86.54.11.100
+    Protective,        // 86.54.11.1
+    ProtectiveChild,   // 86.54.11.12
+    ProtectiveAd,      // 86.54.11.13
+    ProtectiveChildAd, // 86.54.11.11
+    Unfiltered,        // 86.54.11.100
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub enum CleanBrowsingVariant {
-    Family,     // 185.228.168.168
-    Adult,      // TBD
-    Security,   // TBD
+    Family,   // 185.228.168.168
+    Adult,    // TBD
+    Security, // TBD
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub enum Quad9Variant {
-    Recommended,    // 9.9.9.9
-    SecuredEcs,     // 9.9.9.11
-    Unsecured,      // 9.9.9.10
+    Recommended, // 9.9.9.9
+    SecuredEcs,  // 9.9.9.11
+    Unsecured,   // 9.9.9.10
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub enum OpenDnsVariant {
-    FamilyShield,   // 208.67.222.123
-    Home,           // 208.67.222.222
+    FamilyShield, // 208.67.222.123
+    Home,         // 208.67.222.222
 }
 
 // Convert bridge type to core type
@@ -299,10 +315,9 @@ fn dns_provider_from_core(provider: netok_core::DnsProvider) -> DnsProviderType 
             variant: OpenDnsVariant::Home,
         },
         // Custom
-        netok_core::DnsProvider::Custom(primary, secondary) => DnsProviderType::Custom {
-            primary,
-            secondary,
-        },
+        netok_core::DnsProvider::Custom(primary, secondary) => {
+            DnsProviderType::Custom { primary, secondary }
+        }
     }
 }
 
@@ -311,11 +326,9 @@ pub async fn set_dns_provider(provider: DnsProviderType) -> Result<(), String> {
     let core_provider = dns_provider_to_core(provider);
 
     // Run blocking DNS configuration in a separate thread
-    tokio::task::spawn_blocking(move || {
-        netok_core::set_dns(core_provider)
-    })
-    .await
-    .map_err(|e| format!("Failed to run DNS configuration task: {}", e))?
+    tokio::task::spawn_blocking(move || netok_core::set_dns(core_provider))
+        .await
+        .map_err(|e| format!("Failed to run DNS configuration task: {}", e))?
 }
 
 // Get current DNS provider (async wrapper)

@@ -1,5 +1,5 @@
-use criterion::{black_box, criterion_group, criterion_main, Criterion, BenchmarkId};
-use netok_core::{get_default_settings, run_diagnostics, get_computer_info, detect_dns_provider};
+use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
+use netok_core::{detect_dns_provider, get_computer_info, get_default_settings, run_diagnostics};
 
 fn benchmark_full_diagnostics(c: &mut Criterion) {
     let settings = get_default_settings();
@@ -23,7 +23,10 @@ fn benchmark_computer_info(c: &mut Criterion) {
 
 fn benchmark_dns_detection(c: &mut Criterion) {
     let test_cases = vec![
-        ("cloudflare", vec!["1.1.1.1".to_string(), "1.0.0.1".to_string()]),
+        (
+            "cloudflare",
+            vec!["1.1.1.1".to_string(), "1.0.0.1".to_string()],
+        ),
         ("google", vec!["8.8.8.8".to_string(), "8.8.4.4".to_string()]),
         ("custom", vec!["1.2.3.4".to_string(), "5.6.7.8".to_string()]),
         ("single", vec!["1.1.1.1".to_string()]),

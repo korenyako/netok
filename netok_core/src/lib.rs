@@ -1,6 +1,6 @@
-use serde::{Serialize, Deserialize};
-use time::OffsetDateTime;
+use serde::{Deserialize, Serialize};
 use std::time::{Duration, Instant};
+use time::OffsetDateTime;
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug)]
 pub enum NodeId {
@@ -8,15 +8,15 @@ pub enum NodeId {
     Wifi,
     RouterUpnp,
     Dns,
-    Internet
+    Internet,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy)]
-pub enum Status { 
-    Ok, 
-    Warn, 
-    Fail, 
-    Unknown 
+pub enum Status {
+    Ok,
+    Warn,
+    Fail,
+    Unknown,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -31,9 +31,9 @@ pub struct NodeInfo {
 #[derive(serde::Serialize, serde::Deserialize, Debug, Default, Clone)]
 pub struct ComputerInfo {
     pub hostname: Option<String>,
-    pub model: Option<String>,     // keep for future, set None for now
-    pub adapter: Option<String>,   // active interface name
-    pub local_ip: Option<String>,  // first private IPv4
+    pub model: Option<String>,    // keep for future, set None for now
+    pub adapter: Option<String>,  // active interface name
+    pub local_ip: Option<String>, // first private IPv4
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug)]
@@ -55,31 +55,31 @@ impl Default for ConnectionType {
 pub struct NetworkInfo {
     pub connection_type: ConnectionType,
     pub ssid: Option<String>,
-    pub rssi: Option<i32>,                // dBm
-    pub signal_quality: Option<String>,   // i18n key: "signal.excellent" etc
+    pub rssi: Option<i32>,              // dBm
+    pub signal_quality: Option<String>, // i18n key: "signal.excellent" etc
     pub channel: Option<u8>,
-    pub frequency: Option<String>,        // "2.4 GHz" | "5 GHz"
+    pub frequency: Option<String>, // "2.4 GHz" | "5 GHz"
 }
 
 #[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct RouterInfo {
     pub gateway_ip: Option<String>,
     pub gateway_mac: Option<String>,
-    pub vendor: Option<String>,           // From OUI lookup
-    pub model: Option<String>,            // From UPnP (Post-MVP)
+    pub vendor: Option<String>, // From OUI lookup
+    pub model: Option<String>,  // From UPnP (Post-MVP)
 }
 
 #[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct InternetInfo {
     pub public_ip: Option<String>,
-    pub isp: Option<String>,              // ASN org
+    pub isp: Option<String>, // ASN org
     pub country: Option<String>,
     pub city: Option<String>,
     pub dns_ok: bool,
     pub http_ok: bool,
     pub latency_ms: Option<u32>,
-    pub speed_down_mbps: Option<f64>,     // Post-MVP
-    pub speed_up_mbps: Option<f64>,       // Post-MVP
+    pub speed_down_mbps: Option<f64>, // Post-MVP
+    pub speed_up_mbps: Option<f64>,   // Post-MVP
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -101,10 +101,10 @@ pub struct Settings {
 }
 
 pub fn get_default_settings() -> Settings {
-    Settings { 
-        language: "en".into(), 
-        test_timeout_ms: 2000, 
-        dns_servers: vec![] 
+    Settings {
+        language: "en".into(),
+        test_timeout_ms: 2000,
+        dns_servers: vec![],
     }
 }
 
@@ -115,7 +115,7 @@ fn test_dns() -> bool {
 
     // Configure resolver with timeout
     let mut opts = ResolverOpts::default();
-    opts.timeout = Duration::from_secs(2);  // 2 second timeout
+    opts.timeout = Duration::from_secs(2); // 2 second timeout
 
     let resolver = match Resolver::new(ResolverConfig::default(), opts) {
         Ok(r) => r,
@@ -142,7 +142,11 @@ fn test_http() -> bool {
     };
 
     // Try Cloudflare trace endpoint
-    if client.get("https://www.cloudflare.com/cdn-cgi/trace").send().is_ok() {
+    if client
+        .get("https://www.cloudflare.com/cdn-cgi/trace")
+        .send()
+        .is_ok()
+    {
         return true;
     }
 
@@ -156,24 +160,32 @@ struct IpInfoResponse {
     ip: Option<String>,
     city: Option<String>,
     country: Option<String>,
-    org: Option<String>,  // Contains ISP/ASN info
+    org: Option<String>, // Contains ISP/ASN info
 }
 
 // Detect connection type based on interface name
 fn detect_connection_type(interface_name: &str) -> ConnectionType {
     let name_lower = interface_name.to_lowercase();
 
-    if name_lower.contains("wi-fi") || name_lower.contains("wifi") ||
-       name_lower.contains("wlan") || name_lower.contains("802.11") ||
-       name_lower.contains("wireless") {
+    if name_lower.contains("wi-fi")
+        || name_lower.contains("wifi")
+        || name_lower.contains("wlan")
+        || name_lower.contains("802.11")
+        || name_lower.contains("wireless")
+    {
         ConnectionType::Wifi
-    } else if name_lower.contains("ethernet") || name_lower.contains("eth") ||
-              name_lower.starts_with("en") {
+    } else if name_lower.contains("ethernet")
+        || name_lower.contains("eth")
+        || name_lower.starts_with("en")
+    {
         ConnectionType::Ethernet
     } else if name_lower.contains("usb") {
         ConnectionType::Usb
-    } else if name_lower.contains("mobile") || name_lower.contains("cellular") ||
-              name_lower.contains("wwan") || name_lower.contains("lte") {
+    } else if name_lower.contains("mobile")
+        || name_lower.contains("cellular")
+        || name_lower.contains("wwan")
+        || name_lower.contains("lte")
+    {
         ConnectionType::Mobile
     } else {
         ConnectionType::Unknown
@@ -194,9 +206,9 @@ fn detect_connection_type(interface_name: &str) -> ConnectionType {
 /// All safety invariants are documented inline within the unsafe block.
 #[cfg(target_os = "windows")]
 fn get_wifi_info() -> (Option<String>, Option<i32>, Option<String>) {
-    use windows::Win32::NetworkManagement::WiFi::*;
-    use windows::Win32::Foundation::*;
     use std::ptr;
+    use windows::Win32::Foundation::*;
+    use windows::Win32::NetworkManagement::WiFi::*;
 
     /// RAII guard for WLAN client handle to ensure proper cleanup.
     ///
@@ -246,7 +258,7 @@ fn get_wifi_info() -> (Option<String>, Option<i32>, Option<String>) {
         // - Output parameters are valid pointers to local variables
         // - Return code is checked for errors
         let result = WlanOpenHandle(
-            2, // Client version for Windows Vista and later
+            2,    // Client version for Windows Vista and later
             None, // Reserved parameter, must be None
             &mut negotiated_version,
             &mut client_handle,
@@ -291,7 +303,10 @@ fn get_wifi_info() -> (Option<String>, Option<i32>, Option<String>) {
             // Get interface description (UTF-16 string)
             // SAFETY: Interface description is a fixed-size array of u16 (UTF-16)
             let desc_bytes = &interface.strInterfaceDescription;
-            let desc_len = desc_bytes.iter().position(|&c| c == 0).unwrap_or(desc_bytes.len());
+            let desc_len = desc_bytes
+                .iter()
+                .position(|&c| c == 0)
+                .unwrap_or(desc_bytes.len());
             if desc_len > 0 {
                 // String::from_utf16 safely handles UTF-16 conversion
                 interface_desc = String::from_utf16(&desc_bytes[..desc_len]).ok();
@@ -331,7 +346,8 @@ fn get_wifi_info() -> (Option<String>, Option<i32>, Option<String>) {
                         // SAFETY: SSID array access within bounds
                         // - ssid_len <= 32 (DOT11_SSID_MAX_LENGTH)
                         // - ucSSID is a fixed-size array of 32 bytes
-                        let ssid_bytes = &attrs.wlanAssociationAttributes.dot11Ssid.ucSSID[..ssid_len];
+                        let ssid_bytes =
+                            &attrs.wlanAssociationAttributes.dot11Ssid.ucSSID[..ssid_len];
                         ssid = String::from_utf8(ssid_bytes.to_vec()).ok();
                     }
 
@@ -400,9 +416,9 @@ fn get_router_info() -> RouterInfo {
 
     RouterInfo {
         gateway_ip,
-        gateway_mac: None,  // TODO: implement ARP lookup
-        vendor: None,       // TODO: implement OUI lookup
-        model: None,        // Post-MVP: UPnP discovery
+        gateway_mac: None, // TODO: implement ARP lookup
+        vendor: None,      // TODO: implement OUI lookup
+        model: None,       // Post-MVP: UPnP discovery
     }
 }
 
@@ -460,10 +476,7 @@ fn get_default_gateway() -> Option<String> {
     use std::process::Command;
 
     // Run "netstat -nr" and parse the output
-    let output = Command::new("netstat")
-        .args(&["-nr"])
-        .output()
-        .ok()?;
+    let output = Command::new("netstat").args(&["-nr"]).output().ok()?;
 
     let text = String::from_utf8_lossy(&output.stdout);
 
@@ -490,22 +503,17 @@ fn get_internet_info() -> InternetInfo {
     // Try to fetch geo info if HTTP works (with shorter timeout)
     let (public_ip, isp, country, city) = if http_ok {
         match reqwest::blocking::Client::builder()
-            .timeout(Duration::from_secs(3))  // Reduced from 5 to 3 seconds
+            .timeout(Duration::from_secs(3)) // Reduced from 5 to 3 seconds
             .build()
             .ok()
             .and_then(|client| {
-                client.get("https://ipinfo.io/json")
+                client
+                    .get("https://ipinfo.io/json")
                     .send()
                     .ok()
                     .and_then(|resp| resp.json::<IpInfoResponse>().ok())
-            })
-        {
-            Some(info) => (
-                info.ip,
-                info.org,
-                info.country,
-                info.city,
-            ),
+            }) {
+            Some(info) => (info.ip, info.org, info.country, info.city),
             None => (None, None, None, None),
         }
     } else {
@@ -519,7 +527,7 @@ fn get_internet_info() -> InternetInfo {
         city,
         dns_ok,
         http_ok,
-        latency_ms: None,  // TODO: implement latency measurement
+        latency_ms: None, // TODO: implement latency measurement
         speed_down_mbps: None,
         speed_up_mbps: None,
     }
@@ -542,29 +550,25 @@ fn is_private_ip(ip: &std::net::IpAddr) -> bool {
 pub fn get_computer_info() -> ComputerInfo {
     use get_if_addrs::get_if_addrs;
 
-    let hostname = hostname::get()
-        .ok()
-        .and_then(|s| s.into_string().ok());
+    let hostname = hostname::get().ok().and_then(|s| s.into_string().ok());
 
     // Try to get Wi-Fi info first to determine active adapter
     let (_ssid, _rssi, wifi_adapter_desc) = get_wifi_info();
 
     // Collect all non-loopback interfaces with private IPv4
     let interfaces: Vec<(String, String)> = match get_if_addrs() {
-        Ok(ifaces) => {
-            ifaces
-                .into_iter()
-                .filter(|iface| !iface.is_loopback())
-                .filter_map(|iface| {
-                    if let std::net::IpAddr::V4(ipv4) = iface.ip() {
-                        if is_private_ip(&std::net::IpAddr::V4(ipv4)) {
-                            return Some((iface.name.clone(), ipv4.to_string()));
-                        }
+        Ok(ifaces) => ifaces
+            .into_iter()
+            .filter(|iface| !iface.is_loopback())
+            .filter_map(|iface| {
+                if let std::net::IpAddr::V4(ipv4) = iface.ip() {
+                    if is_private_ip(&std::net::IpAddr::V4(ipv4)) {
+                        return Some((iface.name.clone(), ipv4.to_string()));
                     }
-                    None
-                })
-                .collect()
-        }
+                }
+                None
+            })
+            .collect(),
         Err(_) => vec![],
     };
 
@@ -572,7 +576,10 @@ pub fn get_computer_info() -> ComputerInfo {
     let (adapter, local_ip) = if let Some(ref wifi_desc) = wifi_adapter_desc {
         // Wi-Fi is connected, use its description as adapter name
         // Find the IP for this adapter (first private IP we find)
-        let ip = interfaces.first().map(|(_, ip)| ip.clone()).unwrap_or_default();
+        let ip = interfaces
+            .first()
+            .map(|(_, ip)| ip.clone())
+            .unwrap_or_default();
         (wifi_desc.clone(), ip)
     } else {
         // No Wi-Fi, use first available interface
@@ -588,9 +595,13 @@ pub fn get_computer_info() -> ComputerInfo {
 
     ComputerInfo {
         hostname,
-        model: None,        // fill later when we add a safe cross-platform method
+        model: None, // fill later when we add a safe cross-platform method
         adapter: friendly_adapter,
-        local_ip: if local_ip.is_empty() { None } else { Some(local_ip) },
+        local_ip: if local_ip.is_empty() {
+            None
+        } else {
+            Some(local_ip)
+        },
     }
 }
 
@@ -603,7 +614,11 @@ pub fn run_diagnostics(_settings: &Settings) -> DiagnosticsSnapshot {
     let computer_start = Instant::now();
     let computer = get_computer_info();
     let computer_latency = computer_start.elapsed().as_millis() as u32;
-    let computer_status = if computer.hostname.is_some() { Status::Ok } else { Status::Warn };
+    let computer_status = if computer.hostname.is_some() {
+        Status::Ok
+    } else {
+        Status::Warn
+    };
 
     // Network diagnostics with timing
     let network_start = Instant::now();
@@ -618,7 +633,11 @@ pub fn run_diagnostics(_settings: &Settings) -> DiagnosticsSnapshot {
     let router_start = Instant::now();
     let router = get_router_info();
     let router_latency = router_start.elapsed().as_millis() as u32;
-    let router_status = if router.gateway_ip.is_some() { Status::Ok } else { Status::Warn };
+    let router_status = if router.gateway_ip.is_some() {
+        Status::Ok
+    } else {
+        Status::Warn
+    };
 
     // Internet diagnostics with timing
     let internet_start = Instant::now();
@@ -639,28 +658,28 @@ pub fn run_diagnostics(_settings: &Settings) -> DiagnosticsSnapshot {
             name_key: "nodes.computer.name".into(),
             status: computer_status,
             latency_ms: Some(computer_latency),
-            hint_key: None
+            hint_key: None,
         },
         NodeInfo {
             id: NodeId::Wifi,
             name_key: "nodes.wifi.name".into(),
             status: network_status,
             latency_ms: Some(network_latency),
-            hint_key: None
+            hint_key: None,
         },
         NodeInfo {
             id: NodeId::RouterUpnp,
             name_key: "nodes.router.name".into(),
             status: router_status,
             latency_ms: Some(router_latency),
-            hint_key: None
+            hint_key: None,
         },
         NodeInfo {
             id: NodeId::Internet,
             name_key: "nodes.internet.name".into(),
             status: internet_status,
             latency_ms: Some(internet_latency),
-            hint_key: None
+            hint_key: None,
         },
     ];
 
@@ -687,34 +706,34 @@ pub fn run_diagnostics(_settings: &Settings) -> DiagnosticsSnapshot {
 // DNS configuration types
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub enum DnsProvider {
-    Auto,              // Use ISP/DHCP DNS
+    Auto, // Use ISP/DHCP DNS
     // Cloudflare
     Cloudflare,        // 1.1.1.1, 1.0.0.1 - Standard
     CloudflareMalware, // 1.1.1.2, 1.0.0.2 - Malware Protection
     CloudflareFamily,  // 1.1.1.3, 1.0.0.3 - Adult + Malware
     // Google
-    Google,            // 8.8.8.8, 8.8.4.4 - Public DNS
+    Google, // 8.8.8.8, 8.8.4.4 - Public DNS
     // AdGuard
-    AdGuard,           // 94.140.14.14, 94.140.15.15 - Default Filtering
+    AdGuard,             // 94.140.14.14, 94.140.15.15 - Default Filtering
     AdGuardNonFiltering, // 94.140.14.140, 94.140.14.141 - Non-filtering
-    AdGuardFamily,     // 94.140.14.15, 94.140.15.16 - Family Protection
+    AdGuardFamily,       // 94.140.14.15, 94.140.15.16 - Family Protection
     // DNS4EU
-    Dns4EuProtective,  // 86.54.11.1 - Protective
-    Dns4EuProtectiveChild, // 86.54.11.12 - Protective + Child
-    Dns4EuProtectiveAd, // 86.54.11.13 - Protective + Ad
+    Dns4EuProtective,        // 86.54.11.1 - Protective
+    Dns4EuProtectiveChild,   // 86.54.11.12 - Protective + Child
+    Dns4EuProtectiveAd,      // 86.54.11.13 - Protective + Ad
     Dns4EuProtectiveChildAd, // 86.54.11.11 - Protective + Child & Ads
-    Dns4EuUnfiltered,  // 86.54.11.100 - Unfiltered
+    Dns4EuUnfiltered,        // 86.54.11.100 - Unfiltered
     // CleanBrowsing
-    CleanBrowsingFamily, // 185.228.168.168, 185.228.169.168 - Family Filter
-    CleanBrowsingAdult,  // Adult Filter
+    CleanBrowsingFamily,   // 185.228.168.168, 185.228.169.168 - Family Filter
+    CleanBrowsingAdult,    // Adult Filter
     CleanBrowsingSecurity, // Security Filter
     // Quad9
-    Quad9Recommended,  // 9.9.9.9, 149.112.112.112 - Recommended
-    Quad9SecuredEcs,   // 9.9.9.11, 149.112.112.11 - Secured w/ECS
-    Quad9Unsecured,    // 9.9.9.10, 149.112.112.10 - Unsecured
+    Quad9Recommended, // 9.9.9.9, 149.112.112.112 - Recommended
+    Quad9SecuredEcs,  // 9.9.9.11, 149.112.112.11 - Secured w/ECS
+    Quad9Unsecured,   // 9.9.9.10, 149.112.112.10 - Unsecured
     // OpenDNS
-    OpenDnsFamilyShield, // 208.67.222.123, 208.67.220.123 - FamilyShield
-    OpenDnsHome,       // 208.67.222.222, 208.67.220.220 - Home
+    OpenDnsFamilyShield,    // 208.67.222.123, 208.67.220.123 - FamilyShield
+    OpenDnsHome,            // 208.67.222.222, 208.67.220.220 - Home
     Custom(String, String), // Custom primary and secondary DNS
 }
 
@@ -978,14 +997,24 @@ pub fn detect_dns_provider(dns_servers: &[String]) -> DnsProvider {
     match (primary, secondary) {
         // Cloudflare
         (Some("1.1.1.1"), Some("1.0.0.1")) | (Some("1.1.1.1"), None) => DnsProvider::Cloudflare,
-        (Some("1.1.1.2"), Some("1.0.0.2")) | (Some("1.1.1.2"), None) => DnsProvider::CloudflareMalware,
-        (Some("1.1.1.3"), Some("1.0.0.3")) | (Some("1.1.1.3"), None) => DnsProvider::CloudflareFamily,
+        (Some("1.1.1.2"), Some("1.0.0.2")) | (Some("1.1.1.2"), None) => {
+            DnsProvider::CloudflareMalware
+        }
+        (Some("1.1.1.3"), Some("1.0.0.3")) | (Some("1.1.1.3"), None) => {
+            DnsProvider::CloudflareFamily
+        }
         // Google
         (Some("8.8.8.8"), Some("8.8.4.4")) | (Some("8.8.8.8"), None) => DnsProvider::Google,
         // AdGuard
-        (Some("94.140.14.14"), Some("94.140.15.15")) | (Some("94.140.14.14"), None) => DnsProvider::AdGuard,
-        (Some("94.140.14.140"), Some("94.140.14.141")) | (Some("94.140.14.140"), None) => DnsProvider::AdGuardNonFiltering,
-        (Some("94.140.14.15"), Some("94.140.15.16")) | (Some("94.140.14.15"), None) => DnsProvider::AdGuardFamily,
+        (Some("94.140.14.14"), Some("94.140.15.15")) | (Some("94.140.14.14"), None) => {
+            DnsProvider::AdGuard
+        }
+        (Some("94.140.14.140"), Some("94.140.14.141")) | (Some("94.140.14.140"), None) => {
+            DnsProvider::AdGuardNonFiltering
+        }
+        (Some("94.140.14.15"), Some("94.140.15.16")) | (Some("94.140.14.15"), None) => {
+            DnsProvider::AdGuardFamily
+        }
         // DNS4EU
         (Some("86.54.11.1"), _) => DnsProvider::Dns4EuProtective,
         (Some("86.54.11.12"), _) => DnsProvider::Dns4EuProtectiveChild,
@@ -993,14 +1022,26 @@ pub fn detect_dns_provider(dns_servers: &[String]) -> DnsProvider {
         (Some("86.54.11.11"), _) => DnsProvider::Dns4EuProtectiveChildAd,
         (Some("86.54.11.100"), _) => DnsProvider::Dns4EuUnfiltered,
         // CleanBrowsing
-        (Some("185.228.168.168"), Some("185.228.169.168")) | (Some("185.228.168.168"), None) => DnsProvider::CleanBrowsingFamily,
+        (Some("185.228.168.168"), Some("185.228.169.168")) | (Some("185.228.168.168"), None) => {
+            DnsProvider::CleanBrowsingFamily
+        }
         // Quad9
-        (Some("9.9.9.9"), Some("149.112.112.112")) | (Some("9.9.9.9"), None) => DnsProvider::Quad9Recommended,
-        (Some("9.9.9.11"), Some("149.112.112.11")) | (Some("9.9.9.11"), None) => DnsProvider::Quad9SecuredEcs,
-        (Some("9.9.9.10"), Some("149.112.112.10")) | (Some("9.9.9.10"), None) => DnsProvider::Quad9Unsecured,
+        (Some("9.9.9.9"), Some("149.112.112.112")) | (Some("9.9.9.9"), None) => {
+            DnsProvider::Quad9Recommended
+        }
+        (Some("9.9.9.11"), Some("149.112.112.11")) | (Some("9.9.9.11"), None) => {
+            DnsProvider::Quad9SecuredEcs
+        }
+        (Some("9.9.9.10"), Some("149.112.112.10")) | (Some("9.9.9.10"), None) => {
+            DnsProvider::Quad9Unsecured
+        }
         // OpenDNS
-        (Some("208.67.222.123"), Some("208.67.220.123")) | (Some("208.67.222.123"), None) => DnsProvider::OpenDnsFamilyShield,
-        (Some("208.67.222.222"), Some("208.67.220.220")) | (Some("208.67.222.222"), None) => DnsProvider::OpenDnsHome,
+        (Some("208.67.222.123"), Some("208.67.220.123")) | (Some("208.67.222.123"), None) => {
+            DnsProvider::OpenDnsFamilyShield
+        }
+        (Some("208.67.222.222"), Some("208.67.220.220")) | (Some("208.67.222.222"), None) => {
+            DnsProvider::OpenDnsHome
+        }
         // Custom
         (Some(p), Some(s)) => DnsProvider::Custom(p.to_string(), s.to_string()),
         (Some(p), None) => DnsProvider::Custom(p.to_string(), String::new()),
@@ -1028,20 +1069,28 @@ mod tests {
         let octets_192 = [192, 168, 1, 1];
         let octets_172_16 = [172, 16, 0, 1];
         let octets_172_31 = [172, 31, 255, 255];
-        
+
         assert!(octets_10[0] == 10);
         assert!(octets_192[0] == 192 && octets_192[1] == 168);
         assert!(octets_172_16[0] == 172 && (16..=31).contains(&octets_172_16[1]));
         assert!(octets_172_31[0] == 172 && (16..=31).contains(&octets_172_31[1]));
-        
+
         // Test public IP ranges
         let octets_8 = [8, 8, 8, 8];
         let octets_1 = [1, 1, 1, 1];
         let octets_172_15 = [172, 15, 0, 1];
         let octets_172_32 = [172, 32, 0, 1];
-        
-        assert!(octets_8[0] != 10 && !(octets_8[0] == 192 && octets_8[1] == 168) && !(octets_8[0] == 172 && (16..=31).contains(&octets_8[1])));
-        assert!(octets_1[0] != 10 && !(octets_1[0] == 192 && octets_1[1] == 168) && !(octets_1[0] == 172 && (16..=31).contains(&octets_1[1])));
+
+        assert!(
+            octets_8[0] != 10
+                && !(octets_8[0] == 192 && octets_8[1] == 168)
+                && !(octets_8[0] == 172 && (16..=31).contains(&octets_8[1]))
+        );
+        assert!(
+            octets_1[0] != 10
+                && !(octets_1[0] == 192 && octets_1[1] == 168)
+                && !(octets_1[0] == 172 && (16..=31).contains(&octets_1[1]))
+        );
         assert!(octets_172_15[0] == 172 && !(16..=31).contains(&octets_172_15[1]));
         assert!(octets_172_32[0] == 172 && !(16..=31).contains(&octets_172_32[1]));
     }
@@ -1050,7 +1099,7 @@ mod tests {
     fn test_get_computer_info_does_not_panic() {
         // This test ensures the function doesn't panic and returns valid data
         let info = get_computer_info();
-        
+
         // The function should always return a valid ComputerInfo struct
         // We can't assert specific values since they depend on the system
         // but we can ensure it doesn't panic and returns reasonable structure
@@ -1064,12 +1113,24 @@ mod tests {
     fn test_diagnostics_snapshot_includes_computer_info() {
         let settings = get_default_settings();
         let snapshot = run_diagnostics(&settings);
-        
+
         // Verify that computer info is included in the snapshot
-        assert_eq!(snapshot.computer.hostname.is_some() || snapshot.computer.hostname.is_none(), true);
-        assert_eq!(snapshot.computer.model.is_some() || snapshot.computer.model.is_none(), true);
-        assert_eq!(snapshot.computer.adapter.is_some() || snapshot.computer.adapter.is_none(), true);
-        assert_eq!(snapshot.computer.local_ip.is_some() || snapshot.computer.local_ip.is_none(), true);
+        assert_eq!(
+            snapshot.computer.hostname.is_some() || snapshot.computer.hostname.is_none(),
+            true
+        );
+        assert_eq!(
+            snapshot.computer.model.is_some() || snapshot.computer.model.is_none(),
+            true
+        );
+        assert_eq!(
+            snapshot.computer.adapter.is_some() || snapshot.computer.adapter.is_none(),
+            true
+        );
+        assert_eq!(
+            snapshot.computer.local_ip.is_some() || snapshot.computer.local_ip.is_none(),
+            true
+        );
     }
 
     #[test]
@@ -1113,7 +1174,7 @@ mod tests {
             // Note: Internet node can take longer due to network timeouts (up to 60s in CI)
             let max_latency = match node.id {
                 NodeId::Internet => 60000, // 60 seconds for internet tests
-                _ => 10000, // 10 seconds for local operations
+                _ => 10000,                // 10 seconds for local operations
             };
 
             assert!(
@@ -1134,8 +1195,14 @@ mod tests {
         let snapshot = run_diagnostics(&settings);
 
         // Verify summary_key matches node statuses
-        let has_fail = snapshot.nodes.iter().any(|n| matches!(n.status, Status::Fail));
-        let all_ok = snapshot.nodes.iter().all(|n| matches!(n.status, Status::Ok));
+        let has_fail = snapshot
+            .nodes
+            .iter()
+            .any(|n| matches!(n.status, Status::Fail));
+        let all_ok = snapshot
+            .nodes
+            .iter()
+            .all(|n| matches!(n.status, Status::Ok));
 
         if all_ok {
             assert_eq!(snapshot.summary_key, "summary.ok");
