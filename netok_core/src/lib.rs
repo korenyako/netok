@@ -570,14 +570,16 @@ const OUI_DATABASE: &[(&str, &str)] = &[
 /// * `None` if not found or invalid MAC format
 fn lookup_vendor_by_mac(mac: &str) -> Option<String> {
     // Remove separators and convert to uppercase
+    // Remove separators and convert to uppercase.
     let clean_mac: String = mac
         .chars()
         .filter(|c| c.is_ascii_hexdigit())
         .map(|c| c.to_ascii_uppercase())
         .collect();
 
-    // Need at least 6 hex chars (3 bytes) for OUI lookup
-    if clean_mac.len() < 6 {
+    // A valid MAC address must resolve to exactly 12 hexadecimal digits.
+    // This prevents lookups on invalid or partial MACs.
+    if clean_mac.len() != 12 {
         return None;
     }
 
