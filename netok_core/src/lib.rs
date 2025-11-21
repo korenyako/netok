@@ -424,7 +424,6 @@ const OUI_DATABASE: &[(&str, &str)] = &[
     ("68DDB7", "TP-Link"),
     ("A42BB0", "TP-Link"),
     ("50C7BF", "TP-Link"),
-    ("2C3033", "TP-Link"),
     ("98DE0D", "TP-Link"),
     // ASUS
     ("2CF05D", "ASUS"),
@@ -585,6 +584,7 @@ fn lookup_vendor_by_mac(mac: &str) -> Option<String> {
 
     // Try matching from longest to shortest OUI (6, 7, 8+ chars)
     // Some vendors have extended OUI prefixes (28-bit, 36-bit)
+    // This single loop handles all cases including standard 6-char (24-bit) OUI
     for prefix_len in (6..=clean_mac.len().min(10)).rev() {
         let prefix = &clean_mac[..prefix_len];
 
@@ -593,14 +593,6 @@ fn lookup_vendor_by_mac(mac: &str) -> Option<String> {
             if oui.eq_ignore_ascii_case(prefix) {
                 return Some(vendor.to_string());
             }
-        }
-    }
-
-    // Try standard 6-char (24-bit) OUI lookup
-    let oui_prefix = &clean_mac[..6];
-    for (oui, vendor) in OUI_DATABASE {
-        if oui.eq_ignore_ascii_case(oui_prefix) {
-            return Some(vendor.to_string());
         }
     }
 
@@ -2147,6 +2139,10 @@ mod tests {
     fn test_vendor_lookup_netgear() {
         let vendor = lookup_vendor_by_mac("A0:40:A0:11:22:33");
         assert_eq!(vendor, Some("Netgear".to_string()));
+
+        // Test 2C3033 specifically (was incorrectly listed under TP-Link)
+        let vendor_2c3033 = lookup_vendor_by_mac("2C:30:33:11:22:33");
+        assert_eq!(vendor_2c3033, Some("Netgear".to_string()));
     }
 
     #[test]
