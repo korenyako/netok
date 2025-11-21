@@ -548,7 +548,7 @@ const OUI_DATABASE: &[(&str, &str)] = &[
     ("F0272D", "Amazon"),
     ("88E97F", "Amazon"),
     // Apple (AirPort routers)
-    ("0003930", "Apple"),
+    ("000393", "Apple"),
     ("00174F", "Apple"),
     ("001D4F", "Apple"),
     ("002241", "Apple"),
