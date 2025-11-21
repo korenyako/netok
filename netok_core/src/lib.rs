@@ -485,7 +485,7 @@ const OUI_DATABASE: &[(&str, &str)] = &[
     ("14D647", "Belkin"),
     ("EC1A59", "Belkin"),
     // Huawei
-    ("0018820", "Huawei"),
+    ("001882", "Huawei"),
     ("001E10", "Huawei"),
     ("002568", "Huawei"),
     ("00259E", "Huawei"),
