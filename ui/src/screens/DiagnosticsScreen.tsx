@@ -92,11 +92,7 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
             if (snapshot.router.gateway_ip) {
               details.push({ text: snapshot.router.gateway_ip, isIp: true });
             }
-            // Second: Gateway MAC address
-            if (snapshot.router.gateway_mac) {
-              details.push({ text: snapshot.router.gateway_mac });
-            }
-            // Third: Vendor/Model
+            // Second: Vendor/Model (MAC address hidden from user)
             if (snapshot.router.vendor) {
               details.push({ text: snapshot.router.vendor });
             }
@@ -229,9 +225,6 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
         if (node.id === 'dns' && snapshot.router) {
           if (snapshot.router.gateway_ip) {
             details.push({ text: snapshot.router.gateway_ip, isIp: true });
-          }
-          if (snapshot.router.gateway_mac) {
-            details.push({ text: snapshot.router.gateway_mac });
           }
           if (snapshot.router.vendor) {
             details.push({ text: snapshot.router.vendor });
