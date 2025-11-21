@@ -29,11 +29,24 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
   const [nodes, setNodes] = useState<NetworkNode[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [copiedIp, setCopiedIp] = useState<string | null>(null);
 
   // Helper function to remove AS number from ISP string
   const cleanIspName = (isp: string): string => {
     // Remove "AS12345 " prefix if present
     return isp.replace(/^AS\d+\s+/, '');
+  };
+
+  // Helper function to copy IP address to clipboard
+  const handleCopyIp = async (ip: string) => {
+    try {
+      await navigator.clipboard.writeText(ip);
+      setCopiedIp(ip);
+      // Reset copied state after 2 seconds
+      setTimeout(() => setCopiedIp(null), 2000);
+    } catch (err) {
+      console.error('Failed to copy IP:', err);
+    }
   };
 
   useEffect(() => {
@@ -49,13 +62,13 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
 
           // Add computer-specific details (matching screenshot format)
           if (node.id === 'computer' && snapshot.computer) {
-            // First: Local IP
-            if (snapshot.computer.local_ip) {
-              details.push({ text: snapshot.computer.local_ip, isIp: true });
-            }
-            // Second: Adapter name
+            // First: Adapter name
             if (snapshot.computer.adapter) {
               details.push({ text: snapshot.computer.adapter });
+            }
+            // Last: Local IP
+            if (snapshot.computer.local_ip) {
+              details.push({ text: snapshot.computer.local_ip, isIp: true });
             }
           }
 
@@ -88,36 +101,36 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
 
           // Add router-specific details (matching screenshot format)
           if (node.id === 'dns' && snapshot.router) {
-            // First: Gateway IP (without "Gateway:" prefix to match screenshot)
-            if (snapshot.router.gateway_ip) {
-              details.push({ text: snapshot.router.gateway_ip, isIp: true });
-            }
-            // Second: Vendor/Model (MAC address hidden from user)
+            // First: Vendor/Model (MAC address hidden from user)
             if (snapshot.router.vendor) {
               details.push({ text: snapshot.router.vendor });
             }
             if (snapshot.router.model) {
               details.push({ text: snapshot.router.model });
             }
+            // Last: Gateway IP (without "Gateway:" prefix to match screenshot)
+            if (snapshot.router.gateway_ip) {
+              details.push({ text: snapshot.router.gateway_ip, isIp: true });
+            }
           }
 
           // Add internet-specific details (matching screenshot format)
           if (node.id === 'internet' && snapshot.internet) {
-            // First: Public IP (without "IP:" prefix)
-            if (snapshot.internet.public_ip) {
-              details.push({ text: snapshot.internet.public_ip, isIp: true });
-            }
-            // Second: ISP/Provider (without AS number)
+            // First: ISP/Provider (without AS number)
             if (snapshot.internet.isp) {
               details.push({ text: cleanIspName(snapshot.internet.isp) });
             }
-            // Third: City, Country
+            // Second: City, Country
             if (snapshot.internet.city && snapshot.internet.country) {
               details.push({ text: `${snapshot.internet.city}, ${snapshot.internet.country}` });
             } else if (snapshot.internet.country) {
               details.push({ text: snapshot.internet.country });
             } else if (snapshot.internet.city) {
               details.push({ text: snapshot.internet.city });
+            }
+            // Last: Public IP (without "IP:" prefix)
+            if (snapshot.internet.public_ip) {
+              details.push({ text: snapshot.internet.public_ip, isIp: true });
             }
           }
 
@@ -191,11 +204,11 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
         const details: NodeDetail[] = [];
 
         if (node.id === 'computer' && snapshot.computer) {
-          if (snapshot.computer.local_ip) {
-            details.push({ text: snapshot.computer.local_ip, isIp: true });
-          }
           if (snapshot.computer.adapter) {
             details.push({ text: snapshot.computer.adapter });
+          }
+          if (snapshot.computer.local_ip) {
+            details.push({ text: snapshot.computer.local_ip, isIp: true });
           }
         }
 
@@ -223,21 +236,18 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
         }
 
         if (node.id === 'dns' && snapshot.router) {
-          if (snapshot.router.gateway_ip) {
-            details.push({ text: snapshot.router.gateway_ip, isIp: true });
-          }
           if (snapshot.router.vendor) {
             details.push({ text: snapshot.router.vendor });
           }
           if (snapshot.router.model) {
             details.push({ text: snapshot.router.model });
           }
+          if (snapshot.router.gateway_ip) {
+            details.push({ text: snapshot.router.gateway_ip, isIp: true });
+          }
         }
 
         if (node.id === 'internet' && snapshot.internet) {
-          if (snapshot.internet.public_ip) {
-            details.push({ text: snapshot.internet.public_ip, isIp: true });
-          }
           if (snapshot.internet.isp) {
             details.push({ text: cleanIspName(snapshot.internet.isp) });
           }
@@ -247,6 +257,9 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
             details.push({ text: snapshot.internet.country });
           } else if (snapshot.internet.city) {
             details.push({ text: snapshot.internet.city });
+          }
+          if (snapshot.internet.public_ip) {
+            details.push({ text: snapshot.internet.public_ip, isIp: true });
           }
         }
 
@@ -294,7 +307,7 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
           className="w-6 h-6 flex items-center justify-center focus:outline-none disabled:opacity-50"
         >
           <svg
-            className={`w-5 h-5 text-foreground-tertiary ${isLoading ? 'animate-spin' : ''}`}
+            className="w-5 h-5 text-foreground-tertiary"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -346,16 +359,27 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
               {/* Node Details */}
               <div className="pl-4 space-y-[6px]">
                 {node.details.map((detail, detailIndex) => (
-                  <p
-                    key={detailIndex}
-                    className={
-                      detail.isIp
-                        ? DNS_IP_TEXT_CLASS
-                        : 'text-sm text-foreground-secondary leading-[19.6px]'
-                    }
-                  >
-                    {detail.text}
-                  </p>
+                  detail.isIp ? (
+                    <div
+                      key={detailIndex}
+                      onClick={() => handleCopyIp(detail.text)}
+                      className={`${DNS_IP_TEXT_CLASS} cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-2`}
+                    >
+                      <span>{detail.text}</span>
+                      {copiedIp === detail.text && (
+                        <svg className="w-4 h-4 text-primary" viewBox="0 0 16 16" fill="none">
+                          <path d="M13.5 4.5L6 12L2.5 8.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      )}
+                    </div>
+                  ) : (
+                    <p
+                      key={detailIndex}
+                      className="text-sm text-foreground-secondary leading-[19.6px]"
+                    >
+                      {detail.text}
+                    </p>
+                  )
                 ))}
               </div>
             </div>
