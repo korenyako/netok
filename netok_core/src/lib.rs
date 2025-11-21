@@ -468,6 +468,12 @@ const OUI_DATABASE: &[(&str, &str)] = &[
     ("3037A6", "Cisco Systems"),
     ("5C5015", "Cisco Systems"),
     ("6C200B", "Cisco Systems"),
+    // Cisco Meraki (cloud-managed networking)
+    ("7890A2", "Cisco Meraki"),
+    ("E05FB9", "Cisco Meraki"),
+    ("8818A0", "Cisco Meraki"),
+    ("0018F8", "Cisco Meraki"),
+    ("ACB5DE", "Cisco Meraki"),
     // Linksys
     ("000F66", "Linksys"),
     ("001217", "Linksys"),
@@ -2155,6 +2161,12 @@ mod tests {
     fn test_vendor_lookup_cisco() {
         let vendor = lookup_vendor_by_mac("00:01:42:11:22:33");
         assert_eq!(vendor, Some("Cisco Systems".to_string()));
+    }
+
+    #[test]
+    fn test_vendor_lookup_cisco_meraki() {
+        let vendor = lookup_vendor_by_mac("78:90:A2:11:22:33");
+        assert_eq!(vendor, Some("Cisco Meraki".to_string()));
     }
 
     #[test]
