@@ -102,7 +102,8 @@
     "dns_protection": "DNS Protection",
     "dns_protection_enabled": "Blocking unwanted content",
     "dns_protection_disabled": "DNS Protection disabled",
-    "dns_protection_disabled_desc": "Standard ISP DNS"
+    "dns_protection_disabled_desc": "Standard ISP DNS",
+    "dns_checking": "Checking DNS protection"
   },
   "nodes": {
     "computer": {
