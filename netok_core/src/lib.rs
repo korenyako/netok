@@ -404,6 +404,207 @@ fn get_network_info(adapter_name: Option<&str>) -> NetworkInfo {
     }
 }
 
+/// Embedded OUI database with popular router manufacturers.
+/// Format: (OUI prefix as 6 hex chars, Vendor name)
+/// This is a curated list of top router/networking equipment vendors.
+const OUI_DATABASE: &[(&str, &str)] = &[
+    // TP-Link (top prefixes)
+    ("40ED00", "TP-Link"),
+    ("F4F26D", "TP-Link"),
+    ("E8DE27", "TP-Link"),
+    ("D85D4C", "TP-Link"),
+    ("3052A1", "TP-Link"),
+    ("5CA6E6", "TP-Link"),
+    ("B0A7B9", "TP-Link"),
+    ("C006C3", "TP-Link"),
+    ("E028D5", "TP-Link"),
+    ("F0093D", "TP-Link"),
+    // TP-Link Technologies
+    ("14D864", "TP-Link"),
+    ("68DDB7", "TP-Link"),
+    ("A42BB0", "TP-Link"),
+    ("50C7BF", "TP-Link"),
+    ("2C3033", "TP-Link"),
+    ("98DE0D", "TP-Link"),
+    // ASUS
+    ("2CF05D", "ASUS"),
+    ("B06EBF", "ASUS"),
+    ("0418D6", "ASUS"),
+    ("087808", "ASUS"),
+    ("1CECC8", "ASUS"),
+    ("3085A988", "ASUS"),
+    ("3085A9BC", "ASUS"),
+    ("C860007B", "ASUS"),
+    ("C860007C", "ASUS"),
+    ("C860007D", "ASUS"),
+    // Netgear
+    ("A040A0", "Netgear"),
+    ("C03F0E", "Netgear"),
+    ("2C3033", "Netgear"),
+    ("E091F5", "Netgear"),
+    ("845DDB", "Netgear"),
+    ("C4BD48", "Netgear"),
+    ("00095B", "Netgear"),
+    ("001E2A", "Netgear"),
+    ("10C37B", "Netgear"),
+    // D-Link
+    ("1C7EE5", "D-Link"),
+    ("CC9E00", "D-Link"),
+    ("B86CE8", "D-Link"),
+    ("14D64D", "D-Link"),
+    ("1CBDB9", "D-Link"),
+    ("00055D", "D-Link"),
+    ("0013E8", "D-Link"),
+    ("001B11", "D-Link"),
+    ("001CF0", "D-Link"),
+    ("001E58", "D-Link"),
+    // Cisco Systems
+    ("000142", "Cisco Systems"),
+    ("001018", "Cisco Systems"),
+    ("00306E", "Cisco Systems"),
+    ("0050E2", "Cisco Systems"),
+    ("00D014", "Cisco Systems"),
+    ("18033C", "Cisco Systems"),
+    ("28AC9E", "Cisco Systems"),
+    ("3037A6", "Cisco Systems"),
+    ("5C5015", "Cisco Systems"),
+    ("6C200B", "Cisco Systems"),
+    // Linksys
+    ("000F66", "Linksys"),
+    ("001217", "Linksys"),
+    ("001839", "Linksys"),
+    ("00226B", "Linksys"),
+    ("20AA4B", "Linksys"),
+    ("48F8B3", "Linksys"),
+    ("C0C1C0", "Linksys"),
+    // Belkin
+    ("001CDF", "Belkin"),
+    ("002275", "Belkin"),
+    ("08863B", "Belkin"),
+    ("943428", "Belkin"),
+    ("14D647", "Belkin"),
+    ("EC1A59", "Belkin"),
+    // Huawei
+    ("0018820", "Huawei"),
+    ("001E10", "Huawei"),
+    ("002568", "Huawei"),
+    ("00259E", "Huawei"),
+    ("00E0FC", "Huawei"),
+    ("1C1D67", "Huawei"),
+    ("483711", "Huawei"),
+    ("50C88F", "Huawei"),
+    ("64A6F7", "Huawei"),
+    ("C83A35", "Huawei"),
+    // Xiaomi
+    ("34CE00", "Xiaomi"),
+    ("503EAA", "Xiaomi"),
+    ("5C4CA9", "Xiaomi"),
+    ("643CD2", "Xiaomi"),
+    ("68DFDD", "Xiaomi"),
+    ("6C4491", "Xiaomi"),
+    ("78118C", "Xiaomi"),
+    ("C46AB7", "Xiaomi"),
+    ("F08E94", "Xiaomi"),
+    // ZTE
+    ("2CD141", "ZTE"),
+    ("489D24", "ZTE"),
+    ("507B9D", "ZTE"),
+    ("680F20", "ZTE"),
+    ("8C34FD", "ZTE"),
+    ("A44519", "ZTE"),
+    ("C83DD4", "ZTE"),
+    ("F4A739", "ZTE"),
+    // Mikrotik
+    ("0002E3", "Mikrotik"),
+    ("0002FD", "Mikrotik"),
+    ("000520", "Mikrotik"),
+    ("00056B", "Mikrotik"),
+    ("0C8527", "Mikrotik"),
+    ("2C3AE8", "Mikrotik"),
+    ("4C8004", "Mikrotik"),
+    ("6C3B6B", "Mikrotik"),
+    ("D43D7E", "Mikrotik"),
+    // Ubiquiti Networks
+    ("0004E2", "Ubiquiti"),
+    ("001556", "Ubiquiti"),
+    ("001B21", "Ubiquiti"),
+    ("0427A3", "Ubiquiti"),
+    ("18E829", "Ubiquiti"),
+    ("24A43C", "Ubiquiti"),
+    ("687251", "Ubiquiti"),
+    ("70A741", "Ubiquiti"),
+    ("741B28", "Ubiquiti"),
+    ("B4FBE4", "Ubiquiti"),
+    ("D05099", "Ubiquiti"),
+    ("DC9FDB", "Ubiquiti"),
+    ("F09FC2", "Ubiquiti"),
+    // Google (Google Wifi, Nest Wifi)
+    ("00305E", "Google"),
+    ("006D5C", "Google"),
+    ("3C1E04", "Google"),
+    ("6CB0CE", "Google"),
+    ("F4F5D8", "Google"),
+    // Amazon (eero, Amazon routers)
+    ("F0272D", "Amazon"),
+    ("88E97F", "Amazon"),
+    // Apple (AirPort routers)
+    ("0003930", "Apple"),
+    ("00174F", "Apple"),
+    ("001D4F", "Apple"),
+    ("002241", "Apple"),
+    ("002332", "Apple"),
+    ("0025BC", "Apple"),
+    ("0026BB", "Apple"),
+];
+
+/// Lookup vendor name by MAC address using OUI (first 3 bytes).
+///
+/// # Arguments
+/// * `mac` - MAC address in any of these formats:
+///   - Standard: "AA:BB:CC:DD:EE:FF"
+///   - Windows: "AA-BB-CC-DD-EE-FF"
+///   - Compact: "AABBCCDDEEFF"
+///
+/// # Returns
+/// * `Some(vendor_name)` if found in database
+/// * `None` if not found or invalid MAC format
+fn lookup_vendor_by_mac(mac: &str) -> Option<String> {
+    // Remove separators and convert to uppercase
+    let clean_mac: String = mac
+        .chars()
+        .filter(|c| c.is_ascii_hexdigit())
+        .map(|c| c.to_ascii_uppercase())
+        .collect();
+
+    // Need at least 6 hex chars (3 bytes) for OUI lookup
+    if clean_mac.len() < 6 {
+        return None;
+    }
+
+    // Try matching from longest to shortest OUI (6, 7, 8+ chars)
+    // Some vendors have extended OUI prefixes (28-bit, 36-bit)
+    for prefix_len in (6..=clean_mac.len().min(10)).rev() {
+        let prefix = &clean_mac[..prefix_len];
+
+        // Search in database
+        for (oui, vendor) in OUI_DATABASE {
+            if oui.eq_ignore_ascii_case(prefix) {
+                return Some(vendor.to_string());
+            }
+        }
+    }
+
+    // Try standard 6-char (24-bit) OUI lookup
+    let oui_prefix = &clean_mac[..6];
+    for (oui, vendor) in OUI_DATABASE {
+        if oui.eq_ignore_ascii_case(oui_prefix) {
+            return Some(vendor.to_string());
+        }
+    }
+
+    None
+}
+
 // Get router/gateway information
 fn get_router_info() -> RouterInfo {
     // Try to get default gateway IP
@@ -412,11 +613,14 @@ fn get_router_info() -> RouterInfo {
     // Try to get MAC address if we have gateway IP
     let gateway_mac = gateway_ip.as_ref().and_then(|ip| get_router_mac(ip));
 
+    // Try to lookup vendor if we have MAC address
+    let vendor = gateway_mac.as_ref().and_then(|mac| lookup_vendor_by_mac(mac));
+
     RouterInfo {
         gateway_ip,
         gateway_mac,
-        vendor: None,      // TODO: implement OUI lookup
-        model: None,       // Post-MVP: UPnP discovery
+        vendor,
+        model: None, // Post-MVP: UPnP discovery
     }
 }
 
@@ -1474,19 +1678,6 @@ mod tests {
     }
 
     #[test]
-    fn test_router_info_structure() {
-        let settings = get_default_settings();
-        let snapshot = run_diagnostics(&settings);
-
-        // Verify router info structure is present and accessible
-        let _ = &snapshot.router.gateway_ip;
-        let _ = &snapshot.router.gateway_mac;
-        let _ = &snapshot.router.vendor;
-        let _ = &snapshot.router.model;
-        // If we reach here, router info structure is valid - test passes
-    }
-
-    #[test]
     fn test_internet_info_structure() {
         let settings = get_default_settings();
         let snapshot = run_diagnostics(&settings);
@@ -1914,8 +2105,252 @@ mod tests {
         if let Some(mac) = &router.gateway_mac {
             assert_eq!(mac.len(), 17, "MAC should be XX:XX:XX:XX:XX:XX format");
             assert_eq!(mac.matches(':').count(), 5, "MAC should have 5 colons");
-            assert!(mac.chars().all(|c| c.is_ascii_hexdigit() || c == ':'),
-                   "MAC should only contain hex digits and colons");
+            assert!(
+                mac.chars().all(|c| c.is_ascii_hexdigit() || c == ':'),
+                "MAC should only contain hex digits and colons"
+            );
+        }
+    }
+
+    // Vendor Lookup Tests (Phase 2.5.2)
+
+    #[test]
+    fn test_vendor_lookup_tplink_standard_format() {
+        // Test TP-Link MAC in standard format (colon-separated)
+        let vendor = lookup_vendor_by_mac("40:ED:00:11:22:33");
+        assert_eq!(vendor, Some("TP-Link".to_string()));
+    }
+
+    #[test]
+    fn test_vendor_lookup_tplink_windows_format() {
+        // Test TP-Link MAC in Windows format (dash-separated)
+        let vendor = lookup_vendor_by_mac("40-ED-00-11-22-33");
+        assert_eq!(vendor, Some("TP-Link".to_string()));
+    }
+
+    #[test]
+    fn test_vendor_lookup_tplink_compact_format() {
+        // Test TP-Link MAC in compact format (no separators)
+        let vendor = lookup_vendor_by_mac("40ED00112233");
+        assert_eq!(vendor, Some("TP-Link".to_string()));
+    }
+
+    #[test]
+    fn test_vendor_lookup_asus() {
+        let vendor = lookup_vendor_by_mac("2C:F0:5D:11:22:33");
+        assert_eq!(vendor, Some("ASUS".to_string()));
+    }
+
+    #[test]
+    fn test_vendor_lookup_netgear() {
+        let vendor = lookup_vendor_by_mac("A0:40:A0:11:22:33");
+        assert_eq!(vendor, Some("Netgear".to_string()));
+    }
+
+    #[test]
+    fn test_vendor_lookup_dlink() {
+        let vendor = lookup_vendor_by_mac("1C:7E:E5:11:22:33");
+        assert_eq!(vendor, Some("D-Link".to_string()));
+    }
+
+    #[test]
+    fn test_vendor_lookup_cisco() {
+        let vendor = lookup_vendor_by_mac("00:01:42:11:22:33");
+        assert_eq!(vendor, Some("Cisco Systems".to_string()));
+    }
+
+    #[test]
+    fn test_vendor_lookup_linksys() {
+        let vendor = lookup_vendor_by_mac("00:0F:66:11:22:33");
+        assert_eq!(vendor, Some("Linksys".to_string()));
+    }
+
+    #[test]
+    fn test_vendor_lookup_belkin() {
+        let vendor = lookup_vendor_by_mac("00:1C:DF:11:22:33");
+        assert_eq!(vendor, Some("Belkin".to_string()));
+    }
+
+    #[test]
+    fn test_vendor_lookup_huawei() {
+        let vendor = lookup_vendor_by_mac("00:1E:10:11:22:33");
+        assert_eq!(vendor, Some("Huawei".to_string()));
+    }
+
+    #[test]
+    fn test_vendor_lookup_xiaomi() {
+        let vendor = lookup_vendor_by_mac("34:CE:00:11:22:33");
+        assert_eq!(vendor, Some("Xiaomi".to_string()));
+    }
+
+    #[test]
+    fn test_vendor_lookup_zte() {
+        let vendor = lookup_vendor_by_mac("2C:D1:41:11:22:33");
+        assert_eq!(vendor, Some("ZTE".to_string()));
+    }
+
+    #[test]
+    fn test_vendor_lookup_mikrotik() {
+        let vendor = lookup_vendor_by_mac("00:02:E3:11:22:33");
+        assert_eq!(vendor, Some("Mikrotik".to_string()));
+    }
+
+    #[test]
+    fn test_vendor_lookup_ubiquiti() {
+        let vendor = lookup_vendor_by_mac("00:04:E2:11:22:33");
+        assert_eq!(vendor, Some("Ubiquiti".to_string()));
+    }
+
+    #[test]
+    fn test_vendor_lookup_google() {
+        let vendor = lookup_vendor_by_mac("F4:F5:D8:11:22:33");
+        assert_eq!(vendor, Some("Google".to_string()));
+    }
+
+    #[test]
+    fn test_vendor_lookup_amazon() {
+        let vendor = lookup_vendor_by_mac("F0:27:2D:11:22:33");
+        assert_eq!(vendor, Some("Amazon".to_string()));
+    }
+
+    #[test]
+    fn test_vendor_lookup_apple() {
+        let vendor = lookup_vendor_by_mac("00:17:4F:11:22:33");
+        assert_eq!(vendor, Some("Apple".to_string()));
+    }
+
+    #[test]
+    fn test_vendor_lookup_extended_oui_asus() {
+        // Test extended OUI (28-bit) for ASUS
+        let vendor = lookup_vendor_by_mac("30:85:A9:88:11:22");
+        assert_eq!(vendor, Some("ASUS".to_string()));
+    }
+
+    #[test]
+    fn test_vendor_lookup_case_insensitive() {
+        // Test lowercase MAC
+        let vendor1 = lookup_vendor_by_mac("40:ed:00:11:22:33");
+        assert_eq!(vendor1, Some("TP-Link".to_string()));
+
+        // Test mixed case MAC
+        let vendor2 = lookup_vendor_by_mac("40:Ed:00:11:22:33");
+        assert_eq!(vendor2, Some("TP-Link".to_string()));
+
+        // Test uppercase MAC
+        let vendor3 = lookup_vendor_by_mac("40:ED:00:11:22:33");
+        assert_eq!(vendor3, Some("TP-Link".to_string()));
+    }
+
+    #[test]
+    fn test_vendor_lookup_not_found() {
+        // Test with unknown OUI
+        let vendor = lookup_vendor_by_mac("FF:FF:FF:11:22:33");
+        assert_eq!(vendor, None);
+    }
+
+    #[test]
+    fn test_vendor_lookup_invalid_mac_too_short() {
+        // Test with too short MAC
+        let vendor = lookup_vendor_by_mac("40:ED");
+        assert_eq!(vendor, None);
+    }
+
+    #[test]
+    fn test_vendor_lookup_invalid_mac_empty() {
+        // Test with empty string
+        let vendor = lookup_vendor_by_mac("");
+        assert_eq!(vendor, None);
+    }
+
+    #[test]
+    fn test_vendor_lookup_invalid_mac_non_hex() {
+        // Test with non-hex characters
+        let vendor = lookup_vendor_by_mac("ZZ:ZZ:ZZ:11:22:33");
+        assert_eq!(vendor, None);
+    }
+
+    #[test]
+    fn test_vendor_lookup_with_router_info() {
+        // Test that vendor is populated in RouterInfo when MAC is available
+        let router = get_router_info();
+
+        // If we have both MAC and vendor, verify vendor is based on MAC
+        if let (Some(mac), Some(vendor)) = (&router.gateway_mac, &router.vendor) {
+            // Extract OUI from MAC
+            let oui: String = mac
+                .chars()
+                .filter(|c| c.is_ascii_hexdigit())
+                .take(6)
+                .collect();
+
+            // Verify vendor lookup works for this OUI
+            let looked_up_vendor = lookup_vendor_by_mac(mac);
+            if looked_up_vendor.is_some() {
+                assert_eq!(looked_up_vendor.as_ref(), Some(vendor));
+            }
+
+            println!("Router MAC: {}, Vendor: {}, OUI: {}", mac, vendor, oui);
+        }
+    }
+
+    #[test]
+    fn test_oui_database_not_empty() {
+        // Verify OUI database has entries
+        assert!(
+            !OUI_DATABASE.is_empty(),
+            "OUI database should contain vendor entries"
+        );
+        assert!(
+            OUI_DATABASE.len() > 100,
+            "OUI database should have at least 100 entries"
+        );
+    }
+
+    #[test]
+    fn test_oui_database_format() {
+        // Verify all OUI entries are valid hex strings
+        for (oui, vendor) in OUI_DATABASE {
+            assert!(
+                !oui.is_empty(),
+                "OUI prefix should not be empty for vendor {}",
+                vendor
+            );
+            assert!(
+                oui.chars().all(|c| c.is_ascii_hexdigit()),
+                "OUI {} should only contain hex digits for vendor {}",
+                oui,
+                vendor
+            );
+            assert!(
+                oui.len() >= 6,
+                "OUI {} should be at least 6 chars for vendor {}",
+                oui,
+                vendor
+            );
+            assert!(
+                !vendor.is_empty(),
+                "Vendor name should not be empty for OUI {}",
+                oui
+            );
+        }
+    }
+
+    #[test]
+    fn test_multiple_tplink_prefixes() {
+        // Test multiple TP-Link OUI prefixes
+        let prefixes = vec![
+            "40:ED:00", "F4:F2:6D", "E8:DE:27", "D8:5D:4C", "14:D8:64", "68:DD:B7",
+        ];
+
+        for prefix in prefixes {
+            let mac = format!("{}:11:22:33", prefix);
+            let vendor = lookup_vendor_by_mac(&mac);
+            assert_eq!(
+                vendor,
+                Some("TP-Link".to_string()),
+                "Failed for MAC: {}",
+                mac
+            );
         }
     }
 }
