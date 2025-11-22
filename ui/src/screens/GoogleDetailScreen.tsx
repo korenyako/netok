@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { setDns, getDnsProvider } from '../api/tauri';
+import { setDns } from '../api/tauri';
 import { DnsVariantCard } from '../components/DnsVariantCard';
+import { useDnsStore } from '../stores/useDnsStore';
+import { dnsStore } from '../stores/dnsStore';
 
 interface GoogleDetailScreenProps {
   onBack: () => void;
@@ -9,25 +11,12 @@ interface GoogleDetailScreenProps {
 
 export function GoogleDetailScreen({ onBack }: GoogleDetailScreenProps) {
   const { t } = useTranslation();
-  const [isActive, setIsActive] = useState(false);
+  const { currentProvider } = useDnsStore();
   const [isApplying, setIsApplying] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Load current DNS provider to detect if Google is active
-  useEffect(() => {
-    const fetchCurrentProvider = async () => {
-      try {
-        const provider = await getDnsProvider();
-        if (provider.type === 'Google') {
-          setIsActive(true);
-        }
-      } catch (err) {
-        console.error('Failed to get current DNS provider:', err);
-      }
-    };
-
-    fetchCurrentProvider();
-  }, []);
+  // Derive active state from global store
+  const isActive = currentProvider?.type === 'Google';
 
   const handleApply = async () => {
     try {
@@ -35,7 +24,9 @@ export function GoogleDetailScreen({ onBack }: GoogleDetailScreenProps) {
       setError(null);
 
       await setDns({ type: 'Google' });
-      setIsActive(true);
+
+      // Update global store
+      dnsStore.setProvider({ type: 'Google' });
     } catch (err) {
       console.error('Failed to set DNS:', err);
       setError(err instanceof Error ? err.message : 'Failed to set DNS');

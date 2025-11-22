@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { setDns, getDnsProvider, type AdGuardVariant as ApiAdGuardVariant } from '../api/tauri';
+import { setDns, type AdGuardVariant as ApiAdGuardVariant } from '../api/tauri';
 import { DnsVariantCard } from '../components/DnsVariantCard';
+import { useDnsStore } from '../stores/useDnsStore';
+import { dnsStore } from '../stores/dnsStore';
 
 interface AdGuardDetailScreenProps {
   onBack: () => void;
@@ -11,34 +13,16 @@ type AdGuardVariant = 'standard' | 'nonfiltering' | 'family';
 
 export function AdGuardDetailScreen({ onBack }: AdGuardDetailScreenProps) {
   const { t } = useTranslation();
-  const [currentVariant, setCurrentVariant] = useState<AdGuardVariant | null>(null);
+  const { currentProvider } = useDnsStore();
   const [applyingVariant, setApplyingVariant] = useState<AdGuardVariant | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Load current DNS provider to detect which variant is active
-  useEffect(() => {
-    const fetchCurrentProvider = async () => {
-      try {
-        const provider = await getDnsProvider();
-        if (provider.type === 'AdGuard') {
-          const variant = provider.variant;
-          let localVariant: AdGuardVariant;
-          if (variant === 'Standard') {
-            localVariant = 'standard';
-          } else if (variant === 'NonFiltering') {
-            localVariant = 'nonfiltering';
-          } else {
-            localVariant = 'family';
-          }
-          setCurrentVariant(localVariant);
-        }
-      } catch (err) {
-        console.error('Failed to get current DNS provider:', err);
-      }
-    };
-
-    fetchCurrentProvider();
-  }, []);
+  // Derive current variant from global store
+  const currentVariant: AdGuardVariant | null = currentProvider?.type === 'AdGuard'
+    ? currentProvider.variant === 'Standard' ? 'standard'
+    : currentProvider.variant === 'NonFiltering' ? 'nonfiltering'
+    : 'family'
+    : null;
 
   const getDnsAddresses = (variantId: AdGuardVariant): string => {
     switch (variantId) {
@@ -89,7 +73,8 @@ export function AdGuardDetailScreen({ onBack }: AdGuardDetailScreenProps) {
         variant: apiVariant,
       });
 
-      setCurrentVariant(variantId);
+      // Update global store
+      dnsStore.setProvider({ type: 'AdGuard', variant: apiVariant });
     } catch (err) {
       console.error('Failed to set DNS:', err);
       setError(err instanceof Error ? err.message : 'Failed to set DNS');
