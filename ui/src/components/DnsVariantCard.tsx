@@ -50,7 +50,7 @@ export function DnsVariantCard({
   return (
     <div
       className={`w-full rounded-[12px] p-4 text-left focus:outline-none transition-colors ${
-        isActive ? 'ring-2 ring-primary' : ''
+        isActive ? 'ring-1 ring-primary' : ''
       } bg-background-tertiary hover:bg-neutral-100 dark:hover:bg-background-hover`}
     >
       <div

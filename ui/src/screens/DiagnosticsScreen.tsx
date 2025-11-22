@@ -342,45 +342,57 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
 
       {/* Node List */}
       {!isLoading && !error && (
-        <div className="flex-1 overflow-auto px-4 space-y-0">
+        <div className="flex-1 overflow-auto px-4">
           {nodes.map((node, index) => (
             <div
               key={node.id}
-              className={`rounded-[12px] p-4 hover:bg-background-hover transition-colors cursor-pointer ${index < nodes.length - 1 ? 'mb-0' : ''}`}
+              className="flex"
             >
-              {/* Node Title with Icon */}
-              <div className="flex items-center gap-2 mb-[6px]">
-                {getStatusIcon(node.status)}
-                <h3 className="text-base font-medium text-foreground leading-[22.4px]">
-                  {t(node.title)}
-                </h3>
+              {/* Timeline column with bead and connecting line */}
+              <div className="flex flex-col items-center mr-3 pt-[18px]">
+                {/* Bead (status icon) */}
+                <div className="flex-shrink-0">
+                  {getStatusIcon(node.status)}
+                </div>
+                {/* Connecting line to next node */}
+                {index < nodes.length - 1 && (
+                  <div className="w-px flex-1 bg-border mt-2 min-h-[24px]"></div>
+                )}
               </div>
 
-              {/* Node Details */}
-              <div className="pl-4 space-y-[6px]">
-                {node.details.map((detail, detailIndex) => (
-                  detail.isIp ? (
-                    <div
-                      key={detailIndex}
-                      onClick={() => handleCopyIp(detail.text)}
-                      className={`${DNS_IP_TEXT_CLASS} cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-2`}
-                    >
-                      <span>{detail.text}</span>
-                      {copiedIp === detail.text && (
-                        <svg className="w-4 h-4 text-primary" viewBox="0 0 16 16" fill="none">
-                          <path d="M13.5 4.5L6 12L2.5 8.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                      )}
-                    </div>
-                  ) : (
-                    <p
-                      key={detailIndex}
-                      className="text-sm text-foreground-secondary leading-[19.6px]"
-                    >
-                      {detail.text}
-                    </p>
-                  )
-                ))}
+              {/* Node content */}
+              <div className="flex-1 py-3">
+                {/* Node Title */}
+                <h3 className="text-base font-medium text-foreground leading-[22.4px] mb-[6px]">
+                  {t(node.title)}
+                </h3>
+
+                {/* Node Details */}
+                <div className="space-y-[6px]">
+                  {node.details.map((detail, detailIndex) => (
+                    detail.isIp ? (
+                      <div
+                        key={detailIndex}
+                        onClick={() => handleCopyIp(detail.text)}
+                        className={`${DNS_IP_TEXT_CLASS} cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-2`}
+                      >
+                        <span>{detail.text}</span>
+                        {copiedIp === detail.text && (
+                          <svg className="w-4 h-4 text-primary" viewBox="0 0 16 16" fill="none">
+                            <path d="M13.5 4.5L6 12L2.5 8.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        )}
+                      </div>
+                    ) : (
+                      <p
+                        key={detailIndex}
+                        className="text-sm text-foreground-secondary leading-[19.6px]"
+                      >
+                        {detail.text}
+                      </p>
+                    )
+                  ))}
+                </div>
               </div>
             </div>
           ))}
