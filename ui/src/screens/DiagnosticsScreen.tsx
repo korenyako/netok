@@ -377,9 +377,14 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
                         className={`${DNS_IP_TEXT_CLASS} cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-2`}
                       >
                         <span>{detail.text}</span>
-                        {copiedIp === detail.text && (
+                        {copiedIp === detail.text ? (
                           <svg className="w-4 h-4 text-primary" viewBox="0 0 16 16" fill="none">
                             <path d="M13.5 4.5L6 12L2.5 8.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        ) : (
+                          <svg className="w-4 h-4 text-foreground-tertiary" viewBox="0 0 16 16" fill="none">
+                            <rect x="5" y="5" width="9" height="9" rx="1.5" stroke="currentColor" strokeWidth="1.5" />
+                            <path d="M11 5V3.5C11 2.67 10.33 2 9.5 2H3.5C2.67 2 2 2.67 2 3.5V9.5C2 10.33 2.67 11 3.5 11H5" stroke="currentColor" strokeWidth="1.5" />
                           </svg>
                         )}
                       </div>
