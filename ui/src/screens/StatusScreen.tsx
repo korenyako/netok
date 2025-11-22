@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { DiagnosticsSnapshot } from '../api/tauri';
 import { useDnsStore } from '../stores/useDnsStore';
@@ -11,22 +10,10 @@ interface StatusScreenProps {
 
 export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, diagnostics }: StatusScreenProps) {
   const { t } = useTranslation();
-  const { currentProvider: dnsProvider, isLoading: isDnsLoading } = useDnsStore();
-  const [dots, setDots] = useState(1);
+  const { currentProvider: dnsProvider } = useDnsStore();
 
-  // Animate dots during loading
-  useEffect(() => {
-    if (!isDnsLoading) return;
-
-    const interval = setInterval(() => {
-      setDots((prev) => (prev % 3) + 1);
-    }, 400);
-
-    return () => clearInterval(interval);
-  }, [isDnsLoading]);
-
-  // Determine if DNS protection is enabled
-  const isDnsProtectionEnabled = dnsProvider && dnsProvider.type !== 'Auto';
+  // Determine if DNS protection is enabled (not Auto/System DNS)
+  const isDnsProtectionEnabled = dnsProvider !== null && dnsProvider.type !== 'Auto';
 
   return (
     <div className="flex flex-col h-full bg-background">
@@ -78,23 +65,15 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, diag
           onClick={onNavigateToDnsProviders}
           className="w-full rounded-xl p-4 text-left focus:outline-none transition-colors bg-[#F2F2F2] hover:bg-[#E5E5E5] dark:bg-background-tertiary dark:hover:bg-background-hover"
         >
-          {isDnsLoading ? (
-            <p className="text-sm text-foreground-secondary leading-[19.6px]">
-              {t('status.dns_checking')}{'.'.repeat(dots)}
-            </p>
-          ) : (
-            <>
-              <h3 className="text-base font-medium text-foreground leading-5 mb-2">
-                {isDnsProtectionEnabled ? t('status.dns_protection') : t('status.dns_protection_disabled')}
-              </h3>
-              <p className="text-sm text-foreground-secondary leading-[19.6px]">
-                {isDnsProtectionEnabled
-                  ? t('status.dns_protection_enabled')
-                  : t('status.dns_protection_disabled_desc')
-                }
-              </p>
-            </>
-          )}
+          <h3 className="text-base font-medium text-foreground leading-5 mb-2">
+            {isDnsProtectionEnabled ? t('status.dns_protection') : t('status.dns_protection_disabled')}
+          </h3>
+          <p className="text-sm text-foreground-secondary leading-[19.6px]">
+            {isDnsProtectionEnabled
+              ? t('status.dns_protection_enabled')
+              : t('status.dns_protection_disabled_desc')
+            }
+          </p>
         </button>
       </div>
     </div>
