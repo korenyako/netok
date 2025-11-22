@@ -31,14 +31,55 @@ function getProviderDisplayName(type: string): string {
   return names[type] || type;
 }
 
+// Get variant translation key based on provider type and variant
+function getVariantTranslationKey(type: string, variant: string): string {
+  const variantKeys: Record<string, Record<string, string>> = {
+    'Cloudflare': {
+      'Standard': 'dns_detail.cloudflare.standard',
+      'Malware': 'dns_detail.cloudflare.malware',
+      'Family': 'dns_detail.cloudflare.family',
+    },
+    'AdGuard': {
+      'Standard': 'dns_detail.adguard.standard',
+      'NonFiltering': 'dns_detail.adguard.unfiltered',
+      'Family': 'dns_detail.adguard.family',
+    },
+    'Dns4Eu': {
+      'Protective': 'dns_detail.dns4eu.protective',
+      'ProtectiveChild': 'dns_detail.dns4eu.protective_child',
+      'ProtectiveAd': 'dns_detail.dns4eu.protective_ad',
+      'ProtectiveChildAd': 'dns_detail.dns4eu.protective_child_ad',
+      'Unfiltered': 'dns_detail.dns4eu.unfiltered',
+    },
+    'CleanBrowsing': {
+      'Family': 'dns_detail.cleanbrowsing.family',
+      'Adult': 'dns_detail.cleanbrowsing.adult',
+      'Security': 'dns_detail.cleanbrowsing.security',
+    },
+    'Quad9': {
+      'Recommended': 'dns_detail.quad9.recommended',
+      'SecuredEcs': 'dns_detail.quad9.secured_ecs',
+      'Unsecured': 'dns_detail.quad9.unsecured',
+    },
+    'OpenDns': {
+      'FamilyShield': 'dns_detail.opendns.familyshield',
+      'Home': 'dns_detail.opendns.home',
+    },
+  };
+  return variantKeys[type]?.[variant] || variant;
+}
+
 export function DnsProvidersScreen({ onBack, onSelectCloudflare, onSelectAdGuard, onSelectDns4Eu, onSelectCleanBrowsing, onSelectQuad9, onSelectOpenDns, onSelectGoogle }: DnsProvidersScreenProps) {
   const { t } = useTranslation();
   const { currentProvider: apiProvider } = useDnsStore();
   const [isApplying, setIsApplying] = useState(false);
 
-  // Check if protection is enabled
+  // Check if protection is enabled and get variant name
   const isProtectionEnabled = apiProvider !== null && apiProvider.type !== 'Auto';
   const activeProviderName = isProtectionEnabled ? getProviderDisplayName(apiProvider.type) : null;
+  const activeVariantKey = isProtectionEnabled && 'variant' in apiProvider
+    ? getVariantTranslationKey(apiProvider.type, apiProvider.variant as string)
+    : null;
 
   // Map API provider to local type
   const currentProvider: DnsProvider | null = apiProvider
@@ -131,12 +172,14 @@ export function DnsProvidersScreen({ onBack, onSelectCloudflare, onSelectAdGuard
         </p>
 
         {/* Active Protection Status */}
-        <div className="flex items-center gap-2 mt-2 mb-4">
-          <div className={`w-2 h-2 rounded-full ${isProtectionEnabled ? 'bg-primary' : 'bg-amber-500'}`} />
+        <div className="flex items-start gap-2 mt-2 mb-4">
+          <div className={`w-2 h-2 rounded-full mt-[6px] flex-shrink-0 ${isProtectionEnabled ? 'bg-primary' : 'bg-amber-500'}`} />
           <p className={`text-sm ${isProtectionEnabled ? 'text-primary' : 'text-amber-500'}`}>
             {isProtectionEnabled && activeProviderName
-              ? t('status.dns_protection_with_provider', { provider: activeProviderName })
-              : t('dns_providers.auto_desc')}
+              ? activeVariantKey
+                ? t('dns_providers.protection_enabled_with_mode', { provider: activeProviderName, mode: t(activeVariantKey) })
+                : t('dns_providers.protection_enabled', { provider: activeProviderName })
+              : t('dns_providers.protection_disabled')}
           </p>
         </div>
 
