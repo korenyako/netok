@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { setDns, getDnsProvider, type OpenDnsVariant as ApiOpenDnsVariant } from '../api/tauri';
+import { setDns, type OpenDnsVariant as ApiOpenDnsVariant } from '../api/tauri';
 import { DnsVariantCard } from '../components/DnsVariantCard';
+import { useDnsStore } from '../stores/useDnsStore';
+import { dnsStore } from '../stores/dnsStore';
 
 interface OpenDnsDetailScreenProps {
   onBack: () => void;
@@ -11,30 +13,15 @@ type OpenDnsVariant = 'familyshield' | 'home';
 
 export function OpenDnsDetailScreen({ onBack }: OpenDnsDetailScreenProps) {
   const { t } = useTranslation();
-  const [currentVariant, setCurrentVariant] = useState<OpenDnsVariant | null>(null);
+  const { currentProvider } = useDnsStore();
   const [applyingVariant, setApplyingVariant] = useState<OpenDnsVariant | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Load current DNS provider to detect which variant is active
-  useEffect(() => {
-    const fetchCurrentProvider = async () => {
-      try {
-        const provider = await getDnsProvider();
-        if (provider.type === 'OpenDns') {
-          const variant = provider.variant;
-          if (variant === 'FamilyShield') {
-            setCurrentVariant('familyshield');
-          } else if (variant === 'Home') {
-            setCurrentVariant('home');
-          }
-        }
-      } catch (err) {
-        console.error('Failed to get current DNS provider:', err);
-      }
-    };
-
-    fetchCurrentProvider();
-  }, []);
+  // Derive current variant from global store
+  const currentVariant: OpenDnsVariant | null = currentProvider?.type === 'OpenDns'
+    ? currentProvider.variant === 'FamilyShield' ? 'familyshield'
+    : 'home'
+    : null;
 
   const getDnsAddresses = (variantId: OpenDnsVariant): string => {
     switch (variantId) {
@@ -75,7 +62,9 @@ export function OpenDnsDetailScreen({ onBack }: OpenDnsDetailScreenProps) {
         type: 'OpenDns',
         variant: apiVariant,
       });
-      setCurrentVariant(variantId);
+
+      // Update global store
+      dnsStore.setProvider({ type: 'OpenDns', variant: apiVariant });
     } catch (err) {
       console.error('Failed to set DNS:', err);
       setError(err instanceof Error ? err.message : 'Failed to set DNS');

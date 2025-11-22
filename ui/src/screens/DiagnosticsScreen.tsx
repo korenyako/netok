@@ -356,7 +356,7 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
                 </div>
                 {/* Connecting line to next node */}
                 {index < nodes.length - 1 && (
-                  <div className="w-px flex-1 bg-border mt-2 min-h-[24px]"></div>
+                  <div className="w-px flex-1 bg-neutral-300 dark:bg-neutral-600 mt-2 min-h-[24px]"></div>
                 )}
               </div>
 

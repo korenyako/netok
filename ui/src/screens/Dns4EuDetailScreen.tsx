@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { setDns, getDnsProvider, type Dns4EuVariant as ApiDns4EuVariant } from '../api/tauri';
+import { setDns, type Dns4EuVariant as ApiDns4EuVariant } from '../api/tauri';
 import { DnsVariantCard } from '../components/DnsVariantCard';
+import { useDnsStore } from '../stores/useDnsStore';
+import { dnsStore } from '../stores/dnsStore';
 
 interface Dns4EuDetailScreenProps {
   onBack: () => void;
@@ -11,36 +13,18 @@ type Dns4EuVariant = 'protective' | 'protective_child' | 'protective_ad' | 'prot
 
 export function Dns4EuDetailScreen({ onBack }: Dns4EuDetailScreenProps) {
   const { t } = useTranslation();
-  const [currentVariant, setCurrentVariant] = useState<Dns4EuVariant | null>(null);
+  const { currentProvider } = useDnsStore();
   const [applyingVariant, setApplyingVariant] = useState<Dns4EuVariant | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Load current DNS provider to detect which variant is active
-  useEffect(() => {
-    const fetchCurrentProvider = async () => {
-      try {
-        const provider = await getDnsProvider();
-        if (provider.type === 'Dns4Eu') {
-          const variant = provider.variant;
-          if (variant === 'Protective') {
-            setCurrentVariant('protective');
-          } else if (variant === 'ProtectiveChild') {
-            setCurrentVariant('protective_child');
-          } else if (variant === 'ProtectiveAd') {
-            setCurrentVariant('protective_ad');
-          } else if (variant === 'ProtectiveChildAd') {
-            setCurrentVariant('protective_child_ad');
-          } else if (variant === 'Unfiltered') {
-            setCurrentVariant('unfiltered');
-          }
-        }
-      } catch (err) {
-        console.error('Failed to get current DNS provider:', err);
-      }
-    };
-
-    fetchCurrentProvider();
-  }, []);
+  // Derive current variant from global store
+  const currentVariant: Dns4EuVariant | null = currentProvider?.type === 'Dns4Eu'
+    ? currentProvider.variant === 'Protective' ? 'protective'
+    : currentProvider.variant === 'ProtectiveChild' ? 'protective_child'
+    : currentProvider.variant === 'ProtectiveAd' ? 'protective_ad'
+    : currentProvider.variant === 'ProtectiveChildAd' ? 'protective_child_ad'
+    : 'unfiltered'
+    : null;
 
   const getDnsAddresses = (variantId: Dns4EuVariant): string => {
     switch (variantId) {
@@ -106,7 +90,9 @@ export function Dns4EuDetailScreen({ onBack }: Dns4EuDetailScreenProps) {
         type: 'Dns4Eu',
         variant: apiVariant,
       });
-      setCurrentVariant(variantId);
+
+      // Update global store
+      dnsStore.setProvider({ type: 'Dns4Eu', variant: apiVariant });
     } catch (err) {
       console.error('Failed to set DNS:', err);
       setError(err instanceof Error ? err.message : 'Failed to set DNS');

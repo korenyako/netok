@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { setDns, getDnsProvider, type Quad9Variant as ApiQuad9Variant } from '../api/tauri';
+import { setDns, type Quad9Variant as ApiQuad9Variant } from '../api/tauri';
 import { DnsVariantCard } from '../components/DnsVariantCard';
+import { useDnsStore } from '../stores/useDnsStore';
+import { dnsStore } from '../stores/dnsStore';
 
 interface Quad9DetailScreenProps {
   onBack: () => void;
@@ -11,32 +13,16 @@ type Quad9Variant = 'recommended' | 'secured_ecs' | 'unsecured';
 
 export function Quad9DetailScreen({ onBack }: Quad9DetailScreenProps) {
   const { t } = useTranslation();
-  const [currentVariant, setCurrentVariant] = useState<Quad9Variant | null>(null);
+  const { currentProvider } = useDnsStore();
   const [applyingVariant, setApplyingVariant] = useState<Quad9Variant | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Load current DNS provider to detect which variant is active
-  useEffect(() => {
-    const fetchCurrentProvider = async () => {
-      try {
-        const provider = await getDnsProvider();
-        if (provider.type === 'Quad9') {
-          const variant = provider.variant;
-          if (variant === 'Recommended') {
-            setCurrentVariant('recommended');
-          } else if (variant === 'SecuredEcs') {
-            setCurrentVariant('secured_ecs');
-          } else if (variant === 'Unsecured') {
-            setCurrentVariant('unsecured');
-          }
-        }
-      } catch (err) {
-        console.error('Failed to get current DNS provider:', err);
-      }
-    };
-
-    fetchCurrentProvider();
-  }, []);
+  // Derive current variant from global store
+  const currentVariant: Quad9Variant | null = currentProvider?.type === 'Quad9'
+    ? currentProvider.variant === 'Recommended' ? 'recommended'
+    : currentProvider.variant === 'SecuredEcs' ? 'secured_ecs'
+    : 'unsecured'
+    : null;
 
   const getDnsAddresses = (variantId: Quad9Variant): string => {
     switch (variantId) {
@@ -86,7 +72,9 @@ export function Quad9DetailScreen({ onBack }: Quad9DetailScreenProps) {
         type: 'Quad9',
         variant: apiVariant,
       });
-      setCurrentVariant(variantId);
+
+      // Update global store
+      dnsStore.setProvider({ type: 'Quad9', variant: apiVariant });
     } catch (err) {
       console.error('Failed to set DNS:', err);
       setError(err instanceof Error ? err.message : 'Failed to set DNS');

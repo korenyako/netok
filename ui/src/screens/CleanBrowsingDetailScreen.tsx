@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { setDns, getDnsProvider, type CleanBrowsingVariant as ApiCleanBrowsingVariant } from '../api/tauri';
+import { setDns, type CleanBrowsingVariant as ApiCleanBrowsingVariant } from '../api/tauri';
 import { DnsVariantCard } from '../components/DnsVariantCard';
+import { useDnsStore } from '../stores/useDnsStore';
+import { dnsStore } from '../stores/dnsStore';
 
 interface CleanBrowsingDetailScreenProps {
   onBack: () => void;
@@ -11,32 +13,16 @@ type CleanBrowsingVariant = 'family' | 'adult' | 'security';
 
 export function CleanBrowsingDetailScreen({ onBack }: CleanBrowsingDetailScreenProps) {
   const { t } = useTranslation();
-  const [currentVariant, setCurrentVariant] = useState<CleanBrowsingVariant | null>(null);
+  const { currentProvider } = useDnsStore();
   const [applyingVariant, setApplyingVariant] = useState<CleanBrowsingVariant | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Load current DNS provider to detect which variant is active
-  useEffect(() => {
-    const fetchCurrentProvider = async () => {
-      try {
-        const provider = await getDnsProvider();
-        if (provider.type === 'CleanBrowsing') {
-          const variant = provider.variant;
-          if (variant === 'Family') {
-            setCurrentVariant('family');
-          } else if (variant === 'Adult') {
-            setCurrentVariant('adult');
-          } else if (variant === 'Security') {
-            setCurrentVariant('security');
-          }
-        }
-      } catch (err) {
-        console.error('Failed to get current DNS provider:', err);
-      }
-    };
-
-    fetchCurrentProvider();
-  }, []);
+  // Derive current variant from global store
+  const currentVariant: CleanBrowsingVariant | null = currentProvider?.type === 'CleanBrowsing'
+    ? currentProvider.variant === 'Family' ? 'family'
+    : currentProvider.variant === 'Adult' ? 'adult'
+    : 'security'
+    : null;
 
   const getDnsAddresses = (variantId: CleanBrowsingVariant): string => {
     switch (variantId) {
@@ -86,7 +72,9 @@ export function CleanBrowsingDetailScreen({ onBack }: CleanBrowsingDetailScreenP
         type: 'CleanBrowsing',
         variant: apiVariant,
       });
-      setCurrentVariant(variantId);
+
+      // Update global store
+      dnsStore.setProvider({ type: 'CleanBrowsing', variant: apiVariant });
     } catch (err) {
       console.error('Failed to set DNS:', err);
       setError(err instanceof Error ? err.message : 'Failed to set DNS');
