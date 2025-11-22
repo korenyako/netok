@@ -18,7 +18,7 @@ interface DnsProvidersScreenProps {
 type DnsProvider = 'auto' | 'cloudflare' | 'google' | 'adguard' | 'dns4eu' | 'cleanbrowsing' | 'quad9' | 'opendns';
 
 // Get display name for DNS provider
-function getProviderDisplayName(type: string): string {
+function getProviderDisplayName(type: string, t: (key: string) => string): string {
   const names: Record<string, string> = {
     'Cloudflare': 'Cloudflare',
     'Google': 'Google',
@@ -27,6 +27,7 @@ function getProviderDisplayName(type: string): string {
     'CleanBrowsing': 'CleanBrowsing',
     'Quad9': 'Quad9',
     'OpenDns': 'OpenDNS',
+    'Custom': t('dns_providers.custom'),
   };
   return names[type] || type;
 }
@@ -76,7 +77,7 @@ export function DnsProvidersScreen({ onBack, onSelectCloudflare, onSelectAdGuard
 
   // Check if protection is enabled and get variant name
   const isProtectionEnabled = apiProvider !== null && apiProvider.type !== 'Auto';
-  const activeProviderName = isProtectionEnabled ? getProviderDisplayName(apiProvider.type) : null;
+  const activeProviderName = isProtectionEnabled ? getProviderDisplayName(apiProvider.type, t) : null;
   const activeVariantKey = isProtectionEnabled && 'variant' in apiProvider
     ? getVariantTranslationKey(apiProvider.type, apiProvider.variant as string)
     : null;
@@ -162,17 +163,12 @@ export function DnsProvidersScreen({ onBack, onSelectCloudflare, onSelectAdGuard
       {/* Content */}
       <div className="flex-1 px-4">
         {/* Title */}
-        <h1 className="text-2xl font-semibold text-foreground leading-[28.8px] mb-[16px]">
+        <h1 className="text-2xl font-semibold text-foreground leading-[28.8px]">
           {t('dns_providers.title')}
         </h1>
 
-        {/* Description */}
-        <p className="text-sm text-foreground-secondary leading-[19.6px] max-w-[269px]">
-          {t('dns_providers.description')}
-        </p>
-
         {/* Active Protection Status */}
-        <div className="flex items-start gap-2 mt-2 mb-4">
+        <div className="flex items-start gap-2 mt-1 mb-4">
           <div className={`w-2 h-2 rounded-full mt-[6px] flex-shrink-0 ${isProtectionEnabled ? 'bg-primary' : 'bg-amber-500'}`} />
           <p className={`text-sm ${isProtectionEnabled ? 'text-primary' : 'text-amber-500'}`}>
             {isProtectionEnabled && activeProviderName
@@ -182,6 +178,11 @@ export function DnsProvidersScreen({ onBack, onSelectCloudflare, onSelectAdGuard
               : t('dns_providers.protection_disabled')}
           </p>
         </div>
+
+        {/* Description */}
+        <p className="text-sm text-foreground-secondary leading-[19.6px] max-w-[269px] mb-4">
+          {t('dns_providers.description')}
+        </p>
 
         {/* DNS Provider Options */}
         <div className="space-y-2">
