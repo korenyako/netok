@@ -1121,14 +1121,8 @@ pub fn get_current_dns() -> Result<Vec<String>, String> {
 
 // Check if IP address string is private (router/local network)
 fn is_private_ip_str(ip: &str) -> bool {
-    let parts: Vec<u8> = ip.split('.').filter_map(|s| s.parse().ok()).collect();
-    if parts.len() != 4 {
-        return false;
-    }
-    // 10.x.x.x, 172.16-31.x.x, 192.168.x.x
-    parts[0] == 10
-        || (parts[0] == 172 && (16..=31).contains(&parts[1]))
-        || (parts[0] == 192 && parts[1] == 168)
+    ip.parse::<std::net::IpAddr>()
+        .map_or(false, |ip_addr| is_private_ip(&ip_addr))
 }
 
 // Detect which DNS provider is currently in use based on DNS server IPs
