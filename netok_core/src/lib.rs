@@ -884,10 +884,10 @@ impl DnsProvider {
             DnsProvider::Dns4EuProtectiveAd => Some("86.54.11.13".to_string()),
             DnsProvider::Dns4EuProtectiveChildAd => Some("86.54.11.11".to_string()),
             DnsProvider::Dns4EuUnfiltered => Some("86.54.11.100".to_string()),
-            // CleanBrowsing (Adult and Security filters need IPs from table - marked as empty in CSV)
+            // CleanBrowsing
             DnsProvider::CleanBrowsingFamily => Some("185.228.168.168".to_string()),
-            DnsProvider::CleanBrowsingAdult => None, // No IP in table
-            DnsProvider::CleanBrowsingSecurity => None, // No IP in table
+            DnsProvider::CleanBrowsingAdult => Some("185.228.168.10".to_string()),
+            DnsProvider::CleanBrowsingSecurity => Some("185.228.168.9".to_string()),
             // Quad9
             DnsProvider::Quad9Recommended => Some("9.9.9.9".to_string()),
             DnsProvider::Quad9SecuredEcs => Some("9.9.9.11".to_string()),
@@ -920,8 +920,8 @@ impl DnsProvider {
             DnsProvider::Dns4EuUnfiltered => None,
             // CleanBrowsing
             DnsProvider::CleanBrowsingFamily => Some("185.228.169.168".to_string()),
-            DnsProvider::CleanBrowsingAdult => None,
-            DnsProvider::CleanBrowsingSecurity => None,
+            DnsProvider::CleanBrowsingAdult => Some("185.228.169.11".to_string()),
+            DnsProvider::CleanBrowsingSecurity => Some("185.228.169.9".to_string()),
             // Quad9
             DnsProvider::Quad9Recommended => Some("149.112.112.112".to_string()),
             DnsProvider::Quad9SecuredEcs => Some("149.112.112.11".to_string()),
@@ -1119,6 +1119,18 @@ pub fn get_current_dns() -> Result<Vec<String>, String> {
     Err("DNS detection is only supported on Windows".to_string())
 }
 
+// Check if IP address string is private (router/local network)
+fn is_private_ip_str(ip: &str) -> bool {
+    let parts: Vec<u8> = ip.split('.').filter_map(|s| s.parse().ok()).collect();
+    if parts.len() != 4 {
+        return false;
+    }
+    // 10.x.x.x, 172.16-31.x.x, 192.168.x.x
+    parts[0] == 10
+        || (parts[0] == 172 && (16..=31).contains(&parts[1]))
+        || (parts[0] == 192 && parts[1] == 168)
+}
+
 // Detect which DNS provider is currently in use based on DNS server IPs
 pub fn detect_dns_provider(dns_servers: &[String]) -> DnsProvider {
     if dns_servers.is_empty() {
@@ -1127,6 +1139,13 @@ pub fn detect_dns_provider(dns_servers: &[String]) -> DnsProvider {
 
     let primary = dns_servers.first().map(|s| s.as_str());
     let secondary = dns_servers.get(1).map(|s| s.as_str());
+
+    // If primary DNS is a private IP (router), treat as Auto (DHCP-assigned)
+    if let Some(p) = primary {
+        if is_private_ip_str(p) {
+            return DnsProvider::Auto;
+        }
+    }
 
     match (primary, secondary) {
         // Cloudflare
@@ -1158,6 +1177,12 @@ pub fn detect_dns_provider(dns_servers: &[String]) -> DnsProvider {
         // CleanBrowsing
         (Some("185.228.168.168"), Some("185.228.169.168")) | (Some("185.228.168.168"), None) => {
             DnsProvider::CleanBrowsingFamily
+        }
+        (Some("185.228.168.10"), Some("185.228.169.11")) | (Some("185.228.168.10"), None) => {
+            DnsProvider::CleanBrowsingAdult
+        }
+        (Some("185.228.168.9"), Some("185.228.169.9")) | (Some("185.228.168.9"), None) => {
+            DnsProvider::CleanBrowsingSecurity
         }
         // Quad9
         (Some("9.9.9.9"), Some("149.112.112.112")) | (Some("9.9.9.9"), None) => {
