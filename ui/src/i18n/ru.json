@@ -13,6 +13,9 @@
   "dns_providers": {
     "title": "Защита DNS",
     "description": "Выберите DNS-сервер для повышения безопасности и блокировки нежелательного контента",
+    "protection_disabled": "Защита DNS отключена. Используется DNS-сервер вашего провайдера",
+    "protection_enabled": "Включена защита DNS {{provider}}",
+    "protection_enabled_with_mode": "Включена защита DNS {{provider}} ({{mode}})",
     "auto": "Системный DNS",
     "auto_desc": "DNS-сервер вашего провайдера",
     "cloudflare": "Cloudflare",
