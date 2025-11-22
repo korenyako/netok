@@ -14,6 +14,7 @@ export function GoogleDetailScreen({ onBack }: GoogleDetailScreenProps) {
   const { t } = useTranslation();
   const { currentProvider } = useDnsStore();
   const [isApplying, setIsApplying] = useState(false);
+  const [isDisabling, setIsDisabling] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Derive active state from global store
@@ -36,6 +37,26 @@ export function GoogleDetailScreen({ onBack }: GoogleDetailScreenProps) {
       setError(err instanceof Error ? err.message : 'Failed to set DNS');
     } finally {
       setIsApplying(false);
+    }
+  };
+
+  const handleDisable = async () => {
+    try {
+      setIsDisabling(true);
+      setError(null);
+
+      await setDns({ type: 'Auto' });
+
+      // Update global store
+      dnsStore.setProvider({ type: 'Auto' });
+
+      // Show success notification
+      notifications.success(t('dns_detail.disable_success'));
+    } catch (err) {
+      console.error('Failed to disable DNS:', err);
+      setError(err instanceof Error ? err.message : 'Failed to disable DNS');
+    } finally {
+      setIsDisabling(false);
     }
   };
 
@@ -81,10 +102,10 @@ export function GoogleDetailScreen({ onBack }: GoogleDetailScreenProps) {
             dnsAddresses="8.8.8.8, 8.8.4.4"
             isSelected={isActive}
             isActive={isActive}
-            onApply={handleApply}
-            applyLabel={t('dns_detail.apply')}
-            isApplying={isApplying}
-            applyDisabled={isApplying}
+            onApply={isActive ? handleDisable : handleApply}
+            applyLabel={isActive ? t('dns_detail.disable') : t('dns_detail.apply')}
+            isApplying={isActive ? isDisabling : isApplying}
+            applyDisabled={isApplying || isDisabling}
           />
         </div>
 
