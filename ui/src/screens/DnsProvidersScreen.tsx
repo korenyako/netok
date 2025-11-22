@@ -17,19 +17,28 @@ interface DnsProvidersScreenProps {
 
 type DnsProvider = 'auto' | 'cloudflare' | 'google' | 'adguard' | 'dns4eu' | 'cleanbrowsing' | 'quad9' | 'opendns';
 
-// Get display name for DNS provider (returns null for Custom since it has no brand name)
-function getProviderDisplayName(type: string): string | null {
-  const names: Record<string, string> = {
-    'Cloudflare': 'Cloudflare',
-    'Google': 'Google',
-    'AdGuard': 'AdGuard',
-    'Dns4Eu': 'DNS4EU',
-    'CleanBrowsing': 'CleanBrowsing',
-    'Quad9': 'Quad9',
-    'OpenDns': 'OpenDNS',
-  };
-  return names[type] || null;
+// Static provider display names (only non-identical mappings)
+const PROVIDER_DISPLAY_NAMES: Record<string, string> = {
+  'Dns4Eu': 'DNS4EU',
+  'OpenDns': 'OpenDNS',
+};
+
+// Get display name for DNS provider
+function getProviderDisplayName(type: string): string {
+  return PROVIDER_DISPLAY_NAMES[type] || type;
 }
+
+// Map API type to local provider type
+const API_TO_LOCAL_PROVIDER: Record<string, DnsProvider> = {
+  'Auto': 'auto',
+  'Cloudflare': 'cloudflare',
+  'Google': 'google',
+  'AdGuard': 'adguard',
+  'Dns4Eu': 'dns4eu',
+  'CleanBrowsing': 'cleanbrowsing',
+  'Quad9': 'quad9',
+  'OpenDns': 'opendns',
+};
 
 // Get variant translation key based on provider type and variant
 function getVariantTranslationKey(type: string, variant: string): string {
@@ -74,24 +83,16 @@ export function DnsProvidersScreen({ onBack, onSelectCloudflare, onSelectAdGuard
   const { currentProvider: apiProvider } = useDnsStore();
   const [isApplying, setIsApplying] = useState(false);
 
-  // Check if protection is enabled and get variant name
+  // Check if protection is enabled and get provider info
   const isProtectionEnabled = apiProvider !== null && apiProvider.type !== 'Auto';
   const activeProviderName = isProtectionEnabled ? getProviderDisplayName(apiProvider.type) : null;
   const activeVariantKey = isProtectionEnabled && 'variant' in apiProvider
     ? getVariantTranslationKey(apiProvider.type, apiProvider.variant as string)
     : null;
 
-  // Map API provider to local type
+  // Map API provider to local type (null if unknown)
   const currentProvider: DnsProvider | null = apiProvider
-    ? apiProvider.type === 'Auto' ? 'auto'
-    : apiProvider.type === 'Cloudflare' ? 'cloudflare'
-    : apiProvider.type === 'Google' ? 'google'
-    : apiProvider.type === 'AdGuard' ? 'adguard'
-    : apiProvider.type === 'Dns4Eu' ? 'dns4eu'
-    : apiProvider.type === 'CleanBrowsing' ? 'cleanbrowsing'
-    : apiProvider.type === 'Quad9' ? 'quad9'
-    : apiProvider.type === 'OpenDns' ? 'opendns'
-    : 'auto'
+    ? API_TO_LOCAL_PROVIDER[apiProvider.type] ?? null
     : null;
 
   const handleProviderClick = async (providerId: DnsProvider) => {
@@ -170,12 +171,10 @@ export function DnsProvidersScreen({ onBack, onSelectCloudflare, onSelectAdGuard
         <div className="flex items-start gap-2 mt-1 mb-4">
           <div className={`w-2 h-2 rounded-full mt-[6px] flex-shrink-0 ${isProtectionEnabled ? 'bg-primary' : 'bg-amber-500'}`} />
           <p className={`text-sm ${isProtectionEnabled ? 'text-primary' : 'text-amber-500'}`}>
-            {isProtectionEnabled
-              ? activeProviderName
-                ? activeVariantKey
-                  ? t('dns_providers.protection_enabled_with_mode', { provider: activeProviderName, mode: t(activeVariantKey) })
-                  : t('dns_providers.protection_enabled', { provider: activeProviderName })
-                : t('dns_providers.protection_enabled_custom')
+            {isProtectionEnabled && activeProviderName
+              ? activeVariantKey
+                ? t('dns_providers.protection_enabled_with_mode', { provider: activeProviderName, mode: t(activeVariantKey) })
+                : t('dns_providers.protection_enabled', { provider: activeProviderName })
               : t('dns_providers.protection_disabled')}
           </p>
         </div>

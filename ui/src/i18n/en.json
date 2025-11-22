@@ -16,7 +16,6 @@
     "protection_disabled": "DNS protection disabled. Using your ISP's DNS server",
     "protection_enabled": "DNS protection enabled: {{provider}}",
     "protection_enabled_with_mode": "DNS protection enabled: {{provider}} ({{mode}})",
-    "protection_enabled_custom": "DNS protection enabled",
     "auto": "System DNS",
     "auto_desc": "DNS server provided by your ISP",
     "cloudflare": "Cloudflare",
