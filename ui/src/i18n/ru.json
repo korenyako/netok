@@ -100,10 +100,10 @@
     "connection_vpn_detected": "VPN соединение обнаружено",
     "waiting": "Проверяем соединение…",
     "dns_protection": "Защита DNS",
-    "dns_protection_enabled": "Блокировка нежелательного контента включена",
+    "dns_protection_with_provider": "Защита DNS {{provider}}",
+    "dns_protection_enabled": "Блокировка нежелательного контента",
     "dns_protection_disabled": "Защита DNS отключена",
-    "dns_protection_disabled_desc": "Стандартный DNS провайдера",
-    "dns_checking": "Проверка защиты DNS"
+    "dns_protection_disabled_desc": "Используется стандартный DNS провайдера"
   },
   "nodes": {
     "computer": {

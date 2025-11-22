@@ -8,12 +8,27 @@ interface StatusScreenProps {
   diagnostics: DiagnosticsSnapshot | null;
 }
 
+// Get display name for DNS provider
+function getProviderDisplayName(type: string): string {
+  const names: Record<string, string> = {
+    'Cloudflare': 'Cloudflare',
+    'Google': 'Google',
+    'AdGuard': 'AdGuard',
+    'Dns4Eu': 'DNS4EU',
+    'CleanBrowsing': 'CleanBrowsing',
+    'Quad9': 'Quad9',
+    'OpenDns': 'OpenDNS',
+  };
+  return names[type] || type;
+}
+
 export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, diagnostics }: StatusScreenProps) {
   const { t } = useTranslation();
   const { currentProvider: dnsProvider } = useDnsStore();
 
   // Determine if DNS protection is enabled (not Auto/System DNS)
   const isDnsProtectionEnabled = dnsProvider !== null && dnsProvider.type !== 'Auto';
+  const providerName = dnsProvider && dnsProvider.type !== 'Auto' ? getProviderDisplayName(dnsProvider.type) : null;
 
   return (
     <div className="flex flex-col h-full bg-background">
@@ -65,8 +80,11 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, diag
           onClick={onNavigateToDnsProviders}
           className="w-full rounded-xl p-4 text-left focus:outline-none transition-colors bg-[#F2F2F2] hover:bg-[#E5E5E5] dark:bg-background-tertiary dark:hover:bg-background-hover"
         >
-          <h3 className="text-base font-medium text-foreground leading-5 mb-2">
-            {isDnsProtectionEnabled ? t('status.dns_protection') : t('status.dns_protection_disabled')}
+          <h3 className="text-base font-medium text-foreground leading-5 mb-1">
+            {isDnsProtectionEnabled
+              ? t('status.dns_protection_with_provider', { provider: providerName })
+              : t('status.dns_protection_disabled')
+            }
           </h3>
           <p className="text-sm text-foreground-secondary leading-[19.6px]">
             {isDnsProtectionEnabled
