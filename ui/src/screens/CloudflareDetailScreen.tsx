@@ -159,7 +159,7 @@ export function CloudflareDetailScreen({ onBack }: CloudflareDetailScreenProps) 
                 onApply={currentVariant === variant.id ? handleDisable : () => handleApplyVariant(variant.id)}
                 applyLabel={currentVariant === variant.id ? t('dns_detail.disable') : t('dns_detail.apply')}
                 isApplying={currentVariant === variant.id ? isDisabling : applyingVariant === variant.id}
-                applyDisabled={Boolean((applyingVariant || isDisabling) && applyingVariant !== variant.id && !isDisabling)}
+                applyDisabled={Boolean((applyingVariant && applyingVariant !== variant.id) || (isDisabling && currentVariant !== variant.id))}
               />
             );
           })}
