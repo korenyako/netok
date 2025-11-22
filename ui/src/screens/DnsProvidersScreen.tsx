@@ -170,8 +170,8 @@ export function DnsProvidersScreen({ onBack, onSelectCloudflare, onSelectAdGuard
 
         {/* Active Protection Status */}
         <div className="flex items-start gap-2 mt-1 mb-4">
-          <div className={`w-2 h-2 rounded-full mt-[6px] flex-shrink-0 ${isProtectionEnabled ? 'bg-primary' : 'bg-amber-500'}`} />
-          <p className={`text-sm ${isProtectionEnabled ? 'text-primary' : 'text-amber-500'}`}>
+          <div className={`w-2 h-2 rounded-full mt-[5px] flex-shrink-0 ${isProtectionEnabled ? 'bg-primary' : 'bg-amber-500'}`} />
+          <p className={`text-xs font-mono ${isProtectionEnabled ? 'text-primary' : 'text-amber-500'}`}>
             {isProtectionEnabled && activeProviderName
               ? activeVariantKey
                 ? t('dns_providers.protection_enabled_with_mode', { provider: activeProviderName, mode: t(activeVariantKey) })
