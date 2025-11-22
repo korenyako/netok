@@ -126,18 +126,19 @@ export function DnsProvidersScreen({ onBack, onSelectCloudflare, onSelectAdGuard
         </h1>
 
         {/* Description */}
-        <p className="text-sm text-foreground-secondary leading-[19.6px] mb-[16px] max-w-[269px]">
+        <p className="text-sm text-foreground-secondary leading-[19.6px] max-w-[269px]">
           {t('dns_providers.description')}
         </p>
 
-        {/* Active Protection Banner */}
-        {isProtectionEnabled && activeProviderName && (
-          <div className="rounded-[12px] bg-primary/10 px-4 py-3 mb-4">
-            <p className="text-sm font-medium text-primary">
-              {t('status.dns_protection_with_provider', { provider: activeProviderName })}
-            </p>
-          </div>
-        )}
+        {/* Active Protection Status */}
+        <div className="flex items-center gap-2 mt-2 mb-4">
+          <div className={`w-2 h-2 rounded-full ${isProtectionEnabled ? 'bg-primary' : 'bg-amber-500'}`} />
+          <p className={`text-sm ${isProtectionEnabled ? 'text-primary' : 'text-amber-500'}`}>
+            {isProtectionEnabled && activeProviderName
+              ? t('status.dns_protection_with_provider', { provider: activeProviderName })
+              : t('dns_providers.auto_desc')}
+          </p>
+        </div>
 
         {/* DNS Provider Options */}
         <div className="space-y-2">
