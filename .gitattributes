@@ -1,0 +1,19 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Rust/Cargo files - always LF (Cargo writes LF)
+*.rs text eol=lf
+*.toml text eol=lf
+Cargo.lock text eol=lf
+
+# Shell scripts - always LF
+*.sh text eol=lf
+
+# Windows batch files - always CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Config files
+*.json text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf

@@ -1,6 +1,6 @@
 # Project Map - Netok
 
-Generated: 2025-11-19
+Generated: 2025-11-22
 
 ## TREE (ASCII)
 
@@ -10,11 +10,11 @@ Generated: 2025-11-19
 ├── .github
 │   ├── ISSUE_TEMPLATE
 │   │   └── feature_request.md
-│   ├── workflows
-│   │   ├── docs-lint.yml
-│   │   ├── release.yml
-│   │   └── tauri-windows.yml
-│   └── PULL_REQUEST_TEMPLATE.md
+│   └── workflows
+│       ├── docs-lint.yml
+│       ├── release.yml
+│       ├── tauri-windows.yml
+│       └── test.yml
 ├── .husky
 │   ├── _
 │   │   ├── .gitignore
@@ -36,9 +36,16 @@ Generated: 2025-11-19
 │   │   ├── CODING_RULES.md
 │   │   ├── SoT.md
 │   │   └── TASK_TEMPLATE.md
+│   ├── ACTION_PLAN.md
+│   ├── CODE_ANALYSIS.md
 │   ├── IMPLEMENTATION-PLAN.md
+│   ├── PROGRESS.md
 │   ├── README.md
+│   ├── RECOMMENDATIONS.md
+│   ├── REVISED_PRIORITIES.md
+│   ├── SECURITY_AUDIT.md
 │   ├── SoT-ARCH.md
+│   ├── TESTING_PLAN.md
 │   └── UI-SPEC.md
 ├── i18n
 │   ├── en.json
@@ -48,10 +55,15 @@ Generated: 2025-11-19
 │   ├── src
 │   │   ├── lib.rs
 │   │   └── types.rs
+│   ├── tests
+│   │   └── integration_tests.rs
 │   └── Cargo.toml
 ├── netok_core
+│   ├── benches
+│   │   └── diagnostics_benchmark.rs
 │   ├── src
-│   │   └── lib.rs
+│   │   ├── lib.rs
+│   │   └── oui_database.rs
 │   └── Cargo.toml
 ├── netok_desktop
 │   ├── public
@@ -106,6 +118,8 @@ Generated: 2025-11-19
 │   │   ├── src
 │   │   │   ├── lib.rs
 │   │   │   └── main.rs
+│   │   ├── tests
+│   │   │   └── integration_tests.rs
 │   │   ├── .gitignore
 │   │   ├── build.rs
 │   │   ├── Cargo.toml
@@ -121,6 +135,7 @@ Generated: 2025-11-19
 │   ├── tsconfig.node.json
 │   └── vite.config.ts
 ├── scripts
+│   ├── generate_oui_database.py
 │   └── generate_project_map.mjs
 ├── src
 │   └── i18n.ts
@@ -135,15 +150,21 @@ Generated: 2025-11-19
 │   │   ├── components
 │   │   │   ├── icons
 │   │   │   │   └── NavigationIcons.tsx
+│   │   │   ├── BottomNav.tsx
 │   │   │   ├── DnsVariantCard.tsx
 │   │   │   ├── HeaderStatus.tsx
 │   │   │   ├── MainPage.tsx
 │   │   │   ├── NodeCard.tsx
+│   │   │   ├── SecurityRouter.tsx
 │   │   │   ├── SettingsPage.tsx
+│   │   │   ├── SettingsRouter.tsx
 │   │   │   ├── Spinner.tsx
 │   │   │   └── ThemeProvider.tsx
 │   │   ├── constants
 │   │   │   └── dnsVariantStyles.ts
+│   │   ├── hooks
+│   │   │   ├── useDiagnostics.ts
+│   │   │   └── useNavigation.ts
 │   │   ├── i18n
 │   │   │   ├── en.json
 │   │   │   └── ru.json
@@ -161,15 +182,24 @@ Generated: 2025-11-19
 │   │   │   ├── SecurityScreen.tsx
 │   │   │   ├── SettingsScreen.tsx
 │   │   │   ├── StatusScreen.tsx
-│   │   │   └── ThemeSettingsScreen.tsx
+│   │   │   ├── ThemeSettingsScreen.tsx
+│   │   │   └── ToolsScreen.tsx
 │   │   ├── store
 │   │   │   └── useDiagnostics.ts
 │   │   ├── stores
 │   │   │   ├── dnsStore.ts
 │   │   │   ├── themeStore.ts
 │   │   │   └── useDnsStore.ts
+│   │   ├── tests
+│   │   │   ├── dnsStore.test.ts
+│   │   │   ├── formatUpdatedAt.test.ts
+│   │   │   ├── notifications.test.ts
+│   │   │   ├── setup.ts
+│   │   │   ├── tauri.test.ts
+│   │   │   └── themeStore.test.ts
 │   │   ├── utils
-│   │   │   └── formatUpdatedAt.ts
+│   │   │   ├── formatUpdatedAt.ts
+│   │   │   └── notifications.ts
 │   │   ├── App.tsx
 │   │   ├── i18n.ts
 │   │   ├── index.css
@@ -186,8 +216,20 @@ Generated: 2025-11-19
 │   ├── tsconfig.app.json
 │   ├── tsconfig.json
 │   ├── tsconfig.node.json
-│   └── vite.config.ts
+│   ├── vite.config.ts
+│   └── vitest.config.ts
 ├── .cursorrules
+├── .gitattributes
+├── .gitignore
+├── Cargo.lock
+├── Cargo.toml
+├── CLAUDE.md
+├── CONTRIBUTING.md
+├── LICENSE.Apache-2.0
+├── LICENSE.Proprietary
+├── Loading prop to NodeCard for better UX
+├── package-lock.json
+├── package.json
 ├── PROJECT_CONTEXT.md
 ├── PROJECT_MAP.md
 ├── README_DEV.md
@@ -213,7 +255,7 @@ Generated: 2025-11-19
     "beforeDevCommand": "npm run dev --prefix ../ui",
     "beforeBuildCommand": "npm run build --prefix ../ui",
     "devUrl": "http://localhost:5173",
-    "frontendDist": "../ui/dist"
+    "frontendDist": "../../ui/dist"
   },
 
   "app": {
@@ -244,7 +286,11 @@ Generated: 2025-11-19
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "test:run": "vitest run"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.9.0",
@@ -252,28 +298,35 @@ Generated: 2025-11-19
     "netok": "file:..",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-hot-toast": "^2.6.0",
     "react-i18next": "^15.7.3",
     "react-router-dom": "^7.9.1",
     "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
     "@vitejs/plugin-react": "^5.0.0",
+    "@vitest/coverage-v8": "^4.0.12",
+    "@vitest/ui": "^4.0.11",
     "autoprefixer": "^10.4.21",
     "eslint": "^9.33.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.3.0",
+    "happy-dom": "^20.0.10",
+    "jsdom": "^27.2.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.17",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.39.1",
-    "vite": "^7.1.2"
-  }
-}
-
+    "vite": "^7.1.2",
+    "vitest": "^4.0.11"
+  }}
 ```
 
 ### ui/tailwind.config.js
@@ -343,56 +396,56 @@ createRoot(document.getElementById('root')!).render(
 ### ui/src/App.tsx
 
 ```typescript
-import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Toaster } from 'react-hot-toast';
 import { ThemeProvider } from './components/ThemeProvider';
+import { BottomNav } from './components/BottomNav';
+import { SecurityRouter } from './components/SecurityRouter';
+import { SettingsRouter } from './components/SettingsRouter';
 import { StatusScreen } from './screens/StatusScreen';
 import { DiagnosticsScreen } from './screens/DiagnosticsScreen';
-import { DnsProvidersScreen } from './screens/DnsProvidersScreen';
-import { CloudflareDetailScreen } from './screens/CloudflareDetailScreen';
-import { AdGuardDetailScreen } from './screens/AdGuardDetailScreen';
-import { Dns4EuDetailScreen } from './screens/Dns4EuDetailScreen';
-import { CleanBrowsingDetailScreen } from './screens/CleanBrowsingDetailScreen';
-import { Quad9DetailScreen } from './screens/Quad9DetailScreen';
-import { OpenDnsDetailScreen } from './screens/OpenDnsDetailScreen';
-import { GoogleDetailScreen } from './screens/GoogleDetailScreen';
-import { SettingsScreen } from './screens/SettingsScreen';
-import { ThemeSettingsScreen } from './screens/ThemeSettingsScreen';
-import { LanguageSettingsScreen } from './screens/LanguageSettingsScreen';
-import { WaypointsIcon, ShieldIcon, WrenchIcon, SettingsIcon } from './components/icons/NavigationIcons';
-import { runDiagnostics, type DiagnosticsSnapshot } from './api/tauri';
-import { dnsStore } from './stores/dnsStore';
-
-type Screen = 'home' | 'security' | 'tools' | 'settings';
-type SettingsSubScreen = 'main' | 'theme' | 'language';
-type SecuritySubScreen = 'dns-providers' | 'cloudflare-detail' | 'adguard-detail' | 'dns4eu-detail' | 'cleanbrowsing-detail' | 'quad9-detail' | 'opendns-detail' | 'google-detail';
+import { ToolsScreen } from './screens/ToolsScreen';
+import { useNavigation } from './hooks/useNavigation';
+import { useDiagnostics } from './hooks/useDiagnostics';
 
 function App() {
-  const { t } = useTranslation();
-  const [currentScreen, setCurrentScreen] = useState<Screen>('home');
-  const [showDiagnostics, setShowDiagnostics] = useState(false);
-  const [settingsSubScreen, setSettingsSubScreen] = useState<SettingsSubScreen>('main');
-  const [securitySubScreen, setSecuritySubScreen] = useState<SecuritySubScreen>('dns-providers');
-  const [diagnosticsData, setDiagnosticsData] = useState<DiagnosticsSnapshot | null>(null);
+  const {
+    currentScreen,
+    showDiagnostics,
+    settingsSubScreen,
+    securitySubScreen,
+    setShowDiagnostics,
+    setSettingsSubScreen,
+    setSecuritySubScreen,
+    navigateToHome,
+    navigateToSecurity,
+    navigateToTools,
+    navigateToSettings,
+  } = useNavigation();
 
-  // Load diagnostics data once on mount
-  useEffect(() => {
-    fetchDiagnosticsData();
-  }, []);
+  const { diagnosticsData, fetchDiagnosticsData } = useDiagnostics();
 
-  const fetchDiagnosticsData = async () => {
-    try {
-      const snapshot = await runDiagnostics();
-      setDiagnosticsData(snapshot);
-    } catch (err) {
-      console.error('Failed to fetch diagnostics:', err);
-    }
-  };
-
-  // If diagnostics is shown, render it without the nav
   if (showDiagnostics) {
     return (
-      <ThemeProvider>}}
+      <ThemeProvider>
+        <Toaster />
+        <div id="app" className="h-full flex flex-col bg-background">
+          <DiagnosticsScreen
+            onBack={() => setShowDiagnostics(false)}
+            onRefresh={fetchDiagnosticsData}
+            onNavigateToSecurity={() => {
+              setShowDiagnostics(false);
+              navigateToSecurity();
+            }}
+            onNavigateToTools={() => {
+              setShowDiagnostics(false);
+              navigateToTools();
+            }}
+            onNavigateToSettings={() => {
+              setShowDiagnostics(false);
+              navigateToSettings();
+            }}
+          />
+        </div>}}
 
 export default App;
 ```
@@ -404,7 +457,7 @@ export default App;
 - **Dev Command**: npm run dev --prefix ../ui
 - **Build Command**: npm run build --prefix ../ui
 - **Dev Path**: <http://localhost:5173>
-- **Dist Dir**: ../ui/dist
+- **Dist Dir**: ../../ui/dist
 - **Window Title**: Netok
 - **Window Size**: 320×600
 
