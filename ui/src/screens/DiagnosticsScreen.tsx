@@ -349,7 +349,7 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
               className="flex"
             >
               {/* Timeline column with bead and connecting line */}
-              <div className="flex flex-col items-center mr-3 pt-[18px]">
+              <div className="flex flex-col items-center mr-3 pt-3">
                 {/* Bead (status icon) */}
                 <div className="flex-shrink-0">
                   {getStatusIcon(node.status)}
@@ -369,10 +369,10 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
 
                 {/* Node Details */}
                 <div className="space-y-[6px]">
-                  {node.details.map((detail, detailIndex) => (
+                  {node.details.map((detail) => (
                     detail.isIp ? (
                       <div
-                        key={detailIndex}
+                        key={detail.text}
                         onClick={() => handleCopyIp(detail.text)}
                         className={`${DNS_IP_TEXT_CLASS} cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-2`}
                       >
@@ -385,7 +385,7 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
                       </div>
                     ) : (
                       <p
-                        key={detailIndex}
+                        key={detail.text}
                         className="text-sm text-foreground-secondary leading-[19.6px]"
                       >
                         {detail.text}
