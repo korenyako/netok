@@ -17,10 +17,28 @@ interface DnsProvidersScreenProps {
 
 type DnsProvider = 'auto' | 'cloudflare' | 'google' | 'adguard' | 'dns4eu' | 'cleanbrowsing' | 'quad9' | 'opendns';
 
+// Get display name for DNS provider
+function getProviderDisplayName(type: string): string {
+  const names: Record<string, string> = {
+    'Cloudflare': 'Cloudflare',
+    'Google': 'Google',
+    'AdGuard': 'AdGuard',
+    'Dns4Eu': 'DNS4EU',
+    'CleanBrowsing': 'CleanBrowsing',
+    'Quad9': 'Quad9',
+    'OpenDns': 'OpenDNS',
+  };
+  return names[type] || type;
+}
+
 export function DnsProvidersScreen({ onBack, onSelectCloudflare, onSelectAdGuard, onSelectDns4Eu, onSelectCleanBrowsing, onSelectQuad9, onSelectOpenDns, onSelectGoogle }: DnsProvidersScreenProps) {
   const { t } = useTranslation();
   const { currentProvider: apiProvider } = useDnsStore();
   const [isApplying, setIsApplying] = useState(false);
+
+  // Check if protection is enabled
+  const isProtectionEnabled = apiProvider !== null && apiProvider.type !== 'Auto';
+  const activeProviderName = isProtectionEnabled ? getProviderDisplayName(apiProvider.type) : null;
 
   // Map API provider to local type
   const currentProvider: DnsProvider | null = apiProvider
@@ -111,6 +129,15 @@ export function DnsProvidersScreen({ onBack, onSelectCloudflare, onSelectAdGuard
         <p className="text-sm text-foreground-secondary leading-[19.6px] mb-[16px] max-w-[269px]">
           {t('dns_providers.description')}
         </p>
+
+        {/* Active Protection Banner */}
+        {isProtectionEnabled && activeProviderName && (
+          <div className="rounded-[12px] bg-primary/10 px-4 py-3 mb-4">
+            <p className="text-sm font-medium text-primary">
+              {t('status.dns_protection_with_provider', { provider: activeProviderName })}
+            </p>
+          </div>
+        )}
 
         {/* DNS Provider Options */}
         <div className="space-y-2">
