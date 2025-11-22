@@ -17,8 +17,8 @@ interface DnsProvidersScreenProps {
 
 type DnsProvider = 'auto' | 'cloudflare' | 'google' | 'adguard' | 'dns4eu' | 'cleanbrowsing' | 'quad9' | 'opendns';
 
-// Get display name for DNS provider
-function getProviderDisplayName(type: string, t: (key: string) => string): string {
+// Get display name for DNS provider (returns null for Custom since it has no brand name)
+function getProviderDisplayName(type: string): string | null {
   const names: Record<string, string> = {
     'Cloudflare': 'Cloudflare',
     'Google': 'Google',
@@ -27,9 +27,8 @@ function getProviderDisplayName(type: string, t: (key: string) => string): strin
     'CleanBrowsing': 'CleanBrowsing',
     'Quad9': 'Quad9',
     'OpenDns': 'OpenDNS',
-    'Custom': t('dns_providers.custom'),
   };
-  return names[type] || type;
+  return names[type] || null;
 }
 
 // Get variant translation key based on provider type and variant
@@ -77,7 +76,7 @@ export function DnsProvidersScreen({ onBack, onSelectCloudflare, onSelectAdGuard
 
   // Check if protection is enabled and get variant name
   const isProtectionEnabled = apiProvider !== null && apiProvider.type !== 'Auto';
-  const activeProviderName = isProtectionEnabled ? getProviderDisplayName(apiProvider.type, t) : null;
+  const activeProviderName = isProtectionEnabled ? getProviderDisplayName(apiProvider.type) : null;
   const activeVariantKey = isProtectionEnabled && 'variant' in apiProvider
     ? getVariantTranslationKey(apiProvider.type, apiProvider.variant as string)
     : null;
@@ -171,10 +170,12 @@ export function DnsProvidersScreen({ onBack, onSelectCloudflare, onSelectAdGuard
         <div className="flex items-start gap-2 mt-1 mb-4">
           <div className={`w-2 h-2 rounded-full mt-[6px] flex-shrink-0 ${isProtectionEnabled ? 'bg-primary' : 'bg-amber-500'}`} />
           <p className={`text-sm ${isProtectionEnabled ? 'text-primary' : 'text-amber-500'}`}>
-            {isProtectionEnabled && activeProviderName
-              ? activeVariantKey
-                ? t('dns_providers.protection_enabled_with_mode', { provider: activeProviderName, mode: t(activeVariantKey) })
-                : t('dns_providers.protection_enabled', { provider: activeProviderName })
+            {isProtectionEnabled
+              ? activeProviderName
+                ? activeVariantKey
+                  ? t('dns_providers.protection_enabled_with_mode', { provider: activeProviderName, mode: t(activeVariantKey) })
+                  : t('dns_providers.protection_enabled', { provider: activeProviderName })
+                : t('dns_providers.protection_enabled_custom')
               : t('dns_providers.protection_disabled')}
           </p>
         </div>

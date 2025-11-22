@@ -16,6 +16,7 @@
     "protection_disabled": "Защита DNS отключена. Используется DNS-сервер вашего провайдера",
     "protection_enabled": "Включена защита DNS {{provider}}",
     "protection_enabled_with_mode": "Включена защита DNS {{provider}} ({{mode}})",
+    "protection_enabled_custom": "Включена защита DNS",
     "auto": "Системный DNS",
     "auto_desc": "DNS-сервер вашего провайдера",
     "cloudflare": "Cloudflare",
