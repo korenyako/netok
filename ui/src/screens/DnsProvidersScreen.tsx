@@ -176,14 +176,9 @@ export function DnsProvidersScreen({ onBack, onSelectCloudflare, onSelectAdGuard
               ? activeVariantKey
                 ? t('dns_providers.protection_enabled_with_mode', { provider: activeProviderName, mode: t(activeVariantKey) })
                 : t('dns_providers.protection_enabled', { provider: activeProviderName })
-              : t('dns_providers.protection_disabled')}
+              : t('dns_providers.protection_disabled_with_hint')}
           </p>
         </div>
-
-        {/* Description */}
-        <p className="text-sm text-foreground-secondary leading-[19.6px] max-w-[269px] mb-4">
-          {t('dns_providers.description')}
-        </p>
 
         {/* DNS Provider Options */}
         <div className="space-y-2">
