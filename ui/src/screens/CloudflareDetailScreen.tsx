@@ -4,7 +4,6 @@ import { setDns, type CloudflareVariant as ApiCloudflareVariant } from '../api/t
 import { DnsVariantCard } from '../components/DnsVariantCard';
 import { useDnsStore } from '../stores/useDnsStore';
 import { dnsStore } from '../stores/dnsStore';
-import { notifications } from '../utils/notifications';
 
 interface CloudflareDetailScreenProps {
   onBack: () => void;
@@ -76,24 +75,10 @@ export function CloudflareDetailScreen({ onBack }: CloudflareDetailScreenProps) 
 
       // Update global store
       dnsStore.setProvider({ type: 'Cloudflare', variant: apiVariant });
-
-      // Show success notification
-      notifications.success(
-        t('dns.apply_success', {
-          defaultValue: 'DNS settings applied successfully'
-        })
-      );
     } catch (err) {
       console.error('Failed to set DNS:', err);
       const errorMessage = err instanceof Error ? err.message : 'Failed to set DNS';
       setError(errorMessage);
-
-      // Show error notification
-      notifications.error(
-        t('dns.apply_error', {
-          defaultValue: `Failed to apply DNS settings: ${errorMessage}`
-        })
-      );
     } finally {
       setApplyingVariant(null);
     }
