@@ -19,7 +19,9 @@
       "Bash(do sed -i 's|{/\\* Subtitle \\*/}|{/\\* Provider Description \\*/}\\n        <p className=\"\"text-sm text-foreground-secondary leading-[19.6px] mb-[12px]\"\">\\n          {t(''''dns_providers.'''' + provider + ''''_desc'''')}\\n        </p>\\n\\n        {/\\* Subtitle \\*/}|' \"$file\")",
       "Bash(done)",
       "Bash(do)",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "Bash(git add:*)",
+      "Bash(git rm:*)"
     ],
     "deny": [],
     "ask": []
