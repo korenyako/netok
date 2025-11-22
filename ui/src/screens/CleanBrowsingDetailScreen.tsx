@@ -4,6 +4,7 @@ import { setDns, type CleanBrowsingVariant as ApiCleanBrowsingVariant } from '..
 import { DnsVariantCard } from '../components/DnsVariantCard';
 import { useDnsStore } from '../stores/useDnsStore';
 import { dnsStore } from '../stores/dnsStore';
+import { notifications } from '../utils/notifications';
 
 interface CleanBrowsingDetailScreenProps {
   onBack: () => void;
@@ -75,6 +76,9 @@ export function CleanBrowsingDetailScreen({ onBack }: CleanBrowsingDetailScreenP
 
       // Update global store
       dnsStore.setProvider({ type: 'CleanBrowsing', variant: apiVariant });
+
+      // Show success notification
+      notifications.success(t('dns_detail.apply_success'));
     } catch (err) {
       console.error('Failed to set DNS:', err);
       setError(err instanceof Error ? err.message : 'Failed to set DNS');

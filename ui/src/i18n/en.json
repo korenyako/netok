@@ -37,6 +37,7 @@
   "dns_detail": {
     "choose_protection": "Choose protection variant",
     "apply": "Apply",
+    "apply_success": "DNS settings applied",
     "cloudflare": {
       "standard": "Standard",
       "standard_desc": "Fast and reliable DNS",
