@@ -884,10 +884,10 @@ impl DnsProvider {
             DnsProvider::Dns4EuProtectiveAd => Some("86.54.11.13".to_string()),
             DnsProvider::Dns4EuProtectiveChildAd => Some("86.54.11.11".to_string()),
             DnsProvider::Dns4EuUnfiltered => Some("86.54.11.100".to_string()),
-            // CleanBrowsing (Adult and Security filters need IPs from table - marked as empty in CSV)
+            // CleanBrowsing
             DnsProvider::CleanBrowsingFamily => Some("185.228.168.168".to_string()),
-            DnsProvider::CleanBrowsingAdult => None, // No IP in table
-            DnsProvider::CleanBrowsingSecurity => None, // No IP in table
+            DnsProvider::CleanBrowsingAdult => Some("185.228.168.10".to_string()),
+            DnsProvider::CleanBrowsingSecurity => Some("185.228.168.9".to_string()),
             // Quad9
             DnsProvider::Quad9Recommended => Some("9.9.9.9".to_string()),
             DnsProvider::Quad9SecuredEcs => Some("9.9.9.11".to_string()),
@@ -920,8 +920,8 @@ impl DnsProvider {
             DnsProvider::Dns4EuUnfiltered => None,
             // CleanBrowsing
             DnsProvider::CleanBrowsingFamily => Some("185.228.169.168".to_string()),
-            DnsProvider::CleanBrowsingAdult => None,
-            DnsProvider::CleanBrowsingSecurity => None,
+            DnsProvider::CleanBrowsingAdult => Some("185.228.169.11".to_string()),
+            DnsProvider::CleanBrowsingSecurity => Some("185.228.169.9".to_string()),
             // Quad9
             DnsProvider::Quad9Recommended => Some("149.112.112.112".to_string()),
             DnsProvider::Quad9SecuredEcs => Some("149.112.112.11".to_string()),
@@ -1177,6 +1177,12 @@ pub fn detect_dns_provider(dns_servers: &[String]) -> DnsProvider {
         // CleanBrowsing
         (Some("185.228.168.168"), Some("185.228.169.168")) | (Some("185.228.168.168"), None) => {
             DnsProvider::CleanBrowsingFamily
+        }
+        (Some("185.228.168.10"), Some("185.228.169.11")) | (Some("185.228.168.10"), None) => {
+            DnsProvider::CleanBrowsingAdult
+        }
+        (Some("185.228.168.9"), Some("185.228.169.9")) | (Some("185.228.168.9"), None) => {
+            DnsProvider::CleanBrowsingSecurity
         }
         // Quad9
         (Some("9.9.9.9"), Some("149.112.112.112")) | (Some("9.9.9.9"), None) => {
