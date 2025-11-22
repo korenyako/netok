@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { WaypointsIcon, ShieldIcon, WrenchIcon, SettingsIcon } from '../components/icons/NavigationIcons';
-import { CheckmarkIcon, CopyIcon } from '../components/icons/ActionIcons';
+import { CopiedChip, CopyIcon } from '../components/icons/ActionIcons';
 import { runDiagnostics, type NodeResult } from '../api/tauri';
 import { DNS_IP_TEXT_CLASS } from '../constants/dnsVariantStyles';
 
@@ -378,7 +378,7 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
                         className={`${DNS_IP_TEXT_CLASS} cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-2`}
                       >
                         <span>{detail.text}</span>
-                        {copiedIp === detail.text ? <CheckmarkIcon /> : <CopyIcon />}
+                        {copiedIp === detail.text ? <CopiedChip /> : <CopyIcon />}
                       </div>
                     ) : (
                       <p

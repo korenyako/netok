@@ -1,8 +1,8 @@
-export function CheckmarkIcon() {
+export function CopiedChip() {
   return (
-    <svg className="w-4 h-4 text-primary" viewBox="0 0 16 16" fill="none">
-      <path d="M13.5 4.5L6 12L2.5 8.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
+    <span className="text-[10px] font-medium text-primary bg-primary/10 px-1.5 py-0.5 rounded">
+      Copied
+    </span>
   );
 }
 
