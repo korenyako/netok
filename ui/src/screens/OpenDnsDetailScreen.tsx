@@ -16,6 +16,7 @@ export function OpenDnsDetailScreen({ onBack }: OpenDnsDetailScreenProps) {
   const { t } = useTranslation();
   const { currentProvider } = useDnsStore();
   const [applyingVariant, setApplyingVariant] = useState<OpenDnsVariant | null>(null);
+  const [isDisabling, setIsDisabling] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Derive current variant from global store
@@ -77,6 +78,26 @@ export function OpenDnsDetailScreen({ onBack }: OpenDnsDetailScreenProps) {
     }
   };
 
+  const handleDisable = async () => {
+    try {
+      setIsDisabling(true);
+      setError(null);
+
+      await setDns({ type: 'Auto' });
+
+      // Update global store
+      dnsStore.setProvider({ type: 'Auto' });
+
+      // Show success notification
+      notifications.success(t('dns_detail.disable_success'));
+    } catch (err) {
+      console.error('Failed to disable DNS:', err);
+      setError(err instanceof Error ? err.message : 'Failed to disable DNS');
+    } finally {
+      setIsDisabling(false);
+    }
+  };
+
   return (
     <div className="flex flex-col h-full bg-background">
       {/* Header with Back button */}
@@ -123,10 +144,10 @@ export function OpenDnsDetailScreen({ onBack }: OpenDnsDetailScreenProps) {
                 dnsAddresses={dnsAddresses}
                 isSelected={currentVariant === variant.id}
                 isActive={currentVariant === variant.id}
-                onApply={() => handleApplyVariant(variant.id)}
-                applyLabel={t('dns_detail.apply')}
-                isApplying={applyingVariant === variant.id}
-                applyDisabled={Boolean(applyingVariant && applyingVariant !== variant.id)}
+                onApply={currentVariant === variant.id ? handleDisable : () => handleApplyVariant(variant.id)}
+                applyLabel={currentVariant === variant.id ? t('dns_detail.disable') : t('dns_detail.apply')}
+                isApplying={currentVariant === variant.id ? isDisabling : applyingVariant === variant.id}
+                applyDisabled={Boolean((applyingVariant || isDisabling) && applyingVariant !== variant.id && !isDisabling)}
               />
             );
           })}

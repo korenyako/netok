@@ -38,7 +38,9 @@
   "dns_detail": {
     "choose_protection": "Выберите вариант защиты",
     "apply": "Применить",
+    "disable": "Отключить",
     "apply_success": "Настройки DNS применены",
+    "disable_success": "Защита DNS отключена",
     "cloudflare": {
       "standard": "Стандартный",
       "standard_desc": "Быстрый и надёжный DNS",
