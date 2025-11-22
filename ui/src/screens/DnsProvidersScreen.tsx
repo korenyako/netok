@@ -19,7 +19,7 @@ type DnsProvider = 'auto' | 'cloudflare' | 'google' | 'adguard' | 'dns4eu' | 'cl
 
 export function DnsProvidersScreen({ onBack, onSelectCloudflare, onSelectAdGuard, onSelectDns4Eu, onSelectCleanBrowsing, onSelectQuad9, onSelectOpenDns, onSelectGoogle }: DnsProvidersScreenProps) {
   const { t } = useTranslation();
-  const { currentProvider: apiProvider, isLoading } = useDnsStore();
+  const { currentProvider: apiProvider } = useDnsStore();
   const [isApplying, setIsApplying] = useState(false);
 
   // Map API provider to local type
@@ -115,7 +115,7 @@ export function DnsProvidersScreen({ onBack, onSelectCloudflare, onSelectAdGuard
         {/* DNS Provider Options */}
         <div className="space-y-2">
           {providers.map((provider) => {
-            const isSelected = !isLoading && currentProvider === provider.id;
+            const isSelected = currentProvider === provider.id;
 
             return (
               <button
