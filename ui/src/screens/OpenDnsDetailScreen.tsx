@@ -4,6 +4,7 @@ import { setDns, type OpenDnsVariant as ApiOpenDnsVariant } from '../api/tauri';
 import { DnsVariantCard } from '../components/DnsVariantCard';
 import { useDnsStore } from '../stores/useDnsStore';
 import { dnsStore } from '../stores/dnsStore';
+import { notifications } from '../utils/notifications';
 
 interface OpenDnsDetailScreenProps {
   onBack: () => void;
@@ -65,6 +66,9 @@ export function OpenDnsDetailScreen({ onBack }: OpenDnsDetailScreenProps) {
 
       // Update global store
       dnsStore.setProvider({ type: 'OpenDns', variant: apiVariant });
+
+      // Show success notification
+      notifications.success(t('dns_detail.apply_success'));
     } catch (err) {
       console.error('Failed to set DNS:', err);
       setError(err instanceof Error ? err.message : 'Failed to set DNS');

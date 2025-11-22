@@ -8,6 +8,9 @@ interface StatusScreenProps {
   diagnostics: DiagnosticsSnapshot | null;
 }
 
+// Known providers that count as "protection enabled"
+const KNOWN_PROVIDERS = ['Cloudflare', 'Google', 'AdGuard', 'Dns4Eu', 'CleanBrowsing', 'Quad9', 'OpenDns'];
+
 // Get display name for DNS provider
 function getProviderDisplayName(type: string): string {
   const names: Record<string, string> = {
@@ -26,9 +29,10 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, diag
   const { t } = useTranslation();
   const { currentProvider: dnsProvider } = useDnsStore();
 
-  // Determine if DNS protection is enabled (not Auto/System DNS)
-  const isDnsProtectionEnabled = dnsProvider !== null && dnsProvider.type !== 'Auto';
-  const providerName = dnsProvider && dnsProvider.type !== 'Auto' ? getProviderDisplayName(dnsProvider.type) : null;
+  // Determine if DNS protection is enabled (only known providers count as enabled)
+  // Auto and Custom are treated as "protection disabled"
+  const isDnsProtectionEnabled = dnsProvider !== null && KNOWN_PROVIDERS.includes(dnsProvider.type);
+  const providerName = isDnsProtectionEnabled ? getProviderDisplayName(dnsProvider.type) : null;
 
   return (
     <div className="flex flex-col h-full bg-background">

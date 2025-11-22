@@ -14,6 +14,7 @@
     "title": "DNS Protection",
     "description": "Select a DNS server to enhance security and block unwanted content",
     "protection_disabled": "DNS protection disabled. Using your ISP's DNS server",
+    "protection_disabled_with_hint": "Using your ISP's DNS server. Select a DNS server to enhance security and block unwanted content",
     "protection_enabled": "DNS protection enabled: {{provider}}",
     "protection_enabled_with_mode": "DNS protection enabled: {{provider}} ({{mode}})",
     "auto": "System DNS",
@@ -37,6 +38,7 @@
   "dns_detail": {
     "choose_protection": "Choose protection variant",
     "apply": "Apply",
+    "apply_success": "DNS settings applied",
     "cloudflare": {
       "standard": "Standard",
       "standard_desc": "Fast and reliable DNS",

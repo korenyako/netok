@@ -83,16 +83,17 @@ export function DnsProvidersScreen({ onBack, onSelectCloudflare, onSelectAdGuard
   const { currentProvider: apiProvider } = useDnsStore();
   const [isApplying, setIsApplying] = useState(false);
 
-  // Check if protection is enabled and get provider info
-  const isProtectionEnabled = apiProvider !== null && apiProvider.type !== 'Auto';
+  // Check if protection is enabled (Auto and Custom = disabled, known providers = enabled)
+  const isKnownProvider = apiProvider !== null && API_TO_LOCAL_PROVIDER[apiProvider.type] !== undefined && apiProvider.type !== 'Auto';
+  const isProtectionEnabled = isKnownProvider;
   const activeProviderName = isProtectionEnabled ? getProviderDisplayName(apiProvider.type) : null;
   const activeVariantKey = isProtectionEnabled && 'variant' in apiProvider
     ? getVariantTranslationKey(apiProvider.type, apiProvider.variant as string)
     : null;
 
-  // Map API provider to local type (null if unknown)
+  // Map API provider to local type (Custom treated as auto since it's not configurable in UI)
   const currentProvider: DnsProvider | null = apiProvider
-    ? API_TO_LOCAL_PROVIDER[apiProvider.type] ?? null
+    ? apiProvider.type === 'Custom' ? 'auto' : (API_TO_LOCAL_PROVIDER[apiProvider.type] ?? null)
     : null;
 
   const handleProviderClick = async (providerId: DnsProvider) => {
@@ -169,20 +170,15 @@ export function DnsProvidersScreen({ onBack, onSelectCloudflare, onSelectAdGuard
 
         {/* Active Protection Status */}
         <div className="flex items-start gap-2 mt-1 mb-4">
-          <div className={`w-2 h-2 rounded-full mt-[6px] flex-shrink-0 ${isProtectionEnabled ? 'bg-primary' : 'bg-amber-500'}`} />
-          <p className={`text-sm ${isProtectionEnabled ? 'text-primary' : 'text-amber-500'}`}>
+          <div className={`w-2 h-2 rounded-full mt-[5px] flex-shrink-0 ${isProtectionEnabled ? 'bg-primary' : 'bg-amber-500'}`} />
+          <p className={`text-xs font-mono ${isProtectionEnabled ? 'text-primary' : 'text-amber-500'}`}>
             {isProtectionEnabled && activeProviderName
               ? activeVariantKey
                 ? t('dns_providers.protection_enabled_with_mode', { provider: activeProviderName, mode: t(activeVariantKey) })
                 : t('dns_providers.protection_enabled', { provider: activeProviderName })
-              : t('dns_providers.protection_disabled')}
+              : t('dns_providers.protection_disabled_with_hint')}
           </p>
         </div>
-
-        {/* Description */}
-        <p className="text-sm text-foreground-secondary leading-[19.6px] max-w-[269px] mb-4">
-          {t('dns_providers.description')}
-        </p>
 
         {/* DNS Provider Options */}
         <div className="space-y-2">

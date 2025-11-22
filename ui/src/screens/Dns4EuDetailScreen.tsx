@@ -4,6 +4,7 @@ import { setDns, type Dns4EuVariant as ApiDns4EuVariant } from '../api/tauri';
 import { DnsVariantCard } from '../components/DnsVariantCard';
 import { useDnsStore } from '../stores/useDnsStore';
 import { dnsStore } from '../stores/dnsStore';
+import { notifications } from '../utils/notifications';
 
 interface Dns4EuDetailScreenProps {
   onBack: () => void;
@@ -93,6 +94,9 @@ export function Dns4EuDetailScreen({ onBack }: Dns4EuDetailScreenProps) {
 
       // Update global store
       dnsStore.setProvider({ type: 'Dns4Eu', variant: apiVariant });
+
+      // Show success notification
+      notifications.success(t('dns_detail.apply_success'));
     } catch (err) {
       console.error('Failed to set DNS:', err);
       setError(err instanceof Error ? err.message : 'Failed to set DNS');
