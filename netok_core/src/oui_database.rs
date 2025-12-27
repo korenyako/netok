@@ -10007,7 +10007,7 @@ pub const OUI_DATABASE: &[(&str, &str)] = &[
     ("78BC1A", "Cisco Systems, Inc"),
     ("005C86", "SHENZHEN FAST TECHNOLOGIES CO.,LTD"),
     ("5C546D", "HUAWEI TECHNOLOGIES CO.,LTD"),
-    ("48BCA6", "​ASUNG TECHNO CO.,Ltd"),
+    ("48BCA6", "ASUNG TECHNO CO.,Ltd"),
     ("3C10E6", "PHAZR Inc."),
     ("30053F", "JTI Co.,Ltd."),
     ("B009DA", "Ring Solutions"),

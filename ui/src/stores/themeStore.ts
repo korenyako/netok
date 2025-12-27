@@ -30,30 +30,17 @@ export const useThemeStore = create<ThemeState>()(
       theme: 'light',
       resolvedTheme: 'light',
 
+      // Pure state update - no DOM side effects
       setTheme: (theme: Theme) => {
-        set({ theme });
         const resolved = resolveTheme(theme);
-        set({ resolvedTheme: resolved });
-
-        // Apply theme to document
-        if (resolved === 'dark') {
-          document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-        }
+        set({ theme, resolvedTheme: resolved });
       },
 
+      // Pure state update - no DOM side effects
       updateResolvedTheme: () => {
         const { theme } = get();
         const resolved = resolveTheme(theme);
         set({ resolvedTheme: resolved });
-
-        // Apply theme to document
-        if (resolved === 'dark') {
-          document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-        }
       },
     }),
     {
@@ -64,7 +51,7 @@ export const useThemeStore = create<ThemeState>()(
   )
 );
 
-// Listen to system theme changes
+// Listen to system theme changes (pure state update)
 if (typeof window !== 'undefined') {
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
     const store = useThemeStore.getState();
