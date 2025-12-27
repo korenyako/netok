@@ -5,26 +5,23 @@ describe('themeStore', () => {
   beforeEach(() => {
     // Reset store before each test
     useThemeStore.setState({ theme: 'light', resolvedTheme: 'light' });
-    document.documentElement.classList.remove('dark');
   });
 
   describe('setTheme', () => {
-    it('should set light theme and remove dark class', () => {
+    it('should set light theme', () => {
       const { setTheme } = useThemeStore.getState();
       setTheme('light');
 
       expect(useThemeStore.getState().theme).toBe('light');
       expect(useThemeStore.getState().resolvedTheme).toBe('light');
-      expect(document.documentElement.classList.contains('dark')).toBe(false);
     });
 
-    it('should set dark theme and add dark class', () => {
+    it('should set dark theme', () => {
       const { setTheme } = useThemeStore.getState();
       setTheme('dark');
 
       expect(useThemeStore.getState().theme).toBe('dark');
       expect(useThemeStore.getState().resolvedTheme).toBe('dark');
-      expect(document.documentElement.classList.contains('dark')).toBe(true);
     });
 
     it('should set system theme and resolve based on media query', () => {
@@ -62,7 +59,6 @@ describe('themeStore', () => {
 
       updateResolvedTheme();
       expect(useThemeStore.getState().resolvedTheme).toBe('dark');
-      expect(document.documentElement.classList.contains('dark')).toBe(true);
     });
 
     it('should not change resolved theme if user has explicit preference', () => {
@@ -96,16 +92,28 @@ describe('themeStore', () => {
     it('should handle multiple theme changes correctly', () => {
       const { setTheme } = useThemeStore.getState();
 
+      setTheme('light');
+      expect(useThemeStore.getState().resolvedTheme).toBe('light');
+
+      setTheme('dark');
+      expect(useThemeStore.getState().resolvedTheme).toBe('dark');
+
+      setTheme('light');
+      expect(useThemeStore.getState().resolvedTheme).toBe('light');
+    });
+  });
+
+  describe('store is pure (no DOM side effects)', () => {
+    it('should not modify document classList directly', () => {
       // Clear any previous dark class
       document.documentElement.classList.remove('dark');
 
-      setTheme('light');
-      expect(document.documentElement.classList.contains('dark')).toBe(false);
-
+      const { setTheme } = useThemeStore.getState();
       setTheme('dark');
-      expect(document.documentElement.classList.contains('dark')).toBe(true);
 
-      setTheme('light');
+      // Store should update state but NOT touch DOM
+      expect(useThemeStore.getState().resolvedTheme).toBe('dark');
+      // DOM should remain unchanged (ThemeProvider handles DOM)
       expect(document.documentElement.classList.contains('dark')).toBe(false);
     });
   });
