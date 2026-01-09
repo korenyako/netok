@@ -90,5 +90,26 @@
   "nodes.wifi.name": "Wi-Fi",
   "nodes.dns.name": "DNS",
   "nodes.internet.name": "Интернет",
-  "summary.ok": "Всё в порядке"
+  "summary.ok": "Всё в порядке",
+
+  "diagnostic.scenario.all_good.title": "Всё в порядке",
+  "diagnostic.scenario.all_good.message": "Интернет работает нормально.",
+  "diagnostic.scenario.wifi_disabled.title": "Wi-Fi выключен",
+  "diagnostic.scenario.wifi_disabled.message": "Адаптер Wi-Fi выключен. Включите Wi-Fi в настройках Windows.",
+  "diagnostic.scenario.wifi_not_connected.title": "Нет подключения",
+  "diagnostic.scenario.wifi_not_connected.message": "Нет подключения к Wi-Fi. Выберите сеть и подключитесь.",
+  "diagnostic.scenario.router_unreachable.title": "Роутер не отвечает",
+  "diagnostic.scenario.router_unreachable.message": "Роутер не отвечает. Проверьте, включён ли роутер и горят ли на нём индикаторы.",
+  "diagnostic.scenario.no_internet.title": "Нет интернета",
+  "diagnostic.scenario.no_internet.message": "Роутер работает, но интернет отсутствует. Проверьте кабель от провайдера или позвоните в поддержку.",
+  "diagnostic.scenario.dns_failure.title": "Проблема с DNS",
+  "diagnostic.scenario.dns_failure.message": "Не удаётся найти адреса сайтов. Попробуйте сменить DNS на автоматический или используйте Cloudflare (1.1.1.1).",
+  "diagnostic.scenario.http_blocked.title": "Сайты недоступны",
+  "diagnostic.scenario.http_blocked.message": "Интернет частично работает. Сайты недоступны, но DNS отвечает. Проверьте настройки VPN или брандмауэра.",
+  "diagnostic.scenario.weak_signal.title": "Слабый сигнал",
+  "diagnostic.scenario.weak_signal.message": "Слабый сигнал Wi-Fi. Подойдите ближе к роутеру или проверьте, нет ли помех.",
+
+  "diagnostic.mock.title": "Тестовый режим",
+  "diagnostic.mock.select_scenario": "Выберите сценарий",
+  "diagnostic.mock.enabled": "Mock-режим включён"
 }

@@ -90,5 +90,26 @@
   "nodes.wifi.name": "Wi-Fi",
   "nodes.dns.name": "DNS",
   "nodes.internet.name": "Internet",
-  "summary.ok": "All good"
+  "summary.ok": "All good",
+
+  "diagnostic.scenario.all_good.title": "All Good",
+  "diagnostic.scenario.all_good.message": "Internet is working.",
+  "diagnostic.scenario.wifi_disabled.title": "Wi-Fi Disabled",
+  "diagnostic.scenario.wifi_disabled.message": "Wi-Fi adapter is disabled. Turn on Wi-Fi in Windows settings.",
+  "diagnostic.scenario.wifi_not_connected.title": "Not Connected",
+  "diagnostic.scenario.wifi_not_connected.message": "Not connected to Wi-Fi. Select a network and connect.",
+  "diagnostic.scenario.router_unreachable.title": "Router Unreachable",
+  "diagnostic.scenario.router_unreachable.message": "Router is not responding. Check if your router is powered on and its lights are on.",
+  "diagnostic.scenario.no_internet.title": "No Internet",
+  "diagnostic.scenario.no_internet.message": "Router is working, but there's no internet. Check the cable from your provider or contact support.",
+  "diagnostic.scenario.dns_failure.title": "DNS Problem",
+  "diagnostic.scenario.dns_failure.message": "Cannot resolve website addresses. Try switching DNS to automatic or use Cloudflare (1.1.1.1).",
+  "diagnostic.scenario.http_blocked.title": "Websites Unavailable",
+  "diagnostic.scenario.http_blocked.message": "Internet is partially working. Websites are unavailable, but DNS responds. Check your VPN or firewall settings.",
+  "diagnostic.scenario.weak_signal.title": "Weak Signal",
+  "diagnostic.scenario.weak_signal.message": "Weak Wi-Fi signal. Move closer to your router or check for interference.",
+
+  "diagnostic.mock.title": "Test Mode",
+  "diagnostic.mock.select_scenario": "Select scenario",
+  "diagnostic.mock.enabled": "Mock mode enabled"
 }
