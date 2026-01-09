@@ -100,6 +100,149 @@ pub struct DiagnosticsSnapshot {
     pub internet: InternetInfo,
 }
 
+/// Diagnostic scenario representing different network states.
+///
+/// Used for displaying appropriate error messages and for mock testing.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum DiagnosticScenario {
+    /// Everything works normally
+    AllGood,
+    /// Wi-Fi adapter is disabled
+    WifiDisabled,
+    /// Wi-Fi is on but not connected to any network
+    WifiNotConnected,
+    /// Connected to Wi-Fi but router is not responding
+    RouterUnreachable,
+    /// Router works but no internet connection
+    NoInternet,
+    /// DNS resolution is failing
+    DnsFailure,
+    /// DNS works but HTTP requests are blocked
+    HttpBlocked,
+    /// Wi-Fi signal is weak
+    WeakSignal,
+}
+
+impl DiagnosticScenario {
+    /// Returns the i18n key for this scenario's title.
+    pub fn title_key(&self) -> &'static str {
+        match self {
+            Self::AllGood => "diagnostic.scenario.all_good.title",
+            Self::WifiDisabled => "diagnostic.scenario.wifi_disabled.title",
+            Self::WifiNotConnected => "diagnostic.scenario.wifi_not_connected.title",
+            Self::RouterUnreachable => "diagnostic.scenario.router_unreachable.title",
+            Self::NoInternet => "diagnostic.scenario.no_internet.title",
+            Self::DnsFailure => "diagnostic.scenario.dns_failure.title",
+            Self::HttpBlocked => "diagnostic.scenario.http_blocked.title",
+            Self::WeakSignal => "diagnostic.scenario.weak_signal.title",
+        }
+    }
+
+    /// Returns the i18n key for this scenario's message.
+    pub fn message_key(&self) -> &'static str {
+        match self {
+            Self::AllGood => "diagnostic.scenario.all_good.message",
+            Self::WifiDisabled => "diagnostic.scenario.wifi_disabled.message",
+            Self::WifiNotConnected => "diagnostic.scenario.wifi_not_connected.message",
+            Self::RouterUnreachable => "diagnostic.scenario.router_unreachable.message",
+            Self::NoInternet => "diagnostic.scenario.no_internet.message",
+            Self::DnsFailure => "diagnostic.scenario.dns_failure.message",
+            Self::HttpBlocked => "diagnostic.scenario.http_blocked.message",
+            Self::WeakSignal => "diagnostic.scenario.weak_signal.message",
+        }
+    }
+
+    /// Returns the severity level for UI display.
+    pub fn severity(&self) -> DiagnosticSeverity {
+        match self {
+            Self::AllGood => DiagnosticSeverity::Success,
+            Self::WeakSignal => DiagnosticSeverity::Warning,
+            _ => DiagnosticSeverity::Error,
+        }
+    }
+
+    /// Creates a scenario from a numeric ID (for mock testing).
+    pub fn from_id(id: u8) -> Option<Self> {
+        match id {
+            0 => Some(Self::AllGood),
+            1 => Some(Self::WifiDisabled),
+            2 => Some(Self::WifiNotConnected),
+            3 => Some(Self::RouterUnreachable),
+            4 => Some(Self::NoInternet),
+            5 => Some(Self::DnsFailure),
+            6 => Some(Self::HttpBlocked),
+            7 => Some(Self::WeakSignal),
+            _ => None,
+        }
+    }
+
+    /// Returns the numeric ID for this scenario.
+    pub fn to_id(&self) -> u8 {
+        match self {
+            Self::AllGood => 0,
+            Self::WifiDisabled => 1,
+            Self::WifiNotConnected => 2,
+            Self::RouterUnreachable => 3,
+            Self::NoInternet => 4,
+            Self::DnsFailure => 5,
+            Self::HttpBlocked => 6,
+            Self::WeakSignal => 7,
+        }
+    }
+
+    /// Returns all scenarios for iteration.
+    pub fn all() -> &'static [Self] {
+        &[
+            Self::AllGood,
+            Self::WifiDisabled,
+            Self::WifiNotConnected,
+            Self::RouterUnreachable,
+            Self::NoInternet,
+            Self::DnsFailure,
+            Self::HttpBlocked,
+            Self::WeakSignal,
+        ]
+    }
+}
+
+/// Severity level for diagnostic scenarios.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+#[serde(rename_all = "lowercase")]
+pub enum DiagnosticSeverity {
+    Success,
+    Warning,
+    Error,
+}
+
+/// Result of a diagnostic check with scenario and optional details.
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct DiagnosticResult {
+    pub scenario: DiagnosticScenario,
+    pub severity: DiagnosticSeverity,
+    pub details: Option<String>,
+}
+
+impl DiagnosticResult {
+    /// Creates a new diagnostic result from a scenario.
+    pub fn new(scenario: DiagnosticScenario) -> Self {
+        Self {
+            severity: scenario.severity(),
+            scenario,
+            details: None,
+        }
+    }
+
+    /// Creates a new diagnostic result with details.
+    pub fn with_details(scenario: DiagnosticScenario, details: impl Into<String>) -> Self {
+        Self {
+            severity: scenario.severity(),
+            scenario,
+            details: Some(details.into()),
+        }
+    }
+}
+
 /// Application settings.
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Settings {
@@ -317,5 +460,84 @@ mod tests {
     #[test]
     fn test_connection_type_default() {
         assert_eq!(ConnectionType::default(), ConnectionType::Unknown);
+    }
+
+    // ==================== DiagnosticScenario Tests ====================
+
+    #[test]
+    fn test_diagnostic_scenario_from_id() {
+        assert_eq!(DiagnosticScenario::from_id(0), Some(DiagnosticScenario::AllGood));
+        assert_eq!(DiagnosticScenario::from_id(1), Some(DiagnosticScenario::WifiDisabled));
+        assert_eq!(DiagnosticScenario::from_id(7), Some(DiagnosticScenario::WeakSignal));
+        assert_eq!(DiagnosticScenario::from_id(8), None);
+        assert_eq!(DiagnosticScenario::from_id(255), None);
+    }
+
+    #[test]
+    fn test_diagnostic_scenario_to_id_roundtrip() {
+        for scenario in DiagnosticScenario::all() {
+            let id = scenario.to_id();
+            let restored = DiagnosticScenario::from_id(id);
+            assert_eq!(restored, Some(*scenario));
+        }
+    }
+
+    #[test]
+    fn test_diagnostic_scenario_all_count() {
+        assert_eq!(DiagnosticScenario::all().len(), 8);
+    }
+
+    #[test]
+    fn test_diagnostic_scenario_severity() {
+        assert_eq!(DiagnosticScenario::AllGood.severity(), DiagnosticSeverity::Success);
+        assert_eq!(DiagnosticScenario::WeakSignal.severity(), DiagnosticSeverity::Warning);
+        assert_eq!(DiagnosticScenario::WifiDisabled.severity(), DiagnosticSeverity::Error);
+        assert_eq!(DiagnosticScenario::DnsFailure.severity(), DiagnosticSeverity::Error);
+    }
+
+    #[test]
+    fn test_diagnostic_scenario_keys() {
+        let scenario = DiagnosticScenario::WifiDisabled;
+        assert_eq!(scenario.title_key(), "diagnostic.scenario.wifi_disabled.title");
+        assert_eq!(scenario.message_key(), "diagnostic.scenario.wifi_disabled.message");
+    }
+
+    #[test]
+    fn test_diagnostic_scenario_serialization() {
+        for scenario in DiagnosticScenario::all() {
+            let json = serde_json::to_string(scenario).expect("Should serialize");
+            let deserialized: DiagnosticScenario =
+                serde_json::from_str(&json).expect("Should deserialize");
+            assert_eq!(*scenario, deserialized);
+        }
+    }
+
+    #[test]
+    fn test_diagnostic_result_new() {
+        let result = DiagnosticResult::new(DiagnosticScenario::AllGood);
+        assert_eq!(result.scenario, DiagnosticScenario::AllGood);
+        assert_eq!(result.severity, DiagnosticSeverity::Success);
+        assert!(result.details.is_none());
+    }
+
+    #[test]
+    fn test_diagnostic_result_with_details() {
+        let result = DiagnosticResult::with_details(
+            DiagnosticScenario::WifiDisabled,
+            "Adapter: Intel Wi-Fi 6",
+        );
+        assert_eq!(result.scenario, DiagnosticScenario::WifiDisabled);
+        assert_eq!(result.severity, DiagnosticSeverity::Error);
+        assert_eq!(result.details, Some("Adapter: Intel Wi-Fi 6".to_string()));
+    }
+
+    #[test]
+    fn test_diagnostic_result_serialization() {
+        let result = DiagnosticResult::with_details(DiagnosticScenario::NoInternet, "Test");
+        let json = serde_json::to_string(&result).expect("Should serialize");
+        let deserialized: DiagnosticResult =
+            serde_json::from_str(&json).expect("Should deserialize");
+        assert_eq!(deserialized.scenario, result.scenario);
+        assert_eq!(deserialized.details, result.details);
     }
 }

@@ -22,8 +22,9 @@ mod oui_database;
 
 // Re-export all domain types at crate root (backward compatibility)
 pub use domain::{
-    get_default_settings, ComputerInfo, ConnectionType, DiagnosticsSnapshot, DnsProvider,
-    InternetInfo, NetworkInfo, NodeId, NodeInfo, RouterInfo, Settings, Status,
+    get_default_settings, ComputerInfo, ConnectionType, DiagnosticResult, DiagnosticScenario,
+    DiagnosticSeverity, DiagnosticsSnapshot, DnsProvider, InternetInfo, NetworkInfo, NodeId,
+    NodeInfo, RouterInfo, Settings, Status,
 };
 
 // Re-export diagnostics functions
