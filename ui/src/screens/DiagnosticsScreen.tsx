@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { WaypointsIcon, ShieldIcon, WrenchIcon, SettingsIcon } from '../components/icons/NavigationIcons';
 import { CopiedChip, CopyIcon } from '../components/icons/ActionIcons';
-import { runDiagnostics, type NodeResult } from '../api/tauri';
+import { DiagnosticMessage } from '../components/DiagnosticMessage';
+import { runDiagnostics, type NodeResult, type DiagnosticScenario, type DiagnosticSeverity } from '../api/tauri';
 import { DNS_IP_TEXT_CLASS } from '../constants/dnsVariantStyles';
 
 interface NodeDetail {
@@ -23,6 +24,50 @@ interface DiagnosticsScreenProps {
   onNavigateToSecurity?: () => void;
   onNavigateToTools?: () => void;
   onNavigateToSettings?: () => void;
+}
+
+// Derive diagnostic scenario from node statuses
+function deriveScenario(nodes: NetworkNode[]): { scenario: DiagnosticScenario; severity: DiagnosticSeverity } | null {
+  if (nodes.length === 0) return null;
+
+  // Check if all nodes are OK
+  const allOk = nodes.every(n => n.status === 'ok');
+  if (allOk) {
+    return { scenario: 'all_good', severity: 'success' };
+  }
+
+  // Find which node is failing
+  const networkNode = nodes.find(n => n.id === 'network');
+  const routerNode = nodes.find(n => n.id === 'dns'); // 'dns' is actually router in UI
+  const internetNode = nodes.find(n => n.id === 'internet');
+
+  // Check for network issues first (Wi-Fi)
+  if (networkNode?.status === 'down') {
+    return { scenario: 'wifi_not_connected', severity: 'error' };
+  }
+
+  // Check for weak signal (partial network status)
+  if (networkNode?.status === 'partial') {
+    return { scenario: 'weak_signal', severity: 'warning' };
+  }
+
+  // Check for router unreachable
+  if (routerNode?.status === 'down') {
+    return { scenario: 'router_unreachable', severity: 'error' };
+  }
+
+  // Check for internet issues
+  if (internetNode?.status === 'down') {
+    return { scenario: 'no_internet', severity: 'error' };
+  }
+
+  if (internetNode?.status === 'partial') {
+    // Could be DNS failure or HTTP blocked
+    return { scenario: 'dns_failure', severity: 'warning' };
+  }
+
+  // Default to all_good if we can't determine
+  return { scenario: 'all_good', severity: 'success' };
 }
 
 export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onNavigateToTools, onNavigateToSettings }: DiagnosticsScreenProps) {
@@ -344,6 +389,21 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
       {/* Node List */}
       {!isLoading && !error && (
         <div className="flex-1 overflow-auto px-4">
+          {/* Diagnostic Status Message */}
+          {(() => {
+            const result = deriveScenario(nodes);
+            if (result) {
+              return (
+                <DiagnosticMessage
+                  scenario={result.scenario}
+                  severity={result.severity}
+                  className="mb-4"
+                />
+              );
+            }
+            return null;
+          })()}
+
           {nodes.map((node, index) => (
             <div
               key={node.id}
