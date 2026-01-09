@@ -2,8 +2,8 @@ use netok_core::{get_default_settings, run_diagnostics, Settings};
 
 mod types;
 pub use types::{
-    ComputerInfo, ConnectionType, InternetInfo, NetworkInfo, NodeId, NodeResult, Overall,
-    RouterInfo, Snapshot, Speed,
+    ComputerInfo, ConnectionType, DiagnosticResult, DiagnosticScenario, DiagnosticSeverity,
+    InternetInfo, NetworkInfo, NodeId, NodeResult, Overall, RouterInfo, Snapshot, Speed,
 };
 
 #[derive(thiserror::Error, Debug)]
@@ -302,4 +302,42 @@ pub async fn get_dns_provider() -> Result<DnsProviderType, String> {
     })
     .await
     .map_err(|e| format!("Failed to run DNS detection task: {}", e))?
+}
+
+// ==================== Mock Scenario API ====================
+
+/// Get a mock diagnostic result for UI testing.
+///
+/// # Arguments
+/// * `scenario_id` - Numeric ID of the scenario (0-7)
+///
+/// # Returns
+/// * `Ok(DiagnosticResult)` - The mock result for the given scenario
+/// * `Err(String)` - If the scenario ID is invalid
+pub fn get_mock_scenario(scenario_id: u8) -> Result<DiagnosticResult, String> {
+    DiagnosticScenario::from_id(scenario_id)
+        .map(DiagnosticResult::new)
+        .ok_or_else(|| format!("Invalid scenario ID: {}. Valid range: 0-7", scenario_id))
+}
+
+/// Get all available diagnostic scenarios for UI dropdown.
+///
+/// Returns a list of (id, scenario_key) pairs for building UI selectors.
+pub fn get_all_scenarios() -> Vec<(u8, &'static str)> {
+    DiagnosticScenario::all()
+        .iter()
+        .map(|s| {
+            let key = match s {
+                DiagnosticScenario::AllGood => "all_good",
+                DiagnosticScenario::WifiDisabled => "wifi_disabled",
+                DiagnosticScenario::WifiNotConnected => "wifi_not_connected",
+                DiagnosticScenario::RouterUnreachable => "router_unreachable",
+                DiagnosticScenario::NoInternet => "no_internet",
+                DiagnosticScenario::DnsFailure => "dns_failure",
+                DiagnosticScenario::HttpBlocked => "http_blocked",
+                DiagnosticScenario::WeakSignal => "weak_signal",
+            };
+            (s.to_id(), key)
+        })
+        .collect()
 }

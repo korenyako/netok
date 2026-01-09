@@ -6,7 +6,10 @@
 use serde::Serialize;
 
 // Re-export common types from netok_core (no duplication)
-pub use netok_core::{ComputerInfo, ConnectionType, InternetInfo, NetworkInfo, RouterInfo};
+pub use netok_core::{
+    ComputerInfo, ConnectionType, DiagnosticResult, DiagnosticScenario, DiagnosticSeverity,
+    InternetInfo, NetworkInfo, RouterInfo,
+};
 
 /// Overall status for UI display.
 ///

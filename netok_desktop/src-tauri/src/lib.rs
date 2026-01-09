@@ -1,5 +1,8 @@
 // Re-export types from netok_bridge
-pub use netok_bridge::{DnsProviderType, NodeResult, Snapshot, Speed};
+pub use netok_bridge::{
+    DiagnosticResult, DiagnosticScenario, DiagnosticSeverity, DnsProviderType, NodeResult,
+    Snapshot, Speed,
+};
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
@@ -48,6 +51,23 @@ fn run_all() -> Result<serde_json::Value, String> {
     Ok(data)
 }
 
+// ==================== Mock Scenario Commands ====================
+
+/// Get a mock diagnostic result for UI testing.
+#[tauri::command]
+fn get_mock_scenario(scenario_id: u8) -> Result<DiagnosticResult, String> {
+    netok_bridge::get_mock_scenario(scenario_id)
+}
+
+/// Get all available diagnostic scenarios for UI dropdown.
+#[tauri::command]
+fn get_all_scenarios() -> Vec<(u8, String)> {
+    netok_bridge::get_all_scenarios()
+        .into_iter()
+        .map(|(id, key)| (id, key.to_string()))
+        .collect()
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -58,7 +78,9 @@ pub fn run() {
             run_diagnostics,
             set_dns,
             get_dns_provider,
-            run_all
+            run_all,
+            get_mock_scenario,
+            get_all_scenarios
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

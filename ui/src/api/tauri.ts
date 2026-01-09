@@ -100,3 +100,30 @@ export async function setDns(provider: DnsProvider): Promise<void> {
 export async function getDnsProvider(): Promise<DnsProvider> {
   return await invoke<DnsProvider>('get_dns_provider');
 }
+
+// Diagnostic Scenario types
+export type DiagnosticScenario =
+  | 'all_good'
+  | 'wifi_disabled'
+  | 'wifi_not_connected'
+  | 'router_unreachable'
+  | 'no_internet'
+  | 'dns_failure'
+  | 'http_blocked'
+  | 'weak_signal';
+
+export type DiagnosticSeverity = 'success' | 'warning' | 'error';
+
+export interface DiagnosticResult {
+  scenario: DiagnosticScenario;
+  severity: DiagnosticSeverity;
+  details: string | null;
+}
+
+export async function getMockScenario(scenarioId: number): Promise<DiagnosticResult> {
+  return await invoke<DiagnosticResult>('get_mock_scenario', { scenarioId });
+}
+
+export async function getAllScenarios(): Promise<[number, string][]> {
+  return await invoke<[number, string][]>('get_all_scenarios');
+}

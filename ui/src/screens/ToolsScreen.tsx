@@ -1,14 +1,21 @@
 import { useTranslation } from 'react-i18next';
+import { MockScenarioSelector } from '../components/MockScenarioSelector';
 
 export function ToolsScreen() {
   const { t } = useTranslation();
 
   return (
-    <div className="flex items-center justify-center h-full px-6">
-      <div className="text-center">
-        <h1 className="text-2xl font-semibold mb-2 text-foreground">
-          {t('placeholders.tools_title')}
-        </h1>
+    <div className="flex flex-col h-full px-4 py-4 overflow-auto">
+      {/* Header */}
+      <h1 className="text-xl font-semibold mb-4 text-foreground">
+        {t('SettingsTools')}
+      </h1>
+
+      {/* Mock Scenario Selector for Testing */}
+      <MockScenarioSelector className="mb-4" />
+
+      {/* Placeholder for future tools */}
+      <div className="text-center py-8">
         <p className="text-sm text-foreground-tertiary">
           {t('placeholders.tools_description')}
         </p>
