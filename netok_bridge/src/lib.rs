@@ -72,50 +72,11 @@ pub async fn run_diagnostics_struct() -> Result<Snapshot, anyhow::Error> {
         })
         .collect();
 
-    // Convert computer info
-    let computer = ComputerInfo {
-        hostname: core_snapshot.computer.hostname,
-        model: core_snapshot.computer.model,
-        adapter: core_snapshot.computer.adapter,
-        local_ip: core_snapshot.computer.local_ip,
-    };
-
-    // Convert network info
-    let network = NetworkInfo {
-        connection_type: match core_snapshot.network.connection_type {
-            netok_core::ConnectionType::Wifi => ConnectionType::Wifi,
-            netok_core::ConnectionType::Ethernet => ConnectionType::Ethernet,
-            netok_core::ConnectionType::Usb => ConnectionType::Usb,
-            netok_core::ConnectionType::Mobile => ConnectionType::Mobile,
-            netok_core::ConnectionType::Unknown => ConnectionType::Unknown,
-        },
-        ssid: core_snapshot.network.ssid,
-        rssi: core_snapshot.network.rssi,
-        signal_quality: core_snapshot.network.signal_quality,
-        channel: core_snapshot.network.channel,
-        frequency: core_snapshot.network.frequency,
-    };
-
-    // Convert router info
-    let router = RouterInfo {
-        gateway_ip: core_snapshot.router.gateway_ip,
-        gateway_mac: core_snapshot.router.gateway_mac,
-        vendor: core_snapshot.router.vendor,
-        model: core_snapshot.router.model,
-    };
-
-    // Convert internet info
-    let internet = InternetInfo {
-        public_ip: core_snapshot.internet.public_ip,
-        isp: core_snapshot.internet.isp,
-        country: core_snapshot.internet.country,
-        city: core_snapshot.internet.city,
-        dns_ok: core_snapshot.internet.dns_ok,
-        http_ok: core_snapshot.internet.http_ok,
-        latency_ms: core_snapshot.internet.latency_ms,
-        speed_down_mbps: core_snapshot.internet.speed_down_mbps,
-        speed_up_mbps: core_snapshot.internet.speed_up_mbps,
-    };
+    // Use core types directly (re-exported from types.rs)
+    let computer = core_snapshot.computer;
+    let network = core_snapshot.network;
+    let router = core_snapshot.router;
+    let internet = core_snapshot.internet;
 
     // Determine overall status
     let overall = if core_snapshot
