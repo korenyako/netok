@@ -1,6 +1,6 @@
 # Project Map - Netok
 
-Generated: 2025-11-22
+Generated: 2026-01-26
 
 ## TREE (ASCII)
 
@@ -20,17 +20,6 @@ Generated: 2025-11-22
 │   │   ├── .gitignore
 │   │   └── husky.sh
 │   └── pre-commit
-├── core
-│   ├── src
-│   │   ├── netinfo
-│   │   │   └── mod.rs
-│   │   └── lib.rs
-│   └── Cargo.toml
-├── deprecated
-│   ├── AI_ASSISTANTS.md
-│   ├── CLAUDE.md
-│   ├── COPILOT.md
-│   └── GEMINI.md
 ├── docs
 │   ├── deprecated
 │   │   ├── CODING_RULES.md
@@ -42,6 +31,7 @@ Generated: 2025-11-22
 │   ├── PROGRESS.md
 │   ├── README.md
 │   ├── RECOMMENDATIONS.md
+│   ├── REFACTORING-PLAN-SOLID.md
 │   ├── REVISED_PRIORITIES.md
 │   ├── SECURITY_AUDIT.md
 │   ├── SoT-ARCH.md
@@ -62,6 +52,16 @@ Generated: 2025-11-22
 │   ├── benches
 │   │   └── diagnostics_benchmark.rs
 │   ├── src
+│   │   ├── infrastructure
+│   │   │   ├── adapter.rs
+│   │   │   ├── arp.rs
+│   │   │   ├── connection.rs
+│   │   │   ├── dns.rs
+│   │   │   ├── gateway.rs
+│   │   │   ├── mod.rs
+│   │   │   └── wifi.rs
+│   │   ├── diagnostics.rs
+│   │   ├── domain.rs
 │   │   ├── lib.rs
 │   │   └── oui_database.rs
 │   └── Cargo.toml
@@ -137,8 +137,6 @@ Generated: 2025-11-22
 ├── scripts
 │   ├── generate_oui_database.py
 │   └── generate_project_map.mjs
-├── src
-│   └── i18n.ts
 ├── ui
 │   ├── public
 │   │   └── vite.svg
@@ -149,11 +147,14 @@ Generated: 2025-11-22
 │   │   │   └── react.svg
 │   │   ├── components
 │   │   │   ├── icons
+│   │   │   │   ├── ActionIcons.tsx
 │   │   │   │   └── NavigationIcons.tsx
 │   │   │   ├── BottomNav.tsx
+│   │   │   ├── DiagnosticMessage.tsx
 │   │   │   ├── DnsVariantCard.tsx
 │   │   │   ├── HeaderStatus.tsx
 │   │   │   ├── MainPage.tsx
+│   │   │   ├── MockScenarioSelector.tsx
 │   │   │   ├── NodeCard.tsx
 │   │   │   ├── SecurityRouter.tsx
 │   │   │   ├── SettingsPage.tsx
@@ -237,7 +238,8 @@ Generated: 2025-11-22
 ├── s Refresh' when !isLoading
 ├── SETUP-PRECOMMIT.md
 ├── tatus
-└── test_logging.rs
+├── test_logging.rs
+└── TESTING.md
 
 ```
 

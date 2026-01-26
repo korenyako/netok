@@ -96,7 +96,9 @@ pub async fn run_diagnostics_struct() -> Result<Snapshot, anyhow::Error> {
     };
 
     Ok(Snapshot {
+        at_utc: core_snapshot.at_utc,
         overall,
+        summary_key: core_snapshot.summary_key,
         nodes,
         speed: None, // TODO: implement speed test
         computer,
