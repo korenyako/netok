@@ -14,14 +14,22 @@
     "test:run": "vitest run"
   },
   "dependencies": {
+    "@radix-ui/react-collapsible": "^1.1.12",
+    "@radix-ui/react-scroll-area": "^1.2.10",
+    "@radix-ui/react-select": "^2.2.6",
+    "@radix-ui/react-slot": "^1.2.4",
     "@tauri-apps/api": "^2.9.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "i18next": "^25.5.2",
+    "lucide-react": "^0.563.0",
     "netok": "file:..",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "react-hot-toast": "^2.6.0",
     "react-i18next": "^15.7.3",
-    "react-router-dom": "^7.9.1",
+    "sonner": "^2.0.7",
+    "tailwind-merge": "^3.4.0",
+    "tailwindcss-animate": "^1.0.7",
     "zustand": "^5.0.8"
   },
   "devDependencies": {

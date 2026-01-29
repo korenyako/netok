@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface ComputerData {
   hostname?: string;
@@ -43,9 +44,9 @@ export function NodeCard({ type, data, geoConsent = false, isLoading = false }: 
 
   const renderComputer = (data: ComputerData | null) => (
     <div>
-      <h3 className="text-base font-semibold text-neutral-900 mb-2">{t('nodes.computer.name')}</h3>
+      <h3 className="text-base font-semibold text-card-foreground mb-2">{t('nodes.computer.name')}</h3>
       {data ? (
-        <div className="grid gap-1 text-xs text-neutral-600">
+        <div className="grid gap-1 text-xs text-muted-foreground">
           {data.hostname && (
             <div>{t('nodes.computer.name_field')}: {data.hostname}</div>
           )}
@@ -61,7 +62,7 @@ export function NodeCard({ type, data, geoConsent = false, isLoading = false }: 
         </div>
       ) : (
         !isLoading && (
-          <div className="text-xs text-neutral-500 italic">
+          <div className="text-xs text-muted-foreground italic">
             {t('meta.no_data')}
           </div>
         )
@@ -83,7 +84,7 @@ export function NodeCard({ type, data, geoConsent = false, isLoading = false }: 
 
     const getSignalText = () => {
       if (data.type !== 'wifi' || !data.signal) return null;
-      
+
       const levelText = t(`nodes.network.signal_${data.signal.level}`);
       return `${t('nodes.network.signal_field')}: ${levelText} (${data.signal.dbm} dBm)`;
     };
@@ -95,8 +96,8 @@ export function NodeCard({ type, data, geoConsent = false, isLoading = false }: 
 
     return (
       <div>
-        <h3 className="text-base font-semibold text-neutral-900 mb-2">{t('nodes.network.name')}</h3>
-        <div className="grid gap-1 text-xs text-neutral-600">
+        <h3 className="text-base font-semibold text-card-foreground mb-2">{t('nodes.network.name')}</h3>
+        <div className="grid gap-1 text-xs text-muted-foreground">
           <div>{getNetworkTypeText()}</div>
           {getSignalText() && <div>{getSignalText()}</div>}
           {getLinkText() && <div>{getLinkText()}</div>}
@@ -107,8 +108,8 @@ export function NodeCard({ type, data, geoConsent = false, isLoading = false }: 
 
   const renderRouter = (data: RouterData) => (
     <div>
-      <h3 className="text-base font-semibold text-neutral-900 mb-2">{t('nodes.router.name')}</h3>
-      <div className="grid gap-1 text-xs text-neutral-600">
+      <h3 className="text-base font-semibold text-card-foreground mb-2">{t('nodes.router.name')}</h3>
+      <div className="grid gap-1 text-xs text-muted-foreground">
         {(data.model || data.brand) && (
           <div>{data.brand ? `${data.brand} ${data.model}` : data.model}</div>
         )}
@@ -120,8 +121,8 @@ export function NodeCard({ type, data, geoConsent = false, isLoading = false }: 
   const renderInternet = (data: InternetData) => {
     return (
       <div>
-        <h3 className="text-base font-semibold text-neutral-900 mb-2">{t('nodes.internet.name')}</h3>
-        <div className="grid gap-1 text-xs text-neutral-600">
+        <h3 className="text-base font-semibold text-card-foreground mb-2">{t('nodes.internet.name')}</h3>
+        <div className="grid gap-1 text-xs text-muted-foreground">
           {data.provider && <div>{data.provider}</div>}
           <div>{t('nodes.internet.ip_field')}: {data.publicIp}</div>
           {geoConsent && data.country && data.city && (
@@ -148,8 +149,10 @@ export function NodeCard({ type, data, geoConsent = false, isLoading = false }: 
   };
 
   return (
-    <div className="rounded-xl border border-neutral-200 p-3 md:p-4 mb-3 shadow-[0_1px_2px_rgba(0,0,0,0.04)] bg-white">
-      {renderContent()}
-    </div>
+    <Card className="mb-3">
+      <CardContent className="p-3 md:p-4">
+        {renderContent()}
+      </CardContent>
+    </Card>
   );
 }

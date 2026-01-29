@@ -1,6 +1,6 @@
 # Project Map - Netok
 
-Generated: 2026-01-26
+Generated: 2026-01-29
 
 ## TREE (ASCII)
 
@@ -149,15 +149,23 @@ Generated: 2026-01-26
 │   │   │   ├── icons
 │   │   │   │   ├── ActionIcons.tsx
 │   │   │   │   └── NavigationIcons.tsx
+│   │   │   ├── ui
+│   │   │   │   ├── alert.tsx
+│   │   │   │   ├── badge.tsx
+│   │   │   │   ├── button.tsx
+│   │   │   │   ├── card.tsx
+│   │   │   │   ├── collapsible.tsx
+│   │   │   │   ├── scroll-area.tsx
+│   │   │   │   ├── select.tsx
+│   │   │   │   ├── separator.tsx
+│   │   │   │   └── sonner.tsx
 │   │   │   ├── BottomNav.tsx
 │   │   │   ├── DiagnosticMessage.tsx
 │   │   │   ├── DnsVariantCard.tsx
 │   │   │   ├── HeaderStatus.tsx
-│   │   │   ├── MainPage.tsx
 │   │   │   ├── MockScenarioSelector.tsx
 │   │   │   ├── NodeCard.tsx
 │   │   │   ├── SecurityRouter.tsx
-│   │   │   ├── SettingsPage.tsx
 │   │   │   ├── SettingsRouter.tsx
 │   │   │   ├── Spinner.tsx
 │   │   │   └── ThemeProvider.tsx
@@ -165,10 +173,13 @@ Generated: 2026-01-26
 │   │   │   └── dnsVariantStyles.ts
 │   │   ├── hooks
 │   │   │   ├── useDiagnostics.ts
-│   │   │   └── useNavigation.ts
+│   │   │   ├── useNavigation.ts
+│   │   │   └── useTheme.ts
 │   │   ├── i18n
 │   │   │   ├── en.json
 │   │   │   └── ru.json
+│   │   ├── lib
+│   │   │   └── utils.ts
 │   │   ├── screens
 │   │   │   ├── AdGuardDetailScreen.tsx
 │   │   │   ├── CleanBrowsingDetailScreen.tsx
@@ -186,7 +197,6 @@ Generated: 2026-01-26
 │   │   │   ├── ThemeSettingsScreen.tsx
 │   │   │   └── ToolsScreen.tsx
 │   │   ├── store
-│   │   │   └── useDiagnostics.ts
 │   │   ├── stores
 │   │   │   ├── dnsStore.ts
 │   │   │   ├── themeStore.ts
@@ -226,6 +236,7 @@ Generated: 2026-01-26
 ├── Cargo.toml
 ├── CLAUDE.md
 ├── CONTRIBUTING.md
+├── etsy-hover-effects-fixed.html
 ├── LICENSE.Apache-2.0
 ├── LICENSE.Proprietary
 ├── Loading prop to NodeCard for better UX
@@ -254,8 +265,8 @@ Generated: 2026-01-26
   "identifier": "netok",
 
   "build": {
-    "beforeDevCommand": "npm run dev --prefix ../ui",
-    "beforeBuildCommand": "npm run build --prefix ../ui",
+    "beforeDevCommand": "npm run dev --prefix ui",
+    "beforeBuildCommand": "npm run build --prefix ui",
     "devUrl": "http://localhost:5173",
     "frontendDist": "../../ui/dist"
   },
@@ -295,14 +306,22 @@ Generated: 2026-01-26
     "test:run": "vitest run"
   },
   "dependencies": {
+    "@radix-ui/react-collapsible": "^1.1.12",
+    "@radix-ui/react-scroll-area": "^1.2.10",
+    "@radix-ui/react-select": "^2.2.6",
+    "@radix-ui/react-slot": "^1.2.4",
     "@tauri-apps/api": "^2.9.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "i18next": "^25.5.2",
+    "lucide-react": "^0.563.0",
     "netok": "file:..",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "react-hot-toast": "^2.6.0",
     "react-i18next": "^15.7.3",
-    "react-router-dom": "^7.9.1",
+    "sonner": "^2.0.7",
+    "tailwind-merge": "^3.4.0",
+    "tailwindcss-animate": "^1.0.7",
     "zustand": "^5.0.8"
   },
   "devDependencies": {
@@ -321,39 +340,32 @@ Generated: 2026-01-26
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.3.0",
     "happy-dom": "^20.0.10",
-    "jsdom": "^27.2.0",
-    "postcss": "^8.5.6",
-    "tailwindcss": "^3.4.17",
-    "typescript": "~5.8.3",
-    "typescript-eslint": "^8.39.1",
-    "vite": "^7.1.2",
-    "vitest": "^4.0.11"
-  }}
+// ... (truncated due to syntax error)
 ```
 
 ### ui/tailwind.config.js
 
 ```javascript
+import tailwindcssAnimate from 'tailwindcss-animate'
+
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ["./index.html", "./src/**/*.{ts,tsx}"],
-  darkMode: 'class',
+  darkMode: ['class'],
+  content: ['./index.html', './src/**/*.{ts,tsx}'],
   theme: {
     extend: {
-      fontFamily: {
-        sans: ['system-ui', 'sans-serif'],
-        mono: ['"JetBrains Mono"', 'monospace'],
-      },
-      fontSize: {
-        xs: ['12px', '1.4'],
-        sm: ['13px', '1.4'],
-        base: ['14px', '1.4'],
-        lg: ['16px', '1.4'],
-        xl: ['18px', '1.3'],
-        '2xl': ['20px', '1.3'],
-        '3xl': ['24px', '1.25'],
-      },
-      colors: {}}}}
+      fontFamily: {},
+      colors: {
+        border: 'hsl(var(--border))',
+        input: 'hsl(var(--input))',
+        ring: 'hsl(var(--ring))',
+        background: 'hsl(var(--background))',
+        foreground: 'hsl(var(--foreground))',
+        primary: {
+          DEFAULT: 'hsl(var(--primary))',
+          foreground: 'hsl(var(--primary-foreground))',
+        },
+        secondary: {}}}}}
 ```
 
 ### ui/index.html
@@ -398,7 +410,7 @@ createRoot(document.getElementById('root')!).render(
 ### ui/src/App.tsx
 
 ```typescript
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from 'sonner';
 import { ThemeProvider } from './components/ThemeProvider';
 import { BottomNav } from './components/BottomNav';
 import { SecurityRouter } from './components/SecurityRouter';
@@ -406,6 +418,7 @@ import { SettingsRouter } from './components/SettingsRouter';
 import { StatusScreen } from './screens/StatusScreen';
 import { DiagnosticsScreen } from './screens/DiagnosticsScreen';
 import { ToolsScreen } from './screens/ToolsScreen';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useNavigation } from './hooks/useNavigation';
 import { useDiagnostics } from './hooks/useDiagnostics';
 
@@ -446,8 +459,7 @@ function App() {
               setShowDiagnostics(false);
               navigateToSettings();
             }}
-          />
-        </div>}}
+          />}}
 
 export default App;
 ```
@@ -456,8 +468,8 @@ export default App;
 
 ### Build Commands
 
-- **Dev Command**: npm run dev --prefix ../ui
-- **Build Command**: npm run build --prefix ../ui
+- **Dev Command**: npm run dev --prefix ui
+- **Build Command**: npm run build --prefix ui
 - **Dev Path**: <http://localhost:5173>
 - **Dist Dir**: ../../ui/dist
 - **Window Title**: Netok
@@ -474,7 +486,7 @@ export default App;
 
 ### Stores
 
-- useDiagnostics
+- НЕ НАЙДЕНО
 
 ### Pages
 

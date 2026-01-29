@@ -41,6 +41,7 @@
     "disable": "Disable",
     "apply_success": "DNS settings applied",
     "disable_success": "DNS protection disabled",
+    "ip_copied": "Copied",
     "cloudflare": {
       "standard": "Standard",
       "standard_desc": "Fast and reliable DNS",
@@ -93,6 +94,7 @@
     }
   },
   "diagnostics": {
+    "title": "Diagnostics",
     "computer": "Computer",
     "router": "Router",
     "wifi": "Wi-Fi",
@@ -221,5 +223,46 @@
     "provider_name": "Rostelecom",
     "country_name": "Russia",
     "city_name": "Moscow"
+  },
+  "diagnostic": {
+    "scenario": {
+      "all_good": {
+        "title": "All Good",
+        "message": "Internet is working."
+      },
+      "wifi_disabled": {
+        "title": "Wi-Fi Disabled",
+        "message": "Wi-Fi adapter is disabled. Turn on Wi-Fi in Windows settings."
+      },
+      "wifi_not_connected": {
+        "title": "Not Connected",
+        "message": "Not connected to Wi-Fi. Select a network and connect."
+      },
+      "router_unreachable": {
+        "title": "Router Unreachable",
+        "message": "Router is not responding. Check if your router is powered on and its lights are on."
+      },
+      "no_internet": {
+        "title": "No Internet",
+        "message": "Router is working, but there's no internet. Check the cable from your provider or contact support."
+      },
+      "dns_failure": {
+        "title": "DNS Problem",
+        "message": "Cannot resolve website addresses. Try switching DNS to automatic or use Cloudflare (1.1.1.1)."
+      },
+      "http_blocked": {
+        "title": "Websites Unavailable",
+        "message": "Internet is partially working. Websites are unavailable, but DNS responds. Check your VPN or firewall settings."
+      },
+      "weak_signal": {
+        "title": "Weak Signal",
+        "message": "Weak Wi-Fi signal. Move closer to your router or check for interference."
+      }
+    },
+    "mock": {
+      "title": "Test Mode",
+      "select_scenario": "Select scenario",
+      "enabled": "Mock mode enabled"
+    }
   }
 }

@@ -1,113 +1,33 @@
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
 /**
  * Notification utilities for user feedback
  */
 export const notifications = {
-  /**
-   * Show success notification
-   */
   success: (message: string) => {
-    toast.success(message, {
-      duration: 4000,
-      position: 'top-center',
-      style: {
-        background: '#3CB57F',
-        color: '#fff',
-        fontWeight: '500',
-        padding: '12px 20px',
-        borderRadius: '8px',
-      },
-      iconTheme: {
-        primary: '#fff',
-        secondary: '#3CB57F',
-      },
-    });
+    toast.success(message);
   },
 
-  /**
-   * Show error notification
-   */
   error: (message: string) => {
-    toast.error(message, {
-      duration: 6000,
-      position: 'top-center',
-      style: {
-        background: '#EF4444',
-        color: '#fff',
-        fontWeight: '500',
-        padding: '12px 20px',
-        borderRadius: '8px',
-      },
-      iconTheme: {
-        primary: '#fff',
-        secondary: '#EF4444',
-      },
-    });
+    toast.error(message);
   },
 
-  /**
-   * Show info notification
-   */
   info: (message: string) => {
-    toast(message, {
-      duration: 4000,
-      position: 'top-center',
-      style: {
-        background: '#3B82F6',
-        color: '#fff',
-        fontWeight: '500',
-        padding: '12px 20px',
-        borderRadius: '8px',
-      },
-      icon: 'ℹ️',
-    });
+    toast.info(message);
   },
 
-  /**
-   * Show warning notification
-   */
   warn: (message: string) => {
-    toast(message, {
-      duration: 5000,
-      position: 'top-center',
-      style: {
-        background: '#F59E0B',
-        color: '#fff',
-        fontWeight: '500',
-        padding: '12px 20px',
-        borderRadius: '8px',
-      },
-      icon: '⚠️',
-    });
+    toast.warning(message);
   },
 
-  /**
-   * Show loading notification
-   */
   loading: (message: string) => {
-    return toast.loading(message, {
-      position: 'top-center',
-      style: {
-        background: '#6B7280',
-        color: '#fff',
-        fontWeight: '500',
-        padding: '12px 20px',
-        borderRadius: '8px',
-      },
-    });
+    return toast.loading(message);
   },
 
-  /**
-   * Dismiss a notification by ID
-   */
-  dismiss: (toastId: string) => {
+  dismiss: (toastId: string | number) => {
     toast.dismiss(toastId);
   },
 
-  /**
-   * Dismiss all notifications
-   */
   dismissAll: () => {
     toast.dismiss();
   },

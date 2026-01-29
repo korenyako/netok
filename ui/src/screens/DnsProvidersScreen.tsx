@@ -1,8 +1,12 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ArrowLeft, Circle } from 'lucide-react';
 import { setDns } from '../api/tauri';
 import { useDnsStore } from '../stores/useDnsStore';
 import { dnsStore } from '../stores/dnsStore';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 
 interface DnsProvidersScreenProps {
   onBack: () => void;
@@ -141,44 +145,26 @@ export function DnsProvidersScreen({ onBack, onSelectCloudflare, onSelectAdGuard
 
   return (
     <div className="flex flex-col h-full bg-background">
-      {/* Header with Back button */}
-      <div className="px-4 py-4">
-        <button
-          onClick={onBack}
-          className="w-6 h-6 flex items-center justify-center focus:outline-none"
-        >
-          <svg
-            className="w-6 h-6 text-foreground-tertiary"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            strokeWidth={2}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M19 12H5M12 19l-7-7 7-7" />
-          </svg>
-        </button>
+      {/* Header with Back button and Title */}
+      <div className="px-4 py-4 flex items-center gap-2">
+        <Button variant="ghost" size="icon" onClick={onBack}>
+          <ArrowLeft className="w-5 h-5 text-muted-foreground" />
+        </Button>
+        <h1 className="text-lg font-semibold text-foreground">
+          {t('dns_providers.title')}
+        </h1>
       </div>
 
       {/* Content */}
       <div className="flex-1 px-4">
-        {/* Title */}
-        <h1 className="text-2xl font-semibold text-foreground leading-[28.8px]">
-          {t('dns_providers.title')}
-        </h1>
-
-        {/* Active Protection Status */}
-        <div className="flex items-start gap-2 mt-1 mb-4">
-          <div className={`w-2 h-2 rounded-full mt-[5px] flex-shrink-0 ${isProtectionEnabled ? 'bg-primary' : 'bg-amber-500'}`} />
-          <p className={`text-xs font-mono ${isProtectionEnabled ? 'text-primary' : 'text-amber-500'}`}>
-            {isProtectionEnabled && activeProviderName
-              ? activeVariantKey
-                ? t('dns_providers.protection_enabled_with_mode', { provider: activeProviderName, mode: t(activeVariantKey) })
-                : t('dns_providers.protection_enabled', { provider: activeProviderName })
-              : t('dns_providers.protection_disabled_with_hint')}
-          </p>
-        </div>
+        {/* Protection Status - subtitle */}
+        <p className="text-xs text-muted-foreground mb-4">
+          {isProtectionEnabled && activeProviderName
+            ? activeVariantKey
+              ? t('dns_providers.protection_enabled_with_mode', { provider: activeProviderName, mode: t(activeVariantKey) })
+              : t('dns_providers.protection_enabled', { provider: activeProviderName })
+            : t('dns_providers.protection_disabled_with_hint')}
+        </p>
 
         {/* DNS Provider Options */}
         <div className="space-y-2">
@@ -186,38 +172,34 @@ export function DnsProvidersScreen({ onBack, onSelectCloudflare, onSelectAdGuard
             const isSelected = currentProvider === provider.id;
 
             return (
-              <button
-                key={provider.id}
-                onClick={() => handleProviderClick(provider.id)}
-                disabled={isApplying}
-                className={`w-full rounded-[12px] border px-4 py-3 text-left focus:outline-none transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-                  isSelected ? 'border-primary' : 'border-transparent'
-                } hover:bg-neutral-100 dark:hover:bg-background-hover`}
-              >
-                <div className="flex items-start gap-3">
-                  <div className="flex-1">
-                    <div className="text-base font-medium text-foreground leading-5">
-                      {provider.name}
-                    </div>
-                    <p className="text-sm text-foreground-secondary leading-[19.6px]">
-                      {provider.description}
-                    </p>
-                  </div>
-                  {isSelected && (
-                    <svg
-                      className="w-4 h-4 text-primary mt-[2px]"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 16 16"
-                      strokeWidth={2}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M3 8l3 3 7-7" />
-                    </svg>
+              <div key={provider.id} className={cn(isApplying && 'pointer-events-none opacity-50')}>
+                <Card
+                  className={cn(
+                    'cursor-pointer hover:bg-accent transition-colors',
+                    !isSelected && 'bg-transparent'
                   )}
-                </div>
-              </button>
+                  onClick={() => handleProviderClick(provider.id)}
+                >
+                  <CardContent className="flex items-start gap-3 p-4">
+                    <span className={cn(
+                      'flex items-center justify-center w-4 h-4 rounded-full border-2 shrink-0 mt-1',
+                      isSelected ? 'border-primary' : 'border-muted-foreground'
+                    )}>
+                      {isSelected && (
+                        <Circle className="w-2 h-2 fill-primary text-primary" />
+                      )}
+                    </span>
+                    <div className="flex-1">
+                      <div className="text-base font-medium leading-normal mb-1">
+                        {provider.name}
+                      </div>
+                      <p className="text-sm text-muted-foreground leading-normal">
+                        {provider.description}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             );
           })}
         </div>

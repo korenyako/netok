@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ArrowLeft, RotateCw, Loader2 } from 'lucide-react';
 import { WaypointsIcon, ShieldIcon, WrenchIcon, SettingsIcon } from '../components/icons/NavigationIcons';
-import { CopiedChip, CopyIcon } from '../components/icons/ActionIcons';
-import { DiagnosticMessage } from '../components/DiagnosticMessage';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { cn } from '@/lib/utils';
 import { runDiagnostics, type NodeResult, type DiagnosticScenario, type DiagnosticSeverity } from '../api/tauri';
-import { DNS_IP_TEXT_CLASS } from '../constants/dnsVariantStyles';
+import { notifications } from '../utils/notifications';
 
 interface NodeDetail {
   text: string;
@@ -75,8 +78,6 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
   const [nodes, setNodes] = useState<NetworkNode[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [copiedIp, setCopiedIp] = useState<string | null>(null);
-
   // Helper function to remove AS number from ISP string
   const cleanIspName = (isp: string): string => {
     // Remove "AS12345 " prefix if present
@@ -84,15 +85,9 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
   };
 
   // Helper function to copy IP address to clipboard
-  const handleCopyIp = async (ip: string) => {
-    try {
-      await navigator.clipboard.writeText(ip);
-      setCopiedIp(ip);
-      // Reset copied state after 2 seconds
-      setTimeout(() => setCopiedIp(null), 2000);
-    } catch (err) {
-      console.error('Failed to copy IP:', err);
-    }
+  const handleCopyIp = (ip: string) => {
+    navigator.clipboard.writeText(ip);
+    notifications.success(t('dns_detail.ip_copied'));
   };
 
   useEffect(() => {
@@ -205,34 +200,25 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
   const getStatusIcon = (status: NetworkNode['status']) => {
     if (status === 'ok') {
       return (
-        <svg className="w-2 h-2" viewBox="0 0 8 8">
-          <circle cx="4" cy="4" r="4" fill="#3CB57F" />
-        </svg>
+        <div className="w-2 h-2 rounded-full bg-primary" />
       );
     }
 
     if (status === 'partial') {
       return (
-        <svg className="w-2 h-2" viewBox="0 0 8 8">
-          <circle cx="4" cy="4" r="4" fill="#FFA500" />
-        </svg>
+        <div className="w-2 h-2 rounded-full bg-amber-500" />
       );
     }
 
     if (status === 'down') {
       return (
-        <svg className="w-2 h-2" viewBox="0 0 8 8">
-          <circle cx="4" cy="4" r="4" fill="#FF4444" />
-        </svg>
+        <div className="w-2 h-2 rounded-full bg-destructive" />
       );
     }
 
     // Loading spinner
     return (
-      <svg className="w-2 h-2 text-foreground-tertiary animate-spin" viewBox="0 0 8 8" fill="none">
-        <circle cx="4" cy="4" r="3" stroke="currentColor" strokeWidth="1" strokeOpacity="0.25" />
-        <path d="M4 1 A3 3 0 0 1 7 4" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
-      </svg>
+      <Loader2 className="w-2 h-2 text-muted-foreground animate-spin" />
     );
   };
 
@@ -328,42 +314,15 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
 
   return (
     <div className="flex flex-col h-full bg-background">
-      {/* Header with Back and Refresh Buttons */}
-      <div className="px-4 py-4 flex items-center justify-between">
-        <button
-          onClick={onBack}
-          className="w-6 h-6 flex items-center justify-center focus:outline-none"
-        >
-          <svg
-            className="w-6 h-6 text-foreground-tertiary"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            strokeWidth={2}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M19 12H5M12 19l-7-7 7-7" />
-          </svg>
-        </button>
-
-        <button
-          onClick={handleRefresh}
-          disabled={isLoading}
-          className="w-6 h-6 flex items-center justify-center focus:outline-none disabled:opacity-50"
-        >
-          <svg
-            className="w-5 h-5 text-foreground-tertiary"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            strokeWidth={2}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2" />
-          </svg>
-        </button>
+      {/* Header with Back button, Title, and Refresh */}
+      <div className="px-4 py-4 flex items-center gap-2">
+        <Button variant="ghost" size="icon" onClick={onBack}>
+          <ArrowLeft className="w-5 h-5 text-muted-foreground" />
+        </Button>
+        <h1 className="text-lg font-semibold text-foreground flex-1">{t('diagnostics.title')}</h1>
+        <Button variant="ghost" size="icon" onClick={handleRefresh} disabled={isLoading}>
+          <RotateCw className="w-5 h-5 text-muted-foreground" />
+        </Button>
       </div>
 
       {/* Error State */}
@@ -371,7 +330,7 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
         <div className="flex-1 flex items-center justify-center px-4">
           <div className="text-center">
             <p className="text-foreground mb-4">{t('errors.diagnostics')}</p>
-            <p className="text-foreground-tertiary text-sm">{error}</p>
+            <p className="text-muted-foreground text-sm">{error}</p>
           </div>
         </div>
       )}
@@ -379,26 +338,21 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
       {/* Loading State */}
       {isLoading && !error && (
         <div className="flex-1 flex items-center justify-center">
-          <svg className="w-8 h-8 text-primary animate-spin" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeOpacity="0.25" />
-            <path d="M12 2 A10 10 0 0 1 22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-          </svg>
+          <Loader2 className="w-8 h-8 text-primary animate-spin" />
         </div>
       )}
 
       {/* Node List */}
       {!isLoading && !error && (
-        <div className="flex-1 overflow-auto px-4">
-          {/* Diagnostic Status Message */}
+        <ScrollArea className="flex-1 px-4">
+          {/* Diagnostic Status Description */}
           {(() => {
             const result = deriveScenario(nodes);
             if (result) {
               return (
-                <DiagnosticMessage
-                  scenario={result.scenario}
-                  severity={result.severity}
-                  className="mb-4"
-                />
+                <p className="text-xs text-muted-foreground mb-4">
+                  {t(`diagnostic.scenario.${result.scenario}.message`)}
+                </p>
               );
             }
             return null;
@@ -410,40 +364,41 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
               className="flex"
             >
               {/* Timeline column with bead and connecting line */}
-              <div className="flex flex-col items-center mr-3 pt-3">
+              <div className="flex flex-col items-center mr-3">
+                {/* Top segment: line from previous or spacer for first */}
+                <div className={cn("w-px h-5", index > 0 ? "bg-border" : "")} />
                 {/* Bead (status icon) */}
                 <div className="flex-shrink-0">
                   {getStatusIcon(node.status)}
                 </div>
-                {/* Connecting line to next node */}
-                {index < nodes.length - 1 && (
-                  <div className="w-px flex-1 bg-neutral-300 dark:bg-neutral-600 mt-2 min-h-[24px]"></div>
-                )}
+                {/* Bottom segment: line to next or spacer for last */}
+                <div className={cn("w-px flex-1", index < nodes.length - 1 ? "bg-border" : "")} />
               </div>
 
               {/* Node content */}
               <div className="flex-1 py-3">
                 {/* Node Title */}
-                <h3 className="text-base font-medium text-foreground leading-[22.4px] mb-[6px]">
+                <h3 className="text-base font-medium text-foreground leading-normal mb-1.5">
                   {t(node.title)}
                 </h3>
 
                 {/* Node Details */}
-                <div className="space-y-[6px]">
+                <div className="space-y-1.5">
                   {node.details.map((detail) => (
                     detail.isIp ? (
-                      <div
-                        key={detail.text}
-                        onClick={() => handleCopyIp(detail.text)}
-                        className={`${DNS_IP_TEXT_CLASS} cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-2`}
-                      >
-                        <span>{detail.text}</span>
-                        {copiedIp === detail.text ? <CopiedChip /> : <CopyIcon />}
+                      <div key={detail.text}>
+                        <Badge
+                          variant="secondary"
+                          className="cursor-pointer font-mono font-normal text-xs"
+                          onClick={() => handleCopyIp(detail.text)}
+                        >
+                          {detail.text}
+                        </Badge>
                       </div>
                     ) : (
                       <p
                         key={detail.text}
-                        className="text-sm text-foreground-secondary leading-[19.6px]"
+                        className="text-sm text-muted-foreground leading-normal"
                       >
                         {detail.text}
                       </p>
@@ -453,39 +408,24 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
               </div>
             </div>
           ))}
-        </div>
+        </ScrollArea>
       )}
 
       {/* Bottom Navigation Bar */}
-      <nav className="bg-background px-4 py-4 border-t border-border">
+      <nav className="bg-background px-4 py-4">
         <div className="flex items-center justify-between">
-          <button
-            onClick={onBack}
-            className="w-8 h-8 flex items-center justify-center focus:outline-none"
-          >
-            <WaypointsIcon className="w-6 h-6" color="#3CB57F" />
-          </button>
-
-          <button
-            onClick={onNavigateToSecurity}
-            className="w-8 h-8 flex items-center justify-center focus:outline-none"
-          >
-            <ShieldIcon className="w-6 h-6" color="#ADADAD" />
-          </button>
-
-          <button
-            onClick={onNavigateToTools}
-            className="w-8 h-8 flex items-center justify-center focus:outline-none"
-          >
-            <WrenchIcon className="w-6 h-6" color="#ADADAD" />
-          </button>
-
-          <button
-            onClick={onNavigateToSettings}
-            className="w-8 h-8 flex items-center justify-center focus:outline-none"
-          >
-            <SettingsIcon className="w-6 h-6" color="#ADADAD" />
-          </button>
+          <Button variant="ghost" size="icon" className="h-12 w-12 text-primary bg-accent" onClick={onBack}>
+            <WaypointsIcon className="w-6 h-6" />
+          </Button>
+          <Button variant="ghost" size="icon" className="h-12 w-12 text-muted-foreground" onClick={onNavigateToSecurity}>
+            <ShieldIcon className="w-6 h-6" />
+          </Button>
+          <Button variant="ghost" size="icon" className="h-12 w-12 text-muted-foreground" onClick={onNavigateToTools}>
+            <WrenchIcon className="w-6 h-6" />
+          </Button>
+          <Button variant="ghost" size="icon" className="h-12 w-12 text-muted-foreground" onClick={onNavigateToSettings}>
+            <SettingsIcon className="w-6 h-6" />
+          </Button>
         </div>
       </nav>
     </div>

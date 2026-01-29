@@ -1,11 +1,12 @@
 import { useTranslation } from 'react-i18next';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { MockScenarioSelector } from '../components/MockScenarioSelector';
 
 export function ToolsScreen() {
   const { t } = useTranslation();
 
   return (
-    <div className="flex flex-col h-full px-4 py-4 overflow-auto">
+    <ScrollArea className="flex flex-col h-full px-4 py-4">
       {/* Header */}
       <h1 className="text-xl font-semibold mb-4 text-foreground">
         {t('SettingsTools')}
@@ -16,10 +17,10 @@ export function ToolsScreen() {
 
       {/* Placeholder for future tools */}
       <div className="text-center py-8">
-        <p className="text-sm text-foreground-tertiary">
+        <p className="text-sm text-muted-foreground">
           {t('placeholders.tools_description')}
         </p>
       </div>
-    </div>
+    </ScrollArea>
   );
 }

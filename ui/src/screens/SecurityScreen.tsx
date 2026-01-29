@@ -1,5 +1,8 @@
 import { useTranslation } from 'react-i18next';
+import { ArrowLeft, ShieldCheck, ShieldAlert } from 'lucide-react';
 import { useDnsStore } from '../stores/useDnsStore';
+import { Button } from '@/components/ui/button';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
 interface SecurityScreenProps {
   onBack: () => void;
@@ -15,62 +18,34 @@ export function SecurityScreen({ onBack, onNavigateToDnsProviders }: SecurityScr
 
   return (
     <div className="flex flex-col h-full bg-background">
-      {/* Header with Back button */}
-      <div className="px-4 py-4">
-        <button
-          onClick={onBack}
-          className="w-6 h-6 flex items-center justify-center focus:outline-none"
-        >
-          <svg
-            className="w-6 h-6 text-foreground-tertiary"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            strokeWidth={2}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M19 12H5M12 19l-7-7 7-7" />
-          </svg>
-        </button>
+      {/* Header with Back button and Title */}
+      <div className="px-4 py-4 flex items-center gap-2">
+        <Button variant="ghost" size="icon" onClick={onBack}>
+          <ArrowLeft className="w-5 h-5 text-muted-foreground" />
+        </Button>
+        <h1 className="text-lg font-semibold text-foreground">{t('security.title')}</h1>
       </div>
 
       {/* Content */}
       <div className="flex-1 px-4">
-        {/* Title */}
-        <h1 className="text-2xl font-semibold text-foreground mb-[28px]">{t('security.title')}</h1>
 
-        {/* DNS Protection Card - Clickable */}
-        <button
+        {/* DNS Protection Status */}
+        <Alert
+          variant={isDnsProtectionEnabled ? 'success' : 'default'}
+          className="cursor-pointer hover:bg-accent transition-colors"
           onClick={onNavigateToDnsProviders}
-          className="w-full bg-background-tertiary rounded-[12px] p-4 text-left focus:outline-none hover:opacity-80 transition-opacity"
         >
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-base font-medium text-foreground leading-5">
-              {isDnsProtectionEnabled ? t('status.dns_protection') : t('status.dns_protection_disabled')}
-            </h3>
-            {/* Checkmark - green if enabled */}
-            {isDnsProtectionEnabled && (
-              <svg
-                className="w-4 h-4 text-primary flex-shrink-0"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 16 16"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M3 8l3 3 7-7" />
-              </svg>
-            )}
-          </div>
-          <p className="text-sm text-foreground-secondary leading-[19.6px]">
+          {isDnsProtectionEnabled ? <ShieldCheck className="h-4 w-4" /> : <ShieldAlert className="h-4 w-4" />}
+          <AlertTitle>
+            {isDnsProtectionEnabled ? t('status.dns_protection') : t('status.dns_protection_disabled')}
+          </AlertTitle>
+          <AlertDescription>
             {isDnsProtectionEnabled
               ? t('status.dns_protection_enabled')
               : t('status.dns_protection_disabled_desc')
             }
-          </p>
-        </button>
+          </AlertDescription>
+        </Alert>
       </div>
     </div>
   );

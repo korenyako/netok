@@ -1,4 +1,4 @@
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from 'sonner';
 import { ThemeProvider } from './components/ThemeProvider';
 import { BottomNav } from './components/BottomNav';
 import { SecurityRouter } from './components/SecurityRouter';
@@ -6,6 +6,7 @@ import { SettingsRouter } from './components/SettingsRouter';
 import { StatusScreen } from './screens/StatusScreen';
 import { DiagnosticsScreen } from './screens/DiagnosticsScreen';
 import { ToolsScreen } from './screens/ToolsScreen';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useNavigation } from './hooks/useNavigation';
 import { useDiagnostics } from './hooks/useDiagnostics';
 
@@ -56,7 +57,7 @@ function App() {
     <ThemeProvider>
       <Toaster />
       <div id="app" className="h-full flex flex-col bg-background">
-        <div className="flex-1 overflow-auto">
+        <ScrollArea className="flex-1">
           {currentScreen === 'home' && (
             <StatusScreen
               diagnostics={diagnosticsData}
@@ -82,7 +83,7 @@ function App() {
               onBack={navigateToHome}
             />
           )}
-        </div>
+        </ScrollArea>
 
         <BottomNav
           currentScreen={currentScreen}

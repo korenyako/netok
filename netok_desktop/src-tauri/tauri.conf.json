@@ -4,8 +4,8 @@
   "identifier": "netok",
 
   "build": {
-    "beforeDevCommand": "npm run dev --prefix ../ui",
-    "beforeBuildCommand": "npm run build --prefix ../ui",
+    "beforeDevCommand": "npm run dev --prefix ui",
+    "beforeBuildCommand": "npm run build --prefix ui",
     "devUrl": "http://localhost:5173",
     "frontendDist": "../../ui/dist"
   },

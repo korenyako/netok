@@ -1,5 +1,5 @@
 export const DNS_IP_TEXT_CLASS =
-  'text-xs text-foreground-tertiary leading-[16.8px] font-mono';
+  'text-sm text-muted-foreground leading-normal font-mono';
 
 export const DNS_VARIANT_IP_CLASS =
-  'text-xs text-foreground-tertiary leading-[16.8px] font-mono mt-3';
+  'text-xs text-muted-foreground leading-normal font-mono mt-3';

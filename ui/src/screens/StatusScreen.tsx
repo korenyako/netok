@@ -1,6 +1,8 @@
 import { useTranslation } from 'react-i18next';
+import { Check } from 'lucide-react';
 import type { DiagnosticsSnapshot } from '../api/tauri';
 import { useDnsStore } from '../stores/useDnsStore';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface StatusScreenProps {
   onOpenDiagnostics: () => void;
@@ -43,17 +45,7 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, diag
       >
         {/* Green Circle with Check */}
         <div className="w-24 h-24 bg-primary rounded-full flex items-center justify-center mb-6">
-          <svg
-            className="w-14 h-14 text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            strokeWidth={3}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M5 13l4 4L19 7" />
-          </svg>
+          <Check className="w-14 h-14 text-white" strokeWidth={3} />
         </div>
 
         {/* Status Text */}
@@ -63,7 +55,7 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, diag
 
         {/* Network Info */}
         {diagnostics && (
-          <div className="flex items-center gap-2 text-sm text-foreground-secondary">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
             {/* Connection Type */}
             <span>
               {diagnostics.network.connection_type === 'Wifi' && 'Wi-Fi'}
@@ -80,23 +72,22 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, diag
 
       {/* DNS Protection Widget - Clickable */}
       <div className="px-4 pb-4">
-        <button
-          onClick={onNavigateToDnsProviders}
-          className="w-full rounded-xl p-4 text-left focus:outline-none transition-colors bg-[#F2F2F2] hover:bg-[#E5E5E5] dark:bg-background-tertiary dark:hover:bg-background-hover"
-        >
-          <h3 className="text-base font-medium text-foreground leading-5 mb-1">
-            {isDnsProtectionEnabled
-              ? t('status.dns_protection_with_provider', { provider: providerName })
-              : t('status.dns_protection_disabled')
-            }
-          </h3>
-          <p className="text-sm text-foreground-secondary leading-[19.6px]">
-            {isDnsProtectionEnabled
-              ? t('status.dns_protection_enabled')
-              : t('status.dns_protection_disabled_desc')
-            }
-          </p>
-        </button>
+        <Card className="cursor-pointer hover:bg-accent transition-colors" onClick={onNavigateToDnsProviders}>
+          <CardContent className="p-4">
+            <h3 className="text-base font-medium leading-normal mb-1">
+              {isDnsProtectionEnabled
+                ? t('status.dns_protection_with_provider', { provider: providerName })
+                : t('status.dns_protection_disabled')
+              }
+            </h3>
+            <p className="text-sm text-muted-foreground leading-normal">
+              {isDnsProtectionEnabled
+                ? t('status.dns_protection_enabled')
+                : t('status.dns_protection_disabled_desc')
+              }
+            </p>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

@@ -36,18 +36,18 @@ export function HeaderStatus({ internetStatus, speed, vpnDetected = false }: Hea
 
   return (
     <div className="mb-3">
-      <div className="text-neutral-900 mb-1">
+      <div className="text-foreground mb-1">
         {getStatusText()}
       </div>
-      
+
       {getSpeedText() && (
-        <div className="text-sm text-neutral-700 mb-1">
+        <div className="text-sm text-muted-foreground mb-1">
           {getSpeedText()}
         </div>
       )}
-      
+
       {getVpnText() && (
-        <div className="text-sm text-neutral-700">
+        <div className="text-sm text-muted-foreground">
           {getVpnText()}
         </div>
       )}
