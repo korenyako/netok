@@ -21,6 +21,7 @@ export function Dns4EuDetailScreen({ onBack }: Dns4EuDetailScreenProps) {
   const [applyingVariant, setApplyingVariant] = useState<Dns4EuVariant | null>(null);
   const [isDisabling, setIsDisabling] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [expandedVariant, setExpandedVariant] = useState<Dns4EuVariant | null>(null);
 
   // Derive current variant from global store
   const currentVariant: Dns4EuVariant | null = currentProvider?.type === 'Dns4Eu'
@@ -143,10 +144,22 @@ export function Dns4EuDetailScreen({ onBack }: Dns4EuDetailScreenProps) {
 
       {/* Content */}
       <div className="flex-1 px-4">
-        {/* Provider Description */}
-        <p className="text-xs text-muted-foreground leading-normal mb-3">
-          {t('dns_providers.dns4eu_desc')}
-        </p>
+        {/* Provider Status Card */}
+        <div className="rounded-lg border border-primary/50 p-4 mb-4">
+          <div className="flex items-start gap-3">
+            <span className="flex items-center justify-center w-4 h-4 shrink-0 mt-1">
+              <span className="w-2 h-2 rounded-full bg-primary" />
+            </span>
+            <div className="flex-1">
+              <p className="text-base font-medium leading-normal mb-1 text-primary">
+                {t('dns_providers.dns4eu')}
+              </p>
+              <p className="text-sm text-muted-foreground leading-normal">
+                {t('dns_providers.dns4eu_desc')}
+              </p>
+            </div>
+          </div>
+        </div>
 
         {/* Variant Options */}
         <div className="space-y-2 mb-4">
@@ -164,6 +177,8 @@ export function Dns4EuDetailScreen({ onBack }: Dns4EuDetailScreenProps) {
                 applyLabel={currentVariant === variant.id ? t('dns_detail.disable') : t('dns_detail.apply')}
                 isApplying={currentVariant === variant.id ? isDisabling : applyingVariant === variant.id}
                 applyDisabled={Boolean((applyingVariant && applyingVariant !== variant.id) || (isDisabling && currentVariant !== variant.id))}
+                expanded={expandedVariant === variant.id}
+                onToggle={() => setExpandedVariant(expandedVariant === variant.id ? null : variant.id)}
               />
             );
           })}

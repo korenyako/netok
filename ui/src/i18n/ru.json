@@ -3,17 +3,13 @@
     "name": "Netok",
     "title": "Диагностика сети"
   },
-  "placeholders": {
-    "tools_title": "Инструменты",
-    "tools_description": "Раздел в разработке"
-  },
   "security": {
     "title": "Безопасность"
   },
   "dns_providers": {
     "title": "Защита DNS",
     "description": "Выберите DNS-сервер для повышения безопасности и блокировки нежелательного контента",
-    "protection_disabled": "Защита DNS отключена. Используется DNS-сервер вашего провайдера",
+    "protection_disabled": "Защита DNS отключена",
     "protection_disabled_with_hint": "Сейчас используется DNS вашего провайдера. Ниже в списке — альтернативные DNS с защитой и дополнительным контролем",
     "protection_enabled": "Включена защита DNS {{provider}}",
     "protection_enabled_with_mode": "Включена защита DNS {{provider}} ({{mode}})",
@@ -98,7 +94,8 @@
     "computer": "Компьютер",
     "router": "Роутер",
     "wifi": "Wi-Fi",
-    "internet": "Интернет"
+    "internet": "Интернет",
+    "checking": "Проверка..."
   },
   "status": {
     "internet_ok": "Подключено",
@@ -258,11 +255,6 @@
         "title": "Слабый сигнал",
         "message": "Слабый сигнал Wi-Fi. Подойдите ближе к роутеру или проверьте, нет ли помех."
       }
-    },
-    "mock": {
-      "title": "Тестовый режим",
-      "select_scenario": "Выберите сценарий",
-      "enabled": "Mock-режим включён"
     }
   }
 }

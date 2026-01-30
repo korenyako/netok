@@ -821,6 +821,23 @@ export function NewProviderDetailScreen() {
 }
 ```
 
+### Fixing OUI Vendor Name Casing
+
+The IEEE OUI CSV has inconsistent capitalization for vendor names (e.g., `"zte corporation"` instead of `"ZTE Corporation"`). To fix:
+
+1. **Add correction to `scripts/generate_oui_database.py`:**
+
+```python
+BRAND_CORRECTIONS: dict[str, str] = {
+    "zte corporation": "ZTE Corporation",
+    # Add new corrections here as needed
+}
+```
+
+2. **Apply to existing database** (replace all occurrences in `netok_core/src/oui_database.rs`).
+
+The correction is applied automatically on next database regeneration via `apply_brand_correction()`. Lookup is case-insensitive (keyed by `vendor.lower()`).
+
 ### Debugging
 
 #### Backend (Rust)

@@ -10,6 +10,17 @@ import sys
 from pathlib import Path
 from typing import List, Tuple
 
+# Brand name corrections for vendors with incorrect casing in IEEE CSV.
+# Key: lowercase vendor name from CSV, Value: corrected display name.
+BRAND_CORRECTIONS: dict[str, str] = {
+    "zte corporation": "ZTE Corporation",
+}
+
+
+def apply_brand_correction(vendor: str) -> str:
+    """Apply brand name correction if the vendor is in the corrections dict."""
+    return BRAND_CORRECTIONS.get(vendor.lower(), vendor)
+
 
 def parse_oui_csv(csv_path: str) -> List[Tuple[str, str]]:
     """Parse OUI CSV file and extract OUI prefix and vendor name."""
@@ -43,6 +54,9 @@ def parse_oui_csv(csv_path: str) -> List[Tuple[str, str]]:
             # Truncate very long vendor names
             if len(vendor_clean) > 80:
                 vendor_clean = vendor_clean[:77] + "..."
+
+            # Apply brand name corrections
+            vendor_clean = apply_brand_correction(vendor_clean)
 
             entries.append((oui_clean, vendor_clean))
 

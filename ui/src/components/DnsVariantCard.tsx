@@ -20,6 +20,10 @@ interface DnsVariantCardProps {
   applyLabel: string;
   isApplying?: boolean;
   applyDisabled?: boolean;
+  /** Controlled expansion state. If provided, internal state is ignored. */
+  expanded?: boolean;
+  /** Called when the user toggles the card open/closed. */
+  onToggle?: () => void;
 }
 
 export function DnsVariantCard({
@@ -32,8 +36,14 @@ export function DnsVariantCard({
   applyLabel,
   isApplying = false,
   applyDisabled = false,
+  expanded,
+  onToggle,
 }: DnsVariantCardProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [internalExpanded, setInternalExpanded] = useState(false);
+  const isExpanded = expanded !== undefined ? expanded : internalExpanded;
+  const setIsExpanded = onToggle
+    ? (open: boolean) => { if (open !== isExpanded) onToggle(); }
+    : (open: boolean) => setInternalExpanded(open);
 
   const handleApplyClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();

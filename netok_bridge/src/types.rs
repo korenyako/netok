@@ -1,10 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 // Re-export common types from netok_core (no duplication)
-pub use netok_core::{
-    ComputerInfo, ConnectionType, DiagnosticResult, DiagnosticScenario, DiagnosticSeverity,
-    InternetInfo, NetworkInfo, RouterInfo,
-};
+pub use netok_core::{ComputerInfo, ConnectionType, InternetInfo, NetworkInfo, RouterInfo};
 
 /// Overall status for UI display.
 ///
@@ -82,6 +79,16 @@ pub struct NodeResult {
 pub struct Speed {
     pub down_mbps: Option<f64>,
     pub up_mbps: Option<f64>,
+}
+
+/// Result of checking a single diagnostic node (progressive diagnostics).
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SingleNodeResult {
+    pub node: NodeResult,
+    pub computer: Option<ComputerInfo>,
+    pub network: Option<NetworkInfo>,
+    pub router: Option<RouterInfo>,
+    pub internet: Option<InternetInfo>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

@@ -6,7 +6,10 @@ export default {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
   theme: {
     extend: {
-      fontFamily: {},
+      fontFamily: {
+        sans: ['Geist', 'system-ui', 'sans-serif'],
+        mono: ['Geist Mono', 'monospace'],
+      },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',

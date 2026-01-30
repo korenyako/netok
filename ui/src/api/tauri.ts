@@ -120,10 +120,27 @@ export interface DiagnosticResult {
   details: string | null;
 }
 
-export async function getMockScenario(scenarioId: number): Promise<DiagnosticResult> {
-  return await invoke<DiagnosticResult>('get_mock_scenario', { scenarioId });
+// Progressive diagnostics: individual node checks
+export interface SingleNodeResult {
+  node: NodeResult;
+  computer: ComputerInfo | null;
+  network: NetworkInfo | null;
+  router: RouterInfo | null;
+  internet: InternetInfo | null;
 }
 
-export async function getAllScenarios(): Promise<[number, string][]> {
-  return await invoke<[number, string][]>('get_all_scenarios');
+export async function checkComputer(): Promise<SingleNodeResult> {
+  return await invoke<SingleNodeResult>('check_computer');
+}
+
+export async function checkNetwork(adapter: string | null): Promise<SingleNodeResult> {
+  return await invoke<SingleNodeResult>('check_network', { adapter });
+}
+
+export async function checkRouter(): Promise<SingleNodeResult> {
+  return await invoke<SingleNodeResult>('check_router');
+}
+
+export async function checkInternet(): Promise<SingleNodeResult> {
+  return await invoke<SingleNodeResult>('check_internet');
 }

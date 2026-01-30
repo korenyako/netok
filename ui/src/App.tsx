@@ -1,4 +1,4 @@
-import { Toaster } from 'sonner';
+import { Toaster } from '@/components/ui/sonner';
 import { ThemeProvider } from './components/ThemeProvider';
 import { BottomNav } from './components/BottomNav';
 import { SecurityRouter } from './components/SecurityRouter';
@@ -74,7 +74,7 @@ function App() {
             />
           )}
 
-          {currentScreen === 'tools' && <ToolsScreen />}
+          {currentScreen === 'tools' && <ToolsScreen onBack={navigateToHome} />}
 
           {currentScreen === 'settings' && (
             <SettingsRouter

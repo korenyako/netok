@@ -109,7 +109,5 @@
   "diagnostic.scenario.weak_signal.title": "Слабый сигнал",
   "diagnostic.scenario.weak_signal.message": "Слабый сигнал Wi-Fi. Подойдите ближе к роутеру или проверьте, нет ли помех.",
 
-  "diagnostic.mock.title": "Тестовый режим",
-  "diagnostic.mock.select_scenario": "Выберите сценарий",
-  "diagnostic.mock.enabled": "Mock-режим включён"
+  "diagnostics.checking": "Проверка..."
 }

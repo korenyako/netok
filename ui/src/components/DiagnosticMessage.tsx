@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { CheckCircle, AlertTriangle, XCircle } from 'lucide-react';
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { cn } from '@/lib/utils';
 import type { DiagnosticScenario, DiagnosticSeverity } from '../api/tauri';
 
 interface DiagnosticMessageProps {
@@ -9,22 +8,27 @@ interface DiagnosticMessageProps {
   className?: string;
 }
 
-const severityConfig = {
-  success: { icon: CheckCircle, variant: 'success' as const },
-  warning: { icon: AlertTriangle, variant: 'warning' as const },
-  error: { icon: XCircle, variant: 'destructive' as const },
+const severityStyles: Record<DiagnosticSeverity, { bead: string; title: string }> = {
+  success: { bead: 'bg-primary', title: 'text-primary' },
+  warning: { bead: 'bg-warning', title: 'text-warning' },
+  error: { bead: 'bg-destructive', title: 'text-destructive' },
 };
 
 export function DiagnosticMessage({ scenario, severity, className }: DiagnosticMessageProps) {
   const { t } = useTranslation();
-
-  const { icon: IconComponent, variant } = severityConfig[severity];
+  const styles = severityStyles[severity];
 
   return (
-    <Alert variant={variant} className={className}>
-      <IconComponent className="h-4 w-4" />
-      <AlertTitle>{t(`diagnostic.scenario.${scenario}.title`)}</AlertTitle>
-      <AlertDescription>{t(`diagnostic.scenario.${scenario}.message`)}</AlertDescription>
-    </Alert>
+    <div className={cn('flex items-start gap-2', className)}>
+      <div className={cn('w-2 h-2 rounded-full mt-2 flex-shrink-0', styles.bead)} />
+      <div>
+        <p className={cn('text-base font-medium leading-normal', styles.title)}>
+          {t(`diagnostic.scenario.${scenario}.title`)}
+        </p>
+        <p className="text-sm text-foreground">
+          {t(`diagnostic.scenario.${scenario}.message`)}
+        </p>
+      </div>
+    </div>
   );
 }

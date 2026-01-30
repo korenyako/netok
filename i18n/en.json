@@ -109,7 +109,5 @@
   "diagnostic.scenario.weak_signal.title": "Weak Signal",
   "diagnostic.scenario.weak_signal.message": "Weak Wi-Fi signal. Move closer to your router or check for interference.",
 
-  "diagnostic.mock.title": "Test Mode",
-  "diagnostic.mock.select_scenario": "Select scenario",
-  "diagnostic.mock.enabled": "Mock mode enabled"
+  "diagnostics.checking": "Checking..."
 }

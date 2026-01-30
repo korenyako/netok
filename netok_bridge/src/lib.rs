@@ -2,8 +2,8 @@ use netok_core::{get_default_settings, run_diagnostics, Settings};
 
 mod types;
 pub use types::{
-    ComputerInfo, ConnectionType, DiagnosticResult, DiagnosticScenario, DiagnosticSeverity,
-    InternetInfo, NetworkInfo, NodeId, NodeResult, Overall, RouterInfo, Snapshot, Speed,
+    ComputerInfo, ConnectionType, InternetInfo, NetworkInfo, NodeId, NodeResult, Overall,
+    RouterInfo, SingleNodeResult, Snapshot, Speed,
 };
 
 #[derive(thiserror::Error, Debug)]
@@ -29,56 +29,46 @@ pub fn run_diagnostics_json(settings_json: Option<&str>) -> Result<String, Bridg
     Ok(serde_json::to_string(&snapshot).unwrap())
 }
 
+/// Convert a core NodeInfo to a bridge NodeResult.
+fn convert_node(node: &netok_core::NodeInfo) -> NodeResult {
+    let id = match node.id {
+        netok_core::NodeId::Computer => NodeId::Computer,
+        netok_core::NodeId::Wifi => NodeId::Network,
+        netok_core::NodeId::RouterUpnp => NodeId::Dns,
+        netok_core::NodeId::Dns => NodeId::Dns,
+        netok_core::NodeId::Internet => NodeId::Internet,
+    };
+
+    let status = match node.status {
+        netok_core::Status::Ok => Overall::Ok,
+        netok_core::Status::Warn => Overall::Partial,
+        netok_core::Status::Fail => Overall::Down,
+        netok_core::Status::Unknown => Overall::Partial,
+    };
+
+    NodeResult {
+        id,
+        label: match id {
+            NodeId::Computer => "diagnostics.computer".to_string(),
+            NodeId::Network => "diagnostics.wifi".to_string(),
+            NodeId::Dns => "diagnostics.router".to_string(),
+            NodeId::Internet => "diagnostics.internet".to_string(),
+        },
+        status,
+        latency_ms: node.latency_ms.map(|ms| ms as u64),
+        details: None,
+    }
+}
+
 pub async fn run_diagnostics_struct() -> Result<Snapshot, anyhow::Error> {
-    // Run blocking diagnostics in a separate thread to avoid blocking async runtime
     let core_snapshot = tokio::task::spawn_blocking(|| {
         let settings = get_default_settings();
         run_diagnostics(&settings)
     })
     .await?;
 
-    // Convert netok_core types to bridge types
-    let nodes: Vec<NodeResult> = core_snapshot
-        .nodes
-        .iter()
-        .map(|node| {
-            let id = match node.id {
-                netok_core::NodeId::Computer => NodeId::Computer,
-                netok_core::NodeId::Wifi => NodeId::Network,
-                netok_core::NodeId::RouterUpnp => NodeId::Dns,
-                netok_core::NodeId::Dns => NodeId::Dns,
-                netok_core::NodeId::Internet => NodeId::Internet,
-            };
+    let nodes: Vec<NodeResult> = core_snapshot.nodes.iter().map(convert_node).collect();
 
-            let status = match node.status {
-                netok_core::Status::Ok => Overall::Ok,
-                netok_core::Status::Warn => Overall::Partial,
-                netok_core::Status::Fail => Overall::Down,
-                netok_core::Status::Unknown => Overall::Partial,
-            };
-
-            NodeResult {
-                id,
-                label: match id {
-                    NodeId::Computer => "diagnostics.computer".to_string(),
-                    NodeId::Network => "diagnostics.wifi".to_string(),
-                    NodeId::Dns => "diagnostics.router".to_string(),
-                    NodeId::Internet => "diagnostics.internet".to_string(),
-                },
-                status,
-                latency_ms: node.latency_ms.map(|ms| ms as u64),
-                details: None,
-            }
-        })
-        .collect();
-
-    // Use core types directly (re-exported from types.rs)
-    let computer = core_snapshot.computer;
-    let network = core_snapshot.network;
-    let router = core_snapshot.router;
-    let internet = core_snapshot.internet;
-
-    // Determine overall status
     let overall = if core_snapshot
         .nodes
         .iter()
@@ -100,11 +90,62 @@ pub async fn run_diagnostics_struct() -> Result<Snapshot, anyhow::Error> {
         overall,
         summary_key: core_snapshot.summary_key,
         nodes,
-        speed: None, // TODO: implement speed test
-        computer,
-        network,
-        router,
-        internet,
+        speed: None,
+        computer: core_snapshot.computer,
+        network: core_snapshot.network,
+        router: core_snapshot.router,
+        internet: core_snapshot.internet,
+    })
+}
+
+// ==================== Progressive Diagnostics Commands ====================
+
+pub async fn check_computer_node() -> Result<SingleNodeResult, anyhow::Error> {
+    let (node_info, computer) =
+        tokio::task::spawn_blocking(netok_core::check_computer).await?;
+    Ok(SingleNodeResult {
+        node: convert_node(&node_info),
+        computer: Some(computer),
+        network: None,
+        router: None,
+        internet: None,
+    })
+}
+
+pub async fn check_network_node(adapter: Option<String>) -> Result<SingleNodeResult, anyhow::Error> {
+    let (node_info, network) =
+        tokio::task::spawn_blocking(move || netok_core::check_network(adapter.as_deref()))
+            .await?;
+    Ok(SingleNodeResult {
+        node: convert_node(&node_info),
+        computer: None,
+        network: Some(network),
+        router: None,
+        internet: None,
+    })
+}
+
+pub async fn check_router_node() -> Result<SingleNodeResult, anyhow::Error> {
+    let (node_info, router) =
+        tokio::task::spawn_blocking(netok_core::check_router).await?;
+    Ok(SingleNodeResult {
+        node: convert_node(&node_info),
+        computer: None,
+        network: None,
+        router: Some(router),
+        internet: None,
+    })
+}
+
+pub async fn check_internet_node() -> Result<SingleNodeResult, anyhow::Error> {
+    let (node_info, internet) =
+        tokio::task::spawn_blocking(netok_core::check_internet).await?;
+    Ok(SingleNodeResult {
+        node: convert_node(&node_info),
+        computer: None,
+        network: None,
+        router: None,
+        internet: Some(internet),
     })
 }
 
@@ -306,40 +347,3 @@ pub async fn get_dns_provider() -> Result<DnsProviderType, String> {
     .map_err(|e| format!("Failed to run DNS detection task: {}", e))?
 }
 
-// ==================== Mock Scenario API ====================
-
-/// Get a mock diagnostic result for UI testing.
-///
-/// # Arguments
-/// * `scenario_id` - Numeric ID of the scenario (0-7)
-///
-/// # Returns
-/// * `Ok(DiagnosticResult)` - The mock result for the given scenario
-/// * `Err(String)` - If the scenario ID is invalid
-pub fn get_mock_scenario(scenario_id: u8) -> Result<DiagnosticResult, String> {
-    DiagnosticScenario::from_id(scenario_id)
-        .map(DiagnosticResult::new)
-        .ok_or_else(|| format!("Invalid scenario ID: {}. Valid range: 0-7", scenario_id))
-}
-
-/// Get all available diagnostic scenarios for UI dropdown.
-///
-/// Returns a list of (id, scenario_key) pairs for building UI selectors.
-pub fn get_all_scenarios() -> Vec<(u8, &'static str)> {
-    DiagnosticScenario::all()
-        .iter()
-        .map(|s| {
-            let key = match s {
-                DiagnosticScenario::AllGood => "all_good",
-                DiagnosticScenario::WifiDisabled => "wifi_disabled",
-                DiagnosticScenario::WifiNotConnected => "wifi_not_connected",
-                DiagnosticScenario::RouterUnreachable => "router_unreachable",
-                DiagnosticScenario::NoInternet => "no_internet",
-                DiagnosticScenario::DnsFailure => "dns_failure",
-                DiagnosticScenario::HttpBlocked => "http_blocked",
-                DiagnosticScenario::WeakSignal => "weak_signal",
-            };
-            (s.to_id(), key)
-        })
-        .collect()
-}

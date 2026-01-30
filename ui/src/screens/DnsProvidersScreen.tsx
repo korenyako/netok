@@ -157,14 +157,37 @@ export function DnsProvidersScreen({ onBack, onSelectCloudflare, onSelectAdGuard
 
       {/* Content */}
       <div className="flex-1 px-4">
-        {/* Protection Status - subtitle */}
-        <p className="text-xs text-muted-foreground mb-4">
-          {isProtectionEnabled && activeProviderName
-            ? activeVariantKey
-              ? t('dns_providers.protection_enabled_with_mode', { provider: activeProviderName, mode: t(activeVariantKey) })
-              : t('dns_providers.protection_enabled', { provider: activeProviderName })
-            : t('dns_providers.protection_disabled_with_hint')}
-        </p>
+        {/* Protection Status */}
+        <div className={cn(
+          'rounded-lg border p-4 mb-4',
+          isProtectionEnabled ? 'border-primary/50' : 'border-warning/50'
+        )}>
+          <div className="flex items-start gap-3">
+            <span className="flex items-center justify-center w-4 h-4 shrink-0 mt-1">
+              <span className={cn(
+                'w-2 h-2 rounded-full',
+                isProtectionEnabled ? 'bg-primary' : 'bg-warning'
+              )} />
+            </span>
+            <div className="flex-1">
+              <p className={cn(
+                'text-base font-medium leading-normal mb-1',
+                isProtectionEnabled ? 'text-primary' : 'text-warning'
+              )}>
+                {isProtectionEnabled && activeProviderName
+                  ? activeVariantKey
+                    ? t('dns_providers.protection_enabled_with_mode', { provider: activeProviderName, mode: t(activeVariantKey) })
+                    : t('dns_providers.protection_enabled', { provider: activeProviderName })
+                  : t('dns_providers.protection_disabled')}
+              </p>
+              <p className="text-sm text-muted-foreground leading-normal">
+                {isProtectionEnabled
+                  ? t('dns_providers.description')
+                  : t('dns_providers.protection_disabled_with_hint')}
+              </p>
+            </div>
+          </div>
+        </div>
 
         {/* DNS Provider Options */}
         <div className="space-y-2">

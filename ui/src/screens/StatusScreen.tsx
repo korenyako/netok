@@ -1,8 +1,9 @@
 import { useTranslation } from 'react-i18next';
-import { Check } from 'lucide-react';
+import { Check, AlertTriangle, X } from 'lucide-react';
 import type { DiagnosticsSnapshot } from '../api/tauri';
 import { useDnsStore } from '../stores/useDnsStore';
-import { Card, CardContent } from '@/components/ui/card';
+import { deriveScenario } from '../utils/deriveScenario';
+import { cn } from '@/lib/utils';
 
 interface StatusScreenProps {
   onOpenDiagnostics: () => void;
@@ -36,21 +37,35 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, diag
   const isDnsProtectionEnabled = dnsProvider !== null && KNOWN_PROVIDERS.includes(dnsProvider.type);
   const providerName = isDnsProtectionEnabled ? getProviderDisplayName(dnsProvider.type) : null;
 
+  // Derive diagnostic scenario from nodes
+  const scenarioResult = diagnostics ? deriveScenario(diagnostics.nodes) : null;
+  const severity = scenarioResult?.severity ?? 'success';
+
   return (
-    <div className="flex flex-col h-full bg-background">
+    <div className="flex flex-col min-h-[calc(100dvh-5rem)] bg-background">
       {/* Main Content - Clickable Area */}
       <button
         onClick={onOpenDiagnostics}
         className="flex-1 flex flex-col items-center justify-center px-4 py-16 focus:outline-none"
       >
-        {/* Green Circle with Check */}
-        <div className="w-24 h-24 bg-primary rounded-full flex items-center justify-center mb-6">
-          <Check className="w-14 h-14 text-white" strokeWidth={3} />
+        {/* Status Circle */}
+        <div className={cn(
+          "w-24 h-24 rounded-full flex items-center justify-center mb-6",
+          severity === 'success' && "bg-primary",
+          severity === 'warning' && "bg-warning",
+          severity === 'error' && "bg-destructive",
+        )}>
+          {severity === 'success' && <Check className="w-14 h-14 text-white" strokeWidth={3} />}
+          {severity === 'warning' && <AlertTriangle className="w-14 h-14 text-white" strokeWidth={2} />}
+          {severity === 'error' && <X className="w-14 h-14 text-white" strokeWidth={3} />}
         </div>
 
         {/* Status Text */}
         <h1 className="text-4xl font-semibold text-foreground text-center mb-2">
-          {t('status.internet_ok')}
+          {scenarioResult
+            ? t(`diagnostic.scenario.${scenarioResult.scenario}.title`)
+            : t('status.waiting')
+          }
         </h1>
 
         {/* Network Info */}
@@ -70,24 +85,41 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, diag
         )}
       </button>
 
-      {/* DNS Protection Widget - Clickable */}
+      {/* DNS Protection Status */}
       <div className="px-4 pb-4">
-        <Card className="cursor-pointer hover:bg-accent transition-colors" onClick={onNavigateToDnsProviders}>
-          <CardContent className="p-4">
-            <h3 className="text-base font-medium leading-normal mb-1">
-              {isDnsProtectionEnabled
-                ? t('status.dns_protection_with_provider', { provider: providerName })
-                : t('status.dns_protection_disabled')
-              }
-            </h3>
-            <p className="text-sm text-muted-foreground leading-normal">
-              {isDnsProtectionEnabled
-                ? t('status.dns_protection_enabled')
-                : t('status.dns_protection_disabled_desc')
-              }
-            </p>
-          </CardContent>
-        </Card>
+        <button
+          onClick={onNavigateToDnsProviders}
+          className={cn(
+            'w-full text-left rounded-lg border p-4 focus:outline-none',
+            isDnsProtectionEnabled ? 'border-primary/50' : 'border-warning/50'
+          )}
+        >
+          <div className="flex items-start gap-3">
+            <span className="flex items-center justify-center w-4 h-4 shrink-0 mt-1">
+              <span className={cn(
+                'w-2 h-2 rounded-full',
+                isDnsProtectionEnabled ? 'bg-primary' : 'bg-warning'
+              )} />
+            </span>
+            <div className="flex-1">
+              <p className={cn(
+                'text-base font-medium leading-normal mb-1',
+                isDnsProtectionEnabled ? 'text-primary' : 'text-warning'
+              )}>
+                {isDnsProtectionEnabled
+                  ? t('status.dns_protection_with_provider', { provider: providerName })
+                  : t('status.dns_protection_disabled')
+                }
+              </p>
+              <p className="text-sm text-muted-foreground leading-normal">
+                {isDnsProtectionEnabled
+                  ? t('status.dns_protection_enabled')
+                  : t('status.dns_protection_disabled_desc')
+                }
+              </p>
+            </div>
+          </div>
+        </button>
       </div>
     </div>
   );

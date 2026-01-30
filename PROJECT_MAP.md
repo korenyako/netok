@@ -1,6 +1,6 @@
 # Project Map - Netok
 
-Generated: 2026-01-29
+Generated: 2026-01-30
 
 ## TREE (ASCII)
 
@@ -163,7 +163,6 @@ Generated: 2026-01-29
 │   │   │   ├── DiagnosticMessage.tsx
 │   │   │   ├── DnsVariantCard.tsx
 │   │   │   ├── HeaderStatus.tsx
-│   │   │   ├── MockScenarioSelector.tsx
 │   │   │   ├── NodeCard.tsx
 │   │   │   ├── SecurityRouter.tsx
 │   │   │   ├── SettingsRouter.tsx
@@ -171,6 +170,9 @@ Generated: 2026-01-29
 │   │   │   └── ThemeProvider.tsx
 │   │   ├── constants
 │   │   │   └── dnsVariantStyles.ts
+│   │   ├── fonts
+│   │   │   ├── Geist-Variable.woff2
+│   │   │   └── GeistMono-Variable.woff2
 │   │   ├── hooks
 │   │   │   ├── useDiagnostics.ts
 │   │   │   ├── useNavigation.ts
@@ -209,9 +211,11 @@ Generated: 2026-01-29
 │   │   │   ├── tauri.test.ts
 │   │   │   └── themeStore.test.ts
 │   │   ├── utils
+│   │   │   ├── deriveScenario.ts
 │   │   │   ├── formatUpdatedAt.ts
 │   │   │   └── notifications.ts
 │   │   ├── App.tsx
+│   │   ├── fonts && cp dWorkNetoknetokuinode_modulesgeistdistfontsgeist-monoGeistMono-Variable.woff2 dWorkNetoknetokuisrcfonts
 │   │   ├── i18n.ts
 │   │   ├── index.css
 │   │   ├── main.tsx
@@ -313,6 +317,7 @@ Generated: 2026-01-29
     "@tauri-apps/api": "^2.9.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "geist": "^1.5.1",
     "i18next": "^25.5.2",
     "lucide-react": "^0.563.0",
     "netok": "file:..",
@@ -339,7 +344,6 @@ Generated: 2026-01-29
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.3.0",
-    "happy-dom": "^20.0.10",
 // ... (truncated due to syntax error)
 ```
 
@@ -354,7 +358,10 @@ export default {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
   theme: {
     extend: {
-      fontFamily: {},
+      fontFamily: {
+        sans: ['Geist', 'system-ui', 'sans-serif'],
+        mono: ['Geist Mono', 'monospace'],
+      },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
@@ -362,10 +369,7 @@ export default {
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         primary: {
-          DEFAULT: 'hsl(var(--primary))',
-          foreground: 'hsl(var(--primary-foreground))',
-        },
-        secondary: {}}}}}
+          DEFAULT: 'hsl(var(--primary))',}}}}}
 ```
 
 ### ui/index.html
@@ -377,9 +381,6 @@ export default {
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <title>Vite + React + TS</title>
   </head>
   <body>
@@ -410,7 +411,7 @@ createRoot(document.getElementById('root')!).render(
 ### ui/src/App.tsx
 
 ```typescript
-import { Toaster } from 'sonner';
+import { Toaster } from '@/components/ui/sonner';
 import { ThemeProvider } from './components/ThemeProvider';
 import { BottomNav } from './components/BottomNav';
 import { SecurityRouter } from './components/SecurityRouter';

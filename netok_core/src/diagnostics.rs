@@ -190,7 +190,7 @@ pub fn get_computer_info() -> ComputerInfo {
 }
 
 /// Get network connection information.
-fn get_network_info(adapter_name: Option<&str>) -> NetworkInfo {
+pub fn get_network_info(adapter_name: Option<&str>) -> NetworkInfo {
     let connection_type = adapter_name
         .map(detect_connection_type)
         .unwrap_or(ConnectionType::Unknown);
@@ -217,7 +217,7 @@ fn get_network_info(adapter_name: Option<&str>) -> NetworkInfo {
 }
 
 /// Get router/gateway information.
-fn get_router_info() -> RouterInfo {
+pub fn get_router_info() -> RouterInfo {
     // Try to get default gateway IP
     let gateway_ip = get_default_gateway();
 
@@ -236,7 +236,7 @@ fn get_router_info() -> RouterInfo {
 }
 
 /// Get internet connectivity information.
-fn get_internet_info() -> InternetInfo {
+pub fn get_internet_info() -> InternetInfo {
     let dns_ok = test_dns();
     let http_ok = test_http();
 
@@ -273,84 +273,99 @@ fn get_internet_info() -> InternetInfo {
     }
 }
 
-/// Run complete network diagnostics.
-pub fn run_diagnostics(_settings: &Settings) -> DiagnosticsSnapshot {
-    let now = OffsetDateTime::now_utc()
-        .format(&time::format_description::well_known::Rfc3339)
-        .unwrap();
-
-    // Computer diagnostics with timing
-    let computer_start = Instant::now();
+/// Check computer node. Returns the NodeInfo (with status/latency) and the detailed ComputerInfo.
+pub fn check_computer() -> (NodeInfo, ComputerInfo) {
+    let start = Instant::now();
     let computer = get_computer_info();
-    let computer_latency = computer_start.elapsed().as_millis() as u32;
-    let computer_status = if computer.hostname.is_some() {
+    let latency = start.elapsed().as_millis() as u32;
+    let status = if computer.hostname.is_some() {
         Status::Ok
     } else {
         Status::Warn
     };
+    let node = NodeInfo {
+        id: NodeId::Computer,
+        name_key: "nodes.computer.name".into(),
+        status,
+        latency_ms: Some(latency),
+        hint_key: None,
+    };
+    (node, computer)
+}
 
-    // Network diagnostics with timing
-    let network_start = Instant::now();
-    let network = get_network_info(computer.adapter.as_deref());
-    let network_latency = network_start.elapsed().as_millis() as u32;
-    let network_status = match network.connection_type {
+/// Check network node. Requires the adapter name from the computer check.
+pub fn check_network(adapter_name: Option<&str>) -> (NodeInfo, NetworkInfo) {
+    let start = Instant::now();
+    let network = get_network_info(adapter_name);
+    let latency = start.elapsed().as_millis() as u32;
+    let status = match network.connection_type {
         ConnectionType::Unknown => Status::Warn,
         _ => Status::Ok,
     };
+    let node = NodeInfo {
+        id: NodeId::Wifi,
+        name_key: "nodes.wifi.name".into(),
+        status,
+        latency_ms: Some(latency),
+        hint_key: None,
+    };
+    (node, network)
+}
 
-    // Router diagnostics with timing
-    let router_start = Instant::now();
+/// Check router node.
+pub fn check_router() -> (NodeInfo, RouterInfo) {
+    let start = Instant::now();
     let router = get_router_info();
-    let router_latency = router_start.elapsed().as_millis() as u32;
-    let router_status = if router.gateway_ip.is_some() {
+    let latency = start.elapsed().as_millis() as u32;
+    let status = if router.gateway_ip.is_some() {
         Status::Ok
     } else {
         Status::Warn
     };
+    let node = NodeInfo {
+        id: NodeId::RouterUpnp,
+        name_key: "nodes.router.name".into(),
+        status,
+        latency_ms: Some(latency),
+        hint_key: None,
+    };
+    (node, router)
+}
 
-    // Internet diagnostics with timing
-    let internet_start = Instant::now();
+/// Check internet node.
+pub fn check_internet() -> (NodeInfo, InternetInfo) {
+    let start = Instant::now();
     let internet = get_internet_info();
-    let internet_latency = internet_start.elapsed().as_millis() as u32;
-    let internet_status = if internet.dns_ok && internet.http_ok {
+    let latency = start.elapsed().as_millis() as u32;
+    let status = if internet.dns_ok && internet.http_ok {
         Status::Ok
     } else if internet.dns_ok || internet.http_ok {
         Status::Warn
     } else {
         Status::Fail
     };
+    let node = NodeInfo {
+        id: NodeId::Internet,
+        name_key: "nodes.internet.name".into(),
+        status,
+        latency_ms: Some(latency),
+        hint_key: None,
+    };
+    (node, internet)
+}
 
-    // Build nodes with real latency values
-    let nodes = vec![
-        NodeInfo {
-            id: NodeId::Computer,
-            name_key: "nodes.computer.name".into(),
-            status: computer_status,
-            latency_ms: Some(computer_latency),
-            hint_key: None,
-        },
-        NodeInfo {
-            id: NodeId::Wifi,
-            name_key: "nodes.wifi.name".into(),
-            status: network_status,
-            latency_ms: Some(network_latency),
-            hint_key: None,
-        },
-        NodeInfo {
-            id: NodeId::RouterUpnp,
-            name_key: "nodes.router.name".into(),
-            status: router_status,
-            latency_ms: Some(router_latency),
-            hint_key: None,
-        },
-        NodeInfo {
-            id: NodeId::Internet,
-            name_key: "nodes.internet.name".into(),
-            status: internet_status,
-            latency_ms: Some(internet_latency),
-            hint_key: None,
-        },
-    ];
+/// Run complete network diagnostics.
+pub fn run_diagnostics(_settings: &Settings) -> DiagnosticsSnapshot {
+    let now = OffsetDateTime::now_utc()
+        .format(&time::format_description::well_known::Rfc3339)
+        .unwrap();
+
+    let (computer_node, computer) = check_computer();
+    let (network_node, network) = check_network(computer.adapter.as_deref());
+    let (router_node, router) = check_router();
+    let (internet_node, internet) = check_internet();
+
+    let nodes = vec![computer_node, network_node, router_node, internet_node];
 
     // Determine overall summary
     let summary_key = if nodes.iter().all(|n| matches!(n.status, Status::Ok)) {

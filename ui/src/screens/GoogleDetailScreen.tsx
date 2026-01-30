@@ -77,10 +77,22 @@ export function GoogleDetailScreen({ onBack }: GoogleDetailScreenProps) {
 
       {/* Content */}
       <div className="flex-1 px-4">
-        {/* Provider Description */}
-        <p className="text-xs text-muted-foreground leading-normal mb-3">
-          {t('dns_providers.google_desc')}
-        </p>
+        {/* Provider Status Card */}
+        <div className="rounded-lg border border-primary/50 p-4 mb-4">
+          <div className="flex items-start gap-3">
+            <span className="flex items-center justify-center w-4 h-4 shrink-0 mt-1">
+              <span className="w-2 h-2 rounded-full bg-primary" />
+            </span>
+            <div className="flex-1">
+              <p className="text-base font-medium leading-normal mb-1 text-primary">
+                {t('dns_providers.google')}
+              </p>
+              <p className="text-sm text-muted-foreground leading-normal">
+                {t('dns_providers.google_desc')}
+              </p>
+            </div>
+          </div>
+        </div>
 
         {/* Single Variant Option */}
         <div className="space-y-2 mb-4">

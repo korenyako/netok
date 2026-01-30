@@ -3,17 +3,13 @@
     "name": "Netok",
     "title": "Network Diagnostics"
   },
-  "placeholders": {
-    "tools_title": "Tools",
-    "tools_description": "Coming soon"
-  },
   "security": {
     "title": "Security"
   },
   "dns_providers": {
     "title": "DNS Protection",
     "description": "Select a DNS server to enhance security and block unwanted content",
-    "protection_disabled": "DNS protection disabled. Using your ISP's DNS server",
+    "protection_disabled": "DNS protection disabled",
     "protection_disabled_with_hint": "Using DNS from your ISP. Below are alternative servers with more protection and control",
     "protection_enabled": "DNS protection enabled: {{provider}}",
     "protection_enabled_with_mode": "DNS protection enabled: {{provider}} ({{mode}})",
@@ -98,7 +94,8 @@
     "computer": "Computer",
     "router": "Router",
     "wifi": "Wi-Fi",
-    "internet": "Internet"
+    "internet": "Internet",
+    "checking": "Checking..."
   },
   "status": {
     "internet_ok": "Connected",
@@ -258,11 +255,6 @@
         "title": "Weak Signal",
         "message": "Weak Wi-Fi signal. Move closer to your router or check for interference."
       }
-    },
-    "mock": {
-      "title": "Test Mode",
-      "select_scenario": "Select scenario",
-      "enabled": "Mock mode enabled"
     }
   }
 }

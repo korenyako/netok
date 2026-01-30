@@ -1,8 +1,5 @@
 // Re-export types from netok_bridge
-pub use netok_bridge::{
-    DiagnosticResult, DiagnosticScenario, DiagnosticSeverity, DnsProviderType, NodeResult,
-    Snapshot, Speed,
-};
+pub use netok_bridge::{DnsProviderType, SingleNodeResult, Snapshot};
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
@@ -51,21 +48,34 @@ fn run_all() -> Result<serde_json::Value, String> {
     Ok(data)
 }
 
-// ==================== Mock Scenario Commands ====================
+// ==================== Progressive Diagnostics Commands ====================
 
-/// Get a mock diagnostic result for UI testing.
 #[tauri::command]
-fn get_mock_scenario(scenario_id: u8) -> Result<DiagnosticResult, String> {
-    netok_bridge::get_mock_scenario(scenario_id)
+async fn check_computer() -> Result<SingleNodeResult, String> {
+    netok_bridge::check_computer_node()
+        .await
+        .map_err(|e| e.to_string())
 }
 
-/// Get all available diagnostic scenarios for UI dropdown.
 #[tauri::command]
-fn get_all_scenarios() -> Vec<(u8, String)> {
-    netok_bridge::get_all_scenarios()
-        .into_iter()
-        .map(|(id, key)| (id, key.to_string()))
-        .collect()
+async fn check_network(adapter: Option<String>) -> Result<SingleNodeResult, String> {
+    netok_bridge::check_network_node(adapter)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+async fn check_router() -> Result<SingleNodeResult, String> {
+    netok_bridge::check_router_node()
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+async fn check_internet() -> Result<SingleNodeResult, String> {
+    netok_bridge::check_internet_node()
+        .await
+        .map_err(|e| e.to_string())
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -79,8 +89,10 @@ pub fn run() {
             set_dns,
             get_dns_provider,
             run_all,
-            get_mock_scenario,
-            get_all_scenarios
+            check_computer,
+            check_network,
+            check_router,
+            check_internet
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -21,6 +21,7 @@ export function Quad9DetailScreen({ onBack }: Quad9DetailScreenProps) {
   const [applyingVariant, setApplyingVariant] = useState<Quad9Variant | null>(null);
   const [isDisabling, setIsDisabling] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [expandedVariant, setExpandedVariant] = useState<Quad9Variant | null>(null);
 
   // Derive current variant from global store
   const currentVariant: Quad9Variant | null = currentProvider?.type === 'Quad9'
@@ -125,10 +126,22 @@ export function Quad9DetailScreen({ onBack }: Quad9DetailScreenProps) {
 
       {/* Content */}
       <div className="flex-1 px-4">
-        {/* Provider Description */}
-        <p className="text-xs text-muted-foreground leading-normal mb-3">
-          {t('dns_providers.quad9_desc')}
-        </p>
+        {/* Provider Status Card */}
+        <div className="rounded-lg border border-primary/50 p-4 mb-4">
+          <div className="flex items-start gap-3">
+            <span className="flex items-center justify-center w-4 h-4 shrink-0 mt-1">
+              <span className="w-2 h-2 rounded-full bg-primary" />
+            </span>
+            <div className="flex-1">
+              <p className="text-base font-medium leading-normal mb-1 text-primary">
+                {t('dns_providers.quad9')}
+              </p>
+              <p className="text-sm text-muted-foreground leading-normal">
+                {t('dns_providers.quad9_desc')}
+              </p>
+            </div>
+          </div>
+        </div>
 
         {/* Variant Options */}
         <div className="space-y-2 mb-4">
@@ -146,6 +159,8 @@ export function Quad9DetailScreen({ onBack }: Quad9DetailScreenProps) {
                 applyLabel={currentVariant === variant.id ? t('dns_detail.disable') : t('dns_detail.apply')}
                 isApplying={currentVariant === variant.id ? isDisabling : applyingVariant === variant.id}
                 applyDisabled={Boolean((applyingVariant && applyingVariant !== variant.id) || (isDisabling && currentVariant !== variant.id))}
+                expanded={expandedVariant === variant.id}
+                onToggle={() => setExpandedVariant(expandedVariant === variant.id ? null : variant.id)}
               />
             );
           })}
