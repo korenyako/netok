@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, RotateCw, Loader2 } from 'lucide-react';
-import { WaypointsIcon, ShieldIcon, WrenchIcon, SettingsIcon } from '../components/icons/NavigationIcons';
+import { ArrowLeft, RotateCw } from 'lucide-react';
+import { NetokLogoIcon, ShieldIcon, WrenchIcon, SettingsIcon } from '../components/icons/NavigationIcons';
+import { NodeOkIcon, NodeWarningIcon, NodeErrorIcon, NodeLoadingIcon } from '../components/icons/DiagnosticStatusIcons';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { cn } from '@/lib/utils';
 import {
   checkComputer,
   checkNetwork,
@@ -14,8 +15,6 @@ import {
   type SingleNodeResult,
 } from '../api/tauri';
 import { notifications } from '../utils/notifications';
-import { deriveScenario } from '../utils/deriveScenario';
-import { DiagnosticMessage } from '../components/DiagnosticMessage';
 
 interface NodeDetail {
   text: string;
@@ -193,18 +192,17 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
 
   const getStatusIcon = (status: NetworkNode['status']) => {
     if (status === 'ok') {
-      return <div className="w-2 h-2 rounded-full bg-primary" />;
+      return <NodeOkIcon className="w-4 h-4 text-primary" />;
     }
     if (status === 'partial') {
-      return <div className="w-2 h-2 rounded-full bg-amber-500" />;
+      return <NodeWarningIcon className="w-4 h-4 text-warning" />;
     }
     if (status === 'down') {
-      return <div className="w-2 h-2 rounded-full bg-destructive" />;
+      return <NodeErrorIcon className="w-4 h-4 text-destructive" />;
     }
-    return <Loader2 className="w-2 h-2 text-muted-foreground animate-spin" />;
+    return <NodeLoadingIcon className="w-4 h-4 text-muted-foreground animate-spin" />;
   };
 
-  const isDone = currentCheckIndex >= 4;
   const isActive = currentCheckIndex >= 0 && currentCheckIndex < 4;
 
   return (
@@ -233,21 +231,6 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
       {/* Node List — progressive */}
       {(nodes.length > 0 || isActive) && (
         <ScrollArea className="flex-1 px-4">
-          {/* Diagnostic scenario message — shown after all checks complete */}
-          {isDone && nodes.length > 0 && (() => {
-            const result = deriveScenario(nodes);
-            if (result) {
-              return (
-                <DiagnosticMessage
-                  scenario={result.scenario}
-                  severity={result.severity}
-                  className="mb-4 animate-in fade-in duration-300"
-                />
-              );
-            }
-            return null;
-          })()}
-
           {/* Error inline — shown after partial completion */}
           {error && nodes.length > 0 && (
             <div className="mb-4 text-sm text-destructive animate-in fade-in duration-300">
@@ -256,76 +239,65 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
           )}
 
           {/* Completed nodes */}
-          {nodes.map((node, index) => (
-            <div
-              key={node.id}
-              className="flex animate-in fade-in slide-in-from-bottom-2 duration-300"
-            >
-              {/* Timeline column */}
-              <div className="flex flex-col items-center mr-3">
-                <div className={cn("w-px h-5", index > 0 ? "bg-border" : "")} />
-                <div className="flex-shrink-0">
-                  {getStatusIcon(node.status)}
-                </div>
-                <div className={cn(
-                  "w-px flex-1",
-                  (index < nodes.length - 1 || isActive) ? "bg-border" : ""
-                )} />
-              </div>
+          <div className="space-y-2">
+            {nodes.map((node) => (
+              <Card
+                key={node.id}
+                className="bg-transparent animate-in fade-in slide-in-from-bottom-2 duration-300"
+              >
+                <CardContent className="flex items-start gap-3 p-4">
+                  <span className="shrink-0 mt-1">
+                    {getStatusIcon(node.status)}
+                  </span>
+                  <div className="flex-1">
+                    <div className="flex items-baseline gap-2 mb-1">
+                      <div className="text-base font-medium text-foreground leading-normal">
+                        {t(node.title)}
+                      </div>
+                      {node.ip && (
+                        <Badge
+                          variant="secondary"
+                          className="cursor-pointer font-mono font-normal text-xs bg-transparent radial-hover"
+                          onClick={() => handleCopyIp(node.ip!)}
+                        >
+                          {node.ip}
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="space-y-1">
+                      {node.details.map((detail) => (
+                        <p
+                          key={detail.text}
+                          className="text-sm text-muted-foreground leading-normal"
+                        >
+                          {detail.text}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
 
-              {/* Node content */}
-              <div className="flex-1 py-3">
-                <div className="flex items-baseline gap-2 mb-1.5">
-                  <h3 className="text-base font-medium text-foreground leading-normal">
-                    {t(node.title)}
-                  </h3>
-                  {node.ip && (
-                    <Badge
-                      variant="secondary"
-                      className="cursor-pointer font-mono font-normal text-xs bg-transparent radial-hover"
-                      onClick={() => handleCopyIp(node.ip!)}
-                    >
-                      {node.ip}
-                    </Badge>
-                  )}
-                </div>
-                <div className="space-y-1.5">
-                  {node.details.map((detail) => (
-                    <p
-                      key={detail.text}
-                      className="text-sm text-muted-foreground leading-normal"
-                    >
-                      {detail.text}
+            {/* Loading placeholder for current check */}
+            {isActive && (
+              <Card className="bg-transparent animate-in fade-in duration-200">
+                <CardContent className="flex items-start gap-3 p-4">
+                  <span className="shrink-0 mt-1">
+                    <NodeLoadingIcon className="w-4 h-4 text-muted-foreground animate-spin" />
+                  </span>
+                  <div className="flex-1">
+                    <div className="text-base font-medium text-muted-foreground leading-normal mb-1">
+                      {t(LOADING_LABELS[currentCheckIndex])}
+                    </div>
+                    <p className="text-sm text-muted-foreground/60 leading-normal">
+                      {t('diagnostics.checking')}
                     </p>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ))}
-
-          {/* Loading placeholder for current check */}
-          {isActive && (
-            <div className="flex animate-in fade-in duration-200">
-              {/* Timeline column */}
-              <div className="flex flex-col items-center mr-3">
-                <div className={cn("w-px h-5", nodes.length > 0 ? "bg-border" : "")} />
-                <div className="flex-shrink-0">
-                  <div className="w-2 h-2 rounded-full bg-muted-foreground/50 animate-pulse" />
-                </div>
-                <div className="w-px flex-1" />
-              </div>
-
-              {/* Placeholder content */}
-              <div className="flex-1 py-3">
-                <h3 className="text-base font-medium text-muted-foreground leading-normal mb-1.5">
-                  {t(LOADING_LABELS[currentCheckIndex])}
-                </h3>
-                <p className="text-sm text-muted-foreground/60 leading-normal">
-                  {t('diagnostics.checking')}
-                </p>
-              </div>
-            </div>
-          )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
         </ScrollArea>
       )}
 
@@ -333,7 +305,7 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
       <nav className="bg-background px-4 py-4">
         <div className="flex items-center justify-between">
           <Button variant="ghost" size="icon" className="h-12 w-12 text-foreground bg-accent" onClick={onBack}>
-            <WaypointsIcon className="w-6 h-6" />
+            <NetokLogoIcon className="w-6 h-6" />
           </Button>
           <Button variant="ghost" size="icon" className="h-12 w-12 text-muted-foreground" onClick={onNavigateToSecurity}>
             <ShieldIcon className="w-6 h-6" />

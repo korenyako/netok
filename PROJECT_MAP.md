@@ -148,6 +148,7 @@ Generated: 2026-01-30
 │   │   ├── components
 │   │   │   ├── icons
 │   │   │   │   ├── ActionIcons.tsx
+│   │   │   │   ├── DiagnosticStatusIcons.tsx
 │   │   │   │   └── NavigationIcons.tsx
 │   │   │   ├── ui
 │   │   │   │   ├── alert.tsx

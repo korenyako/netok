@@ -102,6 +102,7 @@ export function DnsProvidersScreen({ onBack, onSelectCloudflare, onSelectAdGuard
 
   const handleProviderClick = async (providerId: DnsProvider) => {
     if (providerId === 'auto') {
+      if (currentProvider === 'auto') return;
       try {
         setIsApplying(true);
         await setDns({ type: 'Auto' });

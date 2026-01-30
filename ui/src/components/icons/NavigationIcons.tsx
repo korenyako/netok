@@ -1,4 +1,26 @@
-export { Waypoints as WaypointsIcon } from 'lucide-react'
+import type { SVGProps } from 'react';
+
+export function NetokLogoIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <path
+        d="M18.7964 8.46618V15.5343M16.5308 16.5308C15.2797 17.782 15.2797 19.8105 16.5308 21.0616C17.782 22.3128 19.8105 22.3128 21.0616 21.0616C22.3128 19.8105 22.3128 17.782 21.0616 16.5308C19.8105 15.2797 17.782 15.2797 16.5308 16.5308ZM16.5308 16.5308L7.46918 7.46918M7.46918 7.46918C6.21803 8.72033 4.18951 8.72033 2.93836 7.46918C1.68721 6.21803 1.68721 4.18951 2.93836 2.93836C4.18951 1.68721 6.21803 1.68721 7.46918 2.93836C8.72033 4.18951 8.72033 6.21803 7.46918 7.46918ZM5.2039 15.5343V8.46618M16.5308 2.93836C15.2797 4.18951 15.2797 6.21803 16.5308 7.46918C17.782 8.72033 19.8105 8.72033 21.0616 7.46918C22.3128 6.21803 22.3128 4.18951 21.0616 2.93836C19.8105 1.68721 17.782 1.68721 16.5308 2.93836ZM2.93836 16.5308C1.68721 17.782 1.68721 19.8105 2.93836 21.0616C4.18951 22.3128 6.21803 22.3128 7.46918 21.0616C8.72033 19.8105 8.72033 17.782 7.46918 16.5308C6.21803 15.2797 4.18951 15.2797 2.93836 16.5308Z"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export { ShieldCheck as ShieldIcon } from 'lucide-react'
 export { Wrench as WrenchIcon } from 'lucide-react'
 export { Settings as SettingsIcon } from 'lucide-react'
