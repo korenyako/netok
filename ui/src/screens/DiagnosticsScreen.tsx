@@ -250,21 +250,19 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
                     {getStatusIcon(node.status)}
                   </span>
                   <div className="flex-1">
-                    <div className="flex items-baseline gap-2 mb-1">
-                      <div className="text-base font-medium text-foreground leading-normal">
-                        {t(node.title)}
-                      </div>
+                    <div className="text-base font-medium text-foreground leading-normal">
+                      {t(node.title)}
+                    </div>
+                    <div>
                       {node.ip && (
                         <Badge
                           variant="secondary"
-                          className="cursor-pointer font-mono font-normal text-xs bg-transparent radial-hover"
+                          className="cursor-pointer font-mono font-normal text-xs"
                           onClick={() => handleCopyIp(node.ip!)}
                         >
                           {node.ip}
                         </Badge>
                       )}
-                    </div>
-                    <div className="space-y-1">
                       {node.details.map((detail) => (
                         <p
                           key={detail.text}

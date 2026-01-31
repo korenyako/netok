@@ -34,16 +34,18 @@ export function SettingsScreen({ onNavigateToTheme, onNavigateToLanguage, onBack
         <div className="space-y-2">
           {/* Theme Setting Card */}
           <Card className="cursor-pointer hover:bg-accent transition-colors bg-transparent" onClick={onNavigateToTheme}>
-            <CardContent className="flex items-center gap-3 p-4">
-              {currentTheme === 'dark' ? (
-                <Moon className="w-5 h-5 text-muted-foreground shrink-0" />
-              ) : currentTheme === 'system' ? (
-                <Monitor className="w-5 h-5 text-muted-foreground shrink-0" />
-              ) : (
-                <Sun className="w-5 h-5 text-muted-foreground shrink-0" />
-              )}
+            <CardContent className="flex items-start gap-3 p-4">
+              <span className="shrink-0 mt-1">
+                {currentTheme === 'dark' ? (
+                  <Moon className="w-5 h-5 text-muted-foreground" />
+                ) : currentTheme === 'system' ? (
+                  <Monitor className="w-5 h-5 text-muted-foreground" />
+                ) : (
+                  <Sun className="w-5 h-5 text-muted-foreground" />
+                )}
+              </span>
               <div className="flex-1">
-                <div className="text-base font-medium leading-normal">
+                <div className="text-base font-medium leading-normal mb-1">
                   {t('settings.general.theme')}
                 </div>
                 <div className="text-sm text-muted-foreground leading-normal">
@@ -58,10 +60,12 @@ export function SettingsScreen({ onNavigateToTheme, onNavigateToLanguage, onBack
 
           {/* Language Setting Card */}
           <Card className="cursor-pointer hover:bg-accent transition-colors bg-transparent" onClick={onNavigateToLanguage}>
-            <CardContent className="flex items-center gap-3 p-4">
-              <Languages className="w-5 h-5 text-muted-foreground shrink-0" />
+            <CardContent className="flex items-start gap-3 p-4">
+              <span className="shrink-0 mt-1">
+                <Languages className="w-5 h-5 text-muted-foreground" />
+              </span>
               <div className="flex-1">
-                <div className="text-base font-medium leading-normal">
+                <div className="text-base font-medium leading-normal mb-1">
                   {t('settings.general.language')}
                 </div>
                 <div className="text-sm text-muted-foreground leading-normal">

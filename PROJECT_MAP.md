@@ -1,6 +1,6 @@
 # Project Map - Netok
 
-Generated: 2026-01-30
+Generated: 2026-01-31
 
 ## TREE (ASCII)
 
@@ -216,7 +216,6 @@ Generated: 2026-01-30
 │   │   │   ├── formatUpdatedAt.ts
 │   │   │   └── notifications.ts
 │   │   ├── App.tsx
-│   │   ├── fonts && cp dWorkNetoknetokuinode_modulesgeistdistfontsgeist-monoGeistMono-Variable.woff2 dWorkNetoknetokuisrcfonts
 │   │   ├── i18n.ts
 │   │   ├── index.css
 │   │   ├── main.tsx
@@ -244,17 +243,13 @@ Generated: 2026-01-30
 ├── etsy-hover-effects-fixed.html
 ├── LICENSE.Apache-2.0
 ├── LICENSE.Proprietary
-├── Loading prop to NodeCard for better UX
 ├── package-lock.json
 ├── package.json
 ├── PROJECT_CONTEXT.md
 ├── PROJECT_MAP.md
 ├── README_DEV.md
 ├── README.md
-├── s Refresh' when !isLoading
 ├── SETUP-PRECOMMIT.md
-├── tatus
-├── test_logging.rs
 └── TESTING.md
 
 ```
