@@ -1,8 +1,10 @@
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Circle } from 'lucide-react';
+import { ArrowLeft, Check } from 'lucide-react';
+import { invoke } from '@tauri-apps/api/core';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent } from '@/components/ui/card';
+import { CloseButton } from '../components/WindowControls';
 import { cn } from '@/lib/utils';
 
 interface LanguageSettingsScreenProps {
@@ -26,16 +28,18 @@ export function LanguageSettingsScreen({ onBack }: LanguageSettingsScreenProps) 
   const handleLanguageChange = (language: Language) => {
     i18n.changeLanguage(language);
     localStorage.setItem('netok.lang', language);
+    invoke('update_tray_language', { lang: language }).catch(() => {});
   };
 
   return (
     <div className="flex flex-col h-full bg-background">
       {/* Header with Back button and Title */}
-      <div className="px-4 py-4 flex items-center gap-2">
+      <div data-tauri-drag-region className="px-4 py-4 flex items-center gap-2">
         <Button variant="ghost" size="icon" onClick={onBack}>
           <ArrowLeft className="w-5 h-5 text-muted-foreground" />
         </Button>
-        <h1 className="text-lg font-semibold text-foreground">{t('settings.general.language')}</h1>
+        <h1 className="text-lg font-semibold text-foreground flex-1">{t('settings.general.language')}</h1>
+        <CloseButton />
       </div>
 
       {/* Content */}
@@ -49,21 +53,18 @@ export function LanguageSettingsScreen({ onBack }: LanguageSettingsScreenProps) 
               <Card
                 key={language.code}
                 className={cn(
-                  'cursor-pointer hover:bg-accent transition-colors',
-                  !isSelected && 'bg-transparent'
+                  'cursor-pointer transition-colors',
+                  isSelected
+                    ? 'border-primary bg-primary/10 hover:bg-primary/15 dark:bg-primary/10 dark:hover:bg-primary/15'
+                    : 'bg-transparent hover:bg-accent'
                 )}
                 onClick={() => handleLanguageChange(language.code)}
               >
-                <CardContent className="flex items-center gap-3 p-4">
-                  <span className={cn(
-                    'flex items-center justify-center w-4 h-4 rounded-full border-2 shrink-0 mt-px',
-                    isSelected ? 'border-primary' : 'border-muted-foreground'
-                  )}>
-                    {isSelected && (
-                      <Circle className="w-2 h-2 fill-primary text-primary" />
-                    )}
-                  </span>
-                  <span className="text-base font-medium leading-normal">{language.name}</span>
+                <CardContent className="flex items-center gap-3 px-4 py-3">
+                  <span className="text-base font-medium leading-normal flex-1">{language.name}</span>
+                  {isSelected && (
+                    <Check className="w-5 h-5 text-primary shrink-0" />
+                  )}
                 </CardContent>
               </Card>
             );

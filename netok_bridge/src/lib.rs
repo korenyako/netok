@@ -161,7 +161,12 @@ pub enum DnsProviderType {
     CleanBrowsing { variant: CleanBrowsingVariant },
     Quad9 { variant: Quad9Variant },
     OpenDns { variant: OpenDnsVariant },
-    Custom { primary: String, secondary: String },
+    Custom {
+        primary: String,
+        secondary: String,
+        primary_ipv6: Option<String>,
+        secondary_ipv6: Option<String>,
+    },
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
@@ -243,9 +248,12 @@ fn dns_provider_to_core(provider: DnsProviderType) -> netok_core::DnsProvider {
             OpenDnsVariant::FamilyShield => netok_core::DnsProvider::OpenDnsFamilyShield,
             OpenDnsVariant::Home => netok_core::DnsProvider::OpenDnsHome,
         },
-        DnsProviderType::Custom { primary, secondary } => {
-            netok_core::DnsProvider::Custom(primary, secondary)
-        }
+        DnsProviderType::Custom {
+            primary,
+            secondary,
+            primary_ipv6,
+            secondary_ipv6,
+        } => netok_core::DnsProvider::Custom(primary, secondary, primary_ipv6, secondary_ipv6),
     }
 }
 
@@ -319,8 +327,13 @@ fn dns_provider_from_core(provider: netok_core::DnsProvider) -> DnsProviderType 
             variant: OpenDnsVariant::Home,
         },
         // Custom
-        netok_core::DnsProvider::Custom(primary, secondary) => {
-            DnsProviderType::Custom { primary, secondary }
+        netok_core::DnsProvider::Custom(primary, secondary, primary_ipv6, secondary_ipv6) => {
+            DnsProviderType::Custom {
+                primary,
+                secondary,
+                primary_ipv6,
+                secondary_ipv6,
+            }
         }
     }
 }

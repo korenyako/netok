@@ -31,7 +31,7 @@ function App() {
     return (
       <ThemeProvider>
         <Toaster />
-        <div id="app" className="h-full flex flex-col bg-background">
+                <div id="app" className="h-full flex flex-col bg-background">
           <DiagnosticsScreen
             onBack={() => setShowDiagnostics(false)}
             onRefresh={fetchDiagnosticsData}
@@ -56,7 +56,7 @@ function App() {
   return (
     <ThemeProvider>
       <Toaster />
-      <div id="app" className="h-full flex flex-col bg-background">
+            <div id="app" className="h-full flex flex-col bg-background">
         <ScrollArea className="flex-1">
           {currentScreen === 'home' && (
             <StatusScreen
@@ -74,7 +74,7 @@ function App() {
             />
           )}
 
-          {currentScreen === 'tools' && <ToolsScreen onBack={navigateToHome} />}
+          {currentScreen === 'tools' && <ToolsScreen onBack={navigateToHome} onOpenDiagnostics={() => setShowDiagnostics(true)} />}
 
           {currentScreen === 'settings' && (
             <SettingsRouter

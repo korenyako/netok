@@ -2,7 +2,7 @@
 
 use crate::domain::DnsProvider;
 
-/// Set DNS for active network adapter.
+/// Set DNS for active network adapter (both IPv4 and IPv6).
 #[cfg(target_os = "windows")]
 pub fn set_dns(provider: DnsProvider) -> Result<(), String> {
     use super::adapter::get_active_adapter_name;
@@ -14,7 +14,7 @@ pub fn set_dns(provider: DnsProvider) -> Result<(), String> {
 
     match provider {
         DnsProvider::Auto => {
-            // Set to obtain DNS automatically (DHCP)
+            // Set IPv4 DNS to obtain automatically (DHCP)
             let output = Command::new("netsh")
                 .args(["interface", "ip", "set", "dns", &adapter_name, "dhcp"])
                 .output()
@@ -22,18 +22,31 @@ pub fn set_dns(provider: DnsProvider) -> Result<(), String> {
 
             if !output.status.success() {
                 return Err(format!(
-                    "Failed to set DNS to auto: {}",
+                    "Failed to set IPv4 DNS to auto: {}",
+                    String::from_utf8_lossy(&output.stderr)
+                ));
+            }
+
+            // Set IPv6 DNS to obtain automatically (DHCP)
+            let output = Command::new("netsh")
+                .args(["interface", "ipv6", "set", "dns", &adapter_name, "dhcp"])
+                .output()
+                .map_err(|e| format!("Failed to execute netsh for IPv6: {}", e))?;
+
+            if !output.status.success() {
+                return Err(format!(
+                    "Failed to set IPv6 DNS to auto: {}",
                     String::from_utf8_lossy(&output.stderr)
                 ));
             }
         }
         _ => {
-            // Set static DNS
+            // Set static IPv4 DNS
             let primary = provider
                 .primary()
                 .ok_or_else(|| "No primary DNS for this provider".to_string())?;
 
-            // Set primary DNS
+            // Set primary IPv4 DNS
             let output = Command::new("netsh")
                 .args([
                     "interface",
@@ -49,12 +62,12 @@ pub fn set_dns(provider: DnsProvider) -> Result<(), String> {
 
             if !output.status.success() {
                 return Err(format!(
-                    "Failed to set primary DNS: {}",
+                    "Failed to set primary IPv4 DNS: {}",
                     String::from_utf8_lossy(&output.stderr)
                 ));
             }
 
-            // Set secondary DNS if available
+            // Set secondary IPv4 DNS if available
             if let Some(secondary) = provider.secondary() {
                 let output = Command::new("netsh")
                     .args([
@@ -71,10 +84,62 @@ pub fn set_dns(provider: DnsProvider) -> Result<(), String> {
 
                 if !output.status.success() {
                     return Err(format!(
-                        "Failed to set secondary DNS: {}",
+                        "Failed to set secondary IPv4 DNS: {}",
                         String::from_utf8_lossy(&output.stderr)
                     ));
                 }
+            }
+
+            // Set IPv6 DNS if available
+            if let Some(primary_v6) = provider.primary_ipv6() {
+                // Set primary IPv6 DNS
+                let output = Command::new("netsh")
+                    .args([
+                        "interface",
+                        "ipv6",
+                        "set",
+                        "dns",
+                        &adapter_name,
+                        "static",
+                        &primary_v6,
+                    ])
+                    .output()
+                    .map_err(|e| format!("Failed to execute netsh for IPv6: {}", e))?;
+
+                if !output.status.success() {
+                    return Err(format!(
+                        "Failed to set primary IPv6 DNS: {}",
+                        String::from_utf8_lossy(&output.stderr)
+                    ));
+                }
+
+                // Set secondary IPv6 DNS if available
+                if let Some(secondary_v6) = provider.secondary_ipv6() {
+                    let output = Command::new("netsh")
+                        .args([
+                            "interface",
+                            "ipv6",
+                            "add",
+                            "dns",
+                            &adapter_name,
+                            &secondary_v6,
+                            "index=2",
+                        ])
+                        .output()
+                        .map_err(|e| format!("Failed to execute netsh for IPv6: {}", e))?;
+
+                    if !output.status.success() {
+                        return Err(format!(
+                            "Failed to set secondary IPv6 DNS: {}",
+                            String::from_utf8_lossy(&output.stderr)
+                        ));
+                    }
+                }
+            } else {
+                // No IPv6 for this provider - reset to DHCP to avoid conflicts
+                let _ = Command::new("netsh")
+                    .args(["interface", "ipv6", "set", "dns", &adapter_name, "dhcp"])
+                    .output();
             }
         }
     }

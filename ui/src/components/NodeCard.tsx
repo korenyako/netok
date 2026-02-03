@@ -150,7 +150,7 @@ export function NodeCard({ type, data, geoConsent = false, isLoading = false }: 
 
   return (
     <Card className="mb-3">
-      <CardContent className="p-3 md:p-4">
+      <CardContent className="px-4 py-3">
         {renderContent()}
       </CardContent>
     </Card>

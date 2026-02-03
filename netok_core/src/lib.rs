@@ -261,7 +261,7 @@ mod tests {
     fn test_dns_provider_custom() {
         let provider = detect_dns_provider(&["1.2.3.4".to_string(), "5.6.7.8".to_string()]);
         match provider {
-            DnsProvider::Custom(primary, secondary) => {
+            DnsProvider::Custom(primary, secondary, _, _) => {
                 assert_eq!(primary, "1.2.3.4");
                 assert_eq!(secondary, "5.6.7.8");
             }

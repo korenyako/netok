@@ -1,231 +1,236 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Circle } from 'lucide-react';
-import { setDns } from '../api/tauri';
+import { ArrowLeft, Check, ChevronRight, Loader2 } from 'lucide-react';
+import { setDns, type DnsProvider as ApiDnsProvider } from '../api/tauri';
 import { useDnsStore } from '../stores/useDnsStore';
 import { dnsStore } from '../stores/dnsStore';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
+import { CloseButton } from '../components/WindowControls';
 
 interface DnsProvidersScreenProps {
   onBack: () => void;
-  onSelectCloudflare: () => void;
-  onSelectAdGuard: () => void;
-  onSelectDns4Eu: () => void;
-  onSelectCleanBrowsing: () => void;
-  onSelectQuad9: () => void;
-  onSelectOpenDns: () => void;
-  onSelectGoogle: () => void;
+  onCustomIp: () => void;
 }
 
-type DnsProvider = 'auto' | 'cloudflare' | 'google' | 'adguard' | 'dns4eu' | 'cleanbrowsing' | 'quad9' | 'opendns';
+interface ProviderCard {
+  id: string;
+  nameKey: string;
+  descKey: string;
+  dnsPayload: ApiDnsProvider;
+  matchType: string;
+}
 
-// Static provider display names (only non-identical mappings)
-const PROVIDER_DISPLAY_NAMES: Record<string, string> = {
-  'Dns4Eu': 'DNS4EU',
-  'OpenDns': 'OpenDNS',
+const PROVIDER_CARDS: ProviderCard[] = [
+  {
+    id: 'cloudflare',
+    nameKey: 'dns_providers.cloudflare',
+    descKey: 'dns_providers.goal_fast_desc',
+    dnsPayload: { type: 'Cloudflare', variant: 'Standard' },
+    matchType: 'Cloudflare',
+  },
+  {
+    id: 'adguard',
+    nameKey: 'dns_providers.adguard',
+    descKey: 'dns_providers.goal_adblock_desc',
+    dnsPayload: { type: 'AdGuard', variant: 'Standard' },
+    matchType: 'AdGuard',
+  },
+  {
+    id: 'quad9',
+    nameKey: 'dns_providers.quad9',
+    descKey: 'dns_providers.goal_secure_desc',
+    dnsPayload: { type: 'Quad9', variant: 'Recommended' },
+    matchType: 'Quad9',
+  },
+  {
+    id: 'cleanbrowsing',
+    nameKey: 'dns_providers.cleanbrowsing',
+    descKey: 'dns_providers.goal_family_desc',
+    dnsPayload: { type: 'CleanBrowsing', variant: 'Family' },
+    matchType: 'CleanBrowsing',
+  },
+];
+
+const LAST_DNS_KEY = 'netok_last_dns';
+const DEFAULT_DNS: ApiDnsProvider = { type: 'Cloudflare', variant: 'Standard' };
+
+function saveLastDns(provider: ApiDnsProvider): void {
+  try {
+    localStorage.setItem(LAST_DNS_KEY, JSON.stringify(provider));
+  } catch {
+    // Ignore localStorage errors
+  }
+}
+
+function loadLastDns(): ApiDnsProvider {
+  try {
+    const raw = localStorage.getItem(LAST_DNS_KEY);
+    if (raw) return JSON.parse(raw) as ApiDnsProvider;
+  } catch {
+    // Ignore parse errors
+  }
+  return DEFAULT_DNS;
+}
+
+function isProtected(provider: ApiDnsProvider | null): boolean {
+  if (!provider) return false;
+  return provider.type !== 'Auto';
+}
+
+const PROVIDER_DISPLAY: Record<string, string> = {
+  Cloudflare: 'Cloudflare',
+  AdGuard: 'AdGuard',
+  Quad9: 'Quad9',
+  CleanBrowsing: 'CleanBrowsing',
+  Google: 'Google',
+  Dns4Eu: 'DNS4EU',
+  OpenDns: 'OpenDNS',
 };
 
-// Get display name for DNS provider
-function getProviderDisplayName(type: string): string {
-  return PROVIDER_DISPLAY_NAMES[type] || type;
-}
-
-// Map API type to local provider type
-const API_TO_LOCAL_PROVIDER: Record<string, DnsProvider> = {
-  'Auto': 'auto',
-  'Cloudflare': 'cloudflare',
-  'Google': 'google',
-  'AdGuard': 'adguard',
-  'Dns4Eu': 'dns4eu',
-  'CleanBrowsing': 'cleanbrowsing',
-  'Quad9': 'quad9',
-  'OpenDns': 'opendns',
-};
-
-// Get variant translation key based on provider type and variant
-function getVariantTranslationKey(type: string, variant: string): string {
-  const variantKeys: Record<string, Record<string, string>> = {
-    'Cloudflare': {
-      'Standard': 'dns_detail.cloudflare.standard',
-      'Malware': 'dns_detail.cloudflare.malware',
-      'Family': 'dns_detail.cloudflare.family',
-    },
-    'AdGuard': {
-      'Standard': 'dns_detail.adguard.standard',
-      'NonFiltering': 'dns_detail.adguard.unfiltered',
-      'Family': 'dns_detail.adguard.family',
-    },
-    'Dns4Eu': {
-      'Protective': 'dns_detail.dns4eu.protective',
-      'ProtectiveChild': 'dns_detail.dns4eu.protective_child',
-      'ProtectiveAd': 'dns_detail.dns4eu.protective_ad',
-      'ProtectiveChildAd': 'dns_detail.dns4eu.protective_child_ad',
-      'Unfiltered': 'dns_detail.dns4eu.unfiltered',
-    },
-    'CleanBrowsing': {
-      'Family': 'dns_detail.cleanbrowsing.family',
-      'Adult': 'dns_detail.cleanbrowsing.adult',
-      'Security': 'dns_detail.cleanbrowsing.security',
-    },
-    'Quad9': {
-      'Recommended': 'dns_detail.quad9.recommended',
-      'SecuredEcs': 'dns_detail.quad9.secured_ecs',
-      'Unsecured': 'dns_detail.quad9.unsecured',
-    },
-    'OpenDns': {
-      'FamilyShield': 'dns_detail.opendns.familyshield',
-      'Home': 'dns_detail.opendns.home',
-    },
-  };
-  return variantKeys[type]?.[variant] || variant;
-}
-
-export function DnsProvidersScreen({ onBack, onSelectCloudflare, onSelectAdGuard, onSelectDns4Eu, onSelectCleanBrowsing, onSelectQuad9, onSelectOpenDns, onSelectGoogle }: DnsProvidersScreenProps) {
+export function DnsProvidersScreen({ onBack, onCustomIp }: DnsProvidersScreenProps) {
   const { t } = useTranslation();
   const { currentProvider: apiProvider } = useDnsStore();
   const [isApplying, setIsApplying] = useState(false);
 
-  // Check if protection is enabled (Auto and Custom = disabled, known providers = enabled)
-  const isKnownProvider = apiProvider !== null && API_TO_LOCAL_PROVIDER[apiProvider.type] !== undefined && apiProvider.type !== 'Auto';
-  const isProtectionEnabled = isKnownProvider;
-  const activeProviderName = isProtectionEnabled ? getProviderDisplayName(apiProvider.type) : null;
-  const activeVariantKey = isProtectionEnabled && 'variant' in apiProvider
-    ? getVariantTranslationKey(apiProvider.type, apiProvider.variant as string)
-    : null;
+  const protectionEnabled = isProtected(apiProvider);
+  const isCustomActive = protectionEnabled && apiProvider?.type === 'Custom';
 
-  // Map API provider to local type (Custom treated as auto since it's not configurable in UI)
-  const currentProvider: DnsProvider | null = apiProvider
-    ? apiProvider.type === 'Custom' ? 'auto' : (API_TO_LOCAL_PROVIDER[apiProvider.type] ?? null)
-    : null;
+  useEffect(() => {
+    if (apiProvider && apiProvider.type !== 'Auto') {
+      saveLastDns(apiProvider);
+    }
+  }, [apiProvider]);
 
-  const handleProviderClick = async (providerId: DnsProvider) => {
-    if (providerId === 'auto') {
-      if (currentProvider === 'auto') return;
-      try {
-        setIsApplying(true);
-        await setDns({ type: 'Auto' });
-        dnsStore.setProvider({ type: 'Auto' });
-      } catch (err) {
-        console.error('Failed to set DNS to Auto:', err);
-      } finally {
-        setIsApplying(false);
-      }
-    } else if (providerId === 'cloudflare') {
-      onSelectCloudflare();
-    } else if (providerId === 'google') {
-      onSelectGoogle();
-    } else if (providerId === 'adguard') {
-      onSelectAdGuard();
-    } else if (providerId === 'dns4eu') {
-      onSelectDns4Eu();
-    } else if (providerId === 'cleanbrowsing') {
-      onSelectCleanBrowsing();
-    } else if (providerId === 'quad9') {
-      onSelectQuad9();
-    } else if (providerId === 'opendns') {
-      onSelectOpenDns();
+  const statusSubtitle = (() => {
+    if (!protectionEnabled) return t('dns_providers.status_disabled');
+    if (apiProvider) {
+      if (apiProvider.type === 'Custom') return t('dns_providers.custom_display');
+      return PROVIDER_DISPLAY[apiProvider.type] || apiProvider.type;
+    }
+    return t('dns_providers.status_disabled');
+  })();
+
+  const applyProvider = async (provider: ApiDnsProvider) => {
+    try {
+      setIsApplying(true);
+      await setDns(provider);
+      dnsStore.setProvider(provider);
+    } catch (err) {
+      console.error('Failed to set DNS:', err);
+    } finally {
+      setIsApplying(false);
     }
   };
 
-  const providers: Array<{
-    id: DnsProvider;
-    name: string;
-    description: string;
-  }> = [
-    { id: 'auto', name: t('dns_providers.auto'), description: t('dns_providers.auto_desc') },
-    { id: 'adguard', name: t('dns_providers.adguard'), description: t('dns_providers.adguard_desc') },
-    { id: 'cleanbrowsing', name: t('dns_providers.cleanbrowsing'), description: t('dns_providers.cleanbrowsing_desc') },
-    { id: 'cloudflare', name: t('dns_providers.cloudflare'), description: t('dns_providers.cloudflare_desc') },
-    { id: 'dns4eu', name: t('dns_providers.dns4eu'), description: t('dns_providers.dns4eu_desc') },
-    { id: 'google', name: t('dns_providers.google'), description: t('dns_providers.google_desc') },
-    { id: 'opendns', name: t('dns_providers.opendns'), description: t('dns_providers.opendns_desc') },
-    { id: 'quad9', name: t('dns_providers.quad9'), description: t('dns_providers.quad9_desc') },
-  ];
+  const handleToggle = async (checked: boolean) => {
+    if (isApplying) return;
+    if (checked) {
+      const lastDns = loadLastDns();
+      await applyProvider(lastDns);
+    } else {
+      await applyProvider({ type: 'Auto' });
+    }
+  };
+
+  const handleCardSelect = async (card: ProviderCard) => {
+    if (isApplying) return;
+    if (protectionEnabled && apiProvider?.type === card.matchType) return;
+    await applyProvider(card.dnsPayload);
+  };
 
   return (
-    <div className="flex flex-col h-full bg-background">
-      {/* Header with Back button and Title */}
-      <div className="px-4 py-4 flex items-center gap-2">
-        <Button variant="ghost" size="icon" onClick={onBack}>
-          <ArrowLeft className="w-5 h-5 text-muted-foreground" />
-        </Button>
-        <h1 className="text-lg font-semibold text-foreground">
-          {t('dns_providers.title')}
-        </h1>
+    <div className="flex flex-col min-h-[calc(100dvh-5rem)] bg-background">
+      {/* Header */}
+      <div data-tauri-drag-region className="px-4 pt-4 pb-3">
+        <div className="flex items-center gap-2 pointer-events-auto">
+          <Button variant="ghost" size="icon" onClick={onBack}>
+            <ArrowLeft className="w-5 h-5 text-muted-foreground" />
+          </Button>
+          <h1 className="flex-1 text-lg font-semibold text-foreground">
+            {t('dns_providers.title')}
+          </h1>
+          {isApplying ? (
+            <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+          ) : (
+            <Switch
+              checked={protectionEnabled}
+              onCheckedChange={handleToggle}
+              disabled={isApplying}
+            />
+          )}
+          <CloseButton />
+        </div>
+        <p className="text-xs text-foreground ml-12 mt-0.5">
+          {statusSubtitle}
+        </p>
       </div>
 
       {/* Content */}
-      <div className="flex-1 px-4">
-        {/* Protection Status */}
-        <div className={cn(
-          'rounded-lg border p-4 mb-4',
-          isProtectionEnabled ? 'border-primary/50' : 'border-warning/50'
-        )}>
-          <div className="flex items-start gap-3">
-            <span className="flex items-center justify-center w-4 h-4 shrink-0 mt-1">
-              <span className={cn(
-                'w-2 h-2 rounded-full',
-                isProtectionEnabled ? 'bg-primary' : 'bg-warning'
-              )} />
-            </span>
-            <div className="flex-1">
-              <p className={cn(
-                'text-base font-medium leading-normal mb-1',
-                isProtectionEnabled ? 'text-primary' : 'text-warning'
-              )}>
-                {isProtectionEnabled && activeProviderName
-                  ? activeVariantKey
-                    ? t('dns_providers.protection_enabled_with_mode', { provider: activeProviderName, mode: t(activeVariantKey) })
-                    : t('dns_providers.protection_enabled', { provider: activeProviderName })
-                  : t('dns_providers.protection_disabled')}
-              </p>
-              <p className="text-sm text-muted-foreground leading-normal">
-                {isProtectionEnabled
-                  ? t('dns_providers.description')
-                  : t('dns_providers.protection_disabled_with_hint')}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* DNS Provider Options */}
+      <div className="flex-1 overflow-y-auto px-4 pb-4">
         <div className="space-y-2">
-          {providers.map((provider) => {
-            const isSelected = currentProvider === provider.id;
+          {PROVIDER_CARDS.map((card) => {
+            const isActive = protectionEnabled && apiProvider?.type === card.matchType;
 
             return (
-              <div key={provider.id} className={cn(isApplying && 'pointer-events-none opacity-50')}>
+              <div key={card.id} className={cn(isApplying && !isActive && 'pointer-events-none opacity-50')}>
                 <Card
                   className={cn(
-                    'cursor-pointer hover:bg-accent transition-colors',
-                    !isSelected && 'bg-transparent'
+                    'cursor-pointer transition-colors',
+                    isActive
+                      ? 'border-primary bg-primary/10 hover:bg-primary/15 dark:bg-primary/10 dark:hover:bg-primary/15'
+                      : 'bg-transparent hover:bg-accent'
                   )}
-                  onClick={() => handleProviderClick(provider.id)}
+                  onClick={() => handleCardSelect(card)}
                 >
-                  <CardContent className="flex items-start gap-3 p-4">
-                    <span className={cn(
-                      'flex items-center justify-center w-4 h-4 rounded-full border-2 shrink-0 mt-1',
-                      isSelected ? 'border-primary' : 'border-muted-foreground'
-                    )}>
-                      {isSelected && (
-                        <Circle className="w-2 h-2 fill-primary text-primary" />
-                      )}
-                    </span>
-                    <div className="flex-1">
-                      <div className="text-base font-medium leading-normal mb-1">
-                        {provider.name}
-                      </div>
-                      <p className="text-sm text-muted-foreground leading-normal">
-                        {provider.description}
+                  <CardContent className="flex items-start gap-3 px-4 py-3">
+                    <div className="flex-1 min-w-0">
+                      <span className="text-base font-medium leading-normal">
+                        {t(card.nameKey)}
+                      </span>
+                      <p className="text-sm text-muted-foreground leading-normal mt-0.5">
+                        {t(card.descKey)}
                       </p>
                     </div>
+                    {isActive && (
+                      <Check className="w-5 h-5 text-primary shrink-0 self-center" />
+                    )}
                   </CardContent>
                 </Card>
               </div>
             );
           })}
+
+          {/* Custom IP card */}
+          <div className={cn(isApplying && !isCustomActive && 'pointer-events-none opacity-50')}>
+            <Card
+              className={cn(
+                'cursor-pointer transition-colors',
+                isCustomActive
+                  ? 'border-primary bg-primary/10 hover:bg-primary/15 dark:bg-primary/10 dark:hover:bg-primary/15'
+                  : 'bg-transparent hover:bg-accent'
+              )}
+              onClick={onCustomIp}
+            >
+              <CardContent className="flex items-start gap-3 px-4 py-3">
+                <div className="flex-1 min-w-0">
+                  <span className="text-base font-medium leading-normal">
+                    {t('dns_providers.custom_ip')}
+                  </span>
+                  <p className="text-sm text-muted-foreground leading-normal mt-0.5">
+                    {t('dns_providers.custom_ip_desc')}
+                  </p>
+                </div>
+                {isCustomActive ? (
+                  <Check className="w-5 h-5 text-primary shrink-0 self-center" />
+                ) : (
+                  <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0 self-center" />
+                )}
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </div>

@@ -457,9 +457,9 @@ pub fn detect_dns_provider(dns_servers: &[String]) -> DnsProvider {
         (Some("208.67.222.222"), Some("208.67.220.220")) | (Some("208.67.222.222"), None) => {
             DnsProvider::OpenDnsHome
         }
-        // Custom
-        (Some(p), Some(s)) => DnsProvider::Custom(p.to_string(), s.to_string()),
-        (Some(p), None) => DnsProvider::Custom(p.to_string(), String::new()),
+        // Custom (IPv6 unknown when detecting from IPv4 addresses)
+        (Some(p), Some(s)) => DnsProvider::Custom(p.to_string(), s.to_string(), None, None),
+        (Some(p), None) => DnsProvider::Custom(p.to_string(), String::new(), None, None),
         _ => DnsProvider::Auto,
     }
 }

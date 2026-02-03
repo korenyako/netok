@@ -1,6 +1,6 @@
 # Project Map - Netok
 
-Generated: 2026-01-31
+Generated: 2026-02-03
 
 ## TREE (ASCII)
 
@@ -99,22 +99,8 @@ Generated: 2026-01-31
 │   │   │       ├── desktop-schema.json
 │   │   │       └── windows-schema.json
 │   │   ├── icons
-│   │   │   ├── 128x128.png
-│   │   │   ├── 128x128@2x.png
 │   │   │   ├── 32x32.png
-│   │   │   ├── icon.icns
-│   │   │   ├── icon.ico
-│   │   │   ├── icon.png
-│   │   │   ├── Square107x107Logo.png
-│   │   │   ├── Square142x142Logo.png
-│   │   │   ├── Square150x150Logo.png
-│   │   │   ├── Square284x284Logo.png
-│   │   │   ├── Square30x30Logo.png
-│   │   │   ├── Square310x310Logo.png
-│   │   │   ├── Square44x44Logo.png
-│   │   │   ├── Square71x71Logo.png
-│   │   │   ├── Square89x89Logo.png
-│   │   │   └── StoreLogo.png
+│   │   │   └── icon.ico
 │   │   ├── src
 │   │   │   ├── lib.rs
 │   │   │   └── main.rs
@@ -155,22 +141,21 @@ Generated: 2026-01-31
 │   │   │   │   ├── badge.tsx
 │   │   │   │   ├── button.tsx
 │   │   │   │   ├── card.tsx
-│   │   │   │   ├── collapsible.tsx
+│   │   │   │   ├── input.tsx
 │   │   │   │   ├── scroll-area.tsx
 │   │   │   │   ├── select.tsx
 │   │   │   │   ├── separator.tsx
-│   │   │   │   └── sonner.tsx
+│   │   │   │   ├── sonner.tsx
+│   │   │   │   └── switch.tsx
 │   │   │   ├── BottomNav.tsx
 │   │   │   ├── DiagnosticMessage.tsx
-│   │   │   ├── DnsVariantCard.tsx
 │   │   │   ├── HeaderStatus.tsx
 │   │   │   ├── NodeCard.tsx
 │   │   │   ├── SecurityRouter.tsx
 │   │   │   ├── SettingsRouter.tsx
 │   │   │   ├── Spinner.tsx
-│   │   │   └── ThemeProvider.tsx
-│   │   ├── constants
-│   │   │   └── dnsVariantStyles.ts
+│   │   │   ├── ThemeProvider.tsx
+│   │   │   └── WindowControls.tsx
 │   │   ├── fonts
 │   │   │   ├── Geist-Variable.woff2
 │   │   │   └── GeistMono-Variable.woff2
@@ -184,23 +169,20 @@ Generated: 2026-01-31
 │   │   ├── lib
 │   │   │   └── utils.ts
 │   │   ├── screens
-│   │   │   ├── AdGuardDetailScreen.tsx
-│   │   │   ├── CleanBrowsingDetailScreen.tsx
-│   │   │   ├── CloudflareDetailScreen.tsx
+│   │   │   ├── AboutScreen.tsx
+│   │   │   ├── CloseBehaviorSettingsScreen.tsx
+│   │   │   ├── CustomIpScreen.tsx
 │   │   │   ├── DiagnosticsScreen.tsx
-│   │   │   ├── Dns4EuDetailScreen.tsx
 │   │   │   ├── DnsProvidersScreen.tsx
-│   │   │   ├── GoogleDetailScreen.tsx
 │   │   │   ├── LanguageSettingsScreen.tsx
-│   │   │   ├── OpenDnsDetailScreen.tsx
-│   │   │   ├── Quad9DetailScreen.tsx
-│   │   │   ├── SecurityScreen.tsx
+│   │   │   ├── NodeDetailScreen.tsx
 │   │   │   ├── SettingsScreen.tsx
 │   │   │   ├── StatusScreen.tsx
 │   │   │   ├── ThemeSettingsScreen.tsx
 │   │   │   └── ToolsScreen.tsx
 │   │   ├── store
 │   │   ├── stores
+│   │   │   ├── closeBehaviorStore.ts
 │   │   │   ├── dnsStore.ts
 │   │   │   ├── themeStore.ts
 │   │   │   └── useDnsStore.ts
@@ -240,6 +222,7 @@ Generated: 2026-01-31
 ├── Cargo.toml
 ├── CLAUDE.md
 ├── CONTRIBUTING.md
+├── DNS_PROVIDERS.md
 ├── etsy-hover-effects-fixed.html
 ├── LICENSE.Apache-2.0
 ├── LICENSE.Proprietary
@@ -279,7 +262,9 @@ Generated: 2026-01-31
         "height": 600,
         "minWidth": 320,
         "minHeight": 600,
-        "resizable": true
+        "resizable": true,
+        "decorations": false,
+        "transparent": true
       }
     ]
   }
@@ -310,7 +295,9 @@ Generated: 2026-01-31
     "@radix-ui/react-scroll-area": "^1.2.10",
     "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-slot": "^1.2.4",
+    "@radix-ui/react-switch": "^1.2.6",
     "@tauri-apps/api": "^2.9.0",
+    "@tauri-apps/plugin-opener": "^2.5.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "geist": "^1.5.1",
@@ -338,8 +325,6 @@ Generated: 2026-01-31
     "autoprefixer": "^10.4.21",
     "eslint": "^9.33.0",
     "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.20",
-    "globals": "^16.3.0",
 // ... (truncated due to syntax error)
 ```
 
@@ -440,7 +425,7 @@ function App() {
     return (
       <ThemeProvider>
         <Toaster />
-        <div id="app" className="h-full flex flex-col bg-background">
+                <div id="app" className="h-full flex flex-col bg-background">
           <DiagnosticsScreen
             onBack={() => setShowDiagnostics(false)}
             onRefresh={fetchDiagnosticsData}

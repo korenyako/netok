@@ -318,8 +318,8 @@ pub enum DnsProvider {
     OpenDnsFamilyShield,
     /// 208.67.222.222, 208.67.220.220 - Home
     OpenDnsHome,
-    /// Custom primary and secondary DNS
-    Custom(String, String),
+    /// Custom DNS: (ipv4_primary, ipv4_secondary, ipv6_primary, ipv6_secondary)
+    Custom(String, String, Option<String>, Option<String>),
 }
 
 impl DnsProvider {
@@ -354,7 +354,7 @@ impl DnsProvider {
             // OpenDNS
             DnsProvider::OpenDnsFamilyShield => Some("208.67.222.123".to_string()),
             DnsProvider::OpenDnsHome => Some("208.67.222.222".to_string()),
-            DnsProvider::Custom(primary, _) => Some(primary.clone()),
+            DnsProvider::Custom(primary, _, _, _) => Some(primary.clone()),
         }
     }
 
@@ -389,7 +389,79 @@ impl DnsProvider {
             // OpenDNS
             DnsProvider::OpenDnsFamilyShield => Some("208.67.220.123".to_string()),
             DnsProvider::OpenDnsHome => Some("208.67.220.220".to_string()),
-            DnsProvider::Custom(_, secondary) => Some(secondary.clone()),
+            DnsProvider::Custom(_, secondary, _, _) => Some(secondary.clone()),
+        }
+    }
+
+    /// Returns the primary IPv6 DNS server address.
+    pub fn primary_ipv6(&self) -> Option<String> {
+        match self {
+            DnsProvider::Auto => None,
+            // Cloudflare
+            DnsProvider::Cloudflare => Some("2606:4700:4700::1111".to_string()),
+            DnsProvider::CloudflareMalware => Some("2606:4700:4700::1112".to_string()),
+            DnsProvider::CloudflareFamily => Some("2606:4700:4700::1113".to_string()),
+            // Google
+            DnsProvider::Google => Some("2001:4860:4860::8888".to_string()),
+            // AdGuard
+            DnsProvider::AdGuard => Some("2a10:50c0::ad1:ff".to_string()),
+            DnsProvider::AdGuardNonFiltering => Some("2a10:50c0::1:ff".to_string()),
+            DnsProvider::AdGuardFamily => Some("2a10:50c0::bad1:ff".to_string()),
+            // DNS4EU - no IPv6 published
+            DnsProvider::Dns4EuProtective => None,
+            DnsProvider::Dns4EuProtectiveChild => None,
+            DnsProvider::Dns4EuProtectiveAd => None,
+            DnsProvider::Dns4EuProtectiveChildAd => None,
+            DnsProvider::Dns4EuUnfiltered => None,
+            // CleanBrowsing
+            DnsProvider::CleanBrowsingFamily => Some("2a0d:2a00:1::".to_string()),
+            DnsProvider::CleanBrowsingAdult => Some("2a0d:2a00:1::1".to_string()),
+            DnsProvider::CleanBrowsingSecurity => Some("2a0d:2a00:2::".to_string()),
+            // Quad9
+            DnsProvider::Quad9Recommended => Some("2620:fe::fe".to_string()),
+            DnsProvider::Quad9SecuredEcs => Some("2620:fe::11".to_string()),
+            DnsProvider::Quad9Unsecured => Some("2620:fe::10".to_string()),
+            // OpenDNS
+            DnsProvider::OpenDnsFamilyShield => Some("2620:119:35::123".to_string()),
+            DnsProvider::OpenDnsHome => Some("2620:119:35::35".to_string()),
+            // Custom IPv6
+            DnsProvider::Custom(_, _, ipv6_primary, _) => ipv6_primary.clone(),
+        }
+    }
+
+    /// Returns the secondary IPv6 DNS server address.
+    pub fn secondary_ipv6(&self) -> Option<String> {
+        match self {
+            DnsProvider::Auto => None,
+            // Cloudflare
+            DnsProvider::Cloudflare => Some("2606:4700:4700::1001".to_string()),
+            DnsProvider::CloudflareMalware => Some("2606:4700:4700::1002".to_string()),
+            DnsProvider::CloudflareFamily => Some("2606:4700:4700::1003".to_string()),
+            // Google
+            DnsProvider::Google => Some("2001:4860:4860::8844".to_string()),
+            // AdGuard
+            DnsProvider::AdGuard => Some("2a10:50c0::ad2:ff".to_string()),
+            DnsProvider::AdGuardNonFiltering => Some("2a10:50c0::2:ff".to_string()),
+            DnsProvider::AdGuardFamily => Some("2a10:50c0::bad2:ff".to_string()),
+            // DNS4EU - no IPv6 published
+            DnsProvider::Dns4EuProtective => None,
+            DnsProvider::Dns4EuProtectiveChild => None,
+            DnsProvider::Dns4EuProtectiveAd => None,
+            DnsProvider::Dns4EuProtectiveChildAd => None,
+            DnsProvider::Dns4EuUnfiltered => None,
+            // CleanBrowsing
+            DnsProvider::CleanBrowsingFamily => Some("2a0d:2a00:2::".to_string()),
+            DnsProvider::CleanBrowsingAdult => Some("2a0d:2a00:2::1".to_string()),
+            DnsProvider::CleanBrowsingSecurity => Some("2a0d:2a00:1::".to_string()),
+            // Quad9
+            DnsProvider::Quad9Recommended => Some("2620:fe::9".to_string()),
+            DnsProvider::Quad9SecuredEcs => Some("2620:fe::fe:11".to_string()),
+            DnsProvider::Quad9Unsecured => Some("2620:fe::fe:10".to_string()),
+            // OpenDNS
+            DnsProvider::OpenDnsFamilyShield => Some("2620:119:53::123".to_string()),
+            DnsProvider::OpenDnsHome => Some("2620:119:53::53".to_string()),
+            // Custom IPv6
+            DnsProvider::Custom(_, _, _, ipv6_secondary) => ipv6_secondary.clone(),
         }
     }
 }
@@ -420,9 +492,16 @@ mod tests {
 
     #[test]
     fn test_dns_provider_custom() {
-        let custom = DnsProvider::Custom("1.2.3.4".to_string(), "5.6.7.8".to_string());
+        let custom = DnsProvider::Custom(
+            "1.2.3.4".to_string(),
+            "5.6.7.8".to_string(),
+            Some("2001:db8::1".to_string()),
+            Some("2001:db8::2".to_string()),
+        );
         assert_eq!(custom.primary(), Some("1.2.3.4".to_string()));
         assert_eq!(custom.secondary(), Some("5.6.7.8".to_string()));
+        assert_eq!(custom.primary_ipv6(), Some("2001:db8::1".to_string()));
+        assert_eq!(custom.secondary_ipv6(), Some("2001:db8::2".to_string()));
     }
 
     #[test]

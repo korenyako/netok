@@ -1,16 +1,8 @@
 import { useState } from 'react';
 
 export type Screen = 'home' | 'security' | 'tools' | 'settings';
-export type SettingsSubScreen = 'main' | 'theme' | 'language';
-export type SecuritySubScreen =
-  | 'dns-providers'
-  | 'cloudflare-detail'
-  | 'adguard-detail'
-  | 'dns4eu-detail'
-  | 'cleanbrowsing-detail'
-  | 'quad9-detail'
-  | 'opendns-detail'
-  | 'google-detail';
+export type SettingsSubScreen = 'main' | 'theme' | 'language' | 'close-behavior' | 'about';
+export type SecuritySubScreen = 'dns-providers' | 'custom-ip';
 
 export function useNavigation() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('home');

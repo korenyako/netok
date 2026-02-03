@@ -222,6 +222,8 @@ async fn test_set_dns_custom_provider() {
     let provider = DnsProviderType::Custom {
         primary: "1.1.1.1".to_string(),
         secondary: "8.8.8.8".to_string(),
+        primary_ipv6: None,
+        secondary_ipv6: None,
     };
 
     let result = set_dns_provider(provider).await;
@@ -278,6 +280,8 @@ fn test_dns_provider_all_variants_serialize() {
         DnsProviderType::Custom {
             primary: "1.2.3.4".to_string(),
             secondary: "5.6.7.8".to_string(),
+            primary_ipv6: Some("2001:db8::1".to_string()),
+            secondary_ipv6: Some("2001:db8::2".to_string()),
         },
     ];
 

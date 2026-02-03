@@ -1,3 +1,9 @@
+use tauri::{
+    menu::{Menu, MenuItem},
+    tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
+    Manager,
+};
+
 // Re-export types from netok_bridge
 pub use netok_bridge::{DnsProviderType, SingleNodeResult, Snapshot};
 
@@ -78,6 +84,67 @@ async fn check_internet() -> Result<SingleNodeResult, String> {
         .map_err(|e| e.to_string())
 }
 
+// ==================== System Tray ====================
+
+fn build_tray_menu(app: &tauri::AppHandle, lang: &str) -> Result<Menu<tauri::Wry>, Box<dyn std::error::Error>> {
+    let (open_label, quit_label) = match lang {
+        "en" => ("Open Netok", "Quit"),
+        _ => ("Открыть Netok", "Выйти"),
+    };
+
+    let open_item = MenuItem::with_id(app, "open", open_label, true, None::<&str>)?;
+    let quit_item = MenuItem::with_id(app, "quit", quit_label, true, None::<&str>)?;
+    let menu = Menu::with_items(app, &[&open_item, &quit_item])?;
+    Ok(menu)
+}
+
+fn show_main_window(app: &tauri::AppHandle) {
+    if let Some(window) = app.get_webview_window("main") {
+        let _ = window.show();
+        let _ = window.set_focus();
+    }
+}
+
+fn create_tray(app: &tauri::App) -> Result<(), Box<dyn std::error::Error>> {
+    let handle = app.handle();
+    let menu = build_tray_menu(handle, "ru")?;
+
+    let icon = tauri::include_image!("icons/32x32.png");
+
+    TrayIconBuilder::with_id("main")
+        .icon(icon)
+        .tooltip("Netok")
+        .menu(&menu)
+        .on_menu_event(|app, event| match event.id.as_ref() {
+            "open" => show_main_window(app),
+            "quit" => app.exit(0),
+            _ => {}
+        })
+        .on_tray_icon_event(|tray, event| {
+            if let TrayIconEvent::Click {
+                button: MouseButton::Left,
+                button_state: MouseButtonState::Up,
+                ..
+            } = event
+            {
+                show_main_window(tray.app_handle());
+            }
+        })
+        .build(app)?;
+
+    Ok(())
+}
+
+#[tauri::command]
+fn update_tray_language(app: tauri::AppHandle, lang: String) -> Result<(), String> {
+    let tray = app.tray_by_id("main").ok_or("Tray not found")?;
+    let menu = build_tray_menu(&app, &lang).map_err(|e| e.to_string())?;
+    tray.set_menu(Some(menu)).map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+// ==================== App Entry ====================
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -92,8 +159,20 @@ pub fn run() {
             check_computer,
             check_network,
             check_router,
-            check_internet
+            check_internet,
+            update_tray_language
         ])
+        .setup(|app| {
+            create_tray(app)?;
+            Ok(())
+        })
+        .on_window_event(|window, event| {
+            // Intercept native close (Alt+F4, taskbar close) — hide to tray instead
+            if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                let _ = window.hide();
+                api.prevent_close();
+            }
+        })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

@@ -10,7 +10,7 @@
     "title": "DNS Protection",
     "description": "Select a DNS server to enhance security and block unwanted content",
     "protection_disabled": "DNS protection disabled",
-    "protection_disabled_with_hint": "Using DNS from your ISP. Below are alternative servers with more protection and control",
+    "protection_disabled_with_hint": "Using DNS from your ISP",
     "protection_enabled": "DNS protection enabled: {{provider}}",
     "protection_enabled_with_mode": "DNS protection enabled: {{provider}} ({{mode}})",
     "auto": "System DNS",
@@ -29,7 +29,31 @@
     "opendns_desc": "Cisco anti-phishing and filtering",
     "google": "Google",
     "google_desc": "Reliable, simple replacement for ISP DNS",
-    "custom": "Custom"
+    "custom": "Custom",
+    "goal_fast": "Fast",
+    "goal_fast_desc": "Minimal latency, no filtering",
+    "goal_fast_provider": "Cloudflare",
+    "goal_adblock": "Ad-free",
+    "goal_adblock_desc": "Blocks ads and trackers",
+    "goal_adblock_provider": "AdGuard",
+    "goal_secure": "Secure",
+    "goal_secure_desc": "Blocks malware and phishing",
+    "goal_secure_provider": "Quad9",
+    "goal_family": "Family",
+    "goal_family_desc": "Child safety + safe search",
+    "goal_family_provider": "CleanBrowsing",
+    "custom_ip": "Custom IP",
+    "custom_ip_desc": "Enter DNS addresses manually",
+    "custom_ip_hint": "Enter the DNS server addresses from your provider or another DNS service.",
+    "custom_ip_primary": "Primary DNS",
+    "custom_ip_secondary": "Secondary DNS (optional)",
+    "custom_ip_invalid": "Invalid IP address",
+    "custom_ipv6_invalid": "Invalid IPv6 address",
+    "custom_ip_apply": "Apply",
+    "optional": "optional",
+    "custom_display": "Custom",
+    "disable_protection": "Disable",
+    "status_disabled": "Disabled"
   },
   "dns_detail": {
     "choose_protection": "Choose protection variant",
@@ -106,10 +130,20 @@
     "connection_vpn_detected": "VPN connection active",
     "waiting": "Checking connection...",
     "dns_protection": "DNS Protection",
-    "dns_protection_with_provider": "DNS Protection {{provider}}",
-    "dns_protection_enabled": "Blocking unwanted content",
+    "dns_protection_with_provider": "DNS Protection enabled",
+    "dns_protection_enabled": "Using {{provider}} DNS",
     "dns_protection_disabled": "DNS Protection disabled",
     "dns_protection_disabled_desc": "Using standard ISP DNS"
+  },
+  "node_detail": {
+    "adapter": "Adapter",
+    "ip_address": "IP address",
+    "network_name": "Network",
+    "signal": "Signal",
+    "manufacturer": "Manufacturer",
+    "isp": "ISP",
+    "location": "Location",
+    "open_router": "Open router page"
   },
   "nodes": {
     "computer": {
@@ -131,6 +165,10 @@
       "signal_good": "Good",
       "signal_fair": "Fair",
       "signal_weak": "Weak",
+      "signal_label_excellent": "Excellent signal",
+      "signal_label_good": "Good signal",
+      "signal_label_fair": "Fair signal",
+      "signal_label_weak": "Weak signal",
       "link_field": "Link"
     },
     "router": {
@@ -187,7 +225,28 @@
       "theme_light_desc": "Always use light interface mode",
       "theme_dark_desc": "Always use dark interface mode",
       "theme_system_desc": "Follow system settings automatically",
-      "remember_window_size": "Remember window size"
+      "remember_window_size": "Remember window size",
+      "close_behavior": "On window close",
+      "close_minimize": "Minimize to tray",
+      "close_minimize_desc": "The app will continue running in the system tray",
+      "close_quit": "Close application",
+      "close_quit_desc": "Completely exit the application",
+      "about": "About",
+      "about_desc": "Version and app info"
+    },
+    "about": {
+      "title": "About",
+      "version": "Version",
+      "whats_new": "What's new",
+      "developer": "Developer",
+      "developer_value": "Netok Team",
+      "changes": [
+        "Network diagnostics with progressive node checks",
+        "DNS protection with 7 providers",
+        "Interactive node detail screens",
+        "Light and dark theme support",
+        "English and Russian localization"
+      ]
     },
     "dns": {
       "mode": "DNS mode",
@@ -204,11 +263,13 @@
       "description": "If disabled, geo info will be hidden on Internet node"
     },
     "tools": {
-      "speed_test": "Quick speed test",
+      "diagnostics_desc": "View connection details",
+      "speed_test": "Speed test",
+      "speed_test_desc": "Check what your internet can handle",
       "flush_dns": "Clear DNS cache",
-      "open_captive": "Open Wi-Fi login page (captive)",
-      "open_router": "Open router page",
-      "copy_diagnostics": "Copy diagnostics"
+      "flush_dns_desc": "Fix \"site not loading\" issues",
+      "device_scan": "Device scan",
+      "device_scan_desc": "See who's on your network"
     }
   },
   "mock_data": {

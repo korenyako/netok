@@ -91,7 +91,7 @@ export type DnsProvider =
   | { type: 'CleanBrowsing'; variant: CleanBrowsingVariant }
   | { type: 'Quad9'; variant: Quad9Variant }
   | { type: 'OpenDns'; variant: OpenDnsVariant }
-  | { type: 'Custom'; primary: string; secondary: string };
+  | { type: 'Custom'; primary: string; secondary: string; primaryIpv6: string | null; secondaryIpv6: string | null };
 
 export async function setDns(provider: DnsProvider): Promise<void> {
   return await invoke('set_dns', { provider });

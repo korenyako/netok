@@ -10,7 +10,7 @@
     "title": "Защита DNS",
     "description": "Выберите DNS-сервер для повышения безопасности и блокировки нежелательного контента",
     "protection_disabled": "Защита DNS отключена",
-    "protection_disabled_with_hint": "Сейчас используется DNS вашего провайдера. Ниже в списке — альтернативные DNS с защитой и дополнительным контролем",
+    "protection_disabled_with_hint": "Используется DNS вашего провайдера",
     "protection_enabled": "Включена защита DNS {{provider}}",
     "protection_enabled_with_mode": "Включена защита DNS {{provider}} ({{mode}})",
     "auto": "Системный DNS",
@@ -29,7 +29,31 @@
     "opendns_desc": "Защита от фишинга и фильтрация от Cisco",
     "google": "Google",
     "google_desc": "Надёжная и простая замена DNS провайдера",
-    "custom": "Пользовательский"
+    "custom": "Пользовательский",
+    "goal_fast": "Скорость",
+    "goal_fast_desc": "Минимальная задержка, без фильтрации",
+    "goal_fast_provider": "Cloudflare",
+    "goal_adblock": "Без рекламы",
+    "goal_adblock_desc": "Блокирует рекламу и трекеры",
+    "goal_adblock_provider": "AdGuard",
+    "goal_secure": "Безопасность",
+    "goal_secure_desc": "Блокирует вирусы и фишинг",
+    "goal_secure_provider": "Quad9",
+    "goal_family": "Семья",
+    "goal_family_desc": "Защита детей + безопасный поиск",
+    "goal_family_provider": "CleanBrowsing",
+    "custom_ip": "Свой DNS",
+    "custom_ip_desc": "Указать адреса DNS вручную",
+    "custom_ip_hint": "Введите адреса DNS-серверов вашего провайдера или другого сервиса.",
+    "custom_ip_primary": "Primary DNS",
+    "custom_ip_secondary": "Secondary DNS (необязательно)",
+    "custom_ip_invalid": "Неверный формат IP",
+    "custom_ipv6_invalid": "Неверный формат IPv6",
+    "custom_ip_apply": "Применить",
+    "optional": "необязательно",
+    "custom_display": "Свой DNS",
+    "disable_protection": "Отключить",
+    "status_disabled": "Отключено"
   },
   "dns_detail": {
     "choose_protection": "Выберите вариант защиты",
@@ -106,10 +130,20 @@
     "connection_vpn_detected": "VPN соединение обнаружено",
     "waiting": "Проверяем соединение…",
     "dns_protection": "Защита DNS",
-    "dns_protection_with_provider": "Защита DNS {{provider}}",
-    "dns_protection_enabled": "Блокировка нежелательного контента",
+    "dns_protection_with_provider": "Защита DNS включена",
+    "dns_protection_enabled": "Используется DNS {{provider}}",
     "dns_protection_disabled": "Защита DNS отключена",
     "dns_protection_disabled_desc": "Используется стандартный DNS провайдера"
+  },
+  "node_detail": {
+    "adapter": "Адаптер",
+    "ip_address": "IP-адрес",
+    "network_name": "Сеть",
+    "signal": "Сигнал",
+    "manufacturer": "Производитель",
+    "isp": "Провайдер",
+    "location": "Расположение",
+    "open_router": "Открыть страницу роутера"
   },
   "nodes": {
     "computer": {
@@ -131,6 +165,10 @@
       "signal_good": "хороший",
       "signal_fair": "средний",
       "signal_weak": "слабый",
+      "signal_label_excellent": "Отличный сигнал",
+      "signal_label_good": "Хороший сигнал",
+      "signal_label_fair": "Средний сигнал",
+      "signal_label_weak": "Слабый сигнал",
       "link_field": "Линк"
     },
     "router": {
@@ -187,7 +225,28 @@
       "theme_light_desc": "Всегда использовать светлый режим интерфейса",
       "theme_dark_desc": "Всегда использовать тёмный режим интерфейса",
       "theme_system_desc": "Следовать настройкам системы автоматически",
-      "remember_window_size": "Запоминать размер окна"
+      "remember_window_size": "Запоминать размер окна",
+      "close_behavior": "При закрытии окна",
+      "close_minimize": "Сворачивать в трей",
+      "close_minimize_desc": "Приложение продолжит работать в системном трее",
+      "close_quit": "Закрывать приложение",
+      "close_quit_desc": "Полностью завершить работу приложения",
+      "about": "О программе",
+      "about_desc": "Версия и информация"
+    },
+    "about": {
+      "title": "О программе",
+      "version": "Версия",
+      "whats_new": "Что нового",
+      "developer": "Разработчик",
+      "developer_value": "Netok Team",
+      "changes": [
+        "Диагностика сети с последовательной проверкой узлов",
+        "Защита DNS с 7 провайдерами",
+        "Экраны с детальной информацией об узлах",
+        "Светлая и тёмная тема оформления",
+        "Русская и английская локализация"
+      ]
     },
     "dns": {
       "mode": "Режим DNS",
@@ -204,11 +263,13 @@
       "description": "Если отключено, геоинформация будет скрыта на узле Интернет"
     },
     "tools": {
-      "speed_test": "Короткий тест скорости",
-      "flush_dns": "Очистить DNS-кэш",
-      "open_captive": "Открыть страницу входа Wi-Fi (каптив)",
-      "open_router": "Открыть страницу роутера",
-      "copy_diagnostics": "Скопировать диагностику"
+      "diagnostics_desc": "Состояние подключения",
+      "speed_test": "Тест скорости",
+      "speed_test_desc": "Узнайте, на что способен ваш интернет",
+      "flush_dns": "Очистить кэш DNS",
+      "flush_dns_desc": "Решить проблему «сайт не открывается»",
+      "device_scan": "Устройства в сети",
+      "device_scan_desc": "Посмотрите, кто подключён"
     }
   },
   "mock_data": {

@@ -3,6 +3,7 @@ import { Check, AlertTriangle, X } from 'lucide-react';
 import type { DiagnosticsSnapshot } from '../api/tauri';
 import { useDnsStore } from '../stores/useDnsStore';
 import { deriveScenario } from '../utils/deriveScenario';
+import { CloseButton } from '../components/WindowControls';
 import { cn } from '@/lib/utils';
 
 interface StatusScreenProps {
@@ -43,6 +44,11 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, diag
 
   return (
     <div className="flex flex-col min-h-[calc(100dvh-5rem)] bg-background">
+      {/* Drag region with close button */}
+      <div data-tauri-drag-region className="px-4 py-4 flex items-center justify-end shrink-0">
+        <CloseButton />
+      </div>
+
       {/* Main Content - Clickable Area */}
       <button
         onClick={onOpenDiagnostics}
@@ -90,34 +96,33 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, diag
         <button
           onClick={onNavigateToDnsProviders}
           className={cn(
-            'w-full text-left rounded-lg border p-4 focus:outline-none',
-            isDnsProtectionEnabled ? 'border-primary/50' : 'border-warning/50'
+            'w-full text-left rounded-lg px-4 py-3 focus:outline-none transition-colors',
+            isDnsProtectionEnabled
+              ? 'bg-primary/10 hover:bg-primary/15 dark:bg-primary/10 dark:hover:bg-primary/15'
+              : 'bg-accent hover:bg-accent/80 dark:bg-muted/50 dark:hover:bg-muted/80'
           )}
         >
           <div className="flex items-start gap-3">
-            <span className="flex items-center justify-center w-4 h-4 shrink-0 mt-1">
-              <span className={cn(
-                'w-2 h-2 rounded-full',
-                isDnsProtectionEnabled ? 'bg-primary' : 'bg-warning'
-              )} />
-            </span>
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <p className={cn(
-                'text-base font-medium leading-normal mb-1',
-                isDnsProtectionEnabled ? 'text-primary' : 'text-warning'
+                'text-base font-medium leading-normal',
+                isDnsProtectionEnabled ? 'text-foreground' : 'text-muted-foreground'
               )}>
                 {isDnsProtectionEnabled
-                  ? t('status.dns_protection_with_provider', { provider: providerName })
+                  ? t('status.dns_protection_with_provider')
                   : t('status.dns_protection_disabled')
                 }
               </p>
-              <p className="text-sm text-muted-foreground leading-normal">
+              <p className="text-sm text-muted-foreground leading-normal mt-0.5">
                 {isDnsProtectionEnabled
-                  ? t('status.dns_protection_enabled')
+                  ? t('status.dns_protection_enabled', { provider: providerName })
                   : t('status.dns_protection_disabled_desc')
                 }
               </p>
             </div>
+            {isDnsProtectionEnabled && (
+              <Check className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+            )}
           </div>
         </button>
       </div>

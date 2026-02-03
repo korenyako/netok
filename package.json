@@ -10,6 +10,7 @@
     "tauri": "tauri"
   },
   "devDependencies": {
+    "baseline-browser-mapping": "^2.9.19",
     "husky": "^8.0.3"
   },
   "husky": {

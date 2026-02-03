@@ -1,10 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, RotateCw } from 'lucide-react';
+import { ArrowLeft, RotateCw, ChevronRight } from 'lucide-react';
 import { NetokLogoIcon, ShieldIcon, WrenchIcon, SettingsIcon } from '../components/icons/NavigationIcons';
 import { NodeOkIcon, NodeWarningIcon, NodeErrorIcon, NodeLoadingIcon } from '../components/icons/DiagnosticStatusIcons';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
@@ -14,7 +13,8 @@ import {
   checkInternet,
   type SingleNodeResult,
 } from '../api/tauri';
-import { notifications } from '../utils/notifications';
+import { NodeDetailScreen } from './NodeDetailScreen';
+import { CloseButton } from '../components/WindowControls';
 
 interface NodeDetail {
   text: string;
@@ -67,17 +67,17 @@ function transformSingleNode(result: SingleNodeResult, t: (key: string) => strin
     }
     if (result.network.rssi !== null) {
       const rssi = result.network.rssi;
-      let qualityKey = '';
+      let labelKey = '';
       if (rssi >= -50) {
-        qualityKey = 'nodes.network.signal_excellent';
+        labelKey = 'nodes.network.signal_label_excellent';
       } else if (rssi >= -60) {
-        qualityKey = 'nodes.network.signal_good';
+        labelKey = 'nodes.network.signal_label_good';
       } else if (rssi >= -70) {
-        qualityKey = 'nodes.network.signal_fair';
+        labelKey = 'nodes.network.signal_label_fair';
       } else {
-        qualityKey = 'nodes.network.signal_weak';
+        labelKey = 'nodes.network.signal_label_weak';
       }
-      details.push({ text: `${t('nodes.network.signal_field')} ${t(qualityKey)} (${rssi} dBm)` });
+      details.push({ text: t(labelKey) });
     }
   }
 
@@ -120,12 +120,9 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
   const [currentCheckIndex, setCurrentCheckIndex] = useState(-1);
   const [isRunning, setIsRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const runIdRef = useRef(0);
-
-  const handleCopyIp = (ip: string) => {
-    navigator.clipboard.writeText(ip);
-    notifications.success(t('dns_detail.ip_copied'));
-  };
+  const rawResultsRef = useRef<Map<string, SingleNodeResult>>(new Map());
 
   const runProgressiveDiagnostics = useCallback(async () => {
     const thisRunId = ++runIdRef.current;
@@ -135,12 +132,14 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
     setError(null);
     setIsRunning(true);
     setCurrentCheckIndex(0);
+    rawResultsRef.current.clear();
 
     try {
       // Step 0: Computer
       const computerResult = await checkComputer();
       if (stale()) return;
       const computerNode = transformSingleNode(computerResult, t);
+      rawResultsRef.current.set(computerResult.node.id, computerResult);
       setNodes([computerNode]);
       setCurrentCheckIndex(1);
 
@@ -149,6 +148,7 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
       const networkResult = await checkNetwork(adapter);
       if (stale()) return;
       const networkNode = transformSingleNode(networkResult, t);
+      rawResultsRef.current.set(networkResult.node.id, networkResult);
       setNodes(prev => [...prev, networkNode]);
       setCurrentCheckIndex(2);
 
@@ -156,6 +156,7 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
       const routerResult = await checkRouter();
       if (stale()) return;
       const routerNode = transformSingleNode(routerResult, t);
+      rawResultsRef.current.set(routerResult.node.id, routerResult);
       setNodes(prev => [...prev, routerNode]);
       setCurrentCheckIndex(3);
 
@@ -163,6 +164,7 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
       const internetResult = await checkInternet();
       if (stale()) return;
       const internetNode = transformSingleNode(internetResult, t);
+      rawResultsRef.current.set(internetResult.node.id, internetResult);
       setNodes(prev => [...prev, internetNode]);
       setCurrentCheckIndex(4); // All done
     } catch (err) {
@@ -205,10 +207,21 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
 
   const isActive = currentCheckIndex >= 0 && currentCheckIndex < 4;
 
+  const selectedResult = selectedNode ? rawResultsRef.current.get(selectedNode) : undefined;
+  if (selectedNode && selectedResult) {
+    return (
+      <NodeDetailScreen
+        nodeId={selectedNode}
+        result={selectedResult}
+        onBack={() => setSelectedNode(null)}
+      />
+    );
+  }
+
   return (
     <div className="flex flex-col h-full bg-background">
       {/* Header */}
-      <div className="px-4 py-4 flex items-center gap-2">
+      <div data-tauri-drag-region className="px-4 py-4 flex items-center gap-2">
         <Button variant="ghost" size="icon" onClick={onBack}>
           <ArrowLeft className="w-5 h-5 text-muted-foreground" />
         </Button>
@@ -216,6 +229,7 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
         <Button variant="ghost" size="icon" onClick={handleRefresh} disabled={isRunning}>
           <RotateCw className="w-5 h-5 text-muted-foreground" />
         </Button>
+        <CloseButton />
       </div>
 
       {/* Error State */}
@@ -243,9 +257,10 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
             {nodes.map((node) => (
               <Card
                 key={node.id}
-                className="bg-transparent animate-in fade-in slide-in-from-bottom-2 duration-300"
+                className="bg-transparent animate-in fade-in slide-in-from-bottom-2 duration-300 cursor-pointer hover:bg-accent transition-colors"
+                onClick={() => setSelectedNode(node.id)}
               >
-                <CardContent className="flex items-start gap-3 p-4">
+                <CardContent className="flex items-start gap-3 px-4 py-3">
                   <span className="shrink-0 mt-1">
                     {getStatusIcon(node.status)}
                   </span>
@@ -254,15 +269,6 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
                       {t(node.title)}
                     </div>
                     <div>
-                      {node.ip && (
-                        <Badge
-                          variant="secondary"
-                          className="cursor-pointer font-mono font-normal text-xs"
-                          onClick={() => handleCopyIp(node.ip!)}
-                        >
-                          {node.ip}
-                        </Badge>
-                      )}
                       {node.details.map((detail) => (
                         <p
                           key={detail.text}
@@ -273,6 +279,7 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
                       ))}
                     </div>
                   </div>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0 self-center" />
                 </CardContent>
               </Card>
             ))}
@@ -280,7 +287,7 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
             {/* Loading placeholder for current check */}
             {isActive && (
               <Card className="bg-transparent animate-in fade-in duration-200">
-                <CardContent className="flex items-start gap-3 p-4">
+                <CardContent className="flex items-start gap-3 px-4 py-3">
                   <span className="shrink-0 mt-1">
                     <NodeLoadingIcon className="w-4 h-4 text-muted-foreground animate-spin" />
                   </span>

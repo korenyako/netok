@@ -1,46 +1,37 @@
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Check } from 'lucide-react';
-import { useThemeStore } from '../stores/themeStore';
-import type { Theme } from '../stores/themeStore';
+import { useCloseBehaviorStore } from '../stores/closeBehaviorStore';
+import type { CloseBehavior } from '../stores/closeBehaviorStore';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent } from '@/components/ui/card';
 import { CloseButton } from '../components/WindowControls';
 import { cn } from '@/lib/utils';
 
-interface ThemeSettingsScreenProps {
+interface CloseBehaviorSettingsScreenProps {
   onBack: () => void;
 }
 
-export function ThemeSettingsScreen({ onBack }: ThemeSettingsScreenProps) {
+export function CloseBehaviorSettingsScreen({ onBack }: CloseBehaviorSettingsScreenProps) {
   const { t } = useTranslation();
-  const { theme: currentTheme, setTheme } = useThemeStore();
+  const { closeBehavior, setCloseBehavior } = useCloseBehaviorStore();
 
-  const themes: Array<{
-    id: Theme;
+  const options: Array<{
+    id: CloseBehavior;
     title: string;
     description: string;
   }> = [
     {
-      id: 'light',
-      title: t('settings.general.theme_light'),
-      description: t('settings.general.theme_light_desc'),
+      id: 'minimize_to_tray',
+      title: t('settings.general.close_minimize'),
+      description: t('settings.general.close_minimize_desc'),
     },
     {
-      id: 'dark',
-      title: t('settings.general.theme_dark'),
-      description: t('settings.general.theme_dark_desc'),
-    },
-    {
-      id: 'system',
-      title: t('settings.general.theme_system'),
-      description: t('settings.general.theme_system_desc'),
+      id: 'close_app',
+      title: t('settings.general.close_quit'),
+      description: t('settings.general.close_quit_desc'),
     },
   ];
-
-  const handleThemeChange = (theme: Theme) => {
-    setTheme(theme);
-  };
 
   return (
     <div className="flex flex-col h-full bg-background">
@@ -49,33 +40,31 @@ export function ThemeSettingsScreen({ onBack }: ThemeSettingsScreenProps) {
         <Button variant="ghost" size="icon" onClick={onBack}>
           <ArrowLeft className="w-5 h-5 text-muted-foreground" />
         </Button>
-        <h1 className="text-lg font-semibold text-foreground flex-1">{t('settings.general.theme')}</h1>
+        <h1 className="text-lg font-semibold text-foreground flex-1">{t('settings.general.close_behavior')}</h1>
         <CloseButton />
       </div>
 
       {/* Content */}
       <ScrollArea className="flex-1 px-4">
-
-        {/* Theme Options */}
         <div className="space-y-2">
-          {themes.map((theme) => {
-            const isSelected = currentTheme === theme.id;
+          {options.map((option) => {
+            const isSelected = closeBehavior === option.id;
             return (
               <Card
-                key={theme.id}
+                key={option.id}
                 className={cn(
                   'cursor-pointer transition-colors',
                   isSelected
                     ? 'border-primary bg-primary/10 hover:bg-primary/15 dark:bg-primary/10 dark:hover:bg-primary/15'
                     : 'bg-transparent hover:bg-accent'
                 )}
-                onClick={() => handleThemeChange(theme.id)}
+                onClick={() => setCloseBehavior(option.id)}
               >
                 <CardContent className="flex items-start gap-3 px-4 py-3">
                   <div className="flex-1 min-w-0">
-                    <span className="text-base font-medium leading-normal">{theme.title}</span>
+                    <span className="text-base font-medium leading-normal">{option.title}</span>
                     <div className="text-sm text-muted-foreground leading-normal mt-0.5">
-                      {theme.description}
+                      {option.description}
                     </div>
                   </div>
                   {isSelected && (
