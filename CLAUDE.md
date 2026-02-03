@@ -640,6 +640,30 @@ Current version is in `netok_desktop/src-tauri/Cargo.toml`. Format: `MAJOR.MINOR
 - Minor: backwards-compatible new features
 - Major: breaking changes
 
+### Release Checklist
+
+When releasing a new version:
+
+1. **Bump version** in `netok_desktop/src-tauri/Cargo.toml`:
+   ```toml
+   version = "0.2.0"
+   ```
+
+2. **Update "What's new"** in both i18n files:
+   - `ui/src/i18n/en.json` → `settings.about.changes`
+   - `ui/src/i18n/ru.json` → `settings.about.changes`
+
+3. **Commit** with version bump:
+   ```
+   chore: bump version to 0.2.0
+   ```
+
+4. **Tag** (optional, for CI releases):
+   ```bash
+   git tag v0.2.0
+   git push origin v0.2.0
+   ```
+
 ### Commit Messages (Conventional Commits)
 
 **IMPORTANT:** Claude should proactively suggest commits when:
