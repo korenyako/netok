@@ -241,11 +241,11 @@
       "developer": "Developer",
       "developer_value": "Netok Team",
       "changes": [
-        "Network diagnostics with progressive node checks",
-        "DNS protection with 7 providers",
-        "Interactive node detail screens",
-        "Light and dark theme support",
-        "English and Russian localization"
+        "Custom DNS with IPv4 and IPv6 support",
+        "Simplified DNS provider selection",
+        "Detailed network node information",
+        "Fixed header control elements",
+        "Dynamic version display"
       ]
     },
     "dns": {
