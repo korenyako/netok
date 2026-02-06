@@ -62,7 +62,10 @@ function App() {
             <StatusScreen
               diagnostics={diagnosticsData}
               onOpenDiagnostics={() => setShowDiagnostics(true)}
-              onNavigateToDnsProviders={navigateToSecurity}
+              onNavigateToDnsProviders={() => {
+                navigateToSecurity();
+                setSecuritySubScreen('dns-providers');
+              }}
             />
           )}
 

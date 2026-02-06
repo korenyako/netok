@@ -21,6 +21,4 @@ export function NetokLogoIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-export { ShieldCheck as ShieldIcon } from 'lucide-react'
-export { Wrench as WrenchIcon } from 'lucide-react'
-export { Settings as SettingsIcon } from 'lucide-react'
+export { ShieldCheck as ShieldIcon, Wrench as WrenchIcon, Settings as SettingsIcon } from './UIIcons'

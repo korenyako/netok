@@ -14,6 +14,14 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'Noto Sans Arabic';
+  src: url('./fonts/NotoSansArabic-Variable.ttf') format('truetype');
+  font-weight: 100 900;
+  font-display: swap;
+  font-style: normal;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -22,7 +30,7 @@
   :root {
     --background: 0 0% 100%;
     --foreground: 270 3.6% 11%;
-    --card: 317 33% 95.9%;
+    --card: 309 15% 90.8%;
     --card-foreground: 270 3.6% 11%;
     --popover: 0 0% 100%;
     --popover-foreground: 270 3.6% 11%;
@@ -99,7 +107,7 @@
 .theme-force-light {
   --background: 0 0% 100%;
   --foreground: 270 3.6% 11%;
-  --card: 317 33% 95.9%;
+  --card: 309 15% 90.8%;
   --card-foreground: 270 3.6% 11%;
   --primary: 152 50% 47%;
   --primary-foreground: 210 40% 98%;
@@ -189,4 +197,64 @@ html, body, #root {
   .radial-hover > * {
     position: relative;
   }
+}
+
+/* RTL: flip directional icons (arrows, chevrons) */
+[dir="rtl"] .rtl-flip {
+  transform: scaleX(-1);
+}
+
+/* ── Status circle animations ─────────────────────────── */
+
+@keyframes status-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes status-pulse-slow {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+@keyframes status-pulse-fast {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+.status-circle-loading {
+  stroke-dasharray: 173 405;
+  animation: status-spin 1.8s linear infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
+.status-circle-success {
+  animation: status-pulse-slow 3s ease-in-out infinite;
+}
+
+.status-circle-warning {
+  animation: status-pulse-fast 2s ease-in-out infinite;
+}
+
+/* Glow ring animations (breathing wide stroke behind main ring) */
+@keyframes status-glow-breathe-slow {
+  0%, 100% { opacity: 0.15; stroke-width: 8; }
+  50% { opacity: 0.45; stroke-width: 12; }
+}
+
+@keyframes status-glow-breathe-fast {
+  0%, 100% { opacity: 0.15; stroke-width: 8; }
+  50% { opacity: 0.4; stroke-width: 12; }
+}
+
+.status-glow-success {
+  animation: status-glow-breathe-slow 3s ease-in-out infinite;
+}
+
+.status-glow-warning {
+  animation: status-glow-breathe-fast 2s ease-in-out infinite;
+}
+
+.status-glow-error {
+  opacity: 0.2;
+  stroke-width: 6;
 }

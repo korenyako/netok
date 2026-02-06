@@ -17,6 +17,7 @@ const severityStyles: Record<DiagnosticSeverity, { border: string; bead: string;
 export function DiagnosticMessage({ scenario, severity, className }: DiagnosticMessageProps) {
   const { t } = useTranslation();
   const styles = severityStyles[severity];
+  const action = t(`diagnostic.scenario.${scenario}.action`);
 
   return (
     <div className={cn('rounded-lg border p-4', styles.border, className)}>
@@ -31,6 +32,11 @@ export function DiagnosticMessage({ scenario, severity, className }: DiagnosticM
           <p className="text-sm text-muted-foreground leading-normal">
             {t(`diagnostic.scenario.${scenario}.message`)}
           </p>
+          {action && (
+            <p className="text-sm text-muted-foreground/75 leading-normal mt-1.5">
+              {action}
+            </p>
+          )}
         </div>
       </div>
     </div>

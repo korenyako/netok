@@ -1,4 +1,4 @@
-import { X } from 'lucide-react';
+import { X } from './icons/UIIcons';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { Button } from '@/components/ui/button';
 import { useCloseBehaviorStore } from '../stores/closeBehaviorStore';

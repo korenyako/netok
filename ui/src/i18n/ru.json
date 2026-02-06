@@ -1,123 +1,35 @@
 {
-  "app": {
-    "name": "Netok",
-    "title": "Диагностика сети"
-  },
-  "security": {
-    "title": "Безопасность"
+  "network": {
+    "unknown": "Неизвестно"
   },
   "dns_providers": {
     "title": "Защита DNS",
-    "description": "Выберите DNS-сервер для повышения безопасности и блокировки нежелательного контента",
-    "protection_disabled": "Защита DNS отключена",
-    "protection_disabled_with_hint": "Используется DNS вашего провайдера",
-    "protection_enabled": "Включена защита DNS {{provider}}",
-    "protection_enabled_with_mode": "Включена защита DNS {{provider}} ({{mode}})",
-    "auto": "Системный DNS",
-    "auto_desc": "DNS-сервер вашего провайдера",
     "cloudflare": "Cloudflare",
-    "cloudflare_desc": "Самый быстрый публичный DNS, ориентированный на приватность, проверен KPMG",
     "adguard": "AdGuard",
-    "adguard_desc": "Гибкая блокировка рекламы и трекеров",
-    "dns4eu": "DNS4EU",
-    "dns4eu_desc": "DNS сообщества ЕС с упором на приватность и безопасность",
-    "cleanbrowsing": "CleanBrowsing",
-    "cleanbrowsing_desc": "Бесплатная DNS-фильтрация для безопасного просмотра и родительского контроля",
     "quad9": "Quad9",
-    "quad9_desc": "Фокус на безопасности с блокировкой вредоносного ПО и DNSSEC",
-    "opendns": "OpenDNS",
-    "opendns_desc": "Защита от фишинга и фильтрация от Cisco",
-    "google": "Google",
-    "google_desc": "Надёжная и простая замена DNS провайдера",
-    "custom": "Пользовательский",
-    "goal_fast": "Скорость",
+    "cleanbrowsing": "CleanBrowsing",
     "goal_fast_desc": "Минимальная задержка, без фильтрации",
-    "goal_fast_provider": "Cloudflare",
-    "goal_adblock": "Без рекламы",
     "goal_adblock_desc": "Блокирует рекламу и трекеры",
-    "goal_adblock_provider": "AdGuard",
-    "goal_secure": "Безопасность",
     "goal_secure_desc": "Блокирует вирусы и фишинг",
-    "goal_secure_provider": "Quad9",
-    "goal_family": "Семья",
     "goal_family_desc": "Защита детей + безопасный поиск",
-    "goal_family_provider": "CleanBrowsing",
     "custom_ip": "Свой DNS",
     "custom_ip_desc": "Указать адреса DNS вручную",
     "custom_ip_hint": "Введите адреса DNS-серверов вашего провайдера или другого сервиса.",
-    "custom_ip_primary": "Primary DNS",
-    "custom_ip_secondary": "Secondary DNS (необязательно)",
     "custom_ip_invalid": "Неверный формат IP",
     "custom_ipv6_invalid": "Неверный формат IPv6",
     "custom_ip_apply": "Применить",
     "optional": "необязательно",
     "custom_display": "Свой DNS",
-    "disable_protection": "Отключить",
     "status_disabled": "Отключено"
   },
   "dns_detail": {
-    "choose_protection": "Выберите вариант защиты",
-    "apply": "Применить",
-    "disable": "Отключить",
-    "apply_success": "Настройки DNS применены",
-    "disable_success": "Защита DNS отключена",
-    "ip_copied": "Скопировано",
-    "cloudflare": {
-      "standard": "Стандартный",
-      "standard_desc": "Быстрый и надёжный DNS",
-      "malware": "Блокировка вредоносных сайтов",
-      "malware_desc": "Защита от фишинга и вредоносного ПО",
-      "family": "Семейная защита",
-      "family_desc": "Блокировка контента для взрослых"
-    },
-    "adguard": {
-      "standard": "Стандартный",
-      "standard_desc": "Блокировка рекламы",
-      "family": "Семейная защита",
-      "family_desc": "Блокировка контента для взрослых",
-      "unfiltered": "Без фильтрации",
-      "unfiltered_desc": "Только DNS без блокировок"
-    },
-    "dns4eu": {
-      "protective": "Защита",
-      "protective_desc": "Блокирует мошеннический и вредоносный контент",
-      "protective_child": "Защита + Детская",
-      "protective_child_desc": "Блокирует неподходящий контент для детей",
-      "protective_ad": "Защита + Реклама",
-      "protective_ad_desc": "Добавляет блокировку рекламы к защитным функциям",
-      "protective_child_ad": "Защита + Детская и реклама",
-      "protective_child_ad_desc": "Комбинирует детскую защиту с блокировкой рекламы",
-      "unfiltered": "Без фильтрации",
-      "unfiltered_desc": "Без фильтрации для безопасного, анонимного и быстрого разрешения"
-    },
-    "cleanbrowsing": {
-      "family": "Семейный фильтр",
-      "family_desc": "Блокирует все сайты для взрослых, порно, прокси, VPN; Google, Bing и Youtube SafeSearch",
-      "adult": "Фильтр для взрослых",
-      "adult_desc": "Блокирует сайты для взрослых; разрешает прокси и смешанный контент",
-      "security": "Фильтр безопасности",
-      "security_desc": "Блокирует фишинг, спам, вредоносное ПО; не блокирует контент для взрослых"
-    },
-    "quad9": {
-      "recommended": "Рекомендуемый",
-      "recommended_desc": "Блокирует известные вредоносные домены",
-      "secured_ecs": "Защищённый с ECS",
-      "secured_ecs_desc": "Добавляет функцию ECS к рекомендуемому",
-      "unsecured": "Незащищённый",
-      "unsecured_desc": "Для опытных пользователей"
-    },
-    "opendns": {
-      "familyshield": "FamilyShield",
-      "familyshield_desc": "Автоматически блокирует контент для взрослых и вредоносные сайты",
-      "home": "Домашний",
-      "home_desc": "Настраиваемая фильтрация и защита от вредоносного ПО"
-    }
+    "ip_copied": "Скопировано"
   },
   "diagnostics": {
     "title": "Диагностика",
     "computer": "Компьютер",
-    "router": "Роутер",
     "wifi": "Wi-Fi",
+    "router": "Роутер",
     "internet": "Интернет",
     "checking": "Проверка..."
   },
@@ -126,10 +38,8 @@
     "internet_down": "Нет подключения",
     "internet_partial": "Ограниченное подключение",
     "speed": "Скорость: {down}/{up} Мбит/с",
-    "connection_no_vpn": "Соединение без VPN. Настроить VPN",
     "connection_vpn_detected": "VPN соединение обнаружено",
     "waiting": "Проверяем соединение…",
-    "dns_protection": "Защита DNS",
     "dns_protection_with_provider": "Защита DNS включена",
     "dns_protection_enabled": "Используется DNS {{provider}}",
     "dns_protection_disabled": "Защита DNS отключена",
@@ -169,63 +79,38 @@
       "signal_label_good": "Хороший сигнал",
       "signal_label_fair": "Средний сигнал",
       "signal_label_weak": "Слабый сигнал",
-      "link_field": "Линк"
+      "link_field": "Линк",
+      "link_yes": "Подключено",
+      "link_no": "Отключено"
     },
     "router": {
       "name": "Роутер/Точка доступа",
-      "model_field": "Модель/бренд",
       "local_ip_field": "IP в локальной сети"
     },
     "internet": {
       "name": "Интернет",
-      "provider_field": "Оператор",
       "ip_field": "IP"
     }
   },
-  "buttons": {
-    "refresh": "Обновить",
-    "settings": "Настройки",
-    "close": "Закрыть",
-    "back": "Назад",
-    "save": "Сохранить",
-    "cancel": "Отмена",
-    "apply": "Применить",
-    "copy": "Копировать"
-  },
   "meta": {
-    "updated": "Обновлено: {{time}}",
-    "never": "никогда",
     "no_data": "Нет данных. Нажмите «Обновить»."
-  },
-  "geo": {
-    "consent_label": "Показывать местоположение",
-    "consent_description": "Разрешить показ страны и города по IP-адресу",
-    "location_hidden": "Местоположение скрыто"
   },
   "errors": {
     "diagnostics": "Ошибка диагностики",
-    "network_error": "Ошибка сети"
+    "diagnostics_failed": "Ошибка диагностики"
   },
   "settings": {
     "title": "Настройки",
     "tabs": {
-      "general": "Общие",
-      "dns": "DNS",
-      "geo": "Geo",
       "tools": "Инструменты"
     },
     "general": {
       "language": "Язык",
-      "language_ru": "Русский",
-      "language_en": "English",
       "theme": "Тема",
       "theme_light": "Светлая",
       "theme_dark": "Тёмная",
-      "theme_system": "Системная",
       "theme_light_desc": "Всегда использовать светлый режим интерфейса",
       "theme_dark_desc": "Всегда использовать тёмный режим интерфейса",
-      "theme_system_desc": "Следовать настройкам системы автоматически",
-      "remember_window_size": "Запоминать размер окна",
       "close_behavior": "При закрытии окна",
       "close_minimize": "Сворачивать в трей",
       "close_minimize_desc": "Приложение продолжит работать в системном трее",
@@ -238,29 +123,16 @@
       "title": "О программе",
       "version": "Версия",
       "whats_new": "Что нового",
-      "developer": "Разработчик",
-      "developer_value": "Netok Team",
+      "author": "Автор",
+      "author_value": "Антон Кореняко",
+      "website_button": "netok.app",
       "changes": [
-        "Свой DNS с поддержкой IPv4 и IPv6",
-        "Упрощённый выбор DNS-провайдера",
-        "Детальная информация об узлах сети",
-        "Исправлены элементы управления в заголовках",
-        "Динамическое отображение версии"
+        "Центр защиты: единое управление DNS и VPN",
+        "VPN-туннель с поддержкой WireGuard",
+        "14 новых языков: немецкий, испанский, французский и др.",
+        "Поддержка RTL для арабского и персидского",
+        "Улучшенный интерфейс с новыми компонентами"
       ]
-    },
-    "dns": {
-      "mode": "Режим DNS",
-      "mode_auto": "Автоматически",
-      "mode_cloudflare": "Cloudflare 1.1.1.1",
-      "mode_google": "Google 8.8.8.8",
-      "mode_custom": "Свой вариант",
-      "custom_dns": "Свои DNS-серверы",
-      "custom_dns_placeholder": "Введите DNS-серверы (например, 1.1.1.1, 8.8.8.8)",
-      "flush_cache": "Очистить DNS-кэш"
-    },
-    "geo": {
-      "show_location": "Показывать страну и город для публичного IP",
-      "description": "Если отключено, геоинформация будет скрыта на узле Интернет"
     },
     "tools": {
       "diagnostics_desc": "Состояние подключения",
@@ -272,49 +144,76 @@
       "device_scan_desc": "Посмотрите, кто подключён"
     }
   },
-  "mock_data": {
-    "computer_name": "DESKTOP-ABC123",
-    "computer_model": "Dell OptiPlex 7090",
-    "adapter_name": "Intel Wi-Fi 6 AX201",
-    "router_model": "Archer AX73",
-    "router_brand": "TP-Link",
-    "provider_name": "Rostelecom",
-    "country_name": "Россия",
-    "city_name": "Москва"
+  "protection": {
+    "title": "Защита",
+    "dns_protection": "Защита DNS",
+    "vpn_tunnel": "VPN"
+  },
+  "vpn": {
+    "title": "VPN",
+    "not_configured": "Не настроен",
+    "disabled": "Отключён",
+    "connecting": "Подключение...",
+    "connected": "Подключён",
+    "add_vpn": "Добавить VPN",
+    "add_vpn_desc": "Вставьте ключ или ссылку",
+    "supported_formats": "Поддерживает VLESS, Shadowsocks, Trojan, WireGuard, Outline",
+    "change_server": "Сменить сервер",
+    "change_server_desc": "Использовать другой VPN-ключ",
+    "remove_vpn": "Удалить VPN",
+    "key_label": "Ключ или ссылка",
+    "key_placeholder": "vless://... или ss://... или wg://...",
+    "key_hint": "Введите VPN-ключ или ссылку от вашего провайдера",
+    "add_button": "Добавить",
+    "detecting_location": "Определяем расположение...",
+    "supported_full": "Поддерживается: VLESS, VMess, Shadowsocks, Trojan, WireGuard, Outline",
+    "traffic_path": "Путь вашего трафика",
+    "you": "Вы",
+    "vpn_node": "VPN",
+    "internet": "Интернет",
+    "ping": "пинг"
   },
   "diagnostic": {
     "scenario": {
       "all_good": {
-        "title": "Всё в порядке",
-        "message": "Интернет работает нормально."
+        "title": "Подключено",
+        "message": "Интернет работает нормально.",
+        "action": ""
       },
       "wifi_disabled": {
         "title": "Wi-Fi выключен",
-        "message": "Адаптер Wi-Fi выключен. Включите Wi-Fi в настройках Windows."
+        "message": "Адаптер Wi-Fi отключён на компьютере.",
+        "action": "Включите Wi-Fi в настройках Windows или нажмите переключатель на ноутбуке."
       },
       "wifi_not_connected": {
         "title": "Нет подключения",
-        "message": "Нет подключения к Wi-Fi. Выберите сеть и подключитесь."
+        "message": "Компьютер не подключён к сети Wi-Fi.",
+        "action": "Откройте список сетей, выберите свою и подключитесь."
       },
       "router_unreachable": {
         "title": "Роутер не отвечает",
-        "message": "Роутер не отвечает. Проверьте, включён ли роутер и горят ли на нём индикаторы."
+        "message": "Сигнал не доходит до роутера.",
+        "action": "Проверьте, включён ли роутер и горят ли на нём индикаторы. Попробуйте перезагрузить его."
       },
       "no_internet": {
         "title": "Нет интернета",
-        "message": "Роутер работает, но интернет отсутствует. Проверьте кабель от провайдера или позвоните в поддержку."
+        "message": "Роутер работает, но выход в интернет отсутствует.",
+        "action": "Перезагрузите роутер — выключите на 10 секунд и включите. Если не поможет — позвоните провайдеру."
       },
       "dns_failure": {
         "title": "Проблема с DNS",
-        "message": "Не удаётся найти адреса сайтов. Попробуйте сменить DNS на автоматический или используйте Cloudflare (1.1.1.1)."
+        "message": "Не удаётся найти адреса сайтов.",
+        "action": "Попробуйте включить DNS-защиту в настройках Netok — это может решить проблему."
       },
       "http_blocked": {
         "title": "Сайты недоступны",
-        "message": "Интернет частично работает. Сайты недоступны, но DNS отвечает. Проверьте настройки VPN или брандмауэра."
+        "message": "Соединение есть, но сайты не открываются.",
+        "action": "Если используете VPN — попробуйте отключить его. Также проверьте настройки антивируса."
       },
       "weak_signal": {
         "title": "Слабый сигнал",
-        "message": "Слабый сигнал Wi-Fi. Подойдите ближе к роутеру или проверьте, нет ли помех."
+        "message": "Wi-Fi работает, но сигнал слабый — возможны обрывы.",
+        "action": "Подойдите ближе к роутеру или уберите препятствия между ним и компьютером."
       }
     }
   }

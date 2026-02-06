@@ -101,6 +101,18 @@ export async function getDnsProvider(): Promise<DnsProvider> {
   return await invoke<DnsProvider>('get_dns_provider');
 }
 
+// IP geolocation lookup
+export interface IpLocationInfo {
+  ip: string | null;
+  city: string | null;
+  country: string | null;
+  org: string | null;
+}
+
+export async function lookupIpLocation(ip: string): Promise<IpLocationInfo> {
+  return await invoke<IpLocationInfo>('lookup_ip_location', { ip });
+}
+
 // Diagnostic Scenario types
 export type DiagnosticScenario =
   | 'all_good'

@@ -1,0 +1,191 @@
+{
+  "network": {
+    "unknown": "Bilinmiyor"
+  },
+  "dns_providers": {
+    "title": "DNS Korumasi",
+    "cloudflare": "Cloudflare",
+    "adguard": "AdGuard",
+    "quad9": "Quad9",
+    "cleanbrowsing": "CleanBrowsing",
+    "goal_fast_desc": "Minimum gecikme, filtreleme yok",
+    "goal_adblock_desc": "Reklamlari ve izleyicileri engeller",
+    "goal_secure_desc": "Zararli yazilimlari ve kimlik avini engeller",
+    "goal_family_desc": "Cocuk guvenligi + guvenli arama",
+    "custom_ip": "Ozel IP",
+    "custom_ip_desc": "DNS adreslerini manuel olarak girin",
+    "custom_ip_hint": "Saglayicinizdan veya baska bir DNS hizmetinden DNS sunucu adreslerini girin.",
+    "custom_ip_invalid": "Gecersiz IP adresi",
+    "custom_ipv6_invalid": "Gecersiz IPv6 adresi",
+    "custom_ip_apply": "Uygula",
+    "optional": "istege bagli",
+    "custom_display": "Ozel",
+    "status_disabled": "Devre disi"
+  },
+  "dns_detail": {
+    "ip_copied": "Kopyalandi"
+  },
+  "diagnostics": {
+    "title": "Tanilama",
+    "computer": "Bilgisayar",
+    "wifi": "Wi-Fi",
+    "router": "Yönlendirici",
+    "internet": "İnternet",
+    "checking": "Kontrol ediliyor..."
+  },
+  "status": {
+    "internet_ok": "Bagli",
+    "internet_down": "Internet baglantisi yok",
+    "internet_partial": "Sinirli baglanti",
+    "speed": "Hiz: {down}/{up} Mbps",
+    "connection_vpn_detected": "VPN baglantisi etkin",
+    "waiting": "Baglanti kontrol ediliyor...",
+    "dns_protection_with_provider": "DNS Korumasi etkin",
+    "dns_protection_enabled": "{{provider}} DNS kullaniliyor",
+    "dns_protection_disabled": "DNS Korumasi devre disi",
+    "dns_protection_disabled_desc": "Standart ISS DNS'i kullaniliyor"
+  },
+  "node_detail": {
+    "adapter": "Adaptator",
+    "ip_address": "IP adresi",
+    "network_name": "Ag",
+    "signal": "Sinyal",
+    "manufacturer": "Uretici",
+    "isp": "ISS",
+    "location": "Konum",
+    "open_router": "Yonlendirici sayfasini ac"
+  },
+  "nodes": {
+    "computer": {
+      "name": "Bilgisayar",
+      "name_field": "Ad",
+      "model_field": "Model",
+      "adapter_field": "Ag adaptoru",
+      "local_ip_field": "Yerel IP"
+    },
+    "network": {
+      "name": "Ag",
+      "type_wifi": "Wi-Fi",
+      "type_cable": "Ethernet",
+      "type_usb_modem": "USB modem",
+      "type_bt": "Bluetooth",
+      "type_mobile": "Mobil veri",
+      "signal_field": "Sinyal gucu",
+      "signal_excellent": "Mukemmel",
+      "signal_good": "Iyi",
+      "signal_fair": "Orta",
+      "signal_weak": "Zayif",
+      "signal_label_excellent": "Mükemmel sinyal",
+      "signal_label_good": "İyi sinyal",
+      "signal_label_fair": "Orta sinyal",
+      "signal_label_weak": "Zayıf sinyal",
+      "link_field": "Baglanti",
+      "link_yes": "Bagli",
+      "link_no": "Baglanti kesildi"
+    },
+    "router": {
+      "name": "Yonlendirici",
+      "local_ip_field": "Yerel IP adresi"
+    },
+    "internet": {
+      "name": "Internet",
+      "ip_field": "Genel IP"
+    }
+  },
+  "meta": {
+    "no_data": "Veri yok. 'Yenile' tusuna basin."
+  },
+  "errors": {
+    "diagnostics": "Tanilama hatasi",
+    "diagnostics_failed": "Tanilama basarisiz oldu"
+  },
+  "settings": {
+    "title": "Ayarlar",
+    "tabs": {
+      "tools": "Araclar"
+    },
+    "general": {
+      "language": "Dil",
+      "theme": "Tema",
+      "theme_light": "Acik",
+      "theme_dark": "Koyu",
+      "theme_light_desc": "Her zaman acik arayuz modunu kullan",
+      "theme_dark_desc": "Her zaman koyu arayuz modunu kullan",
+      "close_behavior": "Pencere kapatildiginda",
+      "close_minimize": "Sistem tepsisine kucult",
+      "close_minimize_desc": "Uygulama sistem tepsisinde calismaya devam edecek",
+      "close_quit": "Uygulamayi kapat",
+      "close_quit_desc": "Uygulamadan tamamen cik",
+      "about": "Hakkinda",
+      "about_desc": "Surum ve uygulama bilgisi"
+    },
+    "about": {
+      "title": "Hakkinda",
+      "version": "Surum",
+      "whats_new": "Yenilikler",
+      "author": "Yazar",
+      "author_value": "Anton Korenyako",
+      "website_button": "netok.app",
+      "changes": [
+        "Koruma Merkezi: DNS ve VPN birlesik yonetimi",
+        "WireGuard destekli VPN tuneli",
+        "14 yeni dil: Almanca, Ispanyolca, Fransizca ve daha fazlasi",
+        "Arapca ve Farsca icin RTL destegi",
+        "Yeni bilesenlerle gelistirilmis arayuz"
+      ]
+    },
+    "tools": {
+      "diagnostics_desc": "Baglanti ayrintilerini goruntule",
+      "speed_test": "Hiz testi",
+      "speed_test_desc": "Internetinizin kapasitesini kontrol edin",
+      "flush_dns": "DNS onbellegini temizle",
+      "flush_dns_desc": "\"Site yuklenmiyor\" sorunlarini duzelt",
+      "device_scan": "Cihaz taramasi",
+      "device_scan_desc": "Aginizda kimlerin oldugunu gorun"
+    }
+  },
+  "diagnostic": {
+    "scenario": {
+      "all_good": {
+        "title": "Bağlı",
+        "message": "İnternet normal çalışıyor.",
+        "action": ""
+      },
+      "wifi_disabled": {
+        "title": "Wi-Fi Devre Dışı",
+        "message": "Bilgisayarınızda Wi-Fi adaptörü kapalı.",
+        "action": "Windows ayarlarından Wi-Fi'yi açın veya dizüstü bilgisayarınızdaki Wi-Fi düğmesine basın."
+      },
+      "wifi_not_connected": {
+        "title": "Bağlı Değil",
+        "message": "Bilgisayarınız bir Wi-Fi ağına bağlı değil.",
+        "action": "Ağ listesini açın, ağınızı seçin ve bağlanın."
+      },
+      "router_unreachable": {
+        "title": "Yönlendirici Ulaşılamaz",
+        "message": "Sinyal yönlendiriciye ulaşmıyor.",
+        "action": "Yönlendiricinin açık olduğundan ve gösterge ışıklarının yandığından emin olun. Yeniden başlatmayı deneyin."
+      },
+      "no_internet": {
+        "title": "İnternet Yok",
+        "message": "Yönlendirici çalışıyor, ancak internet erişimi yok.",
+        "action": "Yönlendiriciyi yeniden başlatın — 10 saniye kapatın ve tekrar açın. İşe yaramazsa, sağlayıcınızı arayın."
+      },
+      "dns_failure": {
+        "title": "DNS Sorunu",
+        "message": "Web sitesi adresleri çözümlenemiyor.",
+        "action": "Netok ayarlarında DNS korumasını etkinleştirmeyi deneyin — bu sorunu çözebilir."
+      },
+      "http_blocked": {
+        "title": "Web Siteleri Kullanılamıyor",
+        "message": "Bağlantı var, ancak web siteleri açılmıyor.",
+        "action": "VPN kullanıyorsanız, devre dışı bırakmayı deneyin. Ayrıca antivirüs ayarlarınızı kontrol edin."
+      },
+      "weak_signal": {
+        "title": "Zayıf Sinyal",
+        "message": "Wi-Fi çalışıyor, ancak sinyal zayıf — bağlantı kopmaları olabilir.",
+        "action": "Yönlendiriciye yaklaşın veya onunla bilgisayarınız arasındaki engelleri kaldırın."
+      }
+    }
+  }
+}

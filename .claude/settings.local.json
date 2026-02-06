@@ -48,7 +48,15 @@
       "Bash(ipconfig:*)",
       "Bash(nslookup:*)",
       "Bash(netsh interface ipv4 show dnsservers:*)",
-      "Bash(ping:*)"
+      "Bash(ping:*)",
+      "Bash(npm run lint)",
+      "Bash(ls:*)",
+      "Bash(del c:WorkNetoknetok_validate_i18n.js)",
+      "Bash(npm run build:*)",
+      "Bash(del \"c:\\\\Work\\\\Netok\\\\netok\\\\_validate_i18n.mjs\")",
+      "Bash(powershell -NoProfile -Command:*)",
+      "Bash(powershell -NoProfile -File -:*)",
+      "Bash(powershell:*)"
     ],
     "deny": [],
     "ask": []

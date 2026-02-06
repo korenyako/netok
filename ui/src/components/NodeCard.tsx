@@ -91,7 +91,7 @@ export function NodeCard({ type, data, geoConsent = false, isLoading = false }: 
 
     const getLinkText = () => {
       if (data.type !== 'cable' || data.link === undefined) return null;
-      return `${t('nodes.network.link_field')}: ${data.link ? 'есть' : 'нет'}`;
+      return `${t('nodes.network.link_field')}: ${data.link ? t('nodes.network.link_yes') : t('nodes.network.link_no')}`;
     };
 
     return (

@@ -1,6 +1,6 @@
 # Project Map - Netok
 
-Generated: 2026-02-03
+Generated: 2026-02-06
 
 ## TREE (ASCII)
 
@@ -135,7 +135,9 @@ Generated: 2026-02-03
 │   │   │   ├── icons
 │   │   │   │   ├── ActionIcons.tsx
 │   │   │   │   ├── DiagnosticStatusIcons.tsx
-│   │   │   │   └── NavigationIcons.tsx
+│   │   │   │   ├── NavigationIcons.tsx
+│   │   │   │   ├── ToolIcons.tsx
+│   │   │   │   └── UIIcons.tsx
 │   │   │   ├── ui
 │   │   │   │   ├── alert.tsx
 │   │   │   │   ├── badge.tsx
@@ -150,42 +152,62 @@ Generated: 2026-02-03
 │   │   │   ├── BottomNav.tsx
 │   │   │   ├── DiagnosticMessage.tsx
 │   │   │   ├── HeaderStatus.tsx
+│   │   │   ├── MenuCard.tsx
 │   │   │   ├── NodeCard.tsx
 │   │   │   ├── SecurityRouter.tsx
 │   │   │   ├── SettingsRouter.tsx
 │   │   │   ├── Spinner.tsx
 │   │   │   ├── ThemeProvider.tsx
 │   │   │   └── WindowControls.tsx
+│   │   ├── constants
+│   │   │   └── languages.ts
 │   │   ├── fonts
 │   │   │   ├── Geist-Variable.woff2
-│   │   │   └── GeistMono-Variable.woff2
+│   │   │   ├── GeistMono-Variable.woff2
+│   │   │   └── NotoSansArabic-Variable.ttf
 │   │   ├── hooks
 │   │   │   ├── useDiagnostics.ts
 │   │   │   ├── useNavigation.ts
 │   │   │   └── useTheme.ts
 │   │   ├── i18n
+│   │   │   ├── de.json
 │   │   │   ├── en.json
-│   │   │   └── ru.json
+│   │   │   ├── es.json
+│   │   │   ├── fa.json
+│   │   │   ├── fr.json
+│   │   │   ├── it.json
+│   │   │   ├── ja.json
+│   │   │   ├── ko.json
+│   │   │   ├── pl.json
+│   │   │   ├── pt.json
+│   │   │   ├── ru.json
+│   │   │   ├── tr.json
+│   │   │   ├── uk.json
+│   │   │   └── zh.json
 │   │   ├── lib
 │   │   │   └── utils.ts
 │   │   ├── screens
 │   │   │   ├── AboutScreen.tsx
+│   │   │   ├── AddVpnScreen.tsx
 │   │   │   ├── CloseBehaviorSettingsScreen.tsx
 │   │   │   ├── CustomIpScreen.tsx
 │   │   │   ├── DiagnosticsScreen.tsx
 │   │   │   ├── DnsProvidersScreen.tsx
 │   │   │   ├── LanguageSettingsScreen.tsx
 │   │   │   ├── NodeDetailScreen.tsx
+│   │   │   ├── ProtectionHubScreen.tsx
 │   │   │   ├── SettingsScreen.tsx
 │   │   │   ├── StatusScreen.tsx
 │   │   │   ├── ThemeSettingsScreen.tsx
-│   │   │   └── ToolsScreen.tsx
+│   │   │   ├── ToolsScreen.tsx
+│   │   │   └── VpnTunnelScreen.tsx
 │   │   ├── store
 │   │   ├── stores
 │   │   │   ├── closeBehaviorStore.ts
 │   │   │   ├── dnsStore.ts
 │   │   │   ├── themeStore.ts
-│   │   │   └── useDnsStore.ts
+│   │   │   ├── useDnsStore.ts
+│   │   │   └── vpnStore.ts
 │   │   ├── tests
 │   │   │   ├── dnsStore.test.ts
 │   │   │   ├── formatUpdatedAt.test.ts
@@ -226,6 +248,9 @@ Generated: 2026-02-03
 ├── etsy-hover-effects-fixed.html
 ├── LICENSE.Apache-2.0
 ├── LICENSE.Proprietary
+├── netok-protection-hub.jsx
+├── netok-status.jsx
+├── nul
 ├── package-lock.json
 ├── package.json
 ├── PROJECT_CONTEXT.md
@@ -302,7 +327,7 @@ Generated: 2026-02-03
     "clsx": "^2.1.1",
     "geist": "^1.5.1",
     "i18next": "^25.5.2",
-    "lucide-react": "^0.563.0",
+
     "netok": "file:..",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
@@ -340,24 +365,24 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Geist', 'system-ui', 'sans-serif'],
+        sans: [
+          'Geist',
+          'Noto Sans Arabic',
+          'Microsoft YaHei', 'PingFang SC',
+          'Yu Gothic', 'Hiragino Sans',
+          'Malgun Gothic', 'Apple SD Gothic Neo',
+          'system-ui', 'sans-serif',
+        ],
         mono: ['Geist Mono', 'monospace'],
       },
-      colors: {
-        border: 'hsl(var(--border))',
-        input: 'hsl(var(--input))',
-        ring: 'hsl(var(--ring))',
-        background: 'hsl(var(--background))',
-        foreground: 'hsl(var(--foreground))',
-        primary: {
-          DEFAULT: 'hsl(var(--primary))',}}}}}
+      colors: {}}}}
 ```
 
 ### ui/index.html
 
 ```html
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="ltr">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
@@ -366,6 +391,7 @@ export default {
   </head>
   <body>
     <div id="root"></div>
+    <script>document.addEventListener('contextmenu', e => e.preventDefault())</script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
@@ -463,8 +489,20 @@ export default App;
 
 ### i18n Locales
 
+- de
 - en
+- es
+- fa
+- fr
+- it
+- ja
+- ko
+- pl
+- pt
 - ru
+- tr
+- uk
+- zh
 
 ### Stores
 

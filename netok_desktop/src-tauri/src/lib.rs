@@ -5,7 +5,7 @@ use tauri::{
 };
 
 // Re-export types from netok_bridge
-pub use netok_bridge::{DnsProviderType, SingleNodeResult, Snapshot};
+pub use netok_bridge::{DnsProviderType, IpInfoResponse, SingleNodeResult, Snapshot};
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
@@ -54,6 +54,15 @@ fn run_all() -> Result<serde_json::Value, String> {
     Ok(data)
 }
 
+// ==================== IP Geolocation ====================
+
+#[tauri::command]
+async fn lookup_ip_location(ip: String) -> Result<IpInfoResponse, String> {
+    netok_bridge::lookup_ip_location(ip)
+        .await
+        .map_err(|e| e.to_string())
+}
+
 // ==================== Progressive Diagnostics Commands ====================
 
 #[tauri::command]
@@ -88,8 +97,20 @@ async fn check_internet() -> Result<SingleNodeResult, String> {
 
 fn build_tray_menu(app: &tauri::AppHandle, lang: &str) -> Result<Menu<tauri::Wry>, Box<dyn std::error::Error>> {
     let (open_label, quit_label) = match lang {
-        "en" => ("Open Netok", "Quit"),
-        _ => ("Открыть Netok", "Выйти"),
+        "ru" => ("Открыть Netok", "Выйти"),
+        "de" => ("Netok öffnen", "Beenden"),
+        "es" => ("Abrir Netok", "Salir"),
+        "fr" => ("Ouvrir Netok", "Quitter"),
+        "it" => ("Apri Netok", "Esci"),
+        "pt" => ("Abrir Netok", "Sair"),
+        "tr" => ("Netok'u Aç", "Çıkış"),
+        "fa" => ("باز کردن Netok", "خروج"),
+        "zh" => ("打开 Netok", "退出"),
+        "ja" => ("Netok を開く", "終了"),
+        "ko" => ("Netok 열기", "종료"),
+        "uk" => ("Відкрити Netok", "Вийти"),
+        "pl" => ("Otwórz Netok", "Zamknij"),
+        _ => ("Open Netok", "Quit"),
     };
 
     let open_item = MenuItem::with_id(app, "open", open_label, true, None::<&str>)?;
@@ -160,6 +181,7 @@ pub fn run() {
             check_network,
             check_router,
             check_internet,
+            lookup_ip_location,
             update_tray_language
         ])
         .setup(|app| {

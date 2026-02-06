@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Check, ChevronRight, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2 } from '../components/icons/UIIcons';
 import { setDns, type DnsProvider as ApiDnsProvider } from '../api/tauri';
 import { useDnsStore } from '../stores/useDnsStore';
 import { dnsStore } from '../stores/dnsStore';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
+import { MenuCard } from '@/components/MenuCard';
 import { cn } from '@/lib/utils';
 import { CloseButton } from '../components/WindowControls';
 
@@ -80,16 +80,6 @@ function isProtected(provider: ApiDnsProvider | null): boolean {
   return provider.type !== 'Auto';
 }
 
-const PROVIDER_DISPLAY: Record<string, string> = {
-  Cloudflare: 'Cloudflare',
-  AdGuard: 'AdGuard',
-  Quad9: 'Quad9',
-  CleanBrowsing: 'CleanBrowsing',
-  Google: 'Google',
-  Dns4Eu: 'DNS4EU',
-  OpenDns: 'OpenDNS',
-};
-
 export function DnsProvidersScreen({ onBack, onCustomIp }: DnsProvidersScreenProps) {
   const { t } = useTranslation();
   const { currentProvider: apiProvider } = useDnsStore();
@@ -103,15 +93,6 @@ export function DnsProvidersScreen({ onBack, onCustomIp }: DnsProvidersScreenPro
       saveLastDns(apiProvider);
     }
   }, [apiProvider]);
-
-  const statusSubtitle = (() => {
-    if (!protectionEnabled) return t('dns_providers.status_disabled');
-    if (apiProvider) {
-      if (apiProvider.type === 'Custom') return t('dns_providers.custom_display');
-      return PROVIDER_DISPLAY[apiProvider.type] || apiProvider.type;
-    }
-    return t('dns_providers.status_disabled');
-  })();
 
   const applyProvider = async (provider: ApiDnsProvider) => {
     try {
@@ -147,7 +128,7 @@ export function DnsProvidersScreen({ onBack, onCustomIp }: DnsProvidersScreenPro
       <div data-tauri-drag-region className="px-4 pt-4 pb-3">
         <div className="flex items-center gap-2 pointer-events-auto">
           <Button variant="ghost" size="icon" onClick={onBack}>
-            <ArrowLeft className="w-5 h-5 text-muted-foreground" />
+            <ArrowLeft className="w-5 h-5 text-muted-foreground rtl-flip" />
           </Button>
           <h1 className="flex-1 text-lg font-semibold text-foreground">
             {t('dns_providers.title')}
@@ -163,9 +144,6 @@ export function DnsProvidersScreen({ onBack, onCustomIp }: DnsProvidersScreenPro
           )}
           <CloseButton />
         </div>
-        <p className="text-xs text-foreground ml-12 mt-0.5">
-          {statusSubtitle}
-        </p>
       </div>
 
       {/* Content */}
@@ -176,60 +154,26 @@ export function DnsProvidersScreen({ onBack, onCustomIp }: DnsProvidersScreenPro
 
             return (
               <div key={card.id} className={cn(isApplying && !isActive && 'pointer-events-none opacity-50')}>
-                <Card
-                  className={cn(
-                    'cursor-pointer transition-colors',
-                    isActive
-                      ? 'border-primary bg-primary/10 hover:bg-primary/15 dark:bg-primary/10 dark:hover:bg-primary/15'
-                      : 'bg-transparent hover:bg-accent'
-                  )}
+                <MenuCard
+                  variant={isActive ? 'selected' : 'ghost'}
+                  title={t(card.nameKey)}
+                  subtitle={t(card.descKey)}
+                  trailing={isActive ? 'check' : undefined}
                   onClick={() => handleCardSelect(card)}
-                >
-                  <CardContent className="flex items-start gap-3 px-4 py-3">
-                    <div className="flex-1 min-w-0">
-                      <span className="text-base font-medium leading-normal">
-                        {t(card.nameKey)}
-                      </span>
-                      <p className="text-sm text-muted-foreground leading-normal mt-0.5">
-                        {t(card.descKey)}
-                      </p>
-                    </div>
-                    {isActive && (
-                      <Check className="w-5 h-5 text-primary shrink-0 self-center" />
-                    )}
-                  </CardContent>
-                </Card>
+                />
               </div>
             );
           })}
 
           {/* Custom IP card */}
           <div className={cn(isApplying && !isCustomActive && 'pointer-events-none opacity-50')}>
-            <Card
-              className={cn(
-                'cursor-pointer transition-colors',
-                isCustomActive
-                  ? 'border-primary bg-primary/10 hover:bg-primary/15 dark:bg-primary/10 dark:hover:bg-primary/15'
-                  : 'bg-transparent hover:bg-accent'
-              )}
+            <MenuCard
+              variant={isCustomActive ? 'selected' : 'ghost'}
+              title={t('dns_providers.custom_ip')}
+              subtitle={t('dns_providers.custom_ip_desc')}
+              trailing={isCustomActive ? 'check' : 'chevron'}
               onClick={onCustomIp}
-            >
-              <CardContent className="flex items-start gap-3 px-4 py-3">
-                <div className="flex-1 min-w-0">
-                  <span className="text-base font-medium leading-normal">
-                    {t('dns_providers.custom_ip')}
-                  </span>
-                  <p className="text-sm text-muted-foreground leading-normal mt-0.5">
-                    {t('dns_providers.custom_ip_desc')}
-                  </p>
-                </div>
-                {isCustomActive ? (
-                  <Check className="w-5 h-5 text-primary shrink-0 self-center" />
-                ) : (
-                  <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0 self-center" />
-                )}
-              </CardContent>
-            </Card>
+            />
           </div>
         </div>
       </div>

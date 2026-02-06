@@ -1,0 +1,191 @@
+{
+  "network": {
+    "unknown": "Невідомо"
+  },
+  "dns_providers": {
+    "title": "Захист DNS",
+    "cloudflare": "Cloudflare",
+    "adguard": "AdGuard",
+    "quad9": "Quad9",
+    "cleanbrowsing": "CleanBrowsing",
+    "goal_fast_desc": "Мінімальна затримка, без фільтрації",
+    "goal_adblock_desc": "Блокує рекламу та трекери",
+    "goal_secure_desc": "Блокує віруси та фішинг",
+    "goal_family_desc": "Захист дітей + безпечний пошук",
+    "custom_ip": "Власний DNS",
+    "custom_ip_desc": "Вказати адреси DNS вручну",
+    "custom_ip_hint": "Введіть адреси DNS-серверів вашого провайдера або іншого сервісу.",
+    "custom_ip_invalid": "Невірний формат IP",
+    "custom_ipv6_invalid": "Невірний формат IPv6",
+    "custom_ip_apply": "Застосувати",
+    "optional": "необов'язково",
+    "custom_display": "Власний DNS",
+    "status_disabled": "Вимкнено"
+  },
+  "dns_detail": {
+    "ip_copied": "Скопійовано"
+  },
+  "diagnostics": {
+    "title": "Діагностика",
+    "computer": "Комп'ютер",
+    "wifi": "Wi-Fi",
+    "router": "Роутер",
+    "internet": "Інтернет",
+    "checking": "Перевірка..."
+  },
+  "status": {
+    "internet_ok": "Підключено",
+    "internet_down": "Немає підключення",
+    "internet_partial": "Обмежене підключення",
+    "speed": "Швидкість: {down}/{up} Мбіт/с",
+    "connection_vpn_detected": "VPN з'єднання активне",
+    "waiting": "Перевіряємо з'єднання...",
+    "dns_protection_with_provider": "Захист DNS увімкнено",
+    "dns_protection_enabled": "Використовується DNS {{provider}}",
+    "dns_protection_disabled": "Захист DNS вимкнено",
+    "dns_protection_disabled_desc": "Використовується стандартний DNS провайдера"
+  },
+  "node_detail": {
+    "adapter": "Адаптер",
+    "ip_address": "IP-адреса",
+    "network_name": "Мережа",
+    "signal": "Сигнал",
+    "manufacturer": "Виробник",
+    "isp": "Провайдер",
+    "location": "Розташування",
+    "open_router": "Відкрити сторінку роутера"
+  },
+  "nodes": {
+    "computer": {
+      "name": "Комп'ютер",
+      "name_field": "Ім'я",
+      "model_field": "Модель",
+      "adapter_field": "Мережевий адаптер",
+      "local_ip_field": "IP в локальній мережі"
+    },
+    "network": {
+      "name": "Мережа",
+      "type_wifi": "Wi-Fi",
+      "type_cable": "Ethernet",
+      "type_usb_modem": "USB-модем",
+      "type_bt": "Bluetooth",
+      "type_mobile": "Мобільний модем",
+      "signal_field": "Сигнал",
+      "signal_excellent": "відмінний",
+      "signal_good": "добрий",
+      "signal_fair": "середній",
+      "signal_weak": "слабкий",
+      "signal_label_excellent": "Відмінний сигнал",
+      "signal_label_good": "Добрий сигнал",
+      "signal_label_fair": "Середній сигнал",
+      "signal_label_weak": "Слабкий сигнал",
+      "link_field": "З'єднання",
+      "link_yes": "Підключено",
+      "link_no": "Відключено"
+    },
+    "router": {
+      "name": "Роутер",
+      "local_ip_field": "IP в локальній мережі"
+    },
+    "internet": {
+      "name": "Інтернет",
+      "ip_field": "Публічна IP"
+    }
+  },
+  "meta": {
+    "no_data": "Немає даних. Натисніть «Оновити»."
+  },
+  "errors": {
+    "diagnostics": "Помилка діагностики",
+    "diagnostics_failed": "Помилка діагностики"
+  },
+  "settings": {
+    "title": "Налаштування",
+    "tabs": {
+      "tools": "Інструменти"
+    },
+    "general": {
+      "language": "Мова",
+      "theme": "Тема",
+      "theme_light": "Світла",
+      "theme_dark": "Темна",
+      "theme_light_desc": "Завжди використовувати світлий режим інтерфейсу",
+      "theme_dark_desc": "Завжди використовувати темний режим інтерфейсу",
+      "close_behavior": "При закритті вікна",
+      "close_minimize": "Згортати в трей",
+      "close_minimize_desc": "Застосунок продовжить працювати в системному треї",
+      "close_quit": "Закривати застосунок",
+      "close_quit_desc": "Повністю завершити роботу застосунку",
+      "about": "Про програму",
+      "about_desc": "Версія та інформація"
+    },
+    "about": {
+      "title": "Про програму",
+      "version": "Версія",
+      "whats_new": "Що нового",
+      "author": "Автор",
+      "author_value": "Anton Korenyako",
+      "website_button": "netok.app",
+      "changes": [
+        "Центр захисту: єдине управління DNS та VPN",
+        "VPN-тунель з підтримкою WireGuard",
+        "14 нових мов: німецька, іспанська, французька та інші",
+        "Підтримка RTL для арабської та перської",
+        "Покращений інтерфейс з новими компонентами"
+      ]
+    },
+    "tools": {
+      "diagnostics_desc": "Стан підключення",
+      "speed_test": "Тест швидкості",
+      "speed_test_desc": "Дізнайтеся, на що здатний ваш інтернет",
+      "flush_dns": "Очистити кеш DNS",
+      "flush_dns_desc": "Вирішити проблему «сайт не відкривається»",
+      "device_scan": "Пристрої в мережі",
+      "device_scan_desc": "Подивіться, хто підключений"
+    }
+  },
+  "diagnostic": {
+    "scenario": {
+      "all_good": {
+        "title": "Підключено",
+        "message": "Інтернет працює нормально.",
+        "action": ""
+      },
+      "wifi_disabled": {
+        "title": "Wi-Fi вимкнено",
+        "message": "Адаптер Wi-Fi вимкнено на вашому комп'ютері.",
+        "action": "Увімкніть Wi-Fi в налаштуваннях Windows або натисніть перемикач Wi-Fi на ноутбуці."
+      },
+      "wifi_not_connected": {
+        "title": "Немає підключення",
+        "message": "Ваш комп'ютер не підключено до мережі Wi-Fi.",
+        "action": "Відкрийте список мереж, виберіть свою і підключіться."
+      },
+      "router_unreachable": {
+        "title": "Роутер не відповідає",
+        "message": "Сигнал не доходить до роутера.",
+        "action": "Перевірте, чи увімкнений роутер і чи горять на ньому індикатори. Спробуйте перезавантажити його."
+      },
+      "no_internet": {
+        "title": "Немає інтернету",
+        "message": "Роутер працює, але вихід в інтернет відсутній.",
+        "action": "Перезавантажте роутер — вимкніть на 10 секунд і увімкніть. Якщо не допоможе — зателефонуйте провайдеру."
+      },
+      "dns_failure": {
+        "title": "Проблема з DNS",
+        "message": "Не вдається знайти адреси сайтів.",
+        "action": "Спробуйте увімкнути DNS-захист в налаштуваннях Netok — це може вирішити проблему."
+      },
+      "http_blocked": {
+        "title": "Сайти недоступні",
+        "message": "З'єднання є, але сайти не відкриваються.",
+        "action": "Якщо використовуєте VPN — спробуйте вимкнути його. Також перевірте налаштування антивірусу."
+      },
+      "weak_signal": {
+        "title": "Слабкий сигнал",
+        "message": "Wi-Fi працює, але сигнал слабкий — можливі обриви.",
+        "action": "Підійдіть ближче до роутера або приберіть перешкоди між ним і комп'ютером."
+      }
+    }
+  }
+}

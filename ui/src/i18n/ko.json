@@ -1,0 +1,191 @@
+{
+  "network": {
+    "unknown": "알 수 없음"
+  },
+  "dns_providers": {
+    "title": "DNS 보호",
+    "cloudflare": "Cloudflare",
+    "adguard": "AdGuard",
+    "quad9": "Quad9",
+    "cleanbrowsing": "CleanBrowsing",
+    "goal_fast_desc": "최소 지연 시간, 필터링 없음",
+    "goal_adblock_desc": "광고 및 추적기 차단",
+    "goal_secure_desc": "멀웨어 및 피싱 차단",
+    "goal_family_desc": "아동 안전 + SafeSearch",
+    "custom_ip": "사용자 지정 IP",
+    "custom_ip_desc": "DNS 주소를 직접 입력하세요",
+    "custom_ip_hint": "제공업체 또는 다른 DNS 서비스의 DNS 서버 주소를 입력하세요.",
+    "custom_ip_invalid": "잘못된 IP 주소",
+    "custom_ipv6_invalid": "잘못된 IPv6 주소",
+    "custom_ip_apply": "적용",
+    "optional": "선택 사항",
+    "custom_display": "사용자 지정",
+    "status_disabled": "비활성화됨"
+  },
+  "dns_detail": {
+    "ip_copied": "복사됨"
+  },
+  "diagnostics": {
+    "title": "진단",
+    "computer": "컴퓨터",
+    "wifi": "Wi-Fi",
+    "router": "라우터",
+    "internet": "인터넷",
+    "checking": "확인 중..."
+  },
+  "status": {
+    "internet_ok": "연결됨",
+    "internet_down": "인터넷 연결 없음",
+    "internet_partial": "제한된 연결",
+    "speed": "속도: {down}/{up} Mbps",
+    "connection_vpn_detected": "VPN 연결 활성화됨",
+    "waiting": "연결 확인 중...",
+    "dns_protection_with_provider": "DNS 보호 활성화됨",
+    "dns_protection_enabled": "{{provider}} DNS 사용 중",
+    "dns_protection_disabled": "DNS 보호 비활성화됨",
+    "dns_protection_disabled_desc": "표준 ISP DNS 사용 중"
+  },
+  "node_detail": {
+    "adapter": "어댑터",
+    "ip_address": "IP 주소",
+    "network_name": "네트워크",
+    "signal": "신호",
+    "manufacturer": "제조사",
+    "isp": "ISP",
+    "location": "위치",
+    "open_router": "라우터 페이지 열기"
+  },
+  "nodes": {
+    "computer": {
+      "name": "컴퓨터",
+      "name_field": "이름",
+      "model_field": "모델",
+      "adapter_field": "네트워크 어댑터",
+      "local_ip_field": "로컬 IP"
+    },
+    "network": {
+      "name": "네트워크",
+      "type_wifi": "Wi-Fi",
+      "type_cable": "이더넷",
+      "type_usb_modem": "USB 모뎀",
+      "type_bt": "Bluetooth",
+      "type_mobile": "모바일 데이터",
+      "signal_field": "신호 강도",
+      "signal_excellent": "매우 좋음",
+      "signal_good": "좋음",
+      "signal_fair": "보통",
+      "signal_weak": "약함",
+      "signal_label_excellent": "신호 매우 좋음",
+      "signal_label_good": "신호 좋음",
+      "signal_label_fair": "신호 보통",
+      "signal_label_weak": "신호 약함",
+      "link_field": "링크",
+      "link_yes": "연결됨",
+      "link_no": "연결 끊김"
+    },
+    "router": {
+      "name": "라우터",
+      "local_ip_field": "로컬 IP 주소"
+    },
+    "internet": {
+      "name": "인터넷",
+      "ip_field": "공인 IP"
+    }
+  },
+  "meta": {
+    "no_data": "데이터 없음. '새로고침'을 클릭하세요."
+  },
+  "errors": {
+    "diagnostics": "진단 오류",
+    "diagnostics_failed": "진단 실패"
+  },
+  "settings": {
+    "title": "설정",
+    "tabs": {
+      "tools": "도구"
+    },
+    "general": {
+      "language": "언어",
+      "theme": "테마",
+      "theme_light": "라이트",
+      "theme_dark": "다크",
+      "theme_light_desc": "항상 밝은 인터페이스 모드 사용",
+      "theme_dark_desc": "항상 어두운 인터페이스 모드 사용",
+      "close_behavior": "창 닫기 시",
+      "close_minimize": "트레이로 최소화",
+      "close_minimize_desc": "앱이 시스템 트레이에서 계속 실행됩니다",
+      "close_quit": "애플리케이션 종료",
+      "close_quit_desc": "애플리케이션을 완전히 종료합니다",
+      "about": "정보",
+      "about_desc": "버전 및 앱 정보"
+    },
+    "about": {
+      "title": "정보",
+      "version": "버전",
+      "whats_new": "새로운 기능",
+      "author": "제작자",
+      "author_value": "Anton Korenyako",
+      "website_button": "netok.app",
+      "changes": [
+        "보호 허브: DNS 및 VPN 통합 관리",
+        "WireGuard 지원 VPN 터널",
+        "14개 신규 언어: 독일어, 스페인어, 프랑스어 등",
+        "아랍어 및 페르시아어 RTL 지원",
+        "새로운 컴포넌트로 개선된 UI"
+      ]
+    },
+    "tools": {
+      "diagnostics_desc": "연결 세부 정보 보기",
+      "speed_test": "속도 테스트",
+      "speed_test_desc": "인터넷 속도 확인",
+      "flush_dns": "DNS 캐시 비우기",
+      "flush_dns_desc": "\"사이트가 로드되지 않음\" 문제 해결",
+      "device_scan": "장치 스캔",
+      "device_scan_desc": "네트워크에 연결된 장치 확인"
+    }
+  },
+  "diagnostic": {
+    "scenario": {
+      "all_good": {
+        "title": "연결됨",
+        "message": "인터넷이 정상적으로 작동하고 있습니다.",
+        "action": ""
+      },
+      "wifi_disabled": {
+        "title": "Wi-Fi 비활성화됨",
+        "message": "컴퓨터에서 Wi-Fi 어댑터가 꺼져 있습니다.",
+        "action": "Windows 설정에서 Wi-Fi를 켜거나 노트북의 Wi-Fi 스위치를 누르세요."
+      },
+      "wifi_not_connected": {
+        "title": "연결되지 않음",
+        "message": "컴퓨터가 Wi-Fi 네트워크에 연결되어 있지 않습니다.",
+        "action": "네트워크 목록을 열고 네트워크를 선택한 후 연결하세요."
+      },
+      "router_unreachable": {
+        "title": "라우터에 연결할 수 없음",
+        "message": "신호가 라우터에 도달하지 않습니다.",
+        "action": "라우터의 전원이 켜져 있고 표시등이 켜져 있는지 확인하세요. 재시작해 보세요."
+      },
+      "no_internet": {
+        "title": "인터넷 없음",
+        "message": "라우터는 작동하지만 인터넷 접속이 안 됩니다.",
+        "action": "라우터를 재시작하세요 — 10초 동안 끈 후 다시 켜세요. 해결되지 않으면 제공업체에 문의하세요."
+      },
+      "dns_failure": {
+        "title": "DNS 문제",
+        "message": "웹사이트 주소를 확인할 수 없습니다.",
+        "action": "Netok 설정에서 DNS 보호를 활성화해 보세요 — 문제가 해결될 수 있습니다."
+      },
+      "http_blocked": {
+        "title": "웹사이트 접속 불가",
+        "message": "연결은 있지만 웹사이트가 열리지 않습니다.",
+        "action": "VPN을 사용 중이라면 비활성화해 보세요. 백신 소프트웨어 설정도 확인하세요."
+      },
+      "weak_signal": {
+        "title": "약한 신호",
+        "message": "Wi-Fi는 작동하지만 신호가 약해 끊김이 발생할 수 있습니다.",
+        "action": "라우터에 더 가까이 이동하거나 라우터와 컴퓨터 사이의 장애물을 제거하세요."
+      }
+    }
+  }
+}

@@ -1,0 +1,191 @@
+{
+  "network": {
+    "unknown": "Inconnu"
+  },
+  "dns_providers": {
+    "title": "Protection DNS",
+    "cloudflare": "Cloudflare",
+    "adguard": "AdGuard",
+    "quad9": "Quad9",
+    "cleanbrowsing": "CleanBrowsing",
+    "goal_fast_desc": "Latence minimale, sans filtrage",
+    "goal_adblock_desc": "Bloque les publicités et les traqueurs",
+    "goal_secure_desc": "Bloque les logiciels malveillants et l’hameçonnage",
+    "goal_family_desc": "Sécurité enfant + recherche sécurisée",
+    "custom_ip": "IP personnalisée",
+    "custom_ip_desc": "Saisir les adresses DNS manuellement",
+    "custom_ip_hint": "Saisissez les adresses de serveur DNS de votre fournisseur ou d’un autre service DNS.",
+    "custom_ip_invalid": "Adresse IP invalide",
+    "custom_ipv6_invalid": "Adresse IPv6 invalide",
+    "custom_ip_apply": "Appliquer",
+    "optional": "facultatif",
+    "custom_display": "Personnalisé",
+    "status_disabled": "Désactivé"
+  },
+  "dns_detail": {
+    "ip_copied": "Copié"
+  },
+  "diagnostics": {
+    "title": "Diagnostics",
+    "computer": "Ordinateur",
+    "wifi": "Wi-Fi",
+    "router": "Routeur",
+    "internet": "Internet",
+    "checking": "Vérification..."
+  },
+  "status": {
+    "internet_ok": "Connecté",
+    "internet_down": "Pas de connexion Internet",
+    "internet_partial": "Connectivité limitée",
+    "speed": "Débit : {down}/{up} Mbps",
+    "connection_vpn_detected": "Connexion VPN active",
+    "waiting": "Vérification de la connexion...",
+    "dns_protection_with_provider": "Protection DNS activée",
+    "dns_protection_enabled": "Utilisation du DNS {{provider}}",
+    "dns_protection_disabled": "Protection DNS désactivée",
+    "dns_protection_disabled_desc": "Utilisation du DNS standard du FAI"
+  },
+  "node_detail": {
+    "adapter": "Adaptateur",
+    "ip_address": "Adresse IP",
+    "network_name": "Réseau",
+    "signal": "Signal",
+    "manufacturer": "Fabricant",
+    "isp": "FAI",
+    "location": "Localisation",
+    "open_router": "Ouvrir la page du routeur"
+  },
+  "nodes": {
+    "computer": {
+      "name": "Ordinateur",
+      "name_field": "Nom",
+      "model_field": "Modèle",
+      "adapter_field": "Adaptateur réseau",
+      "local_ip_field": "IP locale"
+    },
+    "network": {
+      "name": "Réseau",
+      "type_wifi": "Wi-Fi",
+      "type_cable": "Ethernet",
+      "type_usb_modem": "Modem USB",
+      "type_bt": "Bluetooth",
+      "type_mobile": "Données mobiles",
+      "signal_field": "Puissance du signal",
+      "signal_excellent": "Excellent",
+      "signal_good": "Bon",
+      "signal_fair": "Moyen",
+      "signal_weak": "Faible",
+      "signal_label_excellent": "Excellent signal",
+      "signal_label_good": "Bon signal",
+      "signal_label_fair": "Signal moyen",
+      "signal_label_weak": "Signal faible",
+      "link_field": "Liaison",
+      "link_yes": "Connecté",
+      "link_no": "Déconnecté"
+    },
+    "router": {
+      "name": "Routeur",
+      "local_ip_field": "Adresse IP locale"
+    },
+    "internet": {
+      "name": "Internet",
+      "ip_field": "IP publique"
+    }
+  },
+  "meta": {
+    "no_data": "Aucune donnée. Cliquez sur « Actualiser »."
+  },
+  "errors": {
+    "diagnostics": "Erreur de diagnostic",
+    "diagnostics_failed": "Échec du diagnostic"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "tabs": {
+      "tools": "Outils"
+    },
+    "general": {
+      "language": "Langue",
+      "theme": "Thème",
+      "theme_light": "Clair",
+      "theme_dark": "Sombre",
+      "theme_light_desc": "Toujours utiliser le mode d’interface clair",
+      "theme_dark_desc": "Toujours utiliser le mode d’interface sombre",
+      "close_behavior": "À la fermeture de la fenêtre",
+      "close_minimize": "Réduire dans la zone de notification",
+      "close_minimize_desc": "L’application continuera de fonctionner dans la zone de notification",
+      "close_quit": "Quitter l’application",
+      "close_quit_desc": "Fermer complètement l’application",
+      "about": "À propos",
+      "about_desc": "Version et informations sur l’application"
+    },
+    "about": {
+      "title": "À propos",
+      "version": "Version",
+      "whats_new": "Nouveautés",
+      "author": "Auteur",
+      "author_value": "Anton Korenyako",
+      "website_button": "netok.app",
+      "changes": [
+        "Centre de protection : gestion unifiée DNS et VPN",
+        "Tunnel VPN avec support WireGuard",
+        "14 nouvelles langues : allemand, espagnol, français et plus",
+        "Support RTL pour l'arabe et le persan",
+        "Interface améliorée avec nouveaux composants"
+      ]
+    },
+    "tools": {
+      "diagnostics_desc": "Voir les détails de la connexion",
+      "speed_test": "Test de débit",
+      "speed_test_desc": "Vérifiez les capacités de votre connexion Internet",
+      "flush_dns": "Vider le cache DNS",
+      "flush_dns_desc": "Résoudre les problèmes de « site inaccessible »",
+      "device_scan": "Analyse des appareils",
+      "device_scan_desc": "Voir qui est connecté à votre réseau"
+    }
+  },
+  "diagnostic": {
+    "scenario": {
+      "all_good": {
+        "title": "Connecté",
+        "message": "Internet fonctionne normalement.",
+        "action": ""
+      },
+      "wifi_disabled": {
+        "title": "Wi-Fi désactivé",
+        "message": "L'adaptateur Wi-Fi est désactivé sur votre ordinateur.",
+        "action": "Activez le Wi-Fi dans les paramètres Windows ou appuyez sur l'interrupteur Wi-Fi de votre ordinateur portable."
+      },
+      "wifi_not_connected": {
+        "title": "Non connecté",
+        "message": "Votre ordinateur n'est pas connecté à un réseau Wi-Fi.",
+        "action": "Ouvrez la liste des réseaux, sélectionnez le vôtre et connectez-vous."
+      },
+      "router_unreachable": {
+        "title": "Routeur inaccessible",
+        "message": "Le signal n'atteint pas votre routeur.",
+        "action": "Vérifiez que le routeur est allumé et que ses voyants sont actifs. Essayez de le redémarrer."
+      },
+      "no_internet": {
+        "title": "Pas d'Internet",
+        "message": "Le routeur fonctionne, mais il n'y a pas d'accès à Internet.",
+        "action": "Redémarrez le routeur — éteignez-le pendant 10 secondes puis rallumez-le. Si cela ne fonctionne pas, appelez votre fournisseur."
+      },
+      "dns_failure": {
+        "title": "Problème DNS",
+        "message": "Impossible de résoudre les adresses de sites web.",
+        "action": "Essayez d'activer la protection DNS dans les paramètres de Netok — cela pourrait résoudre le problème."
+      },
+      "http_blocked": {
+        "title": "Sites web indisponibles",
+        "message": "Il y a une connexion, mais les sites web ne s'ouvrent pas.",
+        "action": "Si vous utilisez un VPN, essayez de le désactiver. Vérifiez également les paramètres de votre antivirus."
+      },
+      "weak_signal": {
+        "title": "Signal faible",
+        "message": "Le Wi-Fi fonctionne, mais le signal est faible — des coupures sont possibles.",
+        "action": "Rapprochez-vous du routeur ou retirez les obstacles entre lui et votre ordinateur."
+      }
+    }
+  }
+}

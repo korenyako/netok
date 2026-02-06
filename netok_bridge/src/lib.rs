@@ -149,6 +149,16 @@ pub async fn check_internet_node() -> Result<SingleNodeResult, anyhow::Error> {
     })
 }
 
+// Re-export IpInfoResponse for Tauri commands
+pub use netok_core::IpInfoResponse;
+
+// IP geolocation lookup (async wrapper)
+pub async fn lookup_ip_location(ip: String) -> Result<IpInfoResponse, String> {
+    tokio::task::spawn_blocking(move || netok_core::lookup_ip_location(&ip))
+        .await
+        .map_err(|e| format!("Failed to run IP location lookup task: {}", e))?
+}
+
 // DNS Provider types for Tauri
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 #[serde(tag = "type")]

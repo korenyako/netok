@@ -1,5 +1,8 @@
+import { ProtectionHubScreen } from '../screens/ProtectionHubScreen';
 import { DnsProvidersScreen } from '../screens/DnsProvidersScreen';
 import { CustomIpScreen } from '../screens/CustomIpScreen';
+import { VpnTunnelScreen } from '../screens/VpnTunnelScreen';
+import { AddVpnScreen } from '../screens/AddVpnScreen';
 import { dnsStore } from '../stores/dnsStore';
 import type { SecuritySubScreen } from '../hooks/useNavigation';
 
@@ -10,8 +13,8 @@ interface SecurityRouterProps {
 }
 
 export function SecurityRouter({ subScreen, onSetSubScreen, onBack }: SecurityRouterProps) {
-  const handleBackToProviders = () => {
-    onSetSubScreen('dns-providers');
+  const handleBackToHub = () => {
+    onSetSubScreen('hub');
     dnsStore.refresh();
   };
 
@@ -20,7 +23,20 @@ export function SecurityRouter({ subScreen, onSetSubScreen, onBack }: SecurityRo
     dnsStore.refresh();
   };
 
+  const handleBackToProviders = () => {
+    onSetSubScreen('dns-providers');
+    dnsStore.refresh();
+  };
+
   switch (subScreen) {
+    case 'dns-providers':
+      return (
+        <DnsProvidersScreen
+          onBack={handleBackToHub}
+          onCustomIp={() => onSetSubScreen('custom-ip')}
+        />
+      );
+
     case 'custom-ip':
       return (
         <CustomIpScreen
@@ -29,12 +45,29 @@ export function SecurityRouter({ subScreen, onSetSubScreen, onBack }: SecurityRo
         />
       );
 
-    case 'dns-providers':
+    case 'vpn':
+      return (
+        <VpnTunnelScreen
+          onBack={handleBackToHub}
+          onAddVpn={() => onSetSubScreen('vpn-add')}
+        />
+      );
+
+    case 'vpn-add':
+      return (
+        <AddVpnScreen
+          onBack={() => onSetSubScreen('vpn')}
+          onAdded={() => onSetSubScreen('vpn')}
+        />
+      );
+
+    case 'hub':
     default:
       return (
-        <DnsProvidersScreen
+        <ProtectionHubScreen
           onBack={handleBackToHome}
-          onCustomIp={() => onSetSubScreen('custom-ip')}
+          onNavigateToDns={() => onSetSubScreen('dns-providers')}
+          onNavigateToVpn={() => onSetSubScreen('vpn')}
         />
       );
   }

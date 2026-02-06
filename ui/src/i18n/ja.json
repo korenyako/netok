@@ -1,0 +1,191 @@
+{
+  "network": {
+    "unknown": "不明"
+  },
+  "dns_providers": {
+    "title": "DNS保護",
+    "cloudflare": "Cloudflare",
+    "adguard": "AdGuard",
+    "quad9": "Quad9",
+    "cleanbrowsing": "CleanBrowsing",
+    "goal_fast_desc": "最小レイテンシ、フィルタリングなし",
+    "goal_adblock_desc": "広告とトラッカーをブロック",
+    "goal_secure_desc": "マルウェアとフィッシングをブロック",
+    "goal_family_desc": "子供の安全 + セーフサーチ",
+    "custom_ip": "カスタムIP",
+    "custom_ip_desc": "DNSアドレスを手動で入力",
+    "custom_ip_hint": "プロバイダーまたは他のDNSサービスのDNSサーバーアドレスを入力してください。",
+    "custom_ip_invalid": "無効なIPアドレス",
+    "custom_ipv6_invalid": "無効なIPv6アドレス",
+    "custom_ip_apply": "適用",
+    "optional": "任意",
+    "custom_display": "カスタム",
+    "status_disabled": "無効"
+  },
+  "dns_detail": {
+    "ip_copied": "コピーしました"
+  },
+  "diagnostics": {
+    "title": "診断",
+    "computer": "コンピュータ",
+    "wifi": "Wi-Fi",
+    "router": "ルーター",
+    "internet": "インターネット",
+    "checking": "確認中..."
+  },
+  "status": {
+    "internet_ok": "接続済み",
+    "internet_down": "インターネット接続なし",
+    "internet_partial": "接続が制限されています",
+    "speed": "速度: {down}/{up} Mbps",
+    "connection_vpn_detected": "VPN接続がアクティブです",
+    "waiting": "接続を確認中...",
+    "dns_protection_with_provider": "DNS保護が有効です",
+    "dns_protection_enabled": "{{provider}} DNSを使用中",
+    "dns_protection_disabled": "DNS保護が無効です",
+    "dns_protection_disabled_desc": "標準のISP DNSを使用中"
+  },
+  "node_detail": {
+    "adapter": "アダプター",
+    "ip_address": "IPアドレス",
+    "network_name": "ネットワーク",
+    "signal": "信号",
+    "manufacturer": "メーカー",
+    "isp": "ISP",
+    "location": "所在地",
+    "open_router": "ルーターページを開く"
+  },
+  "nodes": {
+    "computer": {
+      "name": "コンピュータ",
+      "name_field": "名前",
+      "model_field": "モデル",
+      "adapter_field": "ネットワークアダプター",
+      "local_ip_field": "ローカルIP"
+    },
+    "network": {
+      "name": "ネットワーク",
+      "type_wifi": "Wi-Fi",
+      "type_cable": "有線LAN",
+      "type_usb_modem": "USBモデム",
+      "type_bt": "Bluetooth",
+      "type_mobile": "モバイルデータ",
+      "signal_field": "信号強度",
+      "signal_excellent": "優秀",
+      "signal_good": "良好",
+      "signal_fair": "普通",
+      "signal_weak": "弱い",
+      "signal_label_excellent": "信号: 非常に良好",
+      "signal_label_good": "信号: 良好",
+      "signal_label_fair": "信号: 普通",
+      "signal_label_weak": "信号: 弱い",
+      "link_field": "リンク",
+      "link_yes": "接続済み",
+      "link_no": "切断"
+    },
+    "router": {
+      "name": "ルーター",
+      "local_ip_field": "ローカルIPアドレス"
+    },
+    "internet": {
+      "name": "インターネット",
+      "ip_field": "パブリックIP"
+    }
+  },
+  "meta": {
+    "no_data": "データがありません。「更新」をクリックしてください。"
+  },
+  "errors": {
+    "diagnostics": "診断エラー",
+    "diagnostics_failed": "診断に失敗しました"
+  },
+  "settings": {
+    "title": "設定",
+    "tabs": {
+      "tools": "ツール"
+    },
+    "general": {
+      "language": "言語",
+      "theme": "テーマ",
+      "theme_light": "ライト",
+      "theme_dark": "ダーク",
+      "theme_light_desc": "常にライトモードのインターフェースを使用",
+      "theme_dark_desc": "常にダークモードのインターフェースを使用",
+      "close_behavior": "ウィンドウを閉じたとき",
+      "close_minimize": "トレイに最小化",
+      "close_minimize_desc": "アプリはシステムトレイで動作し続けます",
+      "close_quit": "アプリケーションを終了",
+      "close_quit_desc": "アプリケーションを完全に終了します",
+      "about": "アプリについて",
+      "about_desc": "バージョンとアプリ情報"
+    },
+    "about": {
+      "title": "アプリについて",
+      "version": "バージョン",
+      "whats_new": "新機能",
+      "author": "作者",
+      "author_value": "Anton Korenyako",
+      "website_button": "netok.app",
+      "changes": [
+        "保護ハブ：DNS・VPN統合管理",
+        "WireGuard対応VPNトンネル",
+        "14の新言語：ドイツ語、スペイン語、フランス語など",
+        "アラビア語・ペルシア語のRTLサポート",
+        "新コンポーネントによるUI改善"
+      ]
+    },
+    "tools": {
+      "diagnostics_desc": "接続の詳細を表示",
+      "speed_test": "速度テスト",
+      "speed_test_desc": "インターネットの速度を確認",
+      "flush_dns": "DNSキャッシュをクリア",
+      "flush_dns_desc": "「サイトが読み込まれない」問題を修正",
+      "device_scan": "デバイススキャン",
+      "device_scan_desc": "ネットワーク上のデバイスを確認"
+    }
+  },
+  "diagnostic": {
+    "scenario": {
+      "all_good": {
+        "title": "接続済み",
+        "message": "インターネットは正常に動作しています。",
+        "action": ""
+      },
+      "wifi_disabled": {
+        "title": "Wi-Fiが無効",
+        "message": "お使いのコンピュータでWi-Fiアダプターがオフになっています。",
+        "action": "Windowsの設定でWi-Fiをオンにするか、ノートパソコンのWi-Fiスイッチを押してください。"
+      },
+      "wifi_not_connected": {
+        "title": "未接続",
+        "message": "お使いのコンピュータはWi-Fiネットワークに接続されていません。",
+        "action": "ネットワークリストを開き、お使いのネットワークを選択して接続してください。"
+      },
+      "router_unreachable": {
+        "title": "ルーターに到達不能",
+        "message": "信号がルーターに届いていません。",
+        "action": "ルーターの電源が入っていてインジケーターランプが点灯しているか確認してください。再起動をお試しください。"
+      },
+      "no_internet": {
+        "title": "インターネットなし",
+        "message": "ルーターは動作していますが、インターネットにアクセスできません。",
+        "action": "ルーターを再起動してください — 10秒間オフにしてから再度オンにします。解決しない場合は、プロバイダーにお問い合わせください。"
+      },
+      "dns_failure": {
+        "title": "DNSの問題",
+        "message": "ウェブサイトのアドレスを解決できません。",
+        "action": "NetokでDNS保護を有効にしてみてください — これで問題が解決する可能性があります。"
+      },
+      "http_blocked": {
+        "title": "ウェブサイトが利用不可",
+        "message": "接続はありますが、ウェブサイトが開きません。",
+        "action": "VPNを使用している場合は、無効にしてみてください。また、ウイルス対策ソフトの設定も確認してください。"
+      },
+      "weak_signal": {
+        "title": "信号が弱い",
+        "message": "Wi-Fiは動作していますが、信号が弱いため接続が切れる可能性があります。",
+        "action": "ルーターに近づくか、ルーターとコンピュータの間の障害物を取り除いてください。"
+      }
+    }
+  }
+}

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, RotateCw, ChevronRight } from 'lucide-react';
+import { ArrowLeft, RotateCw, ChevronRight } from '../components/icons/UIIcons';
 import { NetokLogoIcon, ShieldIcon, WrenchIcon, SettingsIcon } from '../components/icons/NavigationIcons';
 import { NodeOkIcon, NodeWarningIcon, NodeErrorIcon, NodeLoadingIcon } from '../components/icons/DiagnosticStatusIcons';
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,8 @@ import {
   type SingleNodeResult,
 } from '../api/tauri';
 import { NodeDetailScreen } from './NodeDetailScreen';
+import { DiagnosticMessage } from '../components/DiagnosticMessage';
+import { deriveScenario } from '../utils/deriveScenario';
 import { CloseButton } from '../components/WindowControls';
 
 interface NodeDetail {
@@ -206,6 +208,8 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
   };
 
   const isActive = currentCheckIndex >= 0 && currentCheckIndex < 4;
+  const scenarioResult = !isRunning && nodes.length > 0 ? deriveScenario(nodes) : null;
+  const showScenarioCard = scenarioResult !== null && scenarioResult.scenario !== 'all_good';
 
   const selectedResult = selectedNode ? rawResultsRef.current.get(selectedNode) : undefined;
   if (selectedNode && selectedResult) {
@@ -214,6 +218,10 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
         nodeId={selectedNode}
         result={selectedResult}
         onBack={() => setSelectedNode(null)}
+        onNavigateToHome={onBack}
+        onNavigateToSecurity={onNavigateToSecurity}
+        onNavigateToTools={onNavigateToTools}
+        onNavigateToSettings={onNavigateToSettings}
       />
     );
   }
@@ -223,7 +231,7 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
       {/* Header */}
       <div data-tauri-drag-region className="px-4 py-4 flex items-center gap-2">
         <Button variant="ghost" size="icon" onClick={onBack}>
-          <ArrowLeft className="w-5 h-5 text-muted-foreground" />
+          <ArrowLeft className="w-5 h-5 text-muted-foreground rtl-flip" />
         </Button>
         <h1 className="text-lg font-semibold text-foreground flex-1">{t('diagnostics.title')}</h1>
         <Button variant="ghost" size="icon" onClick={handleRefresh} disabled={isRunning}>
@@ -231,6 +239,16 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
         </Button>
         <CloseButton />
       </div>
+
+      {/* Scenario Message Card */}
+      {showScenarioCard && (
+        <div className="px-4 pb-2 animate-in fade-in duration-300">
+          <DiagnosticMessage
+            scenario={scenarioResult.scenario}
+            severity={scenarioResult.severity}
+          />
+        </div>
+      )}
 
       {/* Error State */}
       {error && nodes.length === 0 && (

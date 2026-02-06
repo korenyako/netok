@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Copy, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Copy, ExternalLink } from '../components/icons/UIIcons';
+import { NetokLogoIcon, ShieldIcon, WrenchIcon, SettingsIcon } from '../components/icons/NavigationIcons';
 import { openUrl } from '@tauri-apps/plugin-opener';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -12,6 +13,10 @@ interface NodeDetailScreenProps {
   nodeId: string;
   result: SingleNodeResult;
   onBack: () => void;
+  onNavigateToHome?: () => void;
+  onNavigateToSecurity?: () => void;
+  onNavigateToTools?: () => void;
+  onNavigateToSettings?: () => void;
 }
 
 /** Remove AS number prefix from ISP string */
@@ -42,7 +47,7 @@ interface InfoRow {
   copyable?: boolean;
 }
 
-export function NodeDetailScreen({ nodeId, result, onBack }: NodeDetailScreenProps) {
+export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToHome, onNavigateToSecurity, onNavigateToTools, onNavigateToSettings }: NodeDetailScreenProps) {
   const { t } = useTranslation();
 
   const handleCopyIp = (ip: string) => {
@@ -110,7 +115,7 @@ export function NodeDetailScreen({ nodeId, result, onBack }: NodeDetailScreenPro
       {/* Header */}
       <div data-tauri-drag-region className="px-4 pt-4 pb-3 flex items-center gap-2">
         <Button variant="ghost" size="icon" onClick={onBack}>
-          <ArrowLeft className="w-5 h-5 text-muted-foreground" />
+          <ArrowLeft className="w-5 h-5 text-muted-foreground rtl-flip" />
         </Button>
         <h1 className="flex-1 text-lg font-semibold text-foreground">
           {t(getNodeTitleKey(nodeId))}
@@ -152,11 +157,29 @@ export function NodeDetailScreen({ nodeId, result, onBack }: NodeDetailScreenPro
             className="w-full mt-4"
             onClick={handleOpenRouter}
           >
-            <ExternalLink className="w-4 h-4 mr-2" />
+            <ExternalLink className="w-4 h-4 me-2" />
             {t('node_detail.open_router')}
           </Button>
         )}
       </ScrollArea>
+
+      {/* Bottom Navigation Bar */}
+      <nav className="bg-background px-4 py-4">
+        <div className="flex items-center justify-between">
+          <Button variant="ghost" size="icon" className="h-12 w-12 text-muted-foreground" onClick={onNavigateToHome}>
+            <NetokLogoIcon className="w-6 h-6" />
+          </Button>
+          <Button variant="ghost" size="icon" className="h-12 w-12 text-muted-foreground" onClick={onNavigateToSecurity}>
+            <ShieldIcon className="w-6 h-6" />
+          </Button>
+          <Button variant="ghost" size="icon" className="h-12 w-12 text-muted-foreground" onClick={onNavigateToTools}>
+            <WrenchIcon className="w-6 h-6" />
+          </Button>
+          <Button variant="ghost" size="icon" className="h-12 w-12 text-muted-foreground" onClick={onNavigateToSettings}>
+            <SettingsIcon className="w-6 h-6" />
+          </Button>
+        </div>
+      </nav>
     </div>
   );
 }

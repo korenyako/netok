@@ -1,123 +1,35 @@
 {
-  "app": {
-    "name": "Netok",
-    "title": "Network Diagnostics"
-  },
-  "security": {
-    "title": "Security"
+  "network": {
+    "unknown": "Unknown"
   },
   "dns_providers": {
     "title": "DNS Protection",
-    "description": "Select a DNS server to enhance security and block unwanted content",
-    "protection_disabled": "DNS protection disabled",
-    "protection_disabled_with_hint": "Using DNS from your ISP",
-    "protection_enabled": "DNS protection enabled: {{provider}}",
-    "protection_enabled_with_mode": "DNS protection enabled: {{provider}} ({{mode}})",
-    "auto": "System DNS",
-    "auto_desc": "DNS server provided by your ISP",
     "cloudflare": "Cloudflare",
-    "cloudflare_desc": "Fastest public DNS, privacy-focused, audited by KPMG",
     "adguard": "AdGuard",
-    "adguard_desc": "Flexible ad and tracker blocking",
-    "dns4eu": "DNS4EU",
-    "dns4eu_desc": "EU community DNS with privacy and security focus",
-    "cleanbrowsing": "CleanBrowsing",
-    "cleanbrowsing_desc": "Free DNS filtering for safe browsing and parental controls",
     "quad9": "Quad9",
-    "quad9_desc": "Security-focused with malware blocking and DNSSEC",
-    "opendns": "OpenDNS",
-    "opendns_desc": "Cisco anti-phishing and filtering",
-    "google": "Google",
-    "google_desc": "Reliable, simple replacement for ISP DNS",
-    "custom": "Custom",
-    "goal_fast": "Fast",
+    "cleanbrowsing": "CleanBrowsing",
     "goal_fast_desc": "Minimal latency, no filtering",
-    "goal_fast_provider": "Cloudflare",
-    "goal_adblock": "Ad-free",
     "goal_adblock_desc": "Blocks ads and trackers",
-    "goal_adblock_provider": "AdGuard",
-    "goal_secure": "Secure",
     "goal_secure_desc": "Blocks malware and phishing",
-    "goal_secure_provider": "Quad9",
-    "goal_family": "Family",
     "goal_family_desc": "Child safety + safe search",
-    "goal_family_provider": "CleanBrowsing",
     "custom_ip": "Custom IP",
     "custom_ip_desc": "Enter DNS addresses manually",
     "custom_ip_hint": "Enter the DNS server addresses from your provider or another DNS service.",
-    "custom_ip_primary": "Primary DNS",
-    "custom_ip_secondary": "Secondary DNS (optional)",
     "custom_ip_invalid": "Invalid IP address",
     "custom_ipv6_invalid": "Invalid IPv6 address",
     "custom_ip_apply": "Apply",
     "optional": "optional",
     "custom_display": "Custom",
-    "disable_protection": "Disable",
     "status_disabled": "Disabled"
   },
   "dns_detail": {
-    "choose_protection": "Choose protection variant",
-    "apply": "Apply",
-    "disable": "Disable",
-    "apply_success": "DNS settings applied",
-    "disable_success": "DNS protection disabled",
-    "ip_copied": "Copied",
-    "cloudflare": {
-      "standard": "Standard",
-      "standard_desc": "Fast and reliable DNS",
-      "malware": "Malware blocking",
-      "malware_desc": "Protection from phishing and malware",
-      "family": "Family protection",
-      "family_desc": "Block adult content"
-    },
-    "adguard": {
-      "standard": "Standard",
-      "standard_desc": "Ad blocking",
-      "family": "Family protection",
-      "family_desc": "Block adult content",
-      "unfiltered": "Non-filtering",
-      "unfiltered_desc": "DNS only without blocking"
-    },
-    "dns4eu": {
-      "protective": "Protective",
-      "protective_desc": "Blocks fraudulent and malicious content",
-      "protective_child": "Protective + Child",
-      "protective_child_desc": "Blocks inappropriate content for children",
-      "protective_ad": "Protective + Ad",
-      "protective_ad_desc": "Adds blocking of ads on top of protective features",
-      "protective_child_ad": "Protective + Child & Ads",
-      "protective_child_ad_desc": "Combines child protection with ad blocking",
-      "unfiltered": "Unfiltered",
-      "unfiltered_desc": "No filtering for secure, anonymized, and fast resolution"
-    },
-    "cleanbrowsing": {
-      "family": "Family Filter",
-      "family_desc": "Blocks all adult, pornographic, explicit sites, proxies, VPNs; Google, Bing and Youtube SafeSearch",
-      "adult": "Adult Filter",
-      "adult_desc": "Blocks adult and explicit sites; allows proxies and mixed content sites",
-      "security": "Security Filter",
-      "security_desc": "Blocks phishing, spam, malware and malicious domains; does not block adult content"
-    },
-    "quad9": {
-      "recommended": "Recommended",
-      "recommended_desc": "Blocks known malicious domains",
-      "secured_ecs": "Secured w/ECS",
-      "secured_ecs_desc": "Adds ECS feature on top of recommended",
-      "unsecured": "Unsecured",
-      "unsecured_desc": "For expert users"
-    },
-    "opendns": {
-      "familyshield": "FamilyShield",
-      "familyshield_desc": "Blocks adult content and malicious sites automatically",
-      "home": "Home",
-      "home_desc": "Custom filtering and malware protection"
-    }
+    "ip_copied": "Copied"
   },
   "diagnostics": {
     "title": "Diagnostics",
     "computer": "Computer",
-    "router": "Router",
     "wifi": "Wi-Fi",
+    "router": "Router",
     "internet": "Internet",
     "checking": "Checking..."
   },
@@ -126,10 +38,8 @@
     "internet_down": "No Internet connection",
     "internet_partial": "Limited connectivity",
     "speed": "Speed: {down}/{up} Mbps",
-    "connection_no_vpn": "Not using VPN. Configure VPN",
     "connection_vpn_detected": "VPN connection active",
     "waiting": "Checking connection...",
-    "dns_protection": "DNS Protection",
     "dns_protection_with_provider": "DNS Protection enabled",
     "dns_protection_enabled": "Using {{provider}} DNS",
     "dns_protection_disabled": "DNS Protection disabled",
@@ -169,63 +79,38 @@
       "signal_label_good": "Good signal",
       "signal_label_fair": "Fair signal",
       "signal_label_weak": "Weak signal",
-      "link_field": "Link"
+      "link_field": "Link",
+      "link_yes": "Connected",
+      "link_no": "Disconnected"
     },
     "router": {
       "name": "Router",
-      "model_field": "Model",
       "local_ip_field": "Local IP address"
     },
     "internet": {
       "name": "Internet",
-      "provider_field": "ISP",
       "ip_field": "Public IP"
     }
   },
-  "buttons": {
-    "refresh": "Refresh",
-    "settings": "Settings",
-    "close": "Close",
-    "back": "Back",
-    "save": "Save",
-    "cancel": "Cancel",
-    "apply": "Apply",
-    "copy": "Copy"
-  },
   "meta": {
-    "updated": "Updated: {{time}}",
-    "never": "never",
     "no_data": "No data. Click 'Refresh'."
-  },
-  "geo": {
-    "consent_label": "Show location",
-    "consent_description": "Allow showing country and city by IP address",
-    "location_hidden": "Location hidden"
   },
   "errors": {
     "diagnostics": "Diagnostics error",
-    "network_error": "Network error"
+    "diagnostics_failed": "Diagnostics failed"
   },
   "settings": {
     "title": "Settings",
     "tabs": {
-      "general": "General",
-      "dns": "DNS",
-      "geo": "Geo",
       "tools": "Tools"
     },
     "general": {
       "language": "Language",
-      "language_ru": "Русский",
-      "language_en": "English",
       "theme": "Theme",
       "theme_light": "Light",
       "theme_dark": "Dark",
-      "theme_system": "System",
       "theme_light_desc": "Always use light interface mode",
       "theme_dark_desc": "Always use dark interface mode",
-      "theme_system_desc": "Follow system settings automatically",
-      "remember_window_size": "Remember window size",
       "close_behavior": "On window close",
       "close_minimize": "Minimize to tray",
       "close_minimize_desc": "The app will continue running in the system tray",
@@ -238,29 +123,16 @@
       "title": "About",
       "version": "Version",
       "whats_new": "What's new",
-      "developer": "Developer",
-      "developer_value": "Netok Team",
+      "author": "Author",
+      "author_value": "Anton Korenyako",
+      "website_button": "netok.app",
       "changes": [
-        "Custom DNS with IPv4 and IPv6 support",
-        "Simplified DNS provider selection",
-        "Detailed network node information",
-        "Fixed header control elements",
-        "Dynamic version display"
+        "Protection Hub: unified DNS and VPN management",
+        "VPN Tunnel with WireGuard support",
+        "14 new languages including German, Spanish, French",
+        "RTL support for Arabic and Persian",
+        "Improved UI with new card components"
       ]
-    },
-    "dns": {
-      "mode": "DNS mode",
-      "mode_auto": "Automatic",
-      "mode_cloudflare": "Cloudflare 1.1.1.1",
-      "mode_google": "Google 8.8.8.8",
-      "mode_custom": "Custom",
-      "custom_dns": "Custom DNS servers",
-      "custom_dns_placeholder": "Enter DNS servers (e.g., 1.1.1.1, 8.8.8.8)",
-      "flush_cache": "Flush DNS cache"
-    },
-    "geo": {
-      "show_location": "Show country and city for public IP",
-      "description": "If disabled, geo info will be hidden on Internet node"
     },
     "tools": {
       "diagnostics_desc": "View connection details",
@@ -272,49 +144,76 @@
       "device_scan_desc": "See who's on your network"
     }
   },
-  "mock_data": {
-    "computer_name": "DESKTOP-ABC123",
-    "computer_model": "Dell OptiPlex 7090",
-    "adapter_name": "Intel Wi-Fi 6 AX201",
-    "router_model": "Archer AX73",
-    "router_brand": "TP-Link",
-    "provider_name": "Rostelecom",
-    "country_name": "Russia",
-    "city_name": "Moscow"
+  "protection": {
+    "title": "Protection",
+    "dns_protection": "DNS Protection",
+    "vpn_tunnel": "VPN"
+  },
+  "vpn": {
+    "title": "VPN",
+    "not_configured": "Not configured",
+    "disabled": "Disabled",
+    "connecting": "Connecting...",
+    "connected": "Connected",
+    "add_vpn": "Add VPN",
+    "add_vpn_desc": "Paste your key or link",
+    "supported_formats": "Supports VLESS, Shadowsocks, Trojan, WireGuard, Outline",
+    "change_server": "Change server",
+    "change_server_desc": "Use a different VPN key",
+    "remove_vpn": "Remove VPN",
+    "key_label": "Key or link",
+    "key_placeholder": "vless://... or ss://... or wg://...",
+    "key_hint": "Enter the VPN key or link from your provider",
+    "add_button": "Add",
+    "detecting_location": "Detecting location...",
+    "supported_full": "Supported: VLESS, VMess, Shadowsocks, Trojan, WireGuard, Outline",
+    "traffic_path": "Your traffic path",
+    "you": "You",
+    "vpn_node": "VPN",
+    "internet": "Internet",
+    "ping": "ping"
   },
   "diagnostic": {
     "scenario": {
       "all_good": {
-        "title": "All Good",
-        "message": "Internet is working."
+        "title": "Connected",
+        "message": "Internet is working normally.",
+        "action": ""
       },
       "wifi_disabled": {
         "title": "Wi-Fi Disabled",
-        "message": "Wi-Fi adapter is disabled. Turn on Wi-Fi in Windows settings."
+        "message": "The Wi-Fi adapter is turned off on your computer.",
+        "action": "Turn on Wi-Fi in Windows settings or press the Wi-Fi toggle on your laptop."
       },
       "wifi_not_connected": {
         "title": "Not Connected",
-        "message": "Not connected to Wi-Fi. Select a network and connect."
+        "message": "Your computer is not connected to a Wi-Fi network.",
+        "action": "Open the network list, select your network, and connect."
       },
       "router_unreachable": {
         "title": "Router Unreachable",
-        "message": "Router is not responding. Check if your router is powered on and its lights are on."
+        "message": "The signal is not reaching your router.",
+        "action": "Check if your router is powered on and its indicator lights are on. Try restarting it."
       },
       "no_internet": {
         "title": "No Internet",
-        "message": "Router is working, but there's no internet. Check the cable from your provider or contact support."
+        "message": "The router is working, but there is no internet access.",
+        "action": "Restart your router — turn it off for 10 seconds and turn it back on. If that doesn't help, call your provider."
       },
       "dns_failure": {
         "title": "DNS Problem",
-        "message": "Cannot resolve website addresses. Try switching DNS to automatic or use Cloudflare (1.1.1.1)."
+        "message": "Unable to resolve website addresses.",
+        "action": "Try enabling DNS protection in Netok settings — this may fix the issue."
       },
       "http_blocked": {
         "title": "Websites Unavailable",
-        "message": "Internet is partially working. Websites are unavailable, but DNS responds. Check your VPN or firewall settings."
+        "message": "There is a connection, but websites won't open.",
+        "action": "If you're using a VPN, try disabling it. Also check your antivirus settings."
       },
       "weak_signal": {
         "title": "Weak Signal",
-        "message": "Weak Wi-Fi signal. Move closer to your router or check for interference."
+        "message": "Wi-Fi is working, but the signal is weak — dropouts are possible.",
+        "action": "Move closer to your router or remove obstacles between it and your computer."
       }
     }
   }

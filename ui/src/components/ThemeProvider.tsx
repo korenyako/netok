@@ -1,41 +1,40 @@
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useThemeStore } from '../stores/themeStore';
+import { LANGUAGES, type LanguageCode } from '../constants/languages';
 
 interface ThemeProviderProps {
   children: React.ReactNode;
 }
 
 /**
- * ThemeProvider - Handles DOM side effects for theme changes.
+ * ThemeProvider - Handles DOM side effects for theme and language direction.
  *
- * This component is responsible for:
- * 1. Applying the theme class to the document element
- * 2. Syncing resolved theme on mount
- *
- * The store itself is pure (no DOM manipulation), and this component
- * bridges the gap between React state and DOM updates.
+ * Applies the theme class and dir/lang attributes to the document element.
  */
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  const { theme, resolvedTheme, updateResolvedTheme } = useThemeStore();
+  const theme = useThemeStore((state) => state.theme);
+  const { i18n } = useTranslation();
 
-  // Initialize resolved theme on mount
   useEffect(() => {
-    updateResolvedTheme();
-  }, [updateResolvedTheme]);
-
-  // Apply theme class to document when resolved theme changes
-  useEffect(() => {
-    if (resolvedTheme === 'dark') {
+    if (theme === 'dark') {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
-  }, [resolvedTheme]);
+  }, [theme]);
 
-  // Re-resolve theme when user preference changes
   useEffect(() => {
-    updateResolvedTheme();
-  }, [theme, updateResolvedTheme]);
+    const updateDirection = (lang: string) => {
+      const meta = LANGUAGES[lang as LanguageCode];
+      document.documentElement.dir = meta?.dir || 'ltr';
+      document.documentElement.lang = lang;
+    };
+
+    updateDirection(i18n.language);
+    i18n.on('languageChanged', updateDirection);
+    return () => { i18n.off('languageChanged', updateDirection); };
+  }, [i18n]);
 
   return <>{children}</>;
 }

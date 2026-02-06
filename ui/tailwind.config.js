@@ -7,7 +7,14 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Geist', 'system-ui', 'sans-serif'],
+        sans: [
+          'Geist',
+          'Noto Sans Arabic',
+          'Microsoft YaHei', 'PingFang SC',
+          'Yu Gothic', 'Hiragino Sans',
+          'Malgun Gothic', 'Apple SD Gothic Neo',
+          'system-ui', 'sans-serif',
+        ],
         mono: ['Geist Mono', 'monospace'],
       },
       colors: {

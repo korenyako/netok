@@ -30,7 +30,8 @@ pub use domain::{
 // Re-export diagnostics functions
 pub use diagnostics::{
     check_computer, check_internet, check_network, check_router, detect_dns_provider,
-    get_computer_info, get_internet_info, get_network_info, get_router_info, run_diagnostics,
+    get_computer_info, get_internet_info, get_network_info, get_router_info, lookup_ip_location,
+    run_diagnostics, IpInfoResponse,
 };
 
 // Re-export infrastructure functions used by bridge

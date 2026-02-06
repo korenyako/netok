@@ -1,14 +1,10 @@
 import { useThemeStore } from "@/stores/themeStore"
 
 /**
- * Hook that provides the resolved theme for components that need
- * to know the current effective theme ('light' or 'dark').
- *
- * Reads from the existing Zustand themeStore which handles
- * system preference detection and persistence.
+ * Hook that provides the current theme ('light' or 'dark').
  */
 export function useTheme() {
-  const resolvedTheme = useThemeStore((state) => state.resolvedTheme)
+  const theme = useThemeStore((state) => state.theme)
 
-  return { resolvedTheme }
+  return { theme }
 }

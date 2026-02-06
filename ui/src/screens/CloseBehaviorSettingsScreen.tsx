@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Check } from 'lucide-react';
+import { ArrowLeft, Check } from '../components/icons/UIIcons';
 import { useCloseBehaviorStore } from '../stores/closeBehaviorStore';
 import type { CloseBehavior } from '../stores/closeBehaviorStore';
 import { Button } from '@/components/ui/button';
@@ -38,7 +38,7 @@ export function CloseBehaviorSettingsScreen({ onBack }: CloseBehaviorSettingsScr
       {/* Header with Back button and Title */}
       <div data-tauri-drag-region className="px-4 py-4 flex items-center gap-2">
         <Button variant="ghost" size="icon" onClick={onBack}>
-          <ArrowLeft className="w-5 h-5 text-muted-foreground" />
+          <ArrowLeft className="w-5 h-5 text-muted-foreground rtl-flip" />
         </Button>
         <h1 className="text-lg font-semibold text-foreground flex-1">{t('settings.general.close_behavior')}</h1>
         <CloseButton />

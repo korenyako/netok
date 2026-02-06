@@ -1,0 +1,191 @@
+{
+  "network": {
+    "unknown": "ناشناخته"
+  },
+  "dns_providers": {
+    "title": "حفاظت DNS",
+    "cloudflare": "Cloudflare",
+    "adguard": "AdGuard",
+    "quad9": "Quad9",
+    "cleanbrowsing": "CleanBrowsing",
+    "goal_fast_desc": "کمترین تأخیر، بدون فیلتر",
+    "goal_adblock_desc": "مسدودسازی تبلیغات و ردیاب‌ها",
+    "goal_secure_desc": "مسدودسازی بدافزار و فیشینگ",
+    "goal_family_desc": "ایمنی کودک + جستجوی امن",
+    "custom_ip": "IP سفارشی",
+    "custom_ip_desc": "آدرس‌های DNS را به صورت دستی وارد کنید",
+    "custom_ip_hint": "آدرس‌های سرور DNS ارائه‌دهنده خود یا سرویس DNS دیگری را وارد کنید.",
+    "custom_ip_invalid": "آدرس IP نامعتبر",
+    "custom_ipv6_invalid": "آدرس IPv6 نامعتبر",
+    "custom_ip_apply": "اعمال",
+    "optional": "اختیاری",
+    "custom_display": "سفارشی",
+    "status_disabled": "غیرفعال"
+  },
+  "dns_detail": {
+    "ip_copied": "کپی شد"
+  },
+  "diagnostics": {
+    "title": "تشخیص",
+    "computer": "رایانه",
+    "wifi": "Wi-Fi",
+    "router": "روتر",
+    "internet": "اینترنت",
+    "checking": "در حال بررسی..."
+  },
+  "status": {
+    "internet_ok": "متصل",
+    "internet_down": "اتصال اینترنت برقرار نیست",
+    "internet_partial": "اتصال محدود",
+    "speed": "سرعت: {down}/{up} مگابیت بر ثانیه",
+    "connection_vpn_detected": "اتصال VPN فعال است",
+    "waiting": "در حال بررسی اتصال...",
+    "dns_protection_with_provider": "حفاظت DNS فعال است",
+    "dns_protection_enabled": "استفاده از DNS {{provider}}",
+    "dns_protection_disabled": "حفاظت DNS غیرفعال است",
+    "dns_protection_disabled_desc": "استفاده از DNS استاندارد ارائه‌دهنده اینترنت"
+  },
+  "node_detail": {
+    "adapter": "آداپتور",
+    "ip_address": "آدرس IP",
+    "network_name": "شبکه",
+    "signal": "سیگنال",
+    "manufacturer": "سازنده",
+    "isp": "ارائه‌دهنده اینترنت",
+    "location": "موقعیت",
+    "open_router": "باز کردن صفحه روتر"
+  },
+  "nodes": {
+    "computer": {
+      "name": "رایانه",
+      "name_field": "نام",
+      "model_field": "مدل",
+      "adapter_field": "آداپتور شبکه",
+      "local_ip_field": "IP محلی"
+    },
+    "network": {
+      "name": "شبکه",
+      "type_wifi": "Wi-Fi",
+      "type_cable": "اترنت",
+      "type_usb_modem": "مودم USB",
+      "type_bt": "Bluetooth",
+      "type_mobile": "داده تلفن همراه",
+      "signal_field": "قدرت سیگنال",
+      "signal_excellent": "عالی",
+      "signal_good": "خوب",
+      "signal_fair": "متوسط",
+      "signal_weak": "ضعیف",
+      "signal_label_excellent": "سیگنال عالی",
+      "signal_label_good": "سیگنال خوب",
+      "signal_label_fair": "سیگنال متوسط",
+      "signal_label_weak": "سیگنال ضعیف",
+      "link_field": "اتصال",
+      "link_yes": "متصل",
+      "link_no": "قطع شده"
+    },
+    "router": {
+      "name": "روتر",
+      "local_ip_field": "آدرس IP محلی"
+    },
+    "internet": {
+      "name": "اینترنت",
+      "ip_field": "IP عمومی"
+    }
+  },
+  "meta": {
+    "no_data": "داده‌ای موجود نیست. روی «بازنشانی» کلیک کنید."
+  },
+  "errors": {
+    "diagnostics": "خطای تشخیص",
+    "diagnostics_failed": "تشخیص ناموفق بود"
+  },
+  "settings": {
+    "title": "تنظیمات",
+    "tabs": {
+      "tools": "ابزارها"
+    },
+    "general": {
+      "language": "زبان",
+      "theme": "پوسته",
+      "theme_light": "روشن",
+      "theme_dark": "تاریک",
+      "theme_light_desc": "همیشه از حالت رابط روشن استفاده شود",
+      "theme_dark_desc": "همیشه از حالت رابط تاریک استفاده شود",
+      "close_behavior": "هنگام بستن پنجره",
+      "close_minimize": "کوچک‌سازی به سینی سیستم",
+      "close_minimize_desc": "برنامه در سینی سیستم به کار خود ادامه می‌دهد",
+      "close_quit": "بستن برنامه",
+      "close_quit_desc": "خروج کامل از برنامه",
+      "about": "درباره",
+      "about_desc": "نسخه و اطلاعات برنامه"
+    },
+    "about": {
+      "title": "درباره",
+      "version": "نسخه",
+      "whats_new": "تازه‌ها",
+      "author": "سازنده",
+      "author_value": "Anton Korenyako",
+      "website_button": "netok.app",
+      "changes": [
+        "مرکز محافظت: مدیریت یکپارچه DNS و VPN",
+        "تونل VPN با پشتیبانی از WireGuard",
+        "۱۴ زبان جدید: آلمانی، اسپانیایی، فرانسوی و بیشتر",
+        "پشتیبانی RTL برای عربی و فارسی",
+        "رابط کاربری بهبود یافته با کامپوننت‌های جدید"
+      ]
+    },
+    "tools": {
+      "diagnostics_desc": "مشاهده جزئیات اتصال",
+      "speed_test": "تست سرعت",
+      "speed_test_desc": "بررسی توانایی اینترنت شما",
+      "flush_dns": "پاک‌سازی حافظه پنهان DNS",
+      "flush_dns_desc": "رفع مشکل «سایت بارگذاری نمی‌شود»",
+      "device_scan": "اسکن دستگاه‌ها",
+      "device_scan_desc": "ببینید چه کسی به شبکه شما متصل است"
+    }
+  },
+  "diagnostic": {
+    "scenario": {
+      "all_good": {
+        "title": "متصل",
+        "message": "اینترنت به طور عادی کار می‌کند.",
+        "action": ""
+      },
+      "wifi_disabled": {
+        "title": "Wi-Fi غیرفعال است",
+        "message": "آداپتور Wi-Fi در رایانه شما خاموش است.",
+        "action": "Wi-Fi را در تنظیمات ویندوز روشن کنید یا دکمه Wi-Fi روی لپ‌تاپ خود را فشار دهید."
+      },
+      "wifi_not_connected": {
+        "title": "متصل نیست",
+        "message": "رایانه شما به شبکه Wi-Fi متصل نیست.",
+        "action": "فهرست شبکه‌ها را باز کنید، شبکه خود را انتخاب کنید و متصل شوید."
+      },
+      "router_unreachable": {
+        "title": "روتر در دسترس نیست",
+        "message": "سیگنال به روتر نمی‌رسد.",
+        "action": "بررسی کنید که روتر روشن است و چراغ‌های نشانگر آن فعال هستند. سعی کنید آن را راه‌اندازی مجدد کنید."
+      },
+      "no_internet": {
+        "title": "اینترنت قطع است",
+        "message": "روتر کار می‌کند، اما دسترسی به اینترنت وجود ندارد.",
+        "action": "روتر را راه‌اندازی مجدد کنید — ۱۰ ثانیه خاموش کنید و دوباره روشن کنید. اگر کمک نکرد، با ارائه‌دهنده خود تماس بگیرید."
+      },
+      "dns_failure": {
+        "title": "مشکل DNS",
+        "message": "آدرس وب‌سایت‌ها قابل شناسایی نیست.",
+        "action": "سعی کنید حفاظت DNS را در تنظیمات Netok فعال کنید — این ممکن است مشکل را حل کند."
+      },
+      "http_blocked": {
+        "title": "وب‌سایت‌ها در دسترس نیستند",
+        "message": "اتصال وجود دارد، اما وب‌سایت‌ها باز نمی‌شوند.",
+        "action": "اگر از VPN استفاده می‌کنید، سعی کنید آن را غیرفعال کنید. همچنین تنظیمات آنتی‌ویروس خود را بررسی کنید."
+      },
+      "weak_signal": {
+        "title": "سیگنال ضعیف",
+        "message": "Wi-Fi کار می‌کند، اما سیگنال ضعیف است — قطعی احتمالی وجود دارد.",
+        "action": "به روتر نزدیک‌تر شوید یا موانع بین آن و رایانه خود را بردارید."
+      }
+    }
+  }
+}

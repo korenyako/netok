@@ -63,12 +63,30 @@ fn test_http() -> bool {
 }
 
 /// Response from ipinfo.io API.
-#[derive(Deserialize, Debug)]
-struct IpInfoResponse {
-    ip: Option<String>,
-    city: Option<String>,
-    country: Option<String>,
-    org: Option<String>,
+#[derive(serde::Serialize, Deserialize, Debug, Clone)]
+pub struct IpInfoResponse {
+    pub ip: Option<String>,
+    pub city: Option<String>,
+    pub country: Option<String>,
+    pub org: Option<String>,
+}
+
+/// Lookup geolocation info for a given IP address via ipinfo.io.
+pub fn lookup_ip_location(ip: &str) -> Result<IpInfoResponse, String> {
+    let client = reqwest::blocking::Client::builder()
+        .timeout(Duration::from_secs(3))
+        .build()
+        .map_err(|e| format!("Failed to create HTTP client: {}", e))?;
+
+    let url = format!("https://ipinfo.io/{}/json", ip);
+
+    let resp = client
+        .get(&url)
+        .send()
+        .map_err(|e| format!("Request to ipinfo.io failed: {}", e))?;
+
+    resp.json::<IpInfoResponse>()
+        .map_err(|e| format!("Failed to parse ipinfo.io response: {}", e))
 }
 
 /// Check if IP address is private (RFC 1918 or link-local).

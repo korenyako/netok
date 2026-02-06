@@ -1,0 +1,191 @@
+{
+  "network": {
+    "unknown": "未知"
+  },
+  "dns_providers": {
+    "title": "DNS 防护",
+    "cloudflare": "Cloudflare",
+    "adguard": "AdGuard",
+    "quad9": "Quad9",
+    "cleanbrowsing": "CleanBrowsing",
+    "goal_fast_desc": "最低延迟，无过滤",
+    "goal_adblock_desc": "拦截广告和跟踪器",
+    "goal_secure_desc": "拦截恶意软件和钓鱼网站",
+    "goal_family_desc": "儿童保护 + 安全搜索",
+    "custom_ip": "自定义 IP",
+    "custom_ip_desc": "手动输入 DNS 地址",
+    "custom_ip_hint": "请输入您的运营商或其他 DNS 服务的服务器地址。",
+    "custom_ip_invalid": "IP 地址格式无效",
+    "custom_ipv6_invalid": "IPv6 地址格式无效",
+    "custom_ip_apply": "应用",
+    "optional": "可选",
+    "custom_display": "自定义",
+    "status_disabled": "已关闭"
+  },
+  "dns_detail": {
+    "ip_copied": "已复制"
+  },
+  "diagnostics": {
+    "title": "诊断",
+    "computer": "电脑",
+    "wifi": "Wi-Fi",
+    "router": "路由器",
+    "internet": "互联网",
+    "checking": "正在检查..."
+  },
+  "status": {
+    "internet_ok": "已连接",
+    "internet_down": "无互联网连接",
+    "internet_partial": "连接受限",
+    "speed": "速度：{down}/{up} Mbps",
+    "connection_vpn_detected": "VPN 连接已启用",
+    "waiting": "正在检查连接...",
+    "dns_protection_with_provider": "DNS 防护已开启",
+    "dns_protection_enabled": "正在使用 {{provider}} DNS",
+    "dns_protection_disabled": "DNS 防护已关闭",
+    "dns_protection_disabled_desc": "正在使用运营商标准 DNS"
+  },
+  "node_detail": {
+    "adapter": "网络适配器",
+    "ip_address": "IP 地址",
+    "network_name": "网络",
+    "signal": "信号",
+    "manufacturer": "制造商",
+    "isp": "运营商",
+    "location": "位置",
+    "open_router": "打开路由器页面"
+  },
+  "nodes": {
+    "computer": {
+      "name": "计算机",
+      "name_field": "名称",
+      "model_field": "型号",
+      "adapter_field": "网络适配器",
+      "local_ip_field": "本地 IP"
+    },
+    "network": {
+      "name": "网络",
+      "type_wifi": "Wi-Fi",
+      "type_cable": "有线网络",
+      "type_usb_modem": "USB 调制解调器",
+      "type_bt": "Bluetooth",
+      "type_mobile": "移动数据",
+      "signal_field": "信号强度",
+      "signal_excellent": "极好",
+      "signal_good": "良好",
+      "signal_fair": "一般",
+      "signal_weak": "较弱",
+      "signal_label_excellent": "信号极好",
+      "signal_label_good": "信号良好",
+      "signal_label_fair": "信号一般",
+      "signal_label_weak": "信号较弱",
+      "link_field": "链路",
+      "link_yes": "已连接",
+      "link_no": "已断开"
+    },
+    "router": {
+      "name": "路由器",
+      "local_ip_field": "本地 IP 地址"
+    },
+    "internet": {
+      "name": "互联网",
+      "ip_field": "公网 IP"
+    }
+  },
+  "meta": {
+    "no_data": "暂无数据，请点击「刷新」。"
+  },
+  "errors": {
+    "diagnostics": "诊断错误",
+    "diagnostics_failed": "诊断失败"
+  },
+  "settings": {
+    "title": "设置",
+    "tabs": {
+      "tools": "工具"
+    },
+    "general": {
+      "language": "语言",
+      "theme": "主题",
+      "theme_light": "浅色",
+      "theme_dark": "深色",
+      "theme_light_desc": "始终使用浅色界面模式",
+      "theme_dark_desc": "始终使用深色界面模式",
+      "close_behavior": "关闭窗口时",
+      "close_minimize": "最小化到托盘",
+      "close_minimize_desc": "应用将在系统托盘中继续运行",
+      "close_quit": "关闭应用程序",
+      "close_quit_desc": "完全退出应用程序",
+      "about": "关于",
+      "about_desc": "版本和应用信息"
+    },
+    "about": {
+      "title": "关于",
+      "version": "版本",
+      "whats_new": "更新内容",
+      "author": "作者",
+      "author_value": "Anton Korenyako",
+      "website_button": "netok.app",
+      "changes": [
+        "防护中心：DNS 和 VPN 统一管理",
+        "支持 WireGuard 的 VPN 隧道",
+        "新增 14 种语言：德语、西班牙语、法语等",
+        "支持阿拉伯语和波斯语的 RTL",
+        "采用新组件的改进界面"
+      ]
+    },
+    "tools": {
+      "diagnostics_desc": "查看连接详情",
+      "speed_test": "测速",
+      "speed_test_desc": "测试您的网络速度",
+      "flush_dns": "清除 DNS 缓存",
+      "flush_dns_desc": "解决「网站无法打开」的问题",
+      "device_scan": "设备扫描",
+      "device_scan_desc": "查看网络上连接的设备"
+    }
+  },
+  "diagnostic": {
+    "scenario": {
+      "all_good": {
+        "title": "已连接",
+        "message": "互联网连接正常。",
+        "action": ""
+      },
+      "wifi_disabled": {
+        "title": "Wi-Fi 已关闭",
+        "message": "您的电脑上 Wi-Fi 适配器已关闭。",
+        "action": "请在 Windows 设置中开启 Wi-Fi，或按笔记本电脑上的 Wi-Fi 开关。"
+      },
+      "wifi_not_connected": {
+        "title": "未连接",
+        "message": "您的电脑未连接到 Wi-Fi 网络。",
+        "action": "打开网络列表，选择您的网络并连接。"
+      },
+      "router_unreachable": {
+        "title": "路由器无响应",
+        "message": "信号无法到达路由器。",
+        "action": "检查路由器是否已通电，指示灯是否亮起。尝试重新启动。"
+      },
+      "no_internet": {
+        "title": "无互联网",
+        "message": "路由器正常工作，但无法访问互联网。",
+        "action": "重启路由器——关闭10秒后再打开。如果问题仍存在，请联系您的运营商。"
+      },
+      "dns_failure": {
+        "title": "DNS 问题",
+        "message": "无法解析网站地址。",
+        "action": "尝试在 Netok 设置中启用 DNS 防护——这可能会解决问题。"
+      },
+      "http_blocked": {
+        "title": "网站不可用",
+        "message": "有网络连接，但网站无法打开。",
+        "action": "如果您正在使用 VPN，请尝试关闭它。同时检查您的杀毒软件设置。"
+      },
+      "weak_signal": {
+        "title": "信号较弱",
+        "message": "Wi-Fi 正常工作，但信号较弱——可能会出现断连。",
+        "action": "靠近路由器或移除您与路由器之间的障碍物。"
+      }
+    }
+  }
+}

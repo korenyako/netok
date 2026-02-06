@@ -1,9 +1,9 @@
 import { useTranslation } from 'react-i18next';
-import { Check, AlertTriangle, X } from 'lucide-react';
 import type { DiagnosticsSnapshot } from '../api/tauri';
 import { useDnsStore } from '../stores/useDnsStore';
 import { deriveScenario } from '../utils/deriveScenario';
 import { CloseButton } from '../components/WindowControls';
+import { MenuCard } from '@/components/MenuCard';
 import { cn } from '@/lib/utils';
 
 interface StatusScreenProps {
@@ -29,6 +29,34 @@ function getProviderDisplayName(type: string): string {
   return names[type] || type;
 }
 
+// SVG circle constants
+const CIRCLE_SIZE = 192;
+const STROKE_WIDTH = 2;
+const RADIUS = (CIRCLE_SIZE - STROKE_WIDTH * 2) / 2;
+
+type VisualState = 'loading' | 'success' | 'warning' | 'error';
+
+const STROKE_COLORS: Record<VisualState, string> = {
+  loading: 'hsl(var(--muted-foreground))',
+  success: 'hsl(var(--primary))',
+  warning: 'hsl(var(--warning))',
+  error: 'hsl(var(--destructive))',
+};
+
+const CIRCLE_CLASSES: Record<VisualState, string> = {
+  loading: 'status-circle-loading',
+  success: 'status-circle-success',
+  warning: 'status-circle-warning',
+  error: '',
+};
+
+const GLOW_CLASSES: Record<VisualState, string> = {
+  loading: '',
+  success: 'status-glow-success',
+  warning: 'status-glow-warning',
+  error: 'status-glow-error',
+};
+
 export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, diagnostics }: StatusScreenProps) {
   const { t } = useTranslation();
   const { currentProvider: dnsProvider } = useDnsStore();
@@ -39,8 +67,29 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, diag
   const providerName = isDnsProtectionEnabled ? getProviderDisplayName(dnsProvider.type) : null;
 
   // Derive diagnostic scenario from nodes
+  const isLoading = diagnostics === null;
   const scenarioResult = diagnostics ? deriveScenario(diagnostics.nodes) : null;
-  const severity = scenarioResult?.severity ?? 'success';
+  const visualState: VisualState = isLoading
+    ? 'loading'
+    : (scenarioResult?.severity ?? 'success') as VisualState;
+
+  const strokeColor = STROKE_COLORS[visualState];
+  const circleClass = CIRCLE_CLASSES[visualState];
+  const glowClass = GLOW_CLASSES[visualState];
+
+  // Title inside circle
+  const circleTitle = scenarioResult
+    ? t(`diagnostic.scenario.${scenarioResult.scenario}.title`)
+    : t('status.waiting');
+
+  // Message below circle (only for non-all_good scenarios)
+  const showMessage = scenarioResult && scenarioResult.scenario !== 'all_good';
+  const messageText = showMessage
+    ? t(`diagnostic.scenario.${scenarioResult.scenario}.message`)
+    : null;
+
+  // Network info shown only for success or warning
+  const showNetworkInfo = !isLoading && (visualState === 'success' || visualState === 'warning');
 
   return (
     <div className="flex flex-col min-h-[calc(100dvh-5rem)] bg-background">
@@ -52,79 +101,108 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, diag
       {/* Main Content - Clickable Area */}
       <button
         onClick={onOpenDiagnostics}
-        className="flex-1 flex flex-col items-center justify-center px-4 py-16 focus:outline-none"
+        className="flex-1 flex flex-col items-center justify-center px-4 focus:outline-none"
       >
         {/* Status Circle */}
-        <div className={cn(
-          "w-24 h-24 rounded-full flex items-center justify-center mb-6",
-          severity === 'success' && "bg-primary",
-          severity === 'warning' && "bg-warning",
-          severity === 'error' && "bg-destructive",
-        )}>
-          {severity === 'success' && <Check className="w-14 h-14 text-white" strokeWidth={3} />}
-          {severity === 'warning' && <AlertTriangle className="w-14 h-14 text-white" strokeWidth={2} />}
-          {severity === 'error' && <X className="w-14 h-14 text-white" strokeWidth={3} />}
+        <div className="relative w-48 h-48 mb-4">
+          <svg
+            className="w-full h-full overflow-visible"
+            viewBox={`0 0 ${CIRCLE_SIZE} ${CIRCLE_SIZE}`}
+            fill="none"
+          >
+            {/* Background ring (dim) */}
+            <circle
+              cx={CIRCLE_SIZE / 2}
+              cy={CIRCLE_SIZE / 2}
+              r={RADIUS}
+              strokeWidth={STROKE_WIDTH}
+              style={{ stroke: strokeColor }}
+              opacity="0.12"
+            />
+            {/* Glow ring (wide blurred stroke, breathing for success/warning) */}
+            {glowClass && (
+              <circle
+                cx={CIRCLE_SIZE / 2}
+                cy={CIRCLE_SIZE / 2}
+                r={RADIUS}
+                strokeWidth={8}
+                style={{ stroke: strokeColor, filter: 'blur(4px)' }}
+                className={glowClass}
+                fill="none"
+              />
+            )}
+            {/* Main ring */}
+            <circle
+              cx={CIRCLE_SIZE / 2}
+              cy={CIRCLE_SIZE / 2}
+              r={RADIUS}
+              strokeWidth={STROKE_WIDTH}
+              style={{ stroke: strokeColor }}
+              className={circleClass}
+            />
+          </svg>
+
+          {/* Text inside circle */}
+          <div className="absolute inset-0 flex items-center justify-center px-10">
+            <span className={cn(
+              "text-lg font-medium text-center leading-snug",
+              isLoading ? "text-muted-foreground" : "text-foreground"
+            )}>
+              {circleTitle}
+            </span>
+          </div>
         </div>
 
-        {/* Status Text */}
-        <h1 className="text-4xl font-semibold text-foreground text-center mb-2">
-          {scenarioResult
-            ? t(`diagnostic.scenario.${scenarioResult.scenario}.title`)
-            : t('status.waiting')
-          }
-        </h1>
+        {/* Info area below circle */}
+        <div className="min-h-[48px] flex flex-col items-center gap-1.5">
+          {/* Scenario message */}
+          {messageText && (
+            <p className={cn(
+              "text-sm text-center leading-relaxed max-w-[240px]",
+              visualState === 'error' && "text-destructive/75",
+              visualState === 'warning' && "text-warning/75",
+            )}>
+              {messageText}
+            </p>
+          )}
 
-        {/* Network Info */}
-        {diagnostics && (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            {/* Connection Type */}
-            <span>
-              {diagnostics.network.connection_type === 'Wifi' && 'Wi-Fi'}
-              {diagnostics.network.connection_type === 'Ethernet' && 'Ethernet'}
-              {diagnostics.network.connection_type === 'Usb' && 'USB'}
-              {diagnostics.network.connection_type === 'Mobile' && 'Mobile'}
-              {diagnostics.network.connection_type === 'Unknown' && t('network.unknown')}
-            </span>
-            {/* Network Name (SSID for Wi-Fi) */}
-            {diagnostics.network.ssid && <span>{diagnostics.network.ssid}</span>}
-          </div>
-        )}
+          {/* Network Info */}
+          {showNetworkInfo && diagnostics && (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground/60">
+              <span>
+                {diagnostics.network.connection_type === 'Wifi' && 'Wi-Fi'}
+                {diagnostics.network.connection_type === 'Ethernet' && 'Ethernet'}
+                {diagnostics.network.connection_type === 'Usb' && 'USB'}
+                {diagnostics.network.connection_type === 'Mobile' && 'Mobile'}
+                {diagnostics.network.connection_type === 'Unknown' && t('network.unknown')}
+              </span>
+              {diagnostics.network.ssid && (
+                <>
+                  <span>·</span>
+                  <span>{diagnostics.network.ssid}</span>
+                </>
+              )}
+            </div>
+          )}
+        </div>
       </button>
 
       {/* DNS Protection Status */}
       <div className="px-4 pb-4">
-        <button
+        <MenuCard
+          variant={isDnsProtectionEnabled ? 'highlighted' : 'filled'}
+          title={isDnsProtectionEnabled
+            ? t('status.dns_protection_with_provider')
+            : t('status.dns_protection_disabled')
+          }
+          subtitle={isDnsProtectionEnabled
+            ? providerName ?? undefined
+            : t('status.dns_protection_disabled_desc')
+          }
+          trailing={isDnsProtectionEnabled ? 'check' : undefined}
+          muted={!isDnsProtectionEnabled}
           onClick={onNavigateToDnsProviders}
-          className={cn(
-            'w-full text-left rounded-lg px-4 py-3 focus:outline-none transition-colors',
-            isDnsProtectionEnabled
-              ? 'bg-primary/10 hover:bg-primary/15 dark:bg-primary/10 dark:hover:bg-primary/15'
-              : 'bg-accent hover:bg-accent/80 dark:bg-muted/50 dark:hover:bg-muted/80'
-          )}
-        >
-          <div className="flex items-start gap-3">
-            <div className="flex-1 min-w-0">
-              <p className={cn(
-                'text-base font-medium leading-normal',
-                isDnsProtectionEnabled ? 'text-foreground' : 'text-muted-foreground'
-              )}>
-                {isDnsProtectionEnabled
-                  ? t('status.dns_protection_with_provider')
-                  : t('status.dns_protection_disabled')
-                }
-              </p>
-              <p className="text-sm text-muted-foreground leading-normal mt-0.5">
-                {isDnsProtectionEnabled
-                  ? t('status.dns_protection_enabled', { provider: providerName })
-                  : t('status.dns_protection_disabled_desc')
-                }
-              </p>
-            </div>
-            {isDnsProtectionEnabled && (
-              <Check className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-            )}
-          </div>
-        </button>
+        />
       </div>
     </div>
   );
