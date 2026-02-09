@@ -24,3 +24,11 @@ netok_desktop/dist
 
 # UI build and dependencies
 **/node_modules/
+
+# Prototypes and scratch files
+*.jsx
+speedtest-prototype*.html
+nul
+
+# Environment overrides
+.env.development
