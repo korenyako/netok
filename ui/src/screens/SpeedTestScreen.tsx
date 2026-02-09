@@ -160,20 +160,16 @@ function SpeedMetrics() {
     <div className="flex justify-around mb-3">
       <div className="flex items-center justify-center gap-1">
         <ArrowDown className="w-6 h-6 text-primary" />
-        {metrics.download !== null && (
-          <span className="text-[28px] font-semibold text-primary font-mono">
-            {Math.round(metrics.download)}
-          </span>
-        )}
+        <span className={`text-[28px] font-semibold font-mono ${metrics.download !== null ? 'text-primary' : 'text-muted-foreground'}`}>
+          {metrics.download !== null ? Math.round(metrics.download) : '—'}
+        </span>
         <span className="text-sm text-muted-foreground font-mono">Mbps</span>
       </div>
       <div className="flex items-center justify-center gap-1">
         <ArrowUp className="w-6 h-6 text-purple-500" />
-        {metrics.upload !== null && (
-          <span className="text-[28px] font-semibold text-purple-500 font-mono">
-            {Math.round(metrics.upload)}
-          </span>
-        )}
+        <span className={`text-[28px] font-semibold font-mono ${metrics.upload !== null ? 'text-purple-500' : 'text-muted-foreground'}`}>
+          {metrics.upload !== null ? Math.round(metrics.upload) : '—'}
+        </span>
         <span className="text-sm text-muted-foreground font-mono">Mbps</span>
       </div>
     </div>
@@ -374,20 +370,18 @@ function LatencyItem({ label, value, tooltipKey, onTooltip }: LatencyItemProps) 
   return (
     <div className="flex-1">
       <button
-        className="flex items-center gap-1 mb-1 text-muted-foreground hover:text-foreground transition-colors"
+        className="flex items-center gap-1 mb-1 text-muted-foreground hover:text-foreground hover:opacity-100 opacity-70 transition-all"
         onClick={(e) => onTooltip(tooltipKey, e)}
       >
-        <span className="text-xs">{label}</span>
+        <span className="text-sm">{label}</span>
         <InfoCircleFilled className="w-3.5 h-3.5 opacity-50" />
       </button>
-      {value !== null && (
-        <div className="flex items-baseline gap-0.5">
-          <span className="text-xl font-semibold text-foreground font-mono">
-            {Math.round(value)}
-          </span>
-          <span className="text-sm text-muted-foreground font-mono">ms</span>
-        </div>
-      )}
+      <div className="flex items-baseline gap-0.5">
+        <span className="text-xl font-semibold text-foreground font-mono">
+          {value !== null ? Math.round(value) : '—'}
+        </span>
+        <span className="text-sm text-muted-foreground font-mono">ms</span>
+      </div>
     </div>
   );
 }
@@ -461,7 +455,7 @@ function RatingBar({ rating, t }: { rating: ExperienceRating; t: (key: string) =
     <div>
       <div className="flex justify-between items-center mb-1.5">
         <span className="text-sm text-foreground">{t(rating.nameKey)}</span>
-        <span className="text-xs font-medium" style={{ color: rating.color }}>
+        <span className="text-xs" style={{ color: rating.color }}>
           {t(`speed_test.rating_${rating.level}`)}
         </span>
       </div>

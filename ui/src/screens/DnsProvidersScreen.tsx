@@ -62,10 +62,16 @@ function saveLastDns(provider: ApiDnsProvider): void {
   }
 }
 
+const VALID_DNS_TYPES = ['Auto', 'Cloudflare', 'Google', 'AdGuard', 'Dns4Eu', 'Quad9', 'OpenDns', 'Custom'];
+
 function loadLastDns(): ApiDnsProvider {
   try {
     const raw = localStorage.getItem(LAST_DNS_KEY);
-    if (raw) return JSON.parse(raw) as ApiDnsProvider;
+    if (raw) {
+      const parsed = JSON.parse(raw) as ApiDnsProvider;
+      if (VALID_DNS_TYPES.includes(parsed.type)) return parsed;
+      localStorage.removeItem(LAST_DNS_KEY);
+    }
   } catch {
     // Ignore parse errors
   }

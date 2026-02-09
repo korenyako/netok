@@ -133,11 +133,8 @@
       "author_value": "Anton Korenyako",
       "website_button": "Website",
       "changes": [
-        "Protection Hub: unified DNS and VPN management",
-        "VPN Tunnel with WireGuard support",
-        "14 new languages including German, Spanish, French",
-        "RTL support for Arabic and Persian",
-        "Improved UI with new card components"
+        "Speed Test powered by M-Lab NDT7",
+        "UI polish: new font, refined icons and styling"
       ]
     },
     "tools": {
