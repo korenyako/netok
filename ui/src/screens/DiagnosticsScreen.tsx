@@ -1,38 +1,20 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, RotateCw, ChevronRight } from '../components/icons/UIIcons';
-import { NetokLogoIcon, ShieldIcon, WrenchIcon, SettingsIcon } from '../components/icons/NavigationIcons';
+import { NetokLogoIcon, ShieldIcon, ToolsIcon, SettingsIcon } from '../components/icons/NavigationIcons';
 import { NodeOkIcon, NodeWarningIcon, NodeErrorIcon, NodeLoadingIcon } from '../components/icons/DiagnosticStatusIcons';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import {
-  checkComputer,
-  checkNetwork,
-  checkRouter,
-  checkInternet,
-  type SingleNodeResult,
-} from '../api/tauri';
 import { NodeDetailScreen } from './NodeDetailScreen';
 import { DiagnosticMessage } from '../components/DiagnosticMessage';
 import { deriveScenario } from '../utils/deriveScenario';
 import { CloseButton } from '../components/WindowControls';
-
-interface NodeDetail {
-  text: string;
-}
-
-interface NetworkNode {
-  id: string;
-  title: string;
-  status: 'ok' | 'partial' | 'down' | 'loading';
-  ip?: string;
-  details: NodeDetail[];
-}
+import { useDiagnosticsStore, type NetworkNode } from '../stores/diagnosticsStore';
+import { useState } from 'react';
 
 interface DiagnosticsScreenProps {
   onBack: () => void;
-  onRefresh: () => Promise<void>;
   onNavigateToSecurity?: () => void;
   onNavigateToTools?: () => void;
   onNavigateToSettings?: () => void;
@@ -45,153 +27,27 @@ const LOADING_LABELS = [
   'diagnostics.internet',
 ];
 
-/** Remove AS number prefix from ISP string */
-function cleanIspName(isp: string): string {
-  return isp.replace(/^AS\d+\s+/, '');
-}
-
-/** Transform a SingleNodeResult into a UI NetworkNode */
-function transformSingleNode(result: SingleNodeResult, t: (key: string) => string): NetworkNode {
-  const { node } = result;
-  const details: NodeDetail[] = [];
-  let ip: string | undefined;
-
-  if (node.id === 'computer' && result.computer) {
-    if (result.computer.adapter) {
-      details.push({ text: result.computer.adapter });
-    }
-    ip = result.computer.local_ip ?? undefined;
-  }
-
-  if (node.id === 'network' && result.network) {
-    if (result.network.ssid) {
-      details.push({ text: result.network.ssid });
-    }
-    if (result.network.rssi !== null) {
-      const rssi = result.network.rssi;
-      let labelKey = '';
-      if (rssi >= -50) {
-        labelKey = 'nodes.network.signal_label_excellent';
-      } else if (rssi >= -60) {
-        labelKey = 'nodes.network.signal_label_good';
-      } else if (rssi >= -70) {
-        labelKey = 'nodes.network.signal_label_fair';
-      } else {
-        labelKey = 'nodes.network.signal_label_weak';
-      }
-      details.push({ text: t(labelKey) });
-    }
-  }
-
-  if (node.id === 'dns' && result.router) {
-    if (result.router.vendor) {
-      details.push({ text: result.router.vendor });
-    }
-    if (result.router.model) {
-      details.push({ text: result.router.model });
-    }
-    ip = result.router.gateway_ip ?? undefined;
-  }
-
-  if (node.id === 'internet' && result.internet) {
-    if (result.internet.isp) {
-      details.push({ text: cleanIspName(result.internet.isp) });
-    }
-    if (result.internet.city && result.internet.country) {
-      details.push({ text: `${result.internet.city}, ${result.internet.country}` });
-    } else if (result.internet.country) {
-      details.push({ text: result.internet.country });
-    } else if (result.internet.city) {
-      details.push({ text: result.internet.city });
-    }
-    ip = result.internet.public_ip ?? undefined;
-  }
-
-  return {
-    id: node.id,
-    title: node.label,
-    status: node.status,
-    ip,
-    details,
-  };
-}
-
-export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onNavigateToTools, onNavigateToSettings }: DiagnosticsScreenProps) {
+export function DiagnosticsScreen({ onBack, onNavigateToSecurity, onNavigateToTools, onNavigateToSettings }: DiagnosticsScreenProps) {
   const { t } = useTranslation();
-  const [nodes, setNodes] = useState<NetworkNode[]>([]);
-  const [currentCheckIndex, setCurrentCheckIndex] = useState(-1);
-  const [isRunning, setIsRunning] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
-  const runIdRef = useRef(0);
-  const rawResultsRef = useRef<Map<string, SingleNodeResult>>(new Map());
 
-  const runProgressiveDiagnostics = useCallback(async () => {
-    const thisRunId = ++runIdRef.current;
-    const stale = () => runIdRef.current !== thisRunId;
+  // Get state and actions from store
+  const {
+    nodes,
+    isRunning,
+    currentCheckIndex,
+    error,
+    runDiagnostics,
+    getRawResult,
+  } = useDiagnosticsStore();
 
-    setNodes([]);
-    setError(null);
-    setIsRunning(true);
-    setCurrentCheckIndex(0);
-    rawResultsRef.current.clear();
-
-    try {
-      // Step 0: Computer
-      const computerResult = await checkComputer();
-      if (stale()) return;
-      const computerNode = transformSingleNode(computerResult, t);
-      rawResultsRef.current.set(computerResult.node.id, computerResult);
-      setNodes([computerNode]);
-      setCurrentCheckIndex(1);
-
-      // Step 1: Network (depends on computer's adapter)
-      const adapter = computerResult.computer?.adapter ?? null;
-      const networkResult = await checkNetwork(adapter);
-      if (stale()) return;
-      const networkNode = transformSingleNode(networkResult, t);
-      rawResultsRef.current.set(networkResult.node.id, networkResult);
-      setNodes(prev => [...prev, networkNode]);
-      setCurrentCheckIndex(2);
-
-      // Step 2: Router
-      const routerResult = await checkRouter();
-      if (stale()) return;
-      const routerNode = transformSingleNode(routerResult, t);
-      rawResultsRef.current.set(routerResult.node.id, routerResult);
-      setNodes(prev => [...prev, routerNode]);
-      setCurrentCheckIndex(3);
-
-      // Step 3: Internet
-      const internetResult = await checkInternet();
-      if (stale()) return;
-      const internetNode = transformSingleNode(internetResult, t);
-      rawResultsRef.current.set(internetResult.node.id, internetResult);
-      setNodes(prev => [...prev, internetNode]);
-      setCurrentCheckIndex(4); // All done
-    } catch (err) {
-      if (stale()) return;
-      console.error('Failed to run diagnostics:', err);
-      setError(err instanceof Error ? err.message : 'Unknown error');
-      setCurrentCheckIndex(4); // Stop the loading placeholder
-    } finally {
-      if (!stale()) {
-        setIsRunning(false);
-      }
-    }
-  }, [t]);
-
+  // Run diagnostics on mount
   useEffect(() => {
-    runProgressiveDiagnostics();
-  }, [runProgressiveDiagnostics]);
+    runDiagnostics(t);
+  }, [runDiagnostics, t]);
 
-  const handleRefresh = async () => {
-    try {
-      await onRefresh();
-    } catch {
-      // ignore parent refresh errors
-    }
-    runProgressiveDiagnostics();
+  const handleRefresh = () => {
+    runDiagnostics(t);
   };
 
   const getStatusIcon = (status: NetworkNode['status']) => {
@@ -211,7 +67,7 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
   const scenarioResult = !isRunning && nodes.length > 0 ? deriveScenario(nodes) : null;
   const showScenarioCard = scenarioResult !== null && scenarioResult.scenario !== 'all_good';
 
-  const selectedResult = selectedNode ? rawResultsRef.current.get(selectedNode) : undefined;
+  const selectedResult = selectedNode ? getRawResult(selectedNode) : undefined;
   if (selectedNode && selectedResult) {
     return (
       <NodeDetailScreen
@@ -240,16 +96,6 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
         <CloseButton />
       </div>
 
-      {/* Scenario Message Card */}
-      {showScenarioCard && (
-        <div className="px-4 pb-2 animate-in fade-in duration-300">
-          <DiagnosticMessage
-            scenario={scenarioResult.scenario}
-            severity={scenarioResult.severity}
-          />
-        </div>
-      )}
-
       {/* Error State */}
       {error && nodes.length === 0 && (
         <div className="flex-1 flex items-center justify-center px-4">
@@ -260,9 +106,19 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
         </div>
       )}
 
-      {/* Node List — progressive */}
+      {/* Scrollable content: message + nodes */}
       {(nodes.length > 0 || isActive) && (
         <ScrollArea className="flex-1 px-4">
+          {/* Scenario Message Card */}
+          {showScenarioCard && (
+            <div className="pb-3 animate-in fade-in duration-300">
+              <DiagnosticMessage
+                scenario={scenarioResult.scenario}
+                severity={scenarioResult.severity}
+              />
+            </div>
+          )}
+
           {/* Error inline — shown after partial completion */}
           {error && nodes.length > 0 && (
             <div className="mb-4 text-sm text-destructive animate-in fade-in duration-300">
@@ -334,7 +190,7 @@ export function DiagnosticsScreen({ onBack, onRefresh, onNavigateToSecurity, onN
             <ShieldIcon className="w-6 h-6" />
           </Button>
           <Button variant="ghost" size="icon" className="h-12 w-12 text-muted-foreground" onClick={onNavigateToTools}>
-            <WrenchIcon className="w-6 h-6" />
+            <ToolsIcon className="w-6 h-6" />
           </Button>
           <Button variant="ghost" size="icon" className="h-12 w-12 text-muted-foreground" onClick={onNavigateToSettings}>
             <SettingsIcon className="w-6 h-6" />

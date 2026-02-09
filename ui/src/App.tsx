@@ -6,17 +6,19 @@ import { SettingsRouter } from './components/SettingsRouter';
 import { StatusScreen } from './screens/StatusScreen';
 import { DiagnosticsScreen } from './screens/DiagnosticsScreen';
 import { ToolsScreen } from './screens/ToolsScreen';
+import { SpeedTestScreen } from './screens/SpeedTestScreen';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useNavigation } from './hooks/useNavigation';
-import { useDiagnostics } from './hooks/useDiagnostics';
 
 function App() {
   const {
     currentScreen,
     showDiagnostics,
+    showSpeedTest,
     settingsSubScreen,
     securitySubScreen,
     setShowDiagnostics,
+    setShowSpeedTest,
     setSettingsSubScreen,
     setSecuritySubScreen,
     navigateToHome,
@@ -25,7 +27,23 @@ function App() {
     navigateToSettings,
   } = useNavigation();
 
-  const { diagnosticsData, fetchDiagnosticsData } = useDiagnostics();
+  if (showSpeedTest) {
+    return (
+      <ThemeProvider>
+        <Toaster />
+        <div id="app" className="h-full flex flex-col bg-background">
+          <SpeedTestScreen onBack={() => setShowSpeedTest(false)} />
+          <BottomNav
+            currentScreen={currentScreen}
+            onNavigateToHome={() => { setShowSpeedTest(false); navigateToHome(); }}
+            onNavigateToSecurity={() => { setShowSpeedTest(false); navigateToSecurity(); }}
+            onNavigateToTools={() => { setShowSpeedTest(false); navigateToTools(); }}
+            onNavigateToSettings={() => { setShowSpeedTest(false); navigateToSettings(); }}
+          />
+        </div>
+      </ThemeProvider>
+    );
+  }
 
   if (showDiagnostics) {
     return (
@@ -34,7 +52,6 @@ function App() {
                 <div id="app" className="h-full flex flex-col bg-background">
           <DiagnosticsScreen
             onBack={() => setShowDiagnostics(false)}
-            onRefresh={fetchDiagnosticsData}
             onNavigateToSecurity={() => {
               setShowDiagnostics(false);
               navigateToSecurity();
@@ -60,7 +77,6 @@ function App() {
         <ScrollArea className="flex-1">
           {currentScreen === 'home' && (
             <StatusScreen
-              diagnostics={diagnosticsData}
               onOpenDiagnostics={() => setShowDiagnostics(true)}
               onNavigateToDnsProviders={() => {
                 navigateToSecurity();
@@ -77,7 +93,7 @@ function App() {
             />
           )}
 
-          {currentScreen === 'tools' && <ToolsScreen onBack={navigateToHome} onOpenDiagnostics={() => setShowDiagnostics(true)} />}
+          {currentScreen === 'tools' && <ToolsScreen onBack={navigateToHome} onOpenDiagnostics={() => setShowDiagnostics(true)} onOpenSpeedTest={() => setShowSpeedTest(true)} />}
 
           {currentScreen === 'settings' && (
             <SettingsRouter

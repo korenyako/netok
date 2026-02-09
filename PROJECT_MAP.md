@@ -1,6 +1,6 @@
 # Project Map - Netok
 
-Generated: 2026-02-06
+Generated: 2026-02-09
 
 ## TREE (ASCII)
 
@@ -136,7 +136,6 @@ Generated: 2026-02-06
 │   │   │   │   ├── ActionIcons.tsx
 │   │   │   │   ├── DiagnosticStatusIcons.tsx
 │   │   │   │   ├── NavigationIcons.tsx
-│   │   │   │   ├── ToolIcons.tsx
 │   │   │   │   └── UIIcons.tsx
 │   │   │   ├── ui
 │   │   │   │   ├── alert.tsx
@@ -161,12 +160,14 @@ Generated: 2026-02-06
 │   │   │   └── WindowControls.tsx
 │   │   ├── constants
 │   │   │   └── languages.ts
+│   │   ├── data
+│   │   │   └── dns-providers.json
 │   │   ├── fonts
 │   │   │   ├── Geist-Variable.woff2
 │   │   │   ├── GeistMono-Variable.woff2
+│   │   │   ├── MartianMono-Variable.woff2
 │   │   │   └── NotoSansArabic-Variable.ttf
 │   │   ├── hooks
-│   │   │   ├── useDiagnostics.ts
 │   │   │   ├── useNavigation.ts
 │   │   │   └── useTheme.ts
 │   │   ├── i18n
@@ -197,6 +198,7 @@ Generated: 2026-02-06
 │   │   │   ├── NodeDetailScreen.tsx
 │   │   │   ├── ProtectionHubScreen.tsx
 │   │   │   ├── SettingsScreen.tsx
+│   │   │   ├── SpeedTestScreen.tsx
 │   │   │   ├── StatusScreen.tsx
 │   │   │   ├── ThemeSettingsScreen.tsx
 │   │   │   ├── ToolsScreen.tsx
@@ -204,7 +206,9 @@ Generated: 2026-02-06
 │   │   ├── store
 │   │   ├── stores
 │   │   │   ├── closeBehaviorStore.ts
+│   │   │   ├── diagnosticsStore.ts
 │   │   │   ├── dnsStore.ts
+│   │   │   ├── speedTestStore.ts
 │   │   │   ├── themeStore.ts
 │   │   │   ├── useDnsStore.ts
 │   │   │   └── vpnStore.ts
@@ -216,14 +220,18 @@ Generated: 2026-02-06
 │   │   │   ├── tauri.test.ts
 │   │   │   └── themeStore.test.ts
 │   │   ├── utils
+│   │   │   ├── customDnsStorage.ts
 │   │   │   ├── deriveScenario.ts
+│   │   │   ├── dnsProviderLookup.ts
 │   │   │   ├── formatUpdatedAt.ts
+│   │   │   ├── ndt7Client.ts
 │   │   │   └── notifications.ts
 │   │   ├── App.tsx
 │   │   ├── i18n.ts
 │   │   ├── index.css
 │   │   ├── main.tsx
 │   │   └── vite-env.d.ts
+│   ├── .env.development
 │   ├── .gitignore
 │   ├── eslint.config.js
 │   ├── index.html
@@ -258,6 +266,7 @@ Generated: 2026-02-06
 ├── README_DEV.md
 ├── README.md
 ├── SETUP-PRECOMMIT.md
+├── speedtest-prototype-v2.html
 └── TESTING.md
 
 ```
@@ -373,7 +382,7 @@ export default {
           'Malgun Gothic', 'Apple SD Gothic Neo',
           'system-ui', 'sans-serif',
         ],
-        mono: ['Geist Mono', 'monospace'],
+        mono: ['"Martian Mono"', 'monospace'],
       },
       colors: {}}}}
 ```
@@ -426,17 +435,19 @@ import { SettingsRouter } from './components/SettingsRouter';
 import { StatusScreen } from './screens/StatusScreen';
 import { DiagnosticsScreen } from './screens/DiagnosticsScreen';
 import { ToolsScreen } from './screens/ToolsScreen';
+import { SpeedTestScreen } from './screens/SpeedTestScreen';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useNavigation } from './hooks/useNavigation';
-import { useDiagnostics } from './hooks/useDiagnostics';
 
 function App() {
   const {
     currentScreen,
     showDiagnostics,
+    showSpeedTest,
     settingsSubScreen,
     securitySubScreen,
     setShowDiagnostics,
+    setShowSpeedTest,
     setSettingsSubScreen,
     setSecuritySubScreen,
     navigateToHome,
@@ -445,29 +456,27 @@ function App() {
     navigateToSettings,
   } = useNavigation();
 
-  const { diagnosticsData, fetchDiagnosticsData } = useDiagnostics();
-
-  if (showDiagnostics) {
+  if (showSpeedTest) {
     return (
       <ThemeProvider>
         <Toaster />
-                <div id="app" className="h-full flex flex-col bg-background">
-          <DiagnosticsScreen
-            onBack={() => setShowDiagnostics(false)}
-            onRefresh={fetchDiagnosticsData}
-            onNavigateToSecurity={() => {
-              setShowDiagnostics(false);
-              navigateToSecurity();
-            }}
-            onNavigateToTools={() => {
-              setShowDiagnostics(false);
-              navigateToTools();
-            }}
-            onNavigateToSettings={() => {
-              setShowDiagnostics(false);
-              navigateToSettings();
-            }}
-          />}}
+        <div id="app" className="h-full flex flex-col bg-background">
+          <SpeedTestScreen onBack={() => setShowSpeedTest(false)} />
+          <BottomNav
+            currentScreen={currentScreen}
+            onNavigateToHome={() => { setShowSpeedTest(false); navigateToHome(); }}
+            onNavigateToSecurity={() => { setShowSpeedTest(false); navigateToSecurity(); }}
+            onNavigateToTools={() => { setShowSpeedTest(false); navigateToTools(); }}
+            onNavigateToSettings={() => { setShowSpeedTest(false); navigateToSettings(); }}
+          />
+        </div>
+      </ThemeProvider>
+    );
+  }
+
+  if (showDiagnostics) {
+    return (
+      <ThemeProvider>}}
 
 export default App;
 ```

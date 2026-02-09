@@ -5,10 +5,10 @@
   "dns_providers": {
     "title": "حفاظت DNS",
     "cloudflare": "Cloudflare",
+    "recommended": "پیشنهادی",
     "adguard": "AdGuard",
     "quad9": "Quad9",
-    "cleanbrowsing": "CleanBrowsing",
-    "goal_fast_desc": "کمترین تأخیر، بدون فیلتر",
+    "goal_fast_desc": "سریع‌ترین",
     "goal_adblock_desc": "مسدودسازی تبلیغات و ردیاب‌ها",
     "goal_secure_desc": "مسدودسازی بدافزار و فیشینگ",
     "goal_family_desc": "ایمنی کودک + جستجوی امن",
@@ -20,7 +20,8 @@
     "custom_ip_apply": "اعمال",
     "optional": "اختیاری",
     "custom_display": "سفارشی",
-    "status_disabled": "غیرفعال"
+    "status_disabled": "غیرفعال",
+    "cache_cleared": "حافظه کش DNS پاک شد"
   },
   "dns_detail": {
     "ip_copied": "کپی شد"
@@ -53,7 +54,7 @@
     "manufacturer": "سازنده",
     "isp": "ارائه‌دهنده اینترنت",
     "location": "موقعیت",
-    "open_router": "باز کردن صفحه روتر"
+    "open_router": "باز کردن تنظیمات"
   },
   "nodes": {
     "computer": {
@@ -125,7 +126,7 @@
       "whats_new": "تازه‌ها",
       "author": "سازنده",
       "author_value": "Anton Korenyako",
-      "website_button": "netok.app",
+      "website_button": "وب‌سایت",
       "changes": [
         "مرکز محافظت: مدیریت یکپارچه DNS و VPN",
         "تونل VPN با پشتیبانی از WireGuard",
@@ -143,6 +144,41 @@
       "device_scan": "اسکن دستگاه‌ها",
       "device_scan_desc": "ببینید چه کسی به شبکه شما متصل است"
     }
+  },
+  "speed_test": {
+    "title": "Speed test",
+    "start": "Start",
+    "repeat": "Repeat test",
+    "download": "Download",
+    "upload": "Upload",
+    "ping": "Ping",
+    "ping_desc": "at rest",
+    "latency": "Latency",
+    "latency_desc": "under load",
+    "jitter": "Jitter",
+    "jitter_desc": "stability",
+    "phase_ping": "Ping",
+    "phase_download": "Download",
+    "phase_upload": "Upload",
+    "tooltip_ping": "Response time when network is idle. Lower is better. Up to 20ms is excellent, up to 50ms is good.",
+    "tooltip_latency": "Response time under load (when downloading). If much higher than Ping, network gets congested during active use.",
+    "tooltip_jitter": "How stable the ping is. High jitter = stutters and freezes in games and video calls. Up to 5ms is excellent.",
+    "warning_high_latency": "High latency under load",
+    "warning_high_latency_desc": "Latency {{latency}}ms while Ping is {{ping}}ms — under load, delay increases {{ratio}}x. Video calls will stutter when someone downloads files.",
+    "warning_low_speed": "Low connection speed",
+    "warning_low_speed_desc": "Download {{download}} Mbps — 4K video will buffer. Upload {{upload}} Mbps — video calls may stutter.",
+    "warning_unstable": "Unstable connection",
+    "warning_unstable_desc": "Jitter {{jitter}}ms — connection is unstable. You may experience freezes in games and video calls.",
+    "rating_video_calls": "Video calls",
+    "rating_streaming": "Streaming",
+    "rating_gaming": "Gaming",
+    "rating_work_from_home": "Work from home",
+    "rating_excellent": "Excellent",
+    "rating_good": "Good",
+    "rating_fair": "Fair",
+    "rating_poor": "Poor",
+    "error_no_server": "Could not find a test server. Check your internet connection.",
+    "error_test_failed": "Speed test failed. Please try again."
   },
   "diagnostic": {
     "scenario": {

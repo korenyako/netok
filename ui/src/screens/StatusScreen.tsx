@@ -1,19 +1,30 @@
+import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { DiagnosticsSnapshot } from '../api/tauri';
+import { useDiagnosticsStore, shouldRefreshDiagnostics } from '../stores/diagnosticsStore';
 import { useDnsStore } from '../stores/useDnsStore';
 import { deriveScenario } from '../utils/deriveScenario';
 import { CloseButton } from '../components/WindowControls';
 import { MenuCard } from '@/components/MenuCard';
 import { cn } from '@/lib/utils';
+import { getCustomDnsDisplayName } from '../utils/dnsProviderLookup';
+
+// DNS logging helper
+const logDns = (message: string, data?: unknown) => {
+  const timestamp = new Date().toISOString().slice(11, 23);
+  if (data !== undefined) {
+    console.log(`[DNS][UI][StatusScreen][${timestamp}] ${message}`, data);
+  } else {
+    console.log(`[DNS][UI][StatusScreen][${timestamp}] ${message}`);
+  }
+};
 
 interface StatusScreenProps {
   onOpenDiagnostics: () => void;
   onNavigateToDnsProviders: () => void;
-  diagnostics: DiagnosticsSnapshot | null;
 }
 
 // Known providers that count as "protection enabled"
-const KNOWN_PROVIDERS = ['Cloudflare', 'Google', 'AdGuard', 'Dns4Eu', 'CleanBrowsing', 'Quad9', 'OpenDns'];
+const KNOWN_PROVIDERS = ['Cloudflare', 'Google', 'AdGuard', 'Dns4Eu', 'Quad9', 'OpenDns', 'Custom'];
 
 // Get display name for DNS provider
 function getProviderDisplayName(type: string): string {
@@ -22,15 +33,15 @@ function getProviderDisplayName(type: string): string {
     'Google': 'Google',
     'AdGuard': 'AdGuard',
     'Dns4Eu': 'DNS4EU',
-    'CleanBrowsing': 'CleanBrowsing',
     'Quad9': 'Quad9',
     'OpenDns': 'OpenDNS',
+    'Custom': 'Custom DNS',
   };
   return names[type] || type;
 }
 
 // SVG circle constants
-const CIRCLE_SIZE = 192;
+const CIRCLE_SIZE = 240;
 const STROKE_WIDTH = 2;
 const RADIUS = (CIRCLE_SIZE - STROKE_WIDTH * 2) / 2;
 
@@ -45,37 +56,76 @@ const STROKE_COLORS: Record<VisualState, string> = {
 
 const CIRCLE_CLASSES: Record<VisualState, string> = {
   loading: 'status-circle-loading',
-  success: 'status-circle-success',
-  warning: 'status-circle-warning',
+  success: '',
+  warning: '',
   error: '',
 };
 
-const GLOW_CLASSES: Record<VisualState, string> = {
-  loading: '',
-  success: 'status-glow-success',
-  warning: 'status-glow-warning',
-  error: 'status-glow-error',
-};
-
-export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, diagnostics }: StatusScreenProps) {
+export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders }: StatusScreenProps) {
   const { t } = useTranslation();
-  const { currentProvider: dnsProvider } = useDnsStore();
+  const { currentProvider: dnsProvider, isLoading: isDnsLoading } = useDnsStore();
+  const mountedRef = useRef(false);
+
+  // Get diagnostics data from store
+  const { nodes, isRunning, lastUpdated, networkInfo, runDiagnostics } = useDiagnosticsStore();
+
+  // Log on mount
+  useEffect(() => {
+    logDns('Screen MOUNTED', { dnsProvider, isDnsLoading });
+    mountedRef.current = true;
+
+    return () => {
+      logDns('Screen UNMOUNTED');
+      mountedRef.current = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Intentionally empty - only log on actual mount/unmount
+
+  // Log when DNS provider changes
+  useEffect(() => {
+    // Skip first render (mount already logged)
+    if (!mountedRef.current) return;
+
+    logDns('Provider state changed', {
+      provider: dnsProvider?.type ?? null,
+      isLoading: isDnsLoading
+    });
+  }, [dnsProvider, isDnsLoading]);
+
+  // Auto-refresh diagnostics on mount if stale or never run
+  useEffect(() => {
+    if (shouldRefreshDiagnostics(lastUpdated) && !isRunning) {
+      runDiagnostics(t);
+    }
+  }, [lastUpdated, isRunning, runDiagnostics, t]);
 
   // Determine if DNS protection is enabled (only known providers count as enabled)
-  // Auto and Custom are treated as "protection disabled"
+  // Only Auto is treated as "protection disabled"
   const isDnsProtectionEnabled = dnsProvider !== null && KNOWN_PROVIDERS.includes(dnsProvider.type);
-  const providerName = isDnsProtectionEnabled ? getProviderDisplayName(dnsProvider.type) : null;
+
+  // Get provider name, with IP-based recognition for Custom DNS
+  const providerName = (() => {
+    if (!isDnsProtectionEnabled || !dnsProvider) return null;
+    if (dnsProvider.type === 'Custom') {
+      const recognizedProvider = getCustomDnsDisplayName(
+        dnsProvider.primary || '',
+        dnsProvider.primaryIpv6
+      );
+      return recognizedProvider || getProviderDisplayName(dnsProvider.type);
+    }
+    return getProviderDisplayName(dnsProvider.type);
+  })();
 
   // Derive diagnostic scenario from nodes
-  const isLoading = diagnostics === null;
-  const scenarioResult = diagnostics ? deriveScenario(diagnostics.nodes) : null;
+  // Only show loading spinner when we have NO previous data at all
+  const isLoading = isRunning && nodes.length === 0;
+  const scenarioResult = nodes.length > 0 ? deriveScenario(nodes) : null;
   const visualState: VisualState = isLoading
     ? 'loading'
     : (scenarioResult?.severity ?? 'success') as VisualState;
 
   const strokeColor = STROKE_COLORS[visualState];
   const circleClass = CIRCLE_CLASSES[visualState];
-  const glowClass = GLOW_CLASSES[visualState];
 
   // Title inside circle
   const circleTitle = scenarioResult
@@ -104,7 +154,7 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, diag
         className="flex-1 flex flex-col items-center justify-center px-4 focus:outline-none"
       >
         {/* Status Circle */}
-        <div className="relative w-48 h-48 mb-4">
+        <div className="relative w-60 h-60 mb-4">
           <svg
             className="w-full h-full overflow-visible"
             viewBox={`0 0 ${CIRCLE_SIZE} ${CIRCLE_SIZE}`}
@@ -119,18 +169,6 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, diag
               style={{ stroke: strokeColor }}
               opacity="0.12"
             />
-            {/* Glow ring (wide blurred stroke, breathing for success/warning) */}
-            {glowClass && (
-              <circle
-                cx={CIRCLE_SIZE / 2}
-                cy={CIRCLE_SIZE / 2}
-                r={RADIUS}
-                strokeWidth={8}
-                style={{ stroke: strokeColor, filter: 'blur(4px)' }}
-                className={glowClass}
-                fill="none"
-              />
-            )}
             {/* Main ring */}
             <circle
               cx={CIRCLE_SIZE / 2}
@@ -143,13 +181,32 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, diag
           </svg>
 
           {/* Text inside circle */}
-          <div className="absolute inset-0 flex items-center justify-center px-10">
+          <div className="absolute inset-0 flex flex-col items-center justify-center px-8">
             <span className={cn(
               "text-lg font-medium text-center leading-snug",
               isLoading ? "text-muted-foreground" : "text-foreground"
             )}>
               {circleTitle}
             </span>
+
+            {/* Network Info inside circle */}
+            {showNetworkInfo && networkInfo && (
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground/60 mt-2">
+                <span>
+                  {networkInfo.connection_type === 'Wifi' && 'Wi-Fi'}
+                  {networkInfo.connection_type === 'Ethernet' && 'Ethernet'}
+                  {networkInfo.connection_type === 'Usb' && 'USB'}
+                  {networkInfo.connection_type === 'Mobile' && 'Mobile'}
+                  {networkInfo.connection_type === 'Unknown' && t('network.unknown')}
+                </span>
+                {networkInfo.ssid && (
+                  <>
+                    <span>·</span>
+                    <span>{networkInfo.ssid}</span>
+                  </>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
@@ -164,25 +221,6 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, diag
             )}>
               {messageText}
             </p>
-          )}
-
-          {/* Network Info */}
-          {showNetworkInfo && diagnostics && (
-            <div className="flex items-center gap-2 text-xs text-muted-foreground/60">
-              <span>
-                {diagnostics.network.connection_type === 'Wifi' && 'Wi-Fi'}
-                {diagnostics.network.connection_type === 'Ethernet' && 'Ethernet'}
-                {diagnostics.network.connection_type === 'Usb' && 'USB'}
-                {diagnostics.network.connection_type === 'Mobile' && 'Mobile'}
-                {diagnostics.network.connection_type === 'Unknown' && t('network.unknown')}
-              </span>
-              {diagnostics.network.ssid && (
-                <>
-                  <span>·</span>
-                  <span>{diagnostics.network.ssid}</span>
-                </>
-              )}
-            </div>
           )}
         </div>
       </button>

@@ -39,6 +39,40 @@ fn test_dns() -> bool {
     resolver.lookup_ip("dns.google").is_ok()
 }
 
+/// Test if a specific DNS server is reachable by trying to resolve a domain.
+/// Returns Ok(true) if server responds, Ok(false) if timeout, Err on invalid IP.
+pub fn test_dns_server(server_ip: &str, timeout_secs: u64) -> Result<bool, String> {
+    use trust_dns_resolver::config::*;
+    use trust_dns_resolver::Resolver;
+    use std::net::IpAddr;
+
+    // Parse the IP address
+    let ip: IpAddr = server_ip
+        .parse()
+        .map_err(|_| format!("Invalid IP address: {}", server_ip))?;
+
+    // Configure resolver to use the specific DNS server
+    let mut opts = ResolverOpts::default();
+    opts.timeout = Duration::from_secs(timeout_secs);
+    opts.attempts = 1; // Only try once
+
+    let name_server = NameServerConfig {
+        socket_addr: std::net::SocketAddr::new(ip, 53),
+        protocol: Protocol::Udp,
+        tls_dns_name: None,
+        trust_negative_responses: true,
+        bind_addr: None,
+    };
+
+    let config = ResolverConfig::from_parts(None, vec![], vec![name_server]);
+
+    let resolver = Resolver::new(config, opts)
+        .map_err(|e| format!("Failed to create resolver: {}", e))?;
+
+    // Try to resolve google.com - a domain that should always exist
+    Ok(resolver.lookup_ip("google.com").is_ok())
+}
+
 /// HTTP Test: try to fetch from known endpoints.
 fn test_http() -> bool {
     let client = match reqwest::blocking::Client::builder()
@@ -448,16 +482,6 @@ pub fn detect_dns_provider(dns_servers: &[String]) -> DnsProvider {
         (Some("86.54.11.13"), _) => DnsProvider::Dns4EuProtectiveAd,
         (Some("86.54.11.11"), _) => DnsProvider::Dns4EuProtectiveChildAd,
         (Some("86.54.11.100"), _) => DnsProvider::Dns4EuUnfiltered,
-        // CleanBrowsing
-        (Some("185.228.168.168"), Some("185.228.169.168")) | (Some("185.228.168.168"), None) => {
-            DnsProvider::CleanBrowsingFamily
-        }
-        (Some("185.228.168.10"), Some("185.228.169.11")) | (Some("185.228.168.10"), None) => {
-            DnsProvider::CleanBrowsingAdult
-        }
-        (Some("185.228.168.9"), Some("185.228.169.9")) | (Some("185.228.168.9"), None) => {
-            DnsProvider::CleanBrowsingSecurity
-        }
         // Quad9
         (Some("9.9.9.9"), Some("149.112.112.112")) | (Some("9.9.9.9"), None) => {
             DnsProvider::Quad9Recommended

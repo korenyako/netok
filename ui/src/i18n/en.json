@@ -5,10 +5,10 @@
   "dns_providers": {
     "title": "DNS Protection",
     "cloudflare": "Cloudflare",
+    "recommended": "Recommended",
     "adguard": "AdGuard",
     "quad9": "Quad9",
-    "cleanbrowsing": "CleanBrowsing",
-    "goal_fast_desc": "Minimal latency, no filtering",
+    "goal_fast_desc": "Fastest",
     "goal_adblock_desc": "Blocks ads and trackers",
     "goal_secure_desc": "Blocks malware and phishing",
     "goal_family_desc": "Child safety + safe search",
@@ -17,10 +17,16 @@
     "custom_ip_hint": "Enter the DNS server addresses from your provider or another DNS service.",
     "custom_ip_invalid": "Invalid IP address",
     "custom_ipv6_invalid": "Invalid IPv6 address",
+    "custom_ip_typo": "Check the address — looks like there's a typo",
+    "custom_ip_hint_ipv4": "IPv4 address looks like 1.2.3.4",
+    "custom_ip_hint_ipv6": "IPv6 address looks like 2606:4700:4700::1111",
+    "custom_ip_unreachable": "Server not responding — check the address or try a different one",
+    "custom_ip_checking": "Checking if server responds",
     "custom_ip_apply": "Apply",
     "optional": "optional",
     "custom_display": "Custom",
-    "status_disabled": "Disabled"
+    "status_disabled": "Disabled",
+    "cache_cleared": "DNS cache cleared"
   },
   "dns_detail": {
     "ip_copied": "Copied"
@@ -53,7 +59,7 @@
     "manufacturer": "Manufacturer",
     "isp": "ISP",
     "location": "Location",
-    "open_router": "Open router page"
+    "open_router": "Open settings"
   },
   "nodes": {
     "computer": {
@@ -125,7 +131,7 @@
       "whats_new": "What's new",
       "author": "Author",
       "author_value": "Anton Korenyako",
-      "website_button": "netok.app",
+      "website_button": "Website",
       "changes": [
         "Protection Hub: unified DNS and VPN management",
         "VPN Tunnel with WireGuard support",
@@ -172,6 +178,43 @@
     "vpn_node": "VPN",
     "internet": "Internet",
     "ping": "ping"
+  },
+  "speed_test": {
+    "title": "Speed test",
+    "start": "Start",
+    "repeat": "Repeat test",
+    "download": "Download",
+    "upload": "Upload",
+    "ping": "Ping",
+    "ping_desc": "at rest",
+    "latency": "Latency",
+    "latency_desc": "under load",
+    "jitter": "Jitter",
+    "jitter_desc": "stability",
+    "phase_ping": "Ping",
+    "phase_download": "Download",
+    "phase_upload": "Upload",
+    "tooltip_ping": "Response time when network is idle. Lower is better. Up to 20ms is excellent, up to 50ms is good.",
+    "tooltip_latency": "Response time under load (when downloading). If much higher than Ping, network gets congested during active use.",
+    "tooltip_jitter": "How stable the ping is. High jitter = stutters and freezes in games and video calls. Up to 5ms is excellent.",
+    "warning_high_latency": "High latency under load",
+    "warning_high_latency_desc": "Latency {{latency}}ms while Ping is {{ping}}ms — under load, delay increases {{ratio}}x. Video calls will stutter when someone downloads files.",
+    "warning_low_speed": "Low connection speed",
+    "warning_low_speed_desc": "Download {{download}} Mbps — 4K video will buffer. Upload {{upload}} Mbps — video calls may stutter.",
+    "warning_unstable": "Unstable connection",
+    "warning_unstable_desc": "Jitter {{jitter}}ms — connection is unstable. You may experience freezes in games and video calls.",
+    "rating_video_calls": "Video calls",
+    "rating_streaming": "Streaming",
+    "rating_gaming": "Gaming",
+    "rating_work_from_home": "Work from home",
+    "rating_excellent": "Excellent",
+    "rating_good": "Good",
+    "rating_fair": "Fair",
+    "rating_poor": "Poor",
+    "error_no_server": "Could not find a test server. Check your internet connection.",
+    "error_test_failed": "Speed test failed. Please try again.",
+    "error_rate_limited": "Too many tests in a row. Please wait a few minutes.",
+    "error_connection": "Could not connect to the server. Check your connection."
   },
   "diagnostic": {
     "scenario": {

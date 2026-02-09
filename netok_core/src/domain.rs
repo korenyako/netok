@@ -299,13 +299,6 @@ pub enum DnsProvider {
     Dns4EuProtectiveChildAd,
     /// 86.54.11.100 - Unfiltered
     Dns4EuUnfiltered,
-    // CleanBrowsing
-    /// 185.228.168.168, 185.228.169.168 - Family Filter
-    CleanBrowsingFamily,
-    /// Adult Filter
-    CleanBrowsingAdult,
-    /// Security Filter
-    CleanBrowsingSecurity,
     // Quad9
     /// 9.9.9.9, 149.112.112.112 - Recommended
     Quad9Recommended,
@@ -343,10 +336,6 @@ impl DnsProvider {
             DnsProvider::Dns4EuProtectiveAd => Some("86.54.11.13".to_string()),
             DnsProvider::Dns4EuProtectiveChildAd => Some("86.54.11.11".to_string()),
             DnsProvider::Dns4EuUnfiltered => Some("86.54.11.100".to_string()),
-            // CleanBrowsing
-            DnsProvider::CleanBrowsingFamily => Some("185.228.168.168".to_string()),
-            DnsProvider::CleanBrowsingAdult => Some("185.228.168.10".to_string()),
-            DnsProvider::CleanBrowsingSecurity => Some("185.228.168.9".to_string()),
             // Quad9
             DnsProvider::Quad9Recommended => Some("9.9.9.9".to_string()),
             DnsProvider::Quad9SecuredEcs => Some("9.9.9.11".to_string()),
@@ -378,10 +367,6 @@ impl DnsProvider {
             DnsProvider::Dns4EuProtectiveAd => None,
             DnsProvider::Dns4EuProtectiveChildAd => None,
             DnsProvider::Dns4EuUnfiltered => None,
-            // CleanBrowsing
-            DnsProvider::CleanBrowsingFamily => Some("185.228.169.168".to_string()),
-            DnsProvider::CleanBrowsingAdult => Some("185.228.169.11".to_string()),
-            DnsProvider::CleanBrowsingSecurity => Some("185.228.169.9".to_string()),
             // Quad9
             DnsProvider::Quad9Recommended => Some("149.112.112.112".to_string()),
             DnsProvider::Quad9SecuredEcs => Some("149.112.112.11".to_string()),
@@ -413,10 +398,6 @@ impl DnsProvider {
             DnsProvider::Dns4EuProtectiveAd => None,
             DnsProvider::Dns4EuProtectiveChildAd => None,
             DnsProvider::Dns4EuUnfiltered => None,
-            // CleanBrowsing
-            DnsProvider::CleanBrowsingFamily => Some("2a0d:2a00:1::".to_string()),
-            DnsProvider::CleanBrowsingAdult => Some("2a0d:2a00:1::1".to_string()),
-            DnsProvider::CleanBrowsingSecurity => Some("2a0d:2a00:2::".to_string()),
             // Quad9
             DnsProvider::Quad9Recommended => Some("2620:fe::fe".to_string()),
             DnsProvider::Quad9SecuredEcs => Some("2620:fe::11".to_string()),
@@ -449,10 +430,6 @@ impl DnsProvider {
             DnsProvider::Dns4EuProtectiveAd => None,
             DnsProvider::Dns4EuProtectiveChildAd => None,
             DnsProvider::Dns4EuUnfiltered => None,
-            // CleanBrowsing
-            DnsProvider::CleanBrowsingFamily => Some("2a0d:2a00:2::".to_string()),
-            DnsProvider::CleanBrowsingAdult => Some("2a0d:2a00:2::1".to_string()),
-            DnsProvider::CleanBrowsingSecurity => Some("2a0d:2a00:1::".to_string()),
             // Quad9
             DnsProvider::Quad9Recommended => Some("2620:fe::9".to_string()),
             DnsProvider::Quad9SecuredEcs => Some("2620:fe::fe:11".to_string()),

@@ -1,17 +1,48 @@
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft } from '../components/icons/UIIcons';
+import { ArrowLeft, Activity, Gauge, Radar } from '../components/icons/UIIcons';
 import { Button } from '@/components/ui/button';
-import { MenuCard } from '@/components/MenuCard';
 import { CloseButton } from '../components/WindowControls';
-import { DiagnosticsIcon, DeviceScanIcon, FlushDnsIcon, SpeedTestIcon } from '../components/icons/ToolIcons';
 
 interface ToolsScreenProps {
   onBack?: () => void;
   onOpenDiagnostics: () => void;
+  onOpenSpeedTest: () => void;
 }
 
-export function ToolsScreen({ onBack, onOpenDiagnostics }: ToolsScreenProps) {
+interface ToolTile {
+  id: string;
+  nameKey: string;
+  icon: React.ReactNode;
+  iconColorClass: string;
+  onClick: () => void;
+}
+
+export function ToolsScreen({ onBack, onOpenDiagnostics, onOpenSpeedTest }: ToolsScreenProps) {
   const { t } = useTranslation();
+
+  const tools: ToolTile[] = [
+    {
+      id: 'diagnostics',
+      nameKey: 'diagnostics.title',
+      icon: <Activity className="w-6 h-6" />,
+      iconColorClass: 'text-cyan-500',
+      onClick: onOpenDiagnostics,
+    },
+    {
+      id: 'speed-test',
+      nameKey: 'settings.tools.speed_test',
+      icon: <Gauge className="w-6 h-6" />,
+      iconColorClass: 'text-pink-500',
+      onClick: onOpenSpeedTest,
+    },
+    {
+      id: 'device-scan',
+      nameKey: 'settings.tools.device_scan',
+      icon: <Radar className="w-6 h-6" />,
+      iconColorClass: 'text-amber-500',
+      onClick: () => {},
+    },
+  ];
 
   return (
     <div className="flex flex-col h-full bg-background">
@@ -24,48 +55,23 @@ export function ToolsScreen({ onBack, onOpenDiagnostics }: ToolsScreenProps) {
         <CloseButton />
       </div>
 
-      {/* Content */}
-      <div className="flex-1 flex flex-col px-4">
-        <div className="space-y-2">
-          <MenuCard
-            variant="ghost"
-            icon={<DiagnosticsIcon size={24} />}
-            title={t('diagnostics.title')}
-            subtitle={t('settings.tools.diagnostics_desc')}
-            trailing="chevron"
-            iconAlign="center"
-            onClick={onOpenDiagnostics}
-          />
-
-          <MenuCard
-            variant="ghost"
-            icon={<SpeedTestIcon size={24} />}
-            title={t('settings.tools.speed_test')}
-            subtitle={t('settings.tools.speed_test_desc')}
-            trailing="chevron"
-            iconAlign="center"
-            onClick={() => {}}
-          />
-
-          <MenuCard
-            variant="ghost"
-            icon={<FlushDnsIcon size={24} />}
-            title={t('settings.tools.flush_dns')}
-            subtitle={t('settings.tools.flush_dns_desc')}
-            trailing="chevron"
-            iconAlign="center"
-            onClick={() => {}}
-          />
-
-          <MenuCard
-            variant="ghost"
-            icon={<DeviceScanIcon size={24} />}
-            title={t('settings.tools.device_scan')}
-            subtitle={t('settings.tools.device_scan_desc')}
-            trailing="chevron"
-            iconAlign="center"
-            onClick={() => {}}
-          />
+      {/* Content - 2-column grid */}
+      <div className="flex-1 px-4">
+        <div className="grid grid-cols-2 gap-3">
+          {tools.map((tool) => (
+            <button
+              key={tool.id}
+              onClick={tool.onClick}
+              className="flex flex-col items-start gap-3 p-4 rounded-xl bg-accent/50 hover:bg-card transition-colors text-left"
+            >
+              {/* Colorful icon */}
+              <div className={tool.iconColorClass}>{tool.icon}</div>
+              {/* Tool name */}
+              <span className="text-base font-medium text-foreground">
+                {t(tool.nameKey)}
+              </span>
+            </button>
+          ))}
         </div>
       </div>
     </div>

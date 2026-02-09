@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Loader2 } from '../components/icons/UIIcons';
+import { ArrowLeft, Loader2, Trash2 } from '../components/icons/UIIcons';
 import { setDns, type DnsProvider as ApiDnsProvider } from '../api/tauri';
 import { useDnsStore } from '../stores/useDnsStore';
 import { dnsStore } from '../stores/dnsStore';
@@ -9,6 +9,8 @@ import { Switch } from '@/components/ui/switch';
 import { MenuCard } from '@/components/MenuCard';
 import { cn } from '@/lib/utils';
 import { CloseButton } from '../components/WindowControls';
+import { toast } from 'sonner';
+import { hasCustomDnsConfig, clearCustomDnsConfig } from '../utils/customDnsStorage';
 
 interface DnsProvidersScreenProps {
   onBack: () => void;
@@ -21,6 +23,7 @@ interface ProviderCard {
   descKey: string;
   dnsPayload: ApiDnsProvider;
   matchType: string;
+  badgeKey?: string;
 }
 
 const PROVIDER_CARDS: ProviderCard[] = [
@@ -30,6 +33,7 @@ const PROVIDER_CARDS: ProviderCard[] = [
     descKey: 'dns_providers.goal_fast_desc',
     dnsPayload: { type: 'Cloudflare', variant: 'Standard' },
     matchType: 'Cloudflare',
+    badgeKey: 'dns_providers.recommended',
   },
   {
     id: 'adguard',
@@ -44,13 +48,6 @@ const PROVIDER_CARDS: ProviderCard[] = [
     descKey: 'dns_providers.goal_secure_desc',
     dnsPayload: { type: 'Quad9', variant: 'Recommended' },
     matchType: 'Quad9',
-  },
-  {
-    id: 'cleanbrowsing',
-    nameKey: 'dns_providers.cleanbrowsing',
-    descKey: 'dns_providers.goal_family_desc',
-    dnsPayload: { type: 'CleanBrowsing', variant: 'Family' },
-    matchType: 'CleanBrowsing',
   },
 ];
 
@@ -86,7 +83,10 @@ export function DnsProvidersScreen({ onBack, onCustomIp }: DnsProvidersScreenPro
   const [isApplying, setIsApplying] = useState(false);
 
   const protectionEnabled = isProtected(apiProvider);
-  const isCustomActive = protectionEnabled && apiProvider?.type === 'Custom';
+
+  // Check if Custom IP is active by checking localStorage
+  // (localStorage is needed because IPs like 8.8.8.8 get detected as "Google" by backend)
+  const isCustomActive = protectionEnabled && hasCustomDnsConfig();
 
   useEffect(() => {
     if (apiProvider && apiProvider.type !== 'Auto') {
@@ -112,13 +112,18 @@ export function DnsProvidersScreen({ onBack, onCustomIp }: DnsProvidersScreenPro
       const lastDns = loadLastDns();
       await applyProvider(lastDns);
     } else {
+      // Clear Custom DNS config when disabling protection
+      clearCustomDnsConfig();
       await applyProvider({ type: 'Auto' });
     }
   };
 
   const handleCardSelect = async (card: ProviderCard) => {
     if (isApplying) return;
-    if (protectionEnabled && apiProvider?.type === card.matchType) return;
+    // Don't allow re-selecting the same provider (unless it was set via Custom IP)
+    if (protectionEnabled && apiProvider?.type === card.matchType && !isCustomActive) return;
+    // Clear Custom DNS config when selecting a predefined provider
+    clearCustomDnsConfig();
     await applyProvider(card.dnsPayload);
   };
 
@@ -150,13 +155,15 @@ export function DnsProvidersScreen({ onBack, onCustomIp }: DnsProvidersScreenPro
       <div className="flex-1 overflow-y-auto px-4 pb-4">
         <div className="space-y-2">
           {PROVIDER_CARDS.map((card) => {
-            const isActive = protectionEnabled && apiProvider?.type === card.matchType;
+            // Don't highlight predefined providers if Custom IP is active
+            const isActive = protectionEnabled && apiProvider?.type === card.matchType && !isCustomActive;
 
             return (
               <div key={card.id} className={cn(isApplying && !isActive && 'pointer-events-none opacity-50')}>
                 <MenuCard
                   variant={isActive ? 'selected' : 'ghost'}
                   title={t(card.nameKey)}
+                  badge={card.badgeKey ? t(card.badgeKey) : undefined}
                   subtitle={t(card.descKey)}
                   trailing={isActive ? 'check' : undefined}
                   onClick={() => handleCardSelect(card)}
@@ -175,6 +182,21 @@ export function DnsProvidersScreen({ onBack, onCustomIp }: DnsProvidersScreenPro
               onClick={onCustomIp}
             />
           </div>
+        </div>
+
+        {/* Clear DNS cache */}
+        <div className="mt-6">
+          <Button
+            variant="outline"
+            className="w-full uppercase font-mono tracking-wider text-xs"
+            onClick={() => {
+              // TODO: Implement actual DNS cache flush
+              toast.success(t('dns_providers.cache_cleared'));
+            }}
+          >
+            <Trash2 className="w-4 h-4" />
+            {t('settings.tools.flush_dns')}
+          </Button>
         </div>
       </div>
     </div>

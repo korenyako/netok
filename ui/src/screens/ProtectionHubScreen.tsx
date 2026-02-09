@@ -5,6 +5,7 @@ import { MenuCard } from '@/components/MenuCard';
 import { CloseButton } from '../components/WindowControls';
 import { useDnsStore } from '../stores/useDnsStore';
 import { useVpnStore } from '../stores/vpnStore';
+import { getCustomDnsDisplayName } from '../utils/dnsProviderLookup';
 
 interface ProtectionHubScreenProps {
   onBack: () => void;
@@ -12,13 +13,12 @@ interface ProtectionHubScreenProps {
   onNavigateToVpn: () => void;
 }
 
-const KNOWN_PROVIDERS = ['Cloudflare', 'Google', 'AdGuard', 'Dns4Eu', 'CleanBrowsing', 'Quad9', 'OpenDns'];
+const KNOWN_PROVIDERS = ['Cloudflare', 'Google', 'AdGuard', 'Dns4Eu', 'Quad9', 'OpenDns', 'Custom'];
 
 const PROVIDER_DISPLAY: Record<string, string> = {
   Cloudflare: 'Cloudflare',
   AdGuard: 'AdGuard',
   Quad9: 'Quad9',
-  CleanBrowsing: 'CleanBrowsing',
   Google: 'Google',
   Dns4Eu: 'DNS4EU',
   OpenDns: 'OpenDNS',
@@ -34,7 +34,14 @@ export function ProtectionHubScreen({ onBack, onNavigateToDns, onNavigateToVpn }
   const dnsSubtitle = (() => {
     if (!isDnsEnabled) return t('dns_providers.status_disabled');
     if (dnsProvider) {
-      if (dnsProvider.type === 'Custom') return t('dns_providers.custom_display');
+      if (dnsProvider.type === 'Custom') {
+        // Try to recognize provider by IP address
+        const recognizedProvider = getCustomDnsDisplayName(
+          dnsProvider.primary || '',
+          dnsProvider.primaryIpv6
+        );
+        return recognizedProvider || t('dns_providers.custom_display');
+      }
       return PROVIDER_DISPLAY[dnsProvider.type] || dnsProvider.type;
     }
     return t('dns_providers.status_disabled');

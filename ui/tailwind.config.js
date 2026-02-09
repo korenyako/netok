@@ -15,7 +15,7 @@ export default {
           'Malgun Gothic', 'Apple SD Gothic Neo',
           'system-ui', 'sans-serif',
         ],
-        mono: ['Geist Mono', 'monospace'],
+        mono: ['"Martian Mono"', 'monospace'],
       },
       colors: {
         border: 'hsl(var(--border))',
@@ -80,6 +80,10 @@ export default {
         'accordion-up': {
           from: { height: 'var(--radix-accordion-content-height)' },
           to: { height: '0' },
+        },
+        'blink': {
+          '0%, 100%': { opacity: '0.2' },
+          '50%': { opacity: '1' },
         },
       },
       animation: {

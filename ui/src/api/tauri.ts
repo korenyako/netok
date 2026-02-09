@@ -78,7 +78,6 @@ export async function setSettings(json: string): Promise<void> {
 export type CloudflareVariant = 'Standard' | 'Malware' | 'Family';
 export type AdGuardVariant = 'Standard' | 'NonFiltering' | 'Family';
 export type Dns4EuVariant = 'Protective' | 'ProtectiveChild' | 'ProtectiveAd' | 'ProtectiveChildAd' | 'Unfiltered';
-export type CleanBrowsingVariant = 'Family' | 'Adult' | 'Security';
 export type Quad9Variant = 'Recommended' | 'SecuredEcs' | 'Unsecured';
 export type OpenDnsVariant = 'FamilyShield' | 'Home';
 
@@ -88,7 +87,6 @@ export type DnsProvider =
   | { type: 'Google' }
   | { type: 'AdGuard'; variant: AdGuardVariant }
   | { type: 'Dns4Eu'; variant: Dns4EuVariant }
-  | { type: 'CleanBrowsing'; variant: CleanBrowsingVariant }
   | { type: 'Quad9'; variant: Quad9Variant }
   | { type: 'OpenDns'; variant: OpenDnsVariant }
   | { type: 'Custom'; primary: string; secondary: string; primaryIpv6: string | null; secondaryIpv6: string | null };
@@ -99,6 +97,10 @@ export async function setDns(provider: DnsProvider): Promise<void> {
 
 export async function getDnsProvider(): Promise<DnsProvider> {
   return await invoke<DnsProvider>('get_dns_provider');
+}
+
+export async function testDnsServer(serverIp: string): Promise<boolean> {
+  return await invoke<boolean>('test_dns_server', { serverIp });
 }
 
 // IP geolocation lookup

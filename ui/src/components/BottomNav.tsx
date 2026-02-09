@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { NetokLogoIcon, ShieldIcon, WrenchIcon, SettingsIcon } from './icons/NavigationIcons';
+import { NetokLogoIcon, ShieldIcon, ToolsIcon, SettingsIcon } from './icons/NavigationIcons';
 import type { Screen } from '../hooks/useNavigation';
 
 interface BottomNavProps {
@@ -54,7 +54,7 @@ export function BottomNav({
             currentScreen === 'tools' ? 'text-foreground bg-accent' : 'text-muted-foreground'
           )}
         >
-          <WrenchIcon className="w-6 h-6" />
+          <ToolsIcon className="w-6 h-6" />
         </Button>
 
         <Button

@@ -18,6 +18,8 @@ interface MenuCardProps {
   icon?: ReactNode;
   /** Main title text */
   title: string;
+  /** Badge text displayed next to title */
+  badge?: string;
   /** Secondary description text */
   subtitle?: string;
   /** Right side element: 'chevron', 'check', or custom ReactNode */
@@ -45,6 +47,7 @@ export function MenuCard({
   variant = 'ghost',
   icon,
   title,
+  badge,
   subtitle,
   trailing,
   onClick,
@@ -85,13 +88,16 @@ export function MenuCard({
         )}
         <div className="flex-1 min-w-0">
           <div className={cn(
-            "text-base font-medium leading-normal",
+            "text-base font-medium leading-normal flex items-center gap-2",
             muted && "text-muted-foreground"
           )}>
             {title}
+            {badge && (
+              <span className="text-xs font-normal text-primary bg-primary/10 px-1.5 py-0.5 rounded">{badge}</span>
+            )}
           </div>
           {subtitle && (
-            <div className="text-sm font-light text-muted-foreground leading-normal mt-0.5">
+            <div className="text-sm font-normal text-muted-foreground leading-normal mt-0.5">
               {subtitle}
             </div>
           )}

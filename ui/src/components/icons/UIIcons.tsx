@@ -24,6 +24,27 @@ function SvgIcon({ size, children, ...props }: IconProps & { children: ReactNode
   );
 }
 
+// ── Info (filled) ───────────────────────────────────────
+
+export function InfoCircleFilled({ size, ...props }: IconProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size ?? 16}
+      height={size ?? 16}
+      viewBox="0 0 16 16"
+      fill="currentColor"
+      {...props}
+    >
+      <path
+        fillRule="evenodd"
+        d="M15 8A7 7 0 1 1 1 8a7 7 0 0 1 14 0ZM9 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM6.75 8a.75.75 0 0 0 0 1.5h.75v1.75a.75.75 0 0 0 1.5 0v-2.5A.75.75 0 0 0 8.25 8h-1.5Z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
+}
+
 // ── Navigation ──────────────────────────────────────────
 
 export function ArrowLeft(props: IconProps) {
@@ -39,6 +60,24 @@ export function ChevronRight(props: IconProps) {
   return (
     <SvgIcon {...props}>
       <path d="m9 18 6-6-6-6" />
+    </SvgIcon>
+  );
+}
+
+export function ArrowDown(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <path d="M12 5v14" />
+      <path d="m19 12-7 7-7-7" />
+    </SvgIcon>
+  );
+}
+
+export function ArrowUp(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <path d="M12 19V5" />
+      <path d="m5 12 7-7 7 7" />
     </SvgIcon>
   );
 }
@@ -245,6 +284,40 @@ export function Trash2(props: IconProps) {
       <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
       <line x1="10" x2="10" y1="11" y2="17" />
       <line x1="14" x2="14" y1="11" y2="17" />
+    </SvgIcon>
+  );
+}
+
+// ── Tools ───────────────────────────────────────────────
+
+export function Activity(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2" />
+    </SvgIcon>
+  );
+}
+
+export function Gauge(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <path d="m12 14 4-4" />
+      <path d="M3.34 19a10 10 0 1 1 17.32 0" />
+    </SvgIcon>
+  );
+}
+
+export function Radar(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <path d="M19.07 4.93A10 10 0 0 0 6.99 3.34" />
+      <path d="M4 6h.01" />
+      <path d="M2.29 9.62A10 10 0 1 0 21.31 8.35" />
+      <path d="M16.24 7.76A6 6 0 1 0 8.23 16.67" />
+      <path d="M12 18h.01" />
+      <path d="M17.99 11.66A6 6 0 0 1 15.77 16.67" />
+      <circle cx="12" cy="12" r="2" />
+      <path d="m13.41 10.59 5.66-5.66" />
     </SvgIcon>
   );
 }

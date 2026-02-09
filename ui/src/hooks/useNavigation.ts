@@ -7,6 +7,7 @@ export type SecuritySubScreen = 'hub' | 'dns-providers' | 'custom-ip' | 'vpn' | 
 export function useNavigation() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('home');
   const [showDiagnostics, setShowDiagnostics] = useState(false);
+  const [showSpeedTest, setShowSpeedTest] = useState(false);
   const [settingsSubScreen, setSettingsSubScreen] = useState<SettingsSubScreen>('main');
   const [securitySubScreen, setSecuritySubScreen] = useState<SecuritySubScreen>('hub');
 
@@ -37,10 +38,12 @@ export function useNavigation() {
   return {
     currentScreen,
     showDiagnostics,
+    showSpeedTest,
     settingsSubScreen,
     securitySubScreen,
     setCurrentScreen,
     setShowDiagnostics,
+    setShowSpeedTest,
     setSettingsSubScreen,
     setSecuritySubScreen,
     navigateToHome,

@@ -31,7 +31,7 @@ pub use domain::{
 pub use diagnostics::{
     check_computer, check_internet, check_network, check_router, detect_dns_provider,
     get_computer_info, get_internet_info, get_network_info, get_router_info, lookup_ip_location,
-    run_diagnostics, IpInfoResponse,
+    run_diagnostics, test_dns_server, IpInfoResponse,
 };
 
 // Re-export infrastructure functions used by bridge
@@ -228,13 +228,6 @@ mod tests {
         let provider_home =
             detect_dns_provider(&["208.67.222.222".to_string(), "208.67.220.220".to_string()]);
         assert!(matches!(provider_home, DnsProvider::OpenDnsHome));
-    }
-
-    #[test]
-    fn test_dns_provider_cleanbrowsing() {
-        let provider =
-            detect_dns_provider(&["185.228.168.168".to_string(), "185.228.169.168".to_string()]);
-        assert!(matches!(provider, DnsProvider::CleanBrowsingFamily));
     }
 
     #[test]

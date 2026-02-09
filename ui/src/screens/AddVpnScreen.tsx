@@ -119,7 +119,7 @@ export function AddVpnScreen({ onBack, onAdded }: AddVpnScreenProps) {
       <div className="flex-1 px-4 pb-4 overflow-y-auto space-y-3">
         <Card>
           <CardContent className="px-4 py-3 space-y-4">
-            <p className="text-xs text-muted-foreground">
+            <p className="text-sm font-normal text-muted-foreground">
               {t('vpn.key_hint')}
             </p>
 
@@ -136,7 +136,7 @@ export function AddVpnScreen({ onBack, onAdded }: AddVpnScreenProps) {
             </div>
 
             <Button
-              className="w-full"
+              className="w-full uppercase font-mono tracking-wider text-xs"
               onClick={handleAdd}
               disabled={!keyValue.trim() || isLookingUp}
             >
@@ -145,7 +145,7 @@ export function AddVpnScreen({ onBack, onAdded }: AddVpnScreenProps) {
           </CardContent>
         </Card>
 
-        <p className="text-center text-xs text-muted-foreground px-4">
+        <p className="text-center text-sm font-normal text-muted-foreground px-4">
           {t('vpn.supported_full')}
         </p>
       </div>

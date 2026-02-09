@@ -168,7 +168,6 @@ pub enum DnsProviderType {
     Google,
     AdGuard { variant: AdGuardVariant },
     Dns4Eu { variant: Dns4EuVariant },
-    CleanBrowsing { variant: CleanBrowsingVariant },
     Quad9 { variant: Quad9Variant },
     OpenDns { variant: OpenDnsVariant },
     Custom {
@@ -200,13 +199,6 @@ pub enum Dns4EuVariant {
     ProtectiveAd,      // 86.54.11.13
     ProtectiveChildAd, // 86.54.11.11
     Unfiltered,        // 86.54.11.100
-}
-
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
-pub enum CleanBrowsingVariant {
-    Family,   // 185.228.168.168
-    Adult,    // TBD
-    Security, // TBD
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
@@ -243,11 +235,6 @@ fn dns_provider_to_core(provider: DnsProviderType) -> netok_core::DnsProvider {
             Dns4EuVariant::ProtectiveAd => netok_core::DnsProvider::Dns4EuProtectiveAd,
             Dns4EuVariant::ProtectiveChildAd => netok_core::DnsProvider::Dns4EuProtectiveChildAd,
             Dns4EuVariant::Unfiltered => netok_core::DnsProvider::Dns4EuUnfiltered,
-        },
-        DnsProviderType::CleanBrowsing { variant } => match variant {
-            CleanBrowsingVariant::Family => netok_core::DnsProvider::CleanBrowsingFamily,
-            CleanBrowsingVariant::Adult => netok_core::DnsProvider::CleanBrowsingAdult,
-            CleanBrowsingVariant::Security => netok_core::DnsProvider::CleanBrowsingSecurity,
         },
         DnsProviderType::Quad9 { variant } => match variant {
             Quad9Variant::Recommended => netok_core::DnsProvider::Quad9Recommended,
@@ -309,16 +296,6 @@ fn dns_provider_from_core(provider: netok_core::DnsProvider) -> DnsProviderType 
         netok_core::DnsProvider::Dns4EuUnfiltered => DnsProviderType::Dns4Eu {
             variant: Dns4EuVariant::Unfiltered,
         },
-        // CleanBrowsing
-        netok_core::DnsProvider::CleanBrowsingFamily => DnsProviderType::CleanBrowsing {
-            variant: CleanBrowsingVariant::Family,
-        },
-        netok_core::DnsProvider::CleanBrowsingAdult => DnsProviderType::CleanBrowsing {
-            variant: CleanBrowsingVariant::Adult,
-        },
-        netok_core::DnsProvider::CleanBrowsingSecurity => DnsProviderType::CleanBrowsing {
-            variant: CleanBrowsingVariant::Security,
-        },
         // Quad9
         netok_core::DnsProvider::Quad9Recommended => DnsProviderType::Quad9 {
             variant: Quad9Variant::Recommended,
@@ -350,23 +327,51 @@ fn dns_provider_from_core(provider: netok_core::DnsProvider) -> DnsProviderType 
 
 // Set DNS provider (async wrapper)
 pub async fn set_dns_provider(provider: DnsProviderType) -> Result<(), String> {
-    let core_provider = dns_provider_to_core(provider);
+    eprintln!("[DNS] Setting provider: {:?}", provider);
+    let core_provider = dns_provider_to_core(provider.clone());
 
     // Run blocking DNS configuration in a separate thread
-    tokio::task::spawn_blocking(move || netok_core::set_dns(core_provider))
+    let result = tokio::task::spawn_blocking(move || netok_core::set_dns(core_provider))
         .await
-        .map_err(|e| format!("Failed to run DNS configuration task: {}", e))?
+        .map_err(|e| format!("Failed to run DNS configuration task: {}", e))?;
+
+    match &result {
+        Ok(()) => eprintln!("[DNS] Provider set successfully: {:?}", provider),
+        Err(e) => eprintln!("[DNS] Failed to set provider: {}", e),
+    }
+
+    result
 }
 
 // Get current DNS provider (async wrapper)
 pub async fn get_dns_provider() -> Result<DnsProviderType, String> {
+    eprintln!("[DNS] Getting current provider...");
+
     // Run blocking DNS detection in a separate thread
-    tokio::task::spawn_blocking(|| {
+    let result = tokio::task::spawn_blocking(|| {
         let dns_servers = netok_core::get_current_dns()?;
+        eprintln!("[DNS] Detected DNS servers: {:?}", dns_servers);
         let core_provider = netok_core::detect_dns_provider(&dns_servers);
+        eprintln!("[DNS] Detected core provider: {:?}", core_provider);
         Ok(dns_provider_from_core(core_provider))
     })
     .await
-    .map_err(|e| format!("Failed to run DNS detection task: {}", e))?
+    .map_err(|e| format!("Failed to run DNS detection task: {}", e))?;
+
+    match &result {
+        Ok(provider) => eprintln!("[DNS] Returning provider: {:?}", provider),
+        Err(e) => eprintln!("[DNS] Failed to get provider: {}", e),
+    }
+
+    result
+}
+
+// Test if a DNS server is reachable (async wrapper)
+pub async fn test_dns_server_reachable(server_ip: String) -> Result<bool, String> {
+    tokio::task::spawn_blocking(move || {
+        netok_core::test_dns_server(&server_ip, 5) // 5 second timeout
+    })
+    .await
+    .map_err(|e| format!("Failed to run DNS server test task: {}", e))?
 }
 

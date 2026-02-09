@@ -42,6 +42,13 @@ async fn get_dns_provider() -> Result<DnsProviderType, String> {
 }
 
 #[tauri::command]
+async fn test_dns_server(server_ip: String) -> Result<bool, String> {
+    netok_bridge::test_dns_server_reachable(server_ip)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
 fn run_all() -> Result<serde_json::Value, String> {
     // Simple test JSON with hostname, local_ip, isp, etc.
     let data = serde_json::json!({
@@ -176,6 +183,7 @@ pub fn run() {
             run_diagnostics,
             set_dns,
             get_dns_provider,
+            test_dns_server,
             run_all,
             check_computer,
             check_network,

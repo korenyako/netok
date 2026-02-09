@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Copy, ExternalLink } from '../components/icons/UIIcons';
-import { NetokLogoIcon, ShieldIcon, WrenchIcon, SettingsIcon } from '../components/icons/NavigationIcons';
+import { NetokLogoIcon, ShieldIcon, ToolsIcon, SettingsIcon } from '../components/icons/NavigationIcons';
 import { openUrl } from '@tauri-apps/plugin-opener';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -133,7 +133,7 @@ export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToHome, onN
                   <p className="text-sm text-muted-foreground">{row.label}</p>
                   {row.copyable ? (
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-foreground font-mono">{row.value}</span>
+                      <span className="text-sm text-cyan-600 dark:text-cyan-400 font-mono">{row.value}</span>
                       <Button
                         variant="ghost"
                         size="icon"
@@ -154,7 +154,7 @@ export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToHome, onN
         {routerIp && (
           <Button
             variant="outline"
-            className="w-full mt-4"
+            className="w-full mt-4 uppercase font-mono tracking-wider text-xs"
             onClick={handleOpenRouter}
           >
             <ExternalLink className="w-4 h-4 me-2" />
@@ -173,7 +173,7 @@ export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToHome, onN
             <ShieldIcon className="w-6 h-6" />
           </Button>
           <Button variant="ghost" size="icon" className="h-12 w-12 text-muted-foreground" onClick={onNavigateToTools}>
-            <WrenchIcon className="w-6 h-6" />
+            <ToolsIcon className="w-6 h-6" />
           </Button>
           <Button variant="ghost" size="icon" className="h-12 w-12 text-muted-foreground" onClick={onNavigateToSettings}>
             <SettingsIcon className="w-6 h-6" />

@@ -55,7 +55,7 @@ export function CloseBehaviorSettingsScreen({ onBack }: CloseBehaviorSettingsScr
                 className={cn(
                   'cursor-pointer transition-colors',
                   isSelected
-                    ? 'border-primary bg-primary/10 hover:bg-primary/15 dark:bg-primary/10 dark:hover:bg-primary/15'
+                    ? 'border-muted-foreground/30 bg-accent hover:bg-accent/80'
                     : 'bg-transparent hover:bg-accent'
                 )}
                 onClick={() => setCloseBehavior(option.id)}
@@ -68,7 +68,7 @@ export function CloseBehaviorSettingsScreen({ onBack }: CloseBehaviorSettingsScr
                     </div>
                   </div>
                   {isSelected && (
-                    <Check className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                    <Check className="w-5 h-5 text-foreground shrink-0 mt-0.5" />
                   )}
                 </CardContent>
               </Card>

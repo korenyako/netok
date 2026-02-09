@@ -56,7 +56,10 @@
       "Bash(del \"c:\\\\Work\\\\Netok\\\\netok\\\\_validate_i18n.mjs\")",
       "Bash(powershell -NoProfile -Command:*)",
       "Bash(powershell -NoProfile -File -:*)",
-      "Bash(powershell:*)"
+      "Bash(powershell:*)",
+      "WebFetch(domain:locate.measurementlab.net)",
+      "Bash(curl:*)",
+      "Bash(git status:*)"
     ],
     "deny": [],
     "ask": []

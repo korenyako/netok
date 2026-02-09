@@ -56,7 +56,7 @@ export function LanguageSettingsScreen({ onBack }: LanguageSettingsScreenProps) 
                 className={cn(
                   'cursor-pointer transition-colors',
                   isSelected
-                    ? 'border-primary bg-primary/10 hover:bg-primary/15 dark:bg-primary/10 dark:hover:bg-primary/15'
+                    ? 'border-muted-foreground/30 bg-accent hover:bg-accent/80'
                     : 'bg-transparent hover:bg-accent'
                 )}
                 onClick={() => handleLanguageChange(code)}
@@ -64,7 +64,7 @@ export function LanguageSettingsScreen({ onBack }: LanguageSettingsScreenProps) 
                 <CardContent className="flex items-center gap-3 px-4 py-3">
                   <span className="text-base font-medium leading-normal flex-1">{meta.native}</span>
                   {isSelected && (
-                    <Check className="w-5 h-5 text-primary shrink-0" />
+                    <Check className="w-5 h-5 text-foreground shrink-0" />
                   )}
                 </CardContent>
               </Card>

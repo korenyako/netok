@@ -8,10 +8,10 @@ interface DiagnosticMessageProps {
   className?: string;
 }
 
-const severityStyles: Record<DiagnosticSeverity, { border: string; bead: string; title: string }> = {
-  success: { border: 'border-primary/50', bead: 'bg-primary', title: 'text-primary' },
-  warning: { border: 'border-warning/50', bead: 'bg-warning', title: 'text-warning' },
-  error: { border: 'border-destructive/50', bead: 'bg-destructive', title: 'text-destructive' },
+const severityStyles: Record<DiagnosticSeverity, { bead: string; title: string }> = {
+  success: { bead: 'bg-primary', title: 'text-primary' },
+  warning: { bead: 'bg-warning', title: 'text-warning' },
+  error: { bead: 'bg-destructive', title: 'text-destructive' },
 };
 
 export function DiagnosticMessage({ scenario, severity, className }: DiagnosticMessageProps) {
@@ -20,7 +20,7 @@ export function DiagnosticMessage({ scenario, severity, className }: DiagnosticM
   const action = t(`diagnostic.scenario.${scenario}.action`);
 
   return (
-    <div className={cn('rounded-lg border p-4', styles.border, className)}>
+    <div className={cn('rounded-lg bg-accent p-4', className)}>
       <div className="flex items-start gap-3">
         <span className="flex items-center justify-center w-4 h-4 shrink-0 mt-1">
           <span className={cn('w-2 h-2 rounded-full', styles.bead)} />

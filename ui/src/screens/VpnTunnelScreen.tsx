@@ -77,12 +77,12 @@ export function VpnTunnelScreen({ onBack, onAddVpn }: VpnTunnelScreenProps) {
                     <Plus className="w-6 h-6 text-muted-foreground" />
                   </div>
                   <div className="text-base font-medium mb-1">{t('vpn.add_vpn')}</div>
-                  <div className="text-sm text-muted-foreground">{t('vpn.add_vpn_desc')}</div>
+                  <div className="text-sm font-normal text-muted-foreground">{t('vpn.add_vpn_desc')}</div>
                 </div>
               </CardContent>
             </Card>
 
-            <p className="text-center text-xs text-muted-foreground px-4">
+            <p className="text-center text-sm font-normal text-muted-foreground px-4">
               {t('vpn.supported_formats')}
             </p>
           </div>

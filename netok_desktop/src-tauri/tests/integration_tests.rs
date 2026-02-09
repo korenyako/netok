@@ -240,7 +240,7 @@ async fn test_set_dns_custom_provider() {
 #[test]
 fn test_dns_provider_all_variants_serialize() {
     use netok_bridge::{
-        AdGuardVariant, CleanBrowsingVariant, CloudflareVariant, Dns4EuVariant, OpenDnsVariant,
+        AdGuardVariant, CloudflareVariant, Dns4EuVariant, OpenDnsVariant,
         Quad9Variant,
     };
 
@@ -267,9 +267,6 @@ fn test_dns_provider_all_variants_serialize() {
         },
         DnsProviderType::Dns4Eu {
             variant: Dns4EuVariant::Protective,
-        },
-        DnsProviderType::CleanBrowsing {
-            variant: CleanBrowsingVariant::Family,
         },
         DnsProviderType::Quad9 {
             variant: Quad9Variant::Recommended,
