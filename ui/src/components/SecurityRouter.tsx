@@ -46,18 +46,11 @@ export function SecurityRouter({ subScreen, onSetSubScreen, onBack }: SecurityRo
       );
 
     case 'vpn':
-      return (
-        <VpnTunnelScreen
-          onBack={handleBackToHub}
-          onAddVpn={() => onSetSubScreen('vpn-add')}
-        />
-      );
-
     case 'vpn-add':
       return (
         <AddVpnScreen
-          onBack={() => onSetSubScreen('vpn')}
-          onAdded={() => onSetSubScreen('vpn')}
+          onBack={handleBackToHub}
+          onAdded={handleBackToHub}
         />
       );
 

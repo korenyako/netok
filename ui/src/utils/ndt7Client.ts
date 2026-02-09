@@ -462,11 +462,11 @@ async function runMockSpeedTest(
   callbacks: SpeedTestCallbacks,
   signal: AbortSignal,
 ): Promise<SpeedTestResult> {
-  const mockPing = noise(14, 6);
-  const mockDownload = noise(85, 30);
-  const mockUpload = noise(35, 15);
-  const mockLatency = noise(22, 8);
-  const mockJitter = noise(3, 2);
+  const mockPing = noise(45, 8);
+  const mockDownload = noise(62, 15);
+  const mockUpload = noise(18, 6);
+  const mockLatency = noise(58, 10);
+  const mockJitter = noise(12, 4);
 
   // Ping phase
   for (let i = 1; i <= 3; i++) {

@@ -109,7 +109,7 @@ export function AddVpnScreen({ onBack, onAdded }: AddVpnScreenProps) {
             <ArrowLeft className="w-5 h-5 text-muted-foreground rtl-flip" />
           </Button>
           <h1 className="flex-1 text-lg font-semibold text-foreground">
-            {t('vpn.add_vpn')}
+            {t('vpn.title')}
           </h1>
           <CloseButton />
         </div>

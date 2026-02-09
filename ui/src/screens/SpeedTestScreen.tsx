@@ -350,7 +350,7 @@ function LatencyMetrics() {
 
       {/* Tooltip popover */}
       {activeTooltip && (
-        <div className="absolute left-2 right-2 top-full mt-2 bg-card rounded-lg p-3 text-sm text-foreground leading-relaxed z-50 shadow-lg">
+        <div className="absolute left-2 right-2 top-full mt-2 bg-card rounded-lg p-3 text-sm text-foreground leading-relaxed z-50">
           {t(`speed_test.tooltip_${activeTooltip}`)}
         </div>
       )}
@@ -408,7 +408,7 @@ function WarningCards() {
   if (warnings.length === 0) return null;
 
   return (
-    <div className="space-y-3 mb-4">
+    <div className="space-y-3 mb-4 px-1">
       {warnings.map((w) => (
         <WarningCard key={w.titleKey} warning={w} t={t} />
       ))}
@@ -418,15 +418,13 @@ function WarningCards() {
 
 function WarningCard({ warning, t }: { warning: SpeedTestWarning; t: (key: string, params?: Record<string, string>) => string }) {
   return (
-    <div className="rounded-xl p-4 border border-amber-900/50" style={{
-      background: 'linear-gradient(135deg, rgba(61,42,0,0.4) 0%, rgba(45,32,0,0.4) 100%)',
-    }}>
+    <div className="rounded-xl p-4 bg-amber-50 dark:bg-amber-900/15">
       <div className="flex items-center gap-2 mb-2">
-        <span className="text-amber-400 text-sm font-medium">
+        <span className="text-amber-600 dark:text-amber-300/70 text-sm font-medium">
           {t(warning.titleKey)}
         </span>
       </div>
-      <p className="text-sm text-amber-200/80 leading-relaxed">
+      <p className="text-sm text-amber-600 dark:text-amber-300/70 leading-relaxed">
         {t(warning.descKey, warning.descParams)}
       </p>
     </div>
@@ -442,7 +440,7 @@ function ExperienceRatingsSection() {
   if (experienceRatings.length === 0) return null;
 
   return (
-    <div className="space-y-4 mt-5 px-1">
+    <div className="grid grid-cols-2 gap-3 mt-5 px-1">
       {experienceRatings.map((rating) => (
         <RatingBar key={rating.nameKey} rating={rating} t={t} />
       ))}
@@ -452,14 +450,12 @@ function ExperienceRatingsSection() {
 
 function RatingBar({ rating, t }: { rating: ExperienceRating; t: (key: string) => string }) {
   return (
-    <div>
-      <div className="flex justify-between items-center mb-1.5">
-        <span className="text-sm text-foreground">{t(rating.nameKey)}</span>
-        <span className="text-xs" style={{ color: rating.color }}>
-          {t(`speed_test.rating_${rating.level}`)}
-        </span>
-      </div>
-      <div className="h-1 bg-accent rounded-full overflow-hidden">
+    <div className="bg-accent/50 rounded-xl p-3">
+      <span className="text-sm text-foreground">{t(rating.nameKey)}</span>
+      <span className="block text-xs font-medium mt-0.5 mb-2" style={{ color: rating.color }}>
+        {t(`speed_test.rating_${rating.level}`)}
+      </span>
+      <div className="h-1 bg-black/10 dark:bg-white/15 rounded-full overflow-hidden">
         <div
           className="h-full rounded-full transition-all duration-500"
           style={{

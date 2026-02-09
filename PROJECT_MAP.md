@@ -335,7 +335,6 @@ Generated: 2026-02-09
     "clsx": "^2.1.1",
     "geist": "^1.5.1",
     "i18next": "^25.5.2",
-
     "netok": "file:..",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
@@ -358,6 +357,7 @@ Generated: 2026-02-09
     "autoprefixer": "^10.4.21",
     "eslint": "^9.33.0",
     "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
 // ... (truncated due to syntax error)
 ```
 
