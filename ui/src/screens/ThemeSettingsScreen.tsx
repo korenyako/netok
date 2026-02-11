@@ -3,7 +3,6 @@ import { ArrowLeft, Check } from '../components/icons/UIIcons';
 import { useThemeStore } from '../stores/themeStore';
 import type { Theme } from '../stores/themeStore';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent } from '@/components/ui/card';
 import { CloseButton } from '../components/WindowControls';
 import { cn } from '@/lib/utils';
@@ -49,9 +48,7 @@ export function ThemeSettingsScreen({ onBack }: ThemeSettingsScreenProps) {
       </div>
 
       {/* Content */}
-      <ScrollArea className="flex-1 px-4">
-
-        {/* Theme Options */}
+      <div className="px-4">
         <div className="space-y-2">
           {themes.map((theme) => {
             const isSelected = currentTheme === theme.id;
@@ -66,22 +63,20 @@ export function ThemeSettingsScreen({ onBack }: ThemeSettingsScreenProps) {
                 )}
                 onClick={() => handleThemeChange(theme.id)}
               >
-                <CardContent className="flex items-start gap-3 px-4 py-3">
+                <CardContent className="flex items-center gap-3 px-4 py-3">
                   <div className="flex-1 min-w-0">
                     <span className="text-base font-medium leading-normal">{theme.title}</span>
                     <div className="text-sm text-muted-foreground leading-normal mt-0.5">
                       {theme.description}
                     </div>
                   </div>
-                  {isSelected && (
-                    <Check className="w-5 h-5 text-foreground shrink-0 mt-0.5" />
-                  )}
+                  {isSelected && <Check className="w-5 h-5 text-primary shrink-0" />}
                 </CardContent>
               </Card>
             );
           })}
         </div>
-      </ScrollArea>
+      </div>
     </div>
   );
 }

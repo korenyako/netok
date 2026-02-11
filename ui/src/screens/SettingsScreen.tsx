@@ -30,7 +30,10 @@ export function SettingsScreen({ onNavigateToTheme, onNavigateToLanguage, onNavi
     ? t('settings.general.theme_dark')
     : t('settings.general.theme_light');
 
-  const languageSubtitle = LANGUAGES[currentLanguage as LanguageCode]?.native || currentLanguage;
+  const savedLangPref = localStorage.getItem('netok.lang') || 'system';
+  const languageSubtitle = savedLangPref === 'system'
+    ? t('lang.system')
+    : LANGUAGES[currentLanguage as LanguageCode]?.native || currentLanguage;
 
   const closeBehaviorSubtitle = closeBehavior === 'minimize_to_tray'
     ? t('settings.general.close_minimize')

@@ -17,7 +17,7 @@
     "custom_ip_hint": "Insira os endereços do servidor DNS do seu provedor ou de outro serviço DNS.",
     "custom_ip_invalid": "Endereço IP inválido",
     "custom_ipv6_invalid": "Endereço IPv6 inválido",
-    "custom_ip_apply": "Aplicar",
+    "custom_ip_save": "Salvar",
     "optional": "opcional",
     "custom_display": "Personalizado",
     "status_disabled": "Desativado",
@@ -223,5 +223,23 @@
         "action": "Aproxime-se do roteador ou remova obstáculos entre ele e seu computador."
       }
     }
+  },
+  "lang": {
+    "system": "Sistema",
+    "en": "Inglês",
+    "ru": "Russo",
+    "de": "Alemão",
+    "es": "Espanhol",
+    "fr": "Francês",
+    "it": "Italiano",
+    "pt": "Português",
+    "tr": "Turco",
+    "fa": "Persa",
+    "zh": "Chinês",
+    "ja": "Japonês",
+    "ko": "Coreano",
+    "uk": "Ucraniano",
+    "pl": "Polonês",
+    "search": "Encontrar idioma"
   }
 }

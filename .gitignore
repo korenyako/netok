@@ -30,5 +30,9 @@ netok_desktop/dist
 speedtest-prototype*.html
 nul
 
+# Sidecar binaries (bundled at build time, not committed)
+netok_desktop/src-tauri/binaries/*.exe
+netok_desktop/src-tauri/binaries/sing-box-*
+
 # Environment overrides
 .env.development

@@ -13,6 +13,7 @@ pub mod arp;
 pub mod connection;
 pub mod dns;
 pub mod gateway;
+pub mod vpn;
 pub mod wifi;
 
 // Re-export commonly used functions

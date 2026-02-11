@@ -133,6 +133,17 @@ function transformSingleNode(
   };
 }
 
+// Update node in-place by id, or append if not found
+function upsertNode(nodes: NetworkNode[], node: NetworkNode): NetworkNode[] {
+  const idx = nodes.findIndex(n => n.id === node.id);
+  if (idx >= 0) {
+    const updated = [...nodes];
+    updated[idx] = node;
+    return updated;
+  }
+  return [...nodes, node];
+}
+
 // Run ID for cancellation
 let runIdCounter = 0;
 
@@ -143,8 +154,10 @@ export const useDiagnosticsStore = create<DiagnosticsStore>((set, get) => ({
     const thisRunId = ++runIdCounter;
     const stale = () => runIdCounter !== thisRunId;
 
-    // Start running - preserve previous nodes/networkInfo until new data arrives
+    // Start running - clear nodes so they appear one by one
     set({
+      nodes: [],
+      rawResults: new Map(),
       isRunning: true,
       currentCheckIndex: 0,
       error: null,
@@ -156,14 +169,12 @@ export const useDiagnosticsStore = create<DiagnosticsStore>((set, get) => ({
       if (stale()) return;
 
       const computerNode = transformSingleNode(computerResult, t);
-      set(() => {
-        // Clear old data when first new result arrives
-        const newRawResults = new Map<string, SingleNodeResult>();
+      set((state) => {
+        const newRawResults = new Map(state.rawResults);
         newRawResults.set(computerResult.node.id, computerResult);
         return {
-          nodes: [computerNode],
+          nodes: upsertNode(state.nodes, computerNode),
           rawResults: newRawResults,
-          networkInfo: null,
           currentCheckIndex: 1,
         };
       });
@@ -178,7 +189,7 @@ export const useDiagnosticsStore = create<DiagnosticsStore>((set, get) => ({
         const newRawResults = new Map(state.rawResults);
         newRawResults.set(networkResult.node.id, networkResult);
         return {
-          nodes: [...state.nodes, networkNode],
+          nodes: upsertNode(state.nodes, networkNode),
           rawResults: newRawResults,
           currentCheckIndex: 2,
           networkInfo: networkResult.network,
@@ -194,7 +205,7 @@ export const useDiagnosticsStore = create<DiagnosticsStore>((set, get) => ({
         const newRawResults = new Map(state.rawResults);
         newRawResults.set(routerResult.node.id, routerResult);
         return {
-          nodes: [...state.nodes, routerNode],
+          nodes: upsertNode(state.nodes, routerNode),
           rawResults: newRawResults,
           currentCheckIndex: 3,
         };
@@ -209,7 +220,7 @@ export const useDiagnosticsStore = create<DiagnosticsStore>((set, get) => ({
         const newRawResults = new Map(state.rawResults);
         newRawResults.set(internetResult.node.id, internetResult);
         return {
-          nodes: [...state.nodes, internetNode],
+          nodes: upsertNode(state.nodes, internetNode),
           rawResults: newRawResults,
           currentCheckIndex: 4,
           isRunning: false,

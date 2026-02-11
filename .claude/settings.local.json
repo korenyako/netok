@@ -59,7 +59,13 @@
       "Bash(powershell:*)",
       "WebFetch(domain:locate.measurementlab.net)",
       "Bash(curl:*)",
-      "Bash(git status:*)"
+      "Bash(git status:*)",
+      "Bash(cd:*)",
+      "WebFetch(domain:v2.tauri.app)",
+      "WebFetch(domain:docs.rs)",
+      "WebFetch(domain:sing-box.sagernet.org)",
+      "Bash(dir:*)",
+      "Bash(d:/Work/Netok/netok/netok_desktop/src-tauri/binaries/sing-box-x86_64-pc-windows-msvc.exe:*)"
     ],
     "deny": [],
     "ask": []

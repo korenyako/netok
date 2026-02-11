@@ -1,5 +1,6 @@
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
+import { LANGUAGES, type LanguageCode } from './constants/languages';
 import enTranslations from './i18n/en.json';
 import ruTranslations from './i18n/ru.json';
 import deTranslations from './i18n/de.json';
@@ -32,14 +33,49 @@ const resources = {
   pl: { translation: plTranslations },
 };
 
+const supportedCodes = Object.keys(LANGUAGES) as LanguageCode[];
+
+/** Resolve navigator.language to one of our supported language codes */
+export function resolveSystemLanguage(): LanguageCode {
+  const browserLang = navigator.language; // e.g. "ru-RU", "en-US", "zh-CN"
+  const base = browserLang.split('-')[0].toLowerCase();
+  if (supportedCodes.includes(base as LanguageCode)) {
+    return base as LanguageCode;
+  }
+  return 'en';
+}
+
+/** Get the display string for the system language, e.g. "Русский (Россия)" */
+export function getSystemLanguageDisplay(): string {
+  const browserLang = navigator.language;
+  const resolved = resolveSystemLanguage();
+  const nativeName = LANGUAGES[resolved].native;
+  // Try to get region from Intl.DisplayNames
+  try {
+    const parts = browserLang.split('-');
+    if (parts.length > 1) {
+      const regionCode = parts[1].toUpperCase();
+      const displayNames = new Intl.DisplayNames([browserLang], { type: 'region' });
+      const regionName = displayNames.of(regionCode);
+      if (regionName) {
+        return `${nativeName} (${regionName})`;
+      }
+    }
+  } catch {
+    // fallback
+  }
+  return nativeName;
+}
+
 // Read saved language from localStorage
-const savedLang = localStorage.getItem('netok.lang') || 'ru';
+const savedLang = localStorage.getItem('netok.lang') || 'system';
+const resolvedLang = savedLang === 'system' ? resolveSystemLanguage() : savedLang;
 
 i18next
   .use(initReactI18next)
   .init({
     resources,
-    lng: savedLang,
+    lng: resolvedLang,
     fallbackLng: 'en',
     interpolation: { escapeValue: false },
     returnEmptyString: false,

@@ -1,6 +1,6 @@
 # Project Map - Netok
 
-Generated: 2026-02-09
+Generated: 2026-02-11
 
 ## TREE (ASCII)
 
@@ -53,6 +53,10 @@ Generated: 2026-02-09
 │   │   └── diagnostics_benchmark.rs
 │   ├── src
 │   │   ├── infrastructure
+│   │   │   ├── vpn
+│   │   │   │   ├── config.rs
+│   │   │   │   ├── mod.rs
+│   │   │   │   └── uri_parser.rs
 │   │   │   ├── adapter.rs
 │   │   │   ├── arp.rs
 │   │   │   ├── connection.rs
@@ -90,6 +94,8 @@ Generated: 2026-02-09
 │   │   ├── main.tsx
 │   │   └── vite-env.d.ts
 │   ├── src-tauri
+│   │   ├── binaries
+│   │   │   └── sing-box-x86_64-pc-windows-msvc.exe
 │   │   ├── capabilities
 │   │   │   └── default.json
 │   │   ├── gen
@@ -225,7 +231,8 @@ Generated: 2026-02-09
 │   │   │   ├── dnsProviderLookup.ts
 │   │   │   ├── formatUpdatedAt.ts
 │   │   │   ├── ndt7Client.ts
-│   │   │   └── notifications.ts
+│   │   │   ├── notifications.ts
+│   │   │   └── vpnUri.ts
 │   │   ├── App.tsx
 │   │   ├── i18n.ts
 │   │   ├── index.css
@@ -299,6 +306,12 @@ Generated: 2026-02-09
         "decorations": false,
         "transparent": true
       }
+    ]
+  },
+
+  "bundle": {
+    "externalBin": [
+      "binaries/sing-box"
     ]
   }
 }
@@ -435,7 +448,6 @@ import { StatusScreen } from './screens/StatusScreen';
 import { DiagnosticsScreen } from './screens/DiagnosticsScreen';
 import { ToolsScreen } from './screens/ToolsScreen';
 import { SpeedTestScreen } from './screens/SpeedTestScreen';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { useNavigation } from './hooks/useNavigation';
 
 function App() {
@@ -475,7 +487,8 @@ function App() {
 
   if (showDiagnostics) {
     return (
-      <ThemeProvider>}}
+      <ThemeProvider>
+        <Toaster />}}
 
 export default App;
 ```

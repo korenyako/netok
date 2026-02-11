@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, RotateCw, ChevronRight } from '../components/icons/UIIcons';
+import { ArrowLeft, RotateCw } from '../components/icons/UIIcons';
 import { NetokLogoIcon, ShieldIcon, ToolsIcon, SettingsIcon } from '../components/icons/NavigationIcons';
 import { NodeOkIcon, NodeWarningIcon, NodeErrorIcon, NodeLoadingIcon } from '../components/icons/DiagnosticStatusIcons';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { MenuCard } from '@/components/MenuCard';
 import { NodeDetailScreen } from './NodeDetailScreen';
 import { DiagnosticMessage } from '../components/DiagnosticMessage';
 import { deriveScenario } from '../utils/deriveScenario';
@@ -52,15 +52,15 @@ export function DiagnosticsScreen({ onBack, onNavigateToSecurity, onNavigateToTo
 
   const getStatusIcon = (status: NetworkNode['status']) => {
     if (status === 'ok') {
-      return <NodeOkIcon className="w-4 h-4 text-primary" />;
+      return <NodeOkIcon className="w-5 h-5 text-primary" />;
     }
     if (status === 'partial') {
-      return <NodeWarningIcon className="w-4 h-4 text-warning" />;
+      return <NodeWarningIcon className="w-5 h-5 text-warning" />;
     }
     if (status === 'down') {
-      return <NodeErrorIcon className="w-4 h-4 text-destructive" />;
+      return <NodeErrorIcon className="w-5 h-5 text-destructive" />;
     }
-    return <NodeLoadingIcon className="w-4 h-4 text-muted-foreground animate-spin" />;
+    return <NodeLoadingIcon className="w-5 h-5 text-muted-foreground animate-spin" />;
   };
 
   const isActive = currentCheckIndex >= 0 && currentCheckIndex < 4;
@@ -129,52 +129,30 @@ export function DiagnosticsScreen({ onBack, onNavigateToSecurity, onNavigateToTo
           {/* Completed nodes */}
           <div className="space-y-2">
             {nodes.map((node) => (
-              <Card
+              <MenuCard
                 key={node.id}
-                className="bg-transparent animate-in fade-in slide-in-from-bottom-2 duration-300 cursor-pointer hover:bg-accent transition-colors"
+                variant="ghost"
+                icon={getStatusIcon(node.status)}
+                title={t(node.title)}
+                subtitle={node.details.map((detail) => (
+                  <p key={detail.text}>{detail.text}</p>
+                ))}
+                trailing="chevron"
                 onClick={() => setSelectedNode(node.id)}
-              >
-                <CardContent className="flex items-start gap-3 px-4 py-3">
-                  <span className="shrink-0 mt-1">
-                    {getStatusIcon(node.status)}
-                  </span>
-                  <div className="flex-1">
-                    <div className="text-base font-medium text-foreground leading-normal">
-                      {t(node.title)}
-                    </div>
-                    <div>
-                      {node.details.map((detail) => (
-                        <p
-                          key={detail.text}
-                          className="text-sm text-muted-foreground leading-normal"
-                        >
-                          {detail.text}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0 self-center" />
-                </CardContent>
-              </Card>
+                className="animate-in fade-in slide-in-from-bottom-2 duration-300"
+              />
             ))}
 
-            {/* Loading placeholder for current check */}
-            {isActive && (
-              <Card className="bg-transparent animate-in fade-in duration-200">
-                <CardContent className="flex items-start gap-3 px-4 py-3">
-                  <span className="shrink-0 mt-1">
-                    <NodeLoadingIcon className="w-4 h-4 text-muted-foreground animate-spin" />
-                  </span>
-                  <div className="flex-1">
-                    <div className="text-base font-medium text-muted-foreground leading-normal mb-1">
-                      {t(LOADING_LABELS[currentCheckIndex])}
-                    </div>
-                    <p className="text-sm text-muted-foreground/60 leading-normal">
-                      {t('diagnostics.checking')}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
+            {/* Loading placeholder for current check (only if no existing node at this position) */}
+            {isActive && currentCheckIndex >= nodes.length && (
+              <MenuCard
+                variant="static"
+                icon={<NodeLoadingIcon className="w-5 h-5 text-muted-foreground animate-spin" />}
+                title={t(LOADING_LABELS[currentCheckIndex])}
+                subtitle={<span className="text-muted-foreground/60">{t('diagnostics.checking')}</span>}
+                muted
+                className="animate-in fade-in duration-200"
+              />
             )}
           </div>
         </ScrollArea>

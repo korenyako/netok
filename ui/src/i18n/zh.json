@@ -17,7 +17,7 @@
     "custom_ip_hint": "请输入您的运营商或其他 DNS 服务的服务器地址。",
     "custom_ip_invalid": "IP 地址格式无效",
     "custom_ipv6_invalid": "IPv6 地址格式无效",
-    "custom_ip_apply": "应用",
+    "custom_ip_save": "保存",
     "optional": "可选",
     "custom_display": "自定义",
     "status_disabled": "已关闭",
@@ -223,5 +223,23 @@
         "action": "靠近路由器或移除您与路由器之间的障碍物。"
       }
     }
+  },
+  "lang": {
+    "system": "跟随系统",
+    "en": "英语",
+    "ru": "俄语",
+    "de": "德语",
+    "es": "西班牙语",
+    "fr": "法语",
+    "it": "意大利语",
+    "pt": "葡萄牙语",
+    "tr": "土耳其语",
+    "fa": "波斯语",
+    "zh": "中文",
+    "ja": "日语",
+    "ko": "韩语",
+    "uk": "乌克兰语",
+    "pl": "波兰语",
+    "search": "查找语言"
   }
 }

@@ -5,7 +5,6 @@ import { MenuCard } from '@/components/MenuCard';
 import { CloseButton } from '../components/WindowControls';
 import { useDnsStore } from '../stores/useDnsStore';
 import { useVpnStore } from '../stores/vpnStore';
-import { getCustomDnsDisplayName } from '../utils/dnsProviderLookup';
 
 interface ProtectionHubScreenProps {
   onBack: () => void;
@@ -27,7 +26,7 @@ const PROVIDER_DISPLAY: Record<string, string> = {
 export function ProtectionHubScreen({ onBack, onNavigateToDns, onNavigateToVpn }: ProtectionHubScreenProps) {
   const { t } = useTranslation();
   const { currentProvider: dnsProvider } = useDnsStore();
-  const { config: vpnConfig, isEnabled: vpnEnabled, isConnecting: vpnConnecting } = useVpnStore();
+  const { config: vpnConfig, connectionState } = useVpnStore();
 
   const isDnsEnabled = dnsProvider !== null && KNOWN_PROVIDERS.includes(dnsProvider.type);
 
@@ -35,12 +34,7 @@ export function ProtectionHubScreen({ onBack, onNavigateToDns, onNavigateToVpn }
     if (!isDnsEnabled) return t('dns_providers.status_disabled');
     if (dnsProvider) {
       if (dnsProvider.type === 'Custom') {
-        // Try to recognize provider by IP address
-        const recognizedProvider = getCustomDnsDisplayName(
-          dnsProvider.primary || '',
-          dnsProvider.primaryIpv6
-        );
-        return recognizedProvider || t('dns_providers.custom_display');
+        return t('dns_providers.custom');
       }
       return PROVIDER_DISPLAY[dnsProvider.type] || dnsProvider.type;
     }
@@ -49,18 +43,35 @@ export function ProtectionHubScreen({ onBack, onNavigateToDns, onNavigateToVpn }
 
   const vpnSubtitle = (() => {
     if (!vpnConfig) return t('vpn.not_configured');
-    if (vpnConnecting) return t('vpn.connecting');
-    if (!vpnEnabled) return t('vpn.disabled');
-    return `${vpnConfig.country}, ${vpnConfig.city}`;
+    switch (connectionState.type) {
+      case 'connecting': return t('vpn.connecting');
+      case 'connected': {
+        const location = [vpnConfig.country, vpnConfig.city].filter(Boolean).join(', ');
+        return location || t('vpn.connected');
+      }
+      case 'disconnecting': return t('vpn.disconnecting');
+      case 'error': return t('vpn.connection_error');
+      case 'elevation_denied': return t('vpn.elevation_denied');
+      default: return t('vpn.disabled');
+    }
   })();
 
   const dnsIconColor = isDnsEnabled ? 'text-primary' : 'text-muted-foreground';
 
-  const vpnIconColor = vpnConnecting
-    ? 'text-warning animate-pulse'
-    : vpnEnabled
-      ? 'text-primary'
-      : 'text-muted-foreground';
+  const vpnIconColor = (() => {
+    switch (connectionState.type) {
+      case 'connecting':
+      case 'disconnecting':
+        return 'text-warning animate-pulse';
+      case 'connected':
+        return 'text-primary';
+      case 'error':
+      case 'elevation_denied':
+        return 'text-destructive';
+      default:
+        return 'text-muted-foreground';
+    }
+  })();
 
   const trailing = (
     <div className="flex items-center self-center">

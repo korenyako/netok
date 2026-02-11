@@ -341,6 +341,15 @@ export function Wrench(props: IconProps) {
   );
 }
 
+export function Search(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <circle cx="11" cy="11" r="8" />
+      <path d="m21 21-4.3-4.3" />
+    </SvgIcon>
+  );
+}
+
 export function Settings(props: IconProps) {
   return (
     <SvgIcon {...props}>

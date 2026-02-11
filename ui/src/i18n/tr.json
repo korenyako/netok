@@ -17,7 +17,7 @@
     "custom_ip_hint": "Saglayicinizdan veya baska bir DNS hizmetinden DNS sunucu adreslerini girin.",
     "custom_ip_invalid": "Gecersiz IP adresi",
     "custom_ipv6_invalid": "Gecersiz IPv6 adresi",
-    "custom_ip_apply": "Uygula",
+    "custom_ip_save": "Kaydet",
     "optional": "istege bagli",
     "custom_display": "Ozel",
     "status_disabled": "Devre disi",
@@ -223,5 +223,23 @@
         "action": "Yönlendiriciye yaklaşın veya onunla bilgisayarınız arasındaki engelleri kaldırın."
       }
     }
+  },
+  "lang": {
+    "system": "Sistem",
+    "en": "İngilizce",
+    "ru": "Rusça",
+    "de": "Almanca",
+    "es": "İspanyolca",
+    "fr": "Fransızca",
+    "it": "İtalyanca",
+    "pt": "Portekizce",
+    "tr": "Türkçe",
+    "fa": "Farsça",
+    "zh": "Çince",
+    "ja": "Japonca",
+    "ko": "Korece",
+    "uk": "Ukraynaca",
+    "pl": "Lehçe",
+    "search": "Dil bul"
   }
 }

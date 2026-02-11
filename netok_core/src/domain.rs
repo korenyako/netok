@@ -343,7 +343,9 @@ impl DnsProvider {
             // OpenDNS
             DnsProvider::OpenDnsFamilyShield => Some("208.67.222.123".to_string()),
             DnsProvider::OpenDnsHome => Some("208.67.222.222".to_string()),
-            DnsProvider::Custom(primary, _, _, _) => Some(primary.clone()),
+            DnsProvider::Custom(primary, _, _, _) => {
+                if primary.is_empty() { None } else { Some(primary.clone()) }
+            }
         }
     }
 
@@ -374,7 +376,9 @@ impl DnsProvider {
             // OpenDNS
             DnsProvider::OpenDnsFamilyShield => Some("208.67.220.123".to_string()),
             DnsProvider::OpenDnsHome => Some("208.67.220.220".to_string()),
-            DnsProvider::Custom(_, secondary, _, _) => Some(secondary.clone()),
+            DnsProvider::Custom(_, secondary, _, _) => {
+                if secondary.is_empty() { None } else { Some(secondary.clone()) }
+            }
         }
     }
 

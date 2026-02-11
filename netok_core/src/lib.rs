@@ -37,6 +37,12 @@ pub use diagnostics::{
 // Re-export infrastructure functions used by bridge
 pub use infrastructure::{get_current_dns, set_dns};
 
+// Re-export VPN types and functions
+pub use infrastructure::vpn::{
+    generate_singbox_config, parse_vpn_uri, ShadowsocksParams, TrojanParams, VlessParams,
+    VmessParams, VpnProtocol, WireGuardParams,
+};
+
 #[cfg(test)]
 mod tests {
     use super::*;

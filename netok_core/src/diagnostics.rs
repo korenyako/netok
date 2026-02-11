@@ -46,6 +46,8 @@ pub fn test_dns_server(server_ip: &str, timeout_secs: u64) -> Result<bool, Strin
     use trust_dns_resolver::Resolver;
     use std::net::IpAddr;
 
+    use std::net::{Ipv4Addr, Ipv6Addr};
+
     // Parse the IP address
     let ip: IpAddr = server_ip
         .parse()
@@ -56,12 +58,18 @@ pub fn test_dns_server(server_ip: &str, timeout_secs: u64) -> Result<bool, Strin
     opts.timeout = Duration::from_secs(timeout_secs);
     opts.attempts = 1; // Only try once
 
+    // Bind to matching address family — IPv6 server needs an IPv6 socket
+    let bind_addr = match ip {
+        IpAddr::V4(_) => Some(std::net::SocketAddr::new(IpAddr::V4(Ipv4Addr::UNSPECIFIED), 0)),
+        IpAddr::V6(_) => Some(std::net::SocketAddr::new(IpAddr::V6(Ipv6Addr::UNSPECIFIED), 0)),
+    };
+
     let name_server = NameServerConfig {
         socket_addr: std::net::SocketAddr::new(ip, 53),
         protocol: Protocol::Udp,
         tls_dns_name: None,
         trust_negative_responses: true,
-        bind_addr: None,
+        bind_addr,
     };
 
     let config = ResolverConfig::from_parts(None, vec![], vec![name_server]);

@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Loader2, XThick } from '../components/icons/UIIcons';
-import { setDns, testDnsServer } from '../api/tauri';
+import { setDns, testDnsServer, type DnsProvider as ApiDnsProvider } from '../api/tauri';
 import { dnsStore } from '../stores/dnsStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { CloseButton } from '../components/WindowControls';
-import { saveCustomDnsConfig, loadCustomDnsConfig } from '../utils/customDnsStorage';
+import { saveCustomDnsConfig, loadCustomDnsConfig, clearCustomDnsConfig } from '../utils/customDnsStorage';
 
 interface CustomIpScreenProps {
   onBack: () => void;
@@ -55,18 +56,30 @@ export function CustomIpScreen({ onBack, onApplied }: CustomIpScreenProps) {
   const [isApplying, setIsApplying] = useState(false);
   const [serverUnreachable, setServerUnreachable] = useState(false);
 
-  // Load existing Custom DNS addresses from localStorage on mount
+  // Load existing Custom DNS addresses on mount
   useEffect(() => {
     const savedConfig = loadCustomDnsConfig();
     if (savedConfig) {
       setPrimaryDns(savedConfig.primary || '');
       setPrimaryIpv6(savedConfig.primaryIpv6 || '');
-      // Don't load secondary if it's the same as primary (we set it as fallback)
       if (savedConfig.secondary && savedConfig.secondary !== savedConfig.primary) {
         setSecondaryDns(savedConfig.secondary);
       }
       if (savedConfig.secondaryIpv6) {
         setSecondaryIpv6(savedConfig.secondaryIpv6);
+      }
+    } else {
+      // If no saved config, pre-fill from current active provider (e.g. backend detected as Custom)
+      const current: ApiDnsProvider | null = dnsStore.getCurrentProvider();
+      if (current && current.type === 'Custom') {
+        setPrimaryDns(current.primary || '');
+        if (current.secondary && current.secondary !== current.primary) {
+          setSecondaryDns(current.secondary);
+        }
+        setPrimaryIpv6(current.primaryIpv6 || '');
+        if (current.secondaryIpv6) {
+          setSecondaryIpv6(current.secondaryIpv6);
+        }
       }
     }
   }, []);
@@ -100,7 +113,7 @@ export function CustomIpScreen({ onBack, onApplied }: CustomIpScreenProps) {
     }
   };
 
-  const handleApply = async () => {
+  const handleSave = async () => {
     if (isApplying) return;
 
     const primary = primaryDns.trim();
@@ -108,7 +121,16 @@ export function CustomIpScreen({ onBack, onApplied }: CustomIpScreenProps) {
     const primaryV6 = primaryIpv6.trim();
     const secondaryV6 = secondaryIpv6.trim();
 
-    const pErr = !isValidIpv4(primary);
+    // All fields empty → clear saved custom DNS config and go back
+    if (!primary && !secondary && !primaryV6 && !secondaryV6) {
+      clearCustomDnsConfig();
+      onApplied();
+      return;
+    }
+
+    // At least one valid primary (IPv4 or IPv6) is required
+    const hasValidPrimary = (primary !== '' && isValidIpv4(primary)) || (primaryV6 !== '' && isValidIpv6(primaryV6));
+    const pErr = primary !== '' && !isValidIpv4(primary);
     const sErr = secondary !== '' && !isValidIpv4(secondary);
     const pv6Err = primaryV6 !== '' && !isValidIpv6(primaryV6);
     const sv6Err = secondaryV6 !== '' && !isValidIpv6(secondaryV6);
@@ -119,24 +141,25 @@ export function CustomIpScreen({ onBack, onApplied }: CustomIpScreenProps) {
     setSecondaryIpv6Error(sv6Err);
     setServerUnreachable(false);
 
-    if (pErr || sErr || pv6Err || sv6Err) return;
+    if (!hasValidPrimary || pErr || sErr || pv6Err || sv6Err) return;
 
     try {
       setIsApplying(true);
 
-      // Test DNS server reachability before applying
-      const isReachable = await testDnsServer(primary);
-
-      if (!isReachable) {
-        setServerUnreachable(true);
-        setIsApplying(false);
-        return;
+      // Test reachability only for IPv4 — IPv6 test is unreliable (many networks lack IPv6)
+      if (primary) {
+        const isReachable = await testDnsServer(primary);
+        if (!isReachable) {
+          setServerUnreachable(true);
+          setIsApplying(false);
+          return;
+        }
       }
 
       const provider = {
         type: 'Custom' as const,
         primary,
-        secondary: secondary || primary, // Use primary as secondary if not specified
+        secondary: secondary || primary,
         primaryIpv6: primaryV6 || null,
         secondaryIpv6: secondaryV6 || null,
       };
@@ -160,11 +183,8 @@ export function CustomIpScreen({ onBack, onApplied }: CustomIpScreenProps) {
     }
   };
 
-  // Check if Apply button should be enabled
-  const isApplyEnabled = primaryDns.trim() && isValidIpv4(primaryDns.trim()) && !isApplying;
-
   return (
-    <div className="flex flex-col min-h-[calc(100dvh-5rem)] bg-background">
+    <div className="flex flex-col h-full bg-background">
       {/* Header */}
       <div data-tauri-drag-region className="px-4 pt-4 pb-3">
         <div className="flex items-center gap-2 pointer-events-auto">
@@ -179,21 +199,25 @@ export function CustomIpScreen({ onBack, onApplied }: CustomIpScreenProps) {
       </div>
 
       {/* Content */}
-      <div className="flex-1 px-4 pb-4 flex flex-col min-h-0 space-y-4 overflow-y-auto">
+      <ScrollArea className="flex-1">
+      <div className="px-4 pb-4 flex flex-col min-h-0 space-y-6">
         <p className="text-sm font-normal text-muted-foreground">
           {t('dns_providers.custom_ip_hint')}
         </p>
         {/* IPv4 Section */}
         <div className="space-y-3">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">IPv4</p>
+          <div className="flex justify-between items-baseline">
+            <span className="text-xs font-medium text-muted-foreground tracking-wider">IPv4</span>
+            <span className="text-xs text-muted-foreground/60">{t('dns_providers.custom_ip_ipv4_example')}</span>
+          </div>
           <div>
             <div className="relative">
               <Input
-                placeholder="1.1.1.1"
+                placeholder={t('dns_providers.custom_ip_primary')}
                 value={primaryDns}
                 onChange={(e) => { setPrimaryDns(e.target.value); setPrimaryError(false); setServerUnreachable(false); }}
                 onBlur={handlePrimaryBlur}
-                className={cn('font-mono text-sm pr-8 placeholder:font-light', primaryError && 'border-destructive')}
+                className={cn('font-mono pr-8', primaryError && 'ring-1 ring-destructive')}
               />
               {primaryDns && (
                 <button
@@ -215,11 +239,11 @@ export function CustomIpScreen({ onBack, onApplied }: CustomIpScreenProps) {
           <div>
             <div className="relative">
               <Input
-                placeholder="8.8.8.8"
+                placeholder={t('dns_providers.custom_ip_secondary')}
                 value={secondaryDns}
                 onChange={(e) => { setSecondaryDns(e.target.value); setSecondaryError(false); }}
                 onBlur={handleSecondaryBlur}
-                className={cn('font-mono text-sm pr-8 placeholder:font-light', secondaryError && 'border-destructive')}
+                className={cn('font-mono pr-8', secondaryError && 'ring-1 ring-destructive')}
               />
               {secondaryDns && (
                 <button
@@ -242,15 +266,18 @@ export function CustomIpScreen({ onBack, onApplied }: CustomIpScreenProps) {
 
         {/* IPv6 Section */}
         <div className="space-y-3">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">IPv6</p>
+          <div className="flex justify-between items-baseline">
+            <span className="text-xs font-medium text-muted-foreground tracking-wider">IPv6</span>
+            <span className="text-xs text-muted-foreground/60">{t('dns_providers.custom_ip_ipv6_example')}</span>
+          </div>
           <div>
             <div className="relative">
               <Input
-                placeholder="2606:4700:4700::1111"
+                placeholder={t('dns_providers.custom_ip_primary')}
                 value={primaryIpv6}
                 onChange={(e) => { setPrimaryIpv6(e.target.value); setPrimaryIpv6Error(false); }}
                 onBlur={handlePrimaryIpv6Blur}
-                className={cn('font-mono text-sm pr-8 placeholder:font-light', primaryIpv6Error && 'border-destructive')}
+                className={cn('font-mono pr-8', primaryIpv6Error && 'ring-1 ring-destructive')}
               />
               {primaryIpv6 && (
                 <button
@@ -272,11 +299,11 @@ export function CustomIpScreen({ onBack, onApplied }: CustomIpScreenProps) {
           <div>
             <div className="relative">
               <Input
-                placeholder="2606:4700:4700::1001"
+                placeholder={t('dns_providers.custom_ip_secondary')}
                 value={secondaryIpv6}
                 onChange={(e) => { setSecondaryIpv6(e.target.value); setSecondaryIpv6Error(false); }}
                 onBlur={handleSecondaryIpv6Blur}
-                className={cn('font-mono text-sm pr-8 placeholder:font-light', secondaryIpv6Error && 'border-destructive')}
+                className={cn('font-mono pr-8', secondaryIpv6Error && 'ring-1 ring-destructive')}
               />
               {secondaryIpv6 && (
                 <button
@@ -297,7 +324,12 @@ export function CustomIpScreen({ onBack, onApplied }: CustomIpScreenProps) {
           </div>
         </div>
 
-        <div className="flex-1" />
+        {/* Warning: IPv6-only provides partial protection */}
+        {!primaryDns.trim() && primaryIpv6.trim() && isValidIpv6(primaryIpv6.trim()) && !isApplying && (
+          <div className="px-3 py-2 rounded-md bg-yellow-500/10">
+            <p className="text-xs text-yellow-600 dark:text-yellow-500">{t('dns_providers.custom_ip_ipv6_only_warning')}</p>
+          </div>
+        )}
 
         {/* Checking state */}
         {isApplying && (
@@ -318,12 +350,13 @@ export function CustomIpScreen({ onBack, onApplied }: CustomIpScreenProps) {
 
         <Button
           className="w-full uppercase font-mono tracking-wider text-xs"
-          onClick={handleApply}
-          disabled={!isApplyEnabled}
+          onClick={handleSave}
+          disabled={isApplying}
         >
-          {t('dns_providers.custom_ip_apply')}
+          {t('dns_providers.custom_ip_save')}
         </Button>
       </div>
+      </ScrollArea>
     </div>
   );
 }

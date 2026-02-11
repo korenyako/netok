@@ -41,53 +41,56 @@ pub fn set_dns(provider: DnsProvider) -> Result<(), String> {
             }
         }
         _ => {
-            // Set static IPv4 DNS
-            let primary = provider
-                .primary()
-                .ok_or_else(|| "No primary DNS for this provider".to_string())?;
-
-            // Set primary IPv4 DNS
-            let output = Command::new("netsh")
-                .args([
-                    "interface",
-                    "ip",
-                    "set",
-                    "dns",
-                    &adapter_name,
-                    "static",
-                    &primary,
-                ])
-                .output()
-                .map_err(|e| format!("Failed to execute netsh: {}", e))?;
-
-            if !output.status.success() {
-                return Err(format!(
-                    "Failed to set primary IPv4 DNS: {}",
-                    String::from_utf8_lossy(&output.stderr)
-                ));
-            }
-
-            // Set secondary IPv4 DNS if available
-            if let Some(secondary) = provider.secondary() {
+            // Set static IPv4 DNS (skip if no IPv4 addresses — e.g. IPv6-only custom)
+            if let Some(primary) = provider.primary() {
+                // Set primary IPv4 DNS
                 let output = Command::new("netsh")
                     .args([
                         "interface",
                         "ip",
-                        "add",
+                        "set",
                         "dns",
                         &adapter_name,
-                        &secondary,
-                        "index=2",
+                        "static",
+                        &primary,
                     ])
                     .output()
                     .map_err(|e| format!("Failed to execute netsh: {}", e))?;
 
                 if !output.status.success() {
                     return Err(format!(
-                        "Failed to set secondary IPv4 DNS: {}",
+                        "Failed to set primary IPv4 DNS: {}",
                         String::from_utf8_lossy(&output.stderr)
                     ));
                 }
+
+                // Set secondary IPv4 DNS if available and different from primary
+                if let Some(secondary) = provider.secondary().filter(|s| *s != primary) {
+                    let output = Command::new("netsh")
+                        .args([
+                            "interface",
+                            "ip",
+                            "add",
+                            "dns",
+                            &adapter_name,
+                            &secondary,
+                            "index=2",
+                        ])
+                        .output()
+                        .map_err(|e| format!("Failed to execute netsh: {}", e))?;
+
+                    if !output.status.success() {
+                        return Err(format!(
+                            "Failed to set secondary IPv4 DNS: {}",
+                            String::from_utf8_lossy(&output.stderr)
+                        ));
+                    }
+                }
+            } else {
+                // No IPv4 DNS — reset to DHCP
+                let _ = Command::new("netsh")
+                    .args(["interface", "ip", "set", "dns", &adapter_name, "dhcp"])
+                    .output();
             }
 
             // Set IPv6 DNS if available
@@ -113,8 +116,8 @@ pub fn set_dns(provider: DnsProvider) -> Result<(), String> {
                     ));
                 }
 
-                // Set secondary IPv6 DNS if available
-                if let Some(secondary_v6) = provider.secondary_ipv6() {
+                // Set secondary IPv6 DNS if available and different from primary
+                if let Some(secondary_v6) = provider.secondary_ipv6().filter(|s| Some(s.clone()) != provider.primary_ipv6()) {
                     let output = Command::new("netsh")
                         .args([
                             "interface",

@@ -10,6 +10,17 @@
     "core:window:allow-show",
     "core:window:allow-close",
     "core:window:allow-set-focus",
-    "opener:default"
+    "opener:default",
+    "shell:default",
+    {
+      "identifier": "shell:allow-spawn",
+      "allow": [
+        {
+          "name": "binaries/sing-box",
+          "sidecar": true,
+          "args": true
+        }
+      ]
+    }
   ]
 }

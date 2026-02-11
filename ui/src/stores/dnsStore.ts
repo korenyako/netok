@@ -1,4 +1,4 @@
-import { getDnsProvider, type DnsProvider } from '../api/tauri';
+import { getDnsProvider, getDnsServers, type DnsProvider } from '../api/tauri';
 import { notifications } from '../utils/notifications';
 
 type DnsStoreListener = () => void;
@@ -15,6 +15,7 @@ const logDns = (message: string, data?: unknown) => {
 
 class DnsStore {
   private currentProvider: DnsProvider | null = null;
+  private dnsServers: string[] = [];
   private isLoading: boolean = true;  // Start as true to show loading state initially
   private listeners: Set<DnsStoreListener> = new Set();
   private hasInitialized: boolean = false;
@@ -41,10 +42,15 @@ class DnsStore {
       this.notifyListeners();
 
       logDns('Fetching DNS provider from backend...');
-      const provider = await getDnsProvider();
+      const [provider, servers] = await Promise.all([
+        getDnsProvider(),
+        getDnsServers().catch(() => [] as string[]),
+      ]);
       logDns('Received provider from backend:', provider);
+      logDns('Received DNS servers:', servers);
 
       this.currentProvider = provider;
+      this.dnsServers = servers;
       this.hasInitialized = true;
     } catch (err) {
       console.error('[DNS][UI] Failed to get DNS provider:', err);
@@ -77,6 +83,10 @@ class DnsStore {
 
   getCurrentProvider(): DnsProvider | null {
     return this.currentProvider;
+  }
+
+  getDnsServers(): string[] {
+    return this.dnsServers;
   }
 
   isLoadingProvider(): boolean {

@@ -1,5 +1,6 @@
 import { type ReactNode } from 'react';
-import { ChevronRight, Check } from '@/components/icons/UIIcons';
+import { ChevronRight, Check, Loader2 } from '@/components/icons/UIIcons';
+import { Switch } from '@/components/ui/switch';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
@@ -20,16 +21,26 @@ interface MenuCardProps {
   title: string;
   /** Badge text displayed next to title */
   badge?: string;
-  /** Secondary description text */
-  subtitle?: string;
-  /** Right side element: 'chevron', 'check', or custom ReactNode */
-  trailing?: 'chevron' | 'check' | ReactNode;
+  /** Custom badge styling (overrides default primary color) */
+  badgeClassName?: string;
+  /** Secondary description text (string or ReactNode for multi-line content) */
+  subtitle?: ReactNode;
+  /** Right side element: 'chevron', 'check', 'spinner', 'switch', or custom ReactNode */
+  trailing?: 'chevron' | 'check' | 'spinner' | 'switch' | ReactNode;
+  /** Switch state (only used when trailing='switch') */
+  switchChecked?: boolean;
+  /** Switch change handler (only used when trailing='switch') */
+  onSwitchChange?: (checked: boolean) => void;
+  /** Switch disabled state (only used when trailing='switch') */
+  switchDisabled?: boolean;
   /** Click handler - if not provided, card is not interactive */
   onClick?: () => void;
   /** Make title text muted (for inactive states) */
   muted?: boolean;
   /** Icon vertical alignment: 'start' aligns to title, 'center' aligns to card */
   iconAlign?: 'start' | 'center';
+  /** Selection checkmark on the right (undefined = hidden, false = hidden, true = show check, 'spinner' = show spinner) */
+  checked?: boolean | 'spinner';
   /** Additional CSS classes */
   className?: string;
 }
@@ -48,11 +59,16 @@ export function MenuCard({
   icon,
   title,
   badge,
+  badgeClassName,
   subtitle,
   trailing,
+  switchChecked,
+  onSwitchChange,
+  switchDisabled,
   onClick,
   muted,
   iconAlign = 'start',
+  checked,
   className,
 }: MenuCardProps) {
   const isInteractive = variant !== 'static' && variant !== 'disabled' && onClick;
@@ -63,6 +79,20 @@ export function MenuCard({
     }
     if (trailing === 'check') {
       return <Check className="w-5 h-5 text-primary shrink-0 self-center" />;
+    }
+    if (trailing === 'spinner') {
+      return <Loader2 className="w-5 h-5 animate-spin text-muted-foreground shrink-0 self-center" />;
+    }
+    if (trailing === 'switch') {
+      return (
+        <div className="shrink-0 self-center" onClick={(e) => e.stopPropagation()}>
+          <Switch
+            checked={switchChecked}
+            onCheckedChange={onSwitchChange}
+            disabled={switchDisabled}
+          />
+        </div>
+      );
     }
     return trailing;
   })();
@@ -93,7 +123,7 @@ export function MenuCard({
           )}>
             {title}
             {badge && (
-              <span className="text-xs font-normal text-primary bg-primary/10 px-1.5 py-0.5 rounded">{badge}</span>
+              <span className={cn("text-xs font-normal px-1.5 py-0.5 rounded", badgeClassName || "text-primary bg-primary/10")}>{badge}</span>
             )}
           </div>
           {subtitle && (
@@ -103,6 +133,12 @@ export function MenuCard({
           )}
         </div>
         {trailingElement}
+        {checked === 'spinner'
+          ? <Loader2 className="w-5 h-5 animate-spin text-muted-foreground shrink-0 self-center" />
+          : checked === true
+            ? <Check className="w-5 h-5 text-primary shrink-0 self-center" />
+            : null
+        }
       </CardContent>
     </Card>
   );

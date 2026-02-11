@@ -35,6 +35,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 270 3.6% 11%;
     --primary: 152 50% 47%;
+    --primary-hover: 152 45% 40%;
     --primary-foreground: 210 40% 98%;
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 270 3.6% 11%;
@@ -68,6 +69,7 @@
     --popover: 300 2.5% 7.6%;
     --popover-foreground: 292.5 7.3% 78.4%;
     --primary: 152 50% 47%;
+    --primary-hover: 152 55% 54%;
     --primary-foreground: 222.2 47.4% 11.2%;
     --secondary: 270 5% 17.5%;
     --secondary-foreground: 292.5 7.3% 78.4%;
@@ -110,6 +112,7 @@
   --card: 309 15% 90.8%;
   --card-foreground: 270 3.6% 11%;
   --primary: 152 50% 47%;
+  --primary-hover: 152 45% 40%;
   --primary-foreground: 210 40% 98%;
   --secondary: 210 40% 96.1%;
   --secondary-foreground: 270 3.6% 11%;
@@ -134,6 +137,7 @@
   --card: 270 3.6% 11%;
   --card-foreground: 292.5 7.3% 78.4%;
   --primary: 152 50% 47%;
+  --primary-hover: 152 55% 54%;
   --primary-foreground: 222.2 47.4% 11.2%;
   --secondary: 270 5% 17.5%;
   --secondary-foreground: 292.5 7.3% 78.4%;
@@ -154,6 +158,22 @@
 
 html, body, #root {
   height: 100%;
+}
+
+/* Thin custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 3px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
 }
 
 #root {

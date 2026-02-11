@@ -6,7 +6,6 @@ import { deriveScenario } from '../utils/deriveScenario';
 import { CloseButton } from '../components/WindowControls';
 import { MenuCard } from '@/components/MenuCard';
 import { cn } from '@/lib/utils';
-import { getCustomDnsDisplayName } from '../utils/dnsProviderLookup';
 
 // DNS logging helper
 const logDns = (message: string, data?: unknown) => {
@@ -26,19 +25,15 @@ interface StatusScreenProps {
 // Known providers that count as "protection enabled"
 const KNOWN_PROVIDERS = ['Cloudflare', 'Google', 'AdGuard', 'Dns4Eu', 'Quad9', 'OpenDns', 'Custom'];
 
-// Get display name for DNS provider
-function getProviderDisplayName(type: string): string {
-  const names: Record<string, string> = {
-    'Cloudflare': 'Cloudflare',
-    'Google': 'Google',
-    'AdGuard': 'AdGuard',
-    'Dns4Eu': 'DNS4EU',
-    'Quad9': 'Quad9',
-    'OpenDns': 'OpenDNS',
-    'Custom': 'Custom DNS',
-  };
-  return names[type] || type;
-}
+// Get display name for DNS provider (brand names stay as-is, Custom is localised)
+const PROVIDER_DISPLAY: Record<string, string> = {
+  'Cloudflare': 'Cloudflare',
+  'Google': 'Google',
+  'AdGuard': 'AdGuard',
+  'Dns4Eu': 'DNS4EU',
+  'Quad9': 'Quad9',
+  'OpenDns': 'OpenDNS',
+};
 
 // SVG circle constants
 const CIRCLE_SIZE = 240;
@@ -103,18 +98,9 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders }: St
   // Only Auto is treated as "protection disabled"
   const isDnsProtectionEnabled = dnsProvider !== null && KNOWN_PROVIDERS.includes(dnsProvider.type);
 
-  // Get provider name, with IP-based recognition for Custom DNS
-  const providerName = (() => {
-    if (!isDnsProtectionEnabled || !dnsProvider) return null;
-    if (dnsProvider.type === 'Custom') {
-      const recognizedProvider = getCustomDnsDisplayName(
-        dnsProvider.primary || '',
-        dnsProvider.primaryIpv6
-      );
-      return recognizedProvider || getProviderDisplayName(dnsProvider.type);
-    }
-    return getProviderDisplayName(dnsProvider.type);
-  })();
+  const dnsSubtitle = isDnsProtectionEnabled && dnsProvider
+    ? (dnsProvider.type === 'Custom' ? t('dns_providers.custom_display') : PROVIDER_DISPLAY[dnsProvider.type] || dnsProvider.type)
+    : null;
 
   // Derive diagnostic scenario from nodes
   // Only show loading spinner when we have NO previous data at all
@@ -142,7 +128,7 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders }: St
   const showNetworkInfo = !isLoading && (visualState === 'success' || visualState === 'warning');
 
   return (
-    <div className="flex flex-col min-h-[calc(100dvh-5rem)] bg-background">
+    <div className="flex flex-col flex-1 min-h-0 bg-background">
       {/* Drag region with close button */}
       <div data-tauri-drag-region className="px-4 py-4 flex items-center justify-end shrink-0">
         <CloseButton />
@@ -191,20 +177,13 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders }: St
 
             {/* Network Info inside circle */}
             {showNetworkInfo && networkInfo && (
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground/60 mt-2">
-                <span>
-                  {networkInfo.connection_type === 'Wifi' && 'Wi-Fi'}
-                  {networkInfo.connection_type === 'Ethernet' && 'Ethernet'}
-                  {networkInfo.connection_type === 'Usb' && 'USB'}
-                  {networkInfo.connection_type === 'Mobile' && 'Mobile'}
-                  {networkInfo.connection_type === 'Unknown' && t('network.unknown')}
-                </span>
-                {networkInfo.ssid && (
-                  <>
-                    <span>·</span>
-                    <span>{networkInfo.ssid}</span>
-                  </>
-                )}
+              <div className="text-xs font-mono text-muted-foreground/60 mt-2">
+                {networkInfo.connection_type === 'Wifi' && 'Wi-Fi'}
+                {networkInfo.connection_type === 'Ethernet' && 'Ethernet'}
+                {networkInfo.connection_type === 'Usb' && 'USB'}
+                {networkInfo.connection_type === 'Mobile' && 'Mobile'}
+                {networkInfo.connection_type === 'Unknown' && t('network.unknown')}
+                {networkInfo.ssid && ` ${networkInfo.ssid}`}
               </div>
             )}
           </div>
@@ -234,7 +213,7 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders }: St
             : t('status.dns_protection_disabled')
           }
           subtitle={isDnsProtectionEnabled
-            ? providerName ?? undefined
+            ? dnsSubtitle ?? undefined
             : t('status.dns_protection_disabled_desc')
           }
           trailing={isDnsProtectionEnabled ? 'check' : undefined}

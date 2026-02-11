@@ -25,14 +25,14 @@ export function ToolsScreen({ onBack, onOpenDiagnostics, onOpenSpeedTest }: Tool
       id: 'diagnostics',
       nameKey: 'diagnostics.title',
       icon: <Activity className="w-6 h-6" />,
-      iconColorClass: 'text-cyan-500',
+      iconColorClass: 'text-primary',
       onClick: onOpenDiagnostics,
     },
     {
       id: 'speed-test',
       nameKey: 'settings.tools.speed_test',
       icon: <Gauge className="w-6 h-6" />,
-      iconColorClass: 'text-pink-500',
+      iconColorClass: 'text-purple-500',
       onClick: onOpenSpeedTest,
     },
     {

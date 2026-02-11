@@ -17,7 +17,7 @@
     "custom_ip_hint": "Inserisci gli indirizzi del server DNS del tuo provider o di un altro servizio DNS.",
     "custom_ip_invalid": "Indirizzo IP non valido",
     "custom_ipv6_invalid": "Indirizzo IPv6 non valido",
-    "custom_ip_apply": "Applica",
+    "custom_ip_save": "Salva",
     "optional": "opzionale",
     "custom_display": "Personalizzato",
     "status_disabled": "Disattivato",
@@ -223,5 +223,23 @@
         "action": "Avvicinati al router o rimuovi gli ostacoli tra esso e il tuo computer."
       }
     }
+  },
+  "lang": {
+    "system": "Sistema",
+    "en": "Inglese",
+    "ru": "Russo",
+    "de": "Tedesco",
+    "es": "Spagnolo",
+    "fr": "Francese",
+    "it": "Italiano",
+    "pt": "Portoghese",
+    "tr": "Turco",
+    "fa": "Persiano",
+    "zh": "Cinese",
+    "ja": "Giapponese",
+    "ko": "Coreano",
+    "uk": "Ucraino",
+    "pl": "Polacco",
+    "search": "Trova una lingua"
   }
 }

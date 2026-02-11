@@ -23,5 +23,11 @@
         "transparent": true
       }
     ]
+  },
+
+  "bundle": {
+    "externalBin": [
+      "binaries/sing-box"
+    ]
   }
 }

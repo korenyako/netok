@@ -17,7 +17,7 @@
     "custom_ip_hint": "제공업체 또는 다른 DNS 서비스의 DNS 서버 주소를 입력하세요.",
     "custom_ip_invalid": "잘못된 IP 주소",
     "custom_ipv6_invalid": "잘못된 IPv6 주소",
-    "custom_ip_apply": "적용",
+    "custom_ip_save": "저장",
     "optional": "선택 사항",
     "custom_display": "사용자 지정",
     "status_disabled": "비활성화됨",
@@ -223,5 +223,23 @@
         "action": "라우터에 더 가까이 이동하거나 라우터와 컴퓨터 사이의 장애물을 제거하세요."
       }
     }
+  },
+  "lang": {
+    "system": "시스템",
+    "en": "영어",
+    "ru": "러시아어",
+    "de": "독일어",
+    "es": "스페인어",
+    "fr": "프랑스어",
+    "it": "이탈리아어",
+    "pt": "포르투갈어",
+    "tr": "터키어",
+    "fa": "페르시아어",
+    "zh": "중국어",
+    "ja": "일본어",
+    "ko": "한국어",
+    "uk": "우크라이나어",
+    "pl": "폴란드어",
+    "search": "언어 찾기"
   }
 }

@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft } from '../components/icons/UIIcons';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+
 import { CloseButton } from '../components/WindowControls';
 import { useVpnStore, type VpnConfig } from '../stores/vpnStore';
 import { lookupIpLocation } from '../api/tauri';
+import { extractServerHost } from '../utils/vpnUri';
 
 interface AddVpnScreenProps {
   onBack: () => void;
@@ -23,46 +24,11 @@ function detectProtocol(key: string): string {
   return 'Unknown';
 }
 
-/** Extract server host (IP or hostname) from a VPN URI key. */
-function extractServerHost(key: string): string | null {
-  const trimmed = key.trim();
-
-  // vmess:// uses base64-encoded JSON with an "add" field
-  if (trimmed.toLowerCase().startsWith('vmess://')) {
-    try {
-      const b64 = trimmed.slice('vmess://'.length).split('#')[0];
-      const json = JSON.parse(atob(b64));
-      if (json.add) return json.add;
-    } catch {
-      // fall through
-    }
-    return null;
-  }
-
-  // Most protocols: scheme://userinfo@host:port/...
-  // vless, ss, trojan, wg, wireguard, ssconf
-  const atIdx = trimmed.indexOf('@');
-  if (atIdx === -1) return null;
-
-  const afterAt = trimmed.slice(atIdx + 1);
-  // Remove query (?...) and fragment (#...) first
-  const hostPort = afterAt.split(/[?#]/)[0];
-
-  // Handle IPv6 in brackets: [::1]:port
-  const bracketMatch = hostPort.match(/^\[([^\]]+)\]/);
-  if (bracketMatch) return bracketMatch[1];
-
-  // host:port or just host
-  const colonIdx = hostPort.lastIndexOf(':');
-  if (colonIdx === -1) return hostPort || null;
-  return hostPort.slice(0, colonIdx) || null;
-}
-
 export function AddVpnScreen({ onBack, onAdded }: AddVpnScreenProps) {
   const { t } = useTranslation();
-  const [keyValue, setKeyValue] = useState('');
+  const { config, setConfig } = useVpnStore();
+  const [keyValue, setKeyValue] = useState(config?.rawKey ?? '');
   const [isLookingUp, setIsLookingUp] = useState(false);
-  const { setConfig, setEnabled, setConnecting } = useVpnStore();
 
   const handleAdd = async () => {
     const trimmed = keyValue.trim();
@@ -88,6 +54,7 @@ export function AddVpnScreen({ onBack, onAdded }: AddVpnScreenProps) {
 
     const config: VpnConfig = {
       protocol,
+      serverHost: host || '',
       country,
       city,
       ping: 0,
@@ -95,8 +62,6 @@ export function AddVpnScreen({ onBack, onAdded }: AddVpnScreenProps) {
     };
 
     setConfig(config);
-    setEnabled(false);
-    setConnecting(false);
     onAdded();
   };
 
@@ -116,38 +81,27 @@ export function AddVpnScreen({ onBack, onAdded }: AddVpnScreenProps) {
       </div>
 
       {/* Content */}
-      <div className="flex-1 px-4 pb-4 overflow-y-auto space-y-3">
-        <Card>
-          <CardContent className="px-4 py-3 space-y-4">
-            <p className="text-sm font-normal text-muted-foreground">
-              {t('vpn.key_hint')}
-            </p>
-
-            <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
-                {t('vpn.key_label')}
-              </p>
-              <textarea
-                placeholder={t('vpn.key_placeholder')}
-                value={keyValue}
-                onChange={(e) => setKeyValue(e.target.value)}
-                className="w-full h-28 bg-background rounded-lg p-3 text-sm font-mono resize-none border-0 focus:outline-none focus:ring-1 focus:ring-ring placeholder:text-muted-foreground/50"
-              />
-            </div>
-
-            <Button
-              className="w-full uppercase font-mono tracking-wider text-xs"
-              onClick={handleAdd}
-              disabled={!keyValue.trim() || isLookingUp}
-            >
-              {isLookingUp ? t('vpn.detecting_location') : t('vpn.add_button')}
-            </Button>
-          </CardContent>
-        </Card>
-
-        <p className="text-center text-sm font-normal text-muted-foreground px-4">
-          {t('vpn.supported_full')}
+      <div className="flex-1 px-4 pb-4 flex flex-col min-h-0 space-y-6 overflow-y-auto">
+        <p className="text-sm font-normal text-muted-foreground">
+          {t('vpn.key_hint')}
         </p>
+
+        <div className="flex-1 flex flex-col min-h-0 gap-3">
+          <span className="text-xs text-muted-foreground/60">{t('vpn.key_example')}</span>
+          <textarea
+            placeholder=""
+            value={keyValue}
+            onChange={(e) => setKeyValue(e.target.value)}
+            className="flex-1 min-h-0 w-full rounded-lg bg-accent/50 p-3 text-sm font-mono resize-none outline-none focus:ring-1 focus:ring-ring placeholder:font-light placeholder:text-muted-foreground/60 custom-scrollbar"
+          />
+          <Button
+            className="w-full uppercase font-mono tracking-wider text-xs shrink-0"
+            onClick={handleAdd}
+            disabled={!keyValue.trim() || isLookingUp}
+          >
+            {isLookingUp ? t('vpn.detecting_location') : t('vpn.save_button')}
+          </Button>
+        </div>
       </div>
     </div>
   );

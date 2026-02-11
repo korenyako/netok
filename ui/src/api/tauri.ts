@@ -99,6 +99,10 @@ export async function getDnsProvider(): Promise<DnsProvider> {
   return await invoke<DnsProvider>('get_dns_provider');
 }
 
+export async function getDnsServers(): Promise<string[]> {
+  return await invoke<string[]>('get_dns_servers');
+}
+
 export async function testDnsServer(serverIp: string): Promise<boolean> {
   return await invoke<boolean>('test_dns_server', { serverIp });
 }
@@ -157,4 +161,30 @@ export async function checkRouter(): Promise<SingleNodeResult> {
 
 export async function checkInternet(): Promise<SingleNodeResult> {
   return await invoke<SingleNodeResult>('check_internet');
+}
+
+// VPN types
+export type VpnConnectionState =
+  | { type: 'disconnected' }
+  | { type: 'connecting' }
+  | { type: 'connected'; original_ip: string | null; vpn_ip: string | null }
+  | { type: 'disconnecting' }
+  | { type: 'error'; message: string }
+  | { type: 'elevation_denied' };
+
+export interface VpnStatus {
+  state: VpnConnectionState;
+}
+
+// VPN commands
+export async function connectVpn(rawUri: string): Promise<void> {
+  return await invoke('connect_vpn', { rawUri });
+}
+
+export async function disconnectVpn(): Promise<void> {
+  return await invoke('disconnect_vpn');
+}
+
+export async function getVpnStatus(): Promise<VpnStatus> {
+  return await invoke<VpnStatus>('get_vpn_status');
 }

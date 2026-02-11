@@ -7,7 +7,6 @@ import { StatusScreen } from './screens/StatusScreen';
 import { DiagnosticsScreen } from './screens/DiagnosticsScreen';
 import { ToolsScreen } from './screens/ToolsScreen';
 import { SpeedTestScreen } from './screens/SpeedTestScreen';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { useNavigation } from './hooks/useNavigation';
 
 function App() {
@@ -74,7 +73,7 @@ function App() {
     <ThemeProvider>
       <Toaster />
             <div id="app" className="h-full flex flex-col bg-background">
-        <ScrollArea className="flex-1">
+        <div className="flex-1 flex flex-col min-h-0">
           {currentScreen === 'home' && (
             <StatusScreen
               onOpenDiagnostics={() => setShowDiagnostics(true)}
@@ -102,7 +101,7 @@ function App() {
               onBack={navigateToHome}
             />
           )}
-        </ScrollArea>
+        </div>
 
         <BottomNav
           currentScreen={currentScreen}

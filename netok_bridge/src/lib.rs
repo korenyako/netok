@@ -170,6 +170,7 @@ pub enum DnsProviderType {
     Dns4Eu { variant: Dns4EuVariant },
     Quad9 { variant: Quad9Variant },
     OpenDns { variant: OpenDnsVariant },
+    #[serde(rename_all = "camelCase")]
     Custom {
         primary: String,
         secondary: String,
@@ -366,6 +367,15 @@ pub async fn get_dns_provider() -> Result<DnsProviderType, String> {
     result
 }
 
+// Get raw DNS server IPs currently configured on the system
+pub async fn get_dns_servers() -> Result<Vec<String>, String> {
+    tokio::task::spawn_blocking(|| {
+        netok_core::get_current_dns()
+    })
+    .await
+    .map_err(|e| format!("Failed to run DNS servers task: {}", e))?
+}
+
 // Test if a DNS server is reachable (async wrapper)
 pub async fn test_dns_server_reachable(server_ip: String) -> Result<bool, String> {
     tokio::task::spawn_blocking(move || {
@@ -373,5 +383,68 @@ pub async fn test_dns_server_reachable(server_ip: String) -> Result<bool, String
     })
     .await
     .map_err(|e| format!("Failed to run DNS server test task: {}", e))?
+}
+
+// ==================== VPN Types ====================
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum VpnConnectionState {
+    Disconnected,
+    Connecting,
+    Connected {
+        original_ip: Option<String>,
+        vpn_ip: Option<String>,
+    },
+    Disconnecting,
+    Error {
+        message: String,
+    },
+    ElevationDenied,
+}
+
+impl Default for VpnConnectionState {
+    fn default() -> Self {
+        Self::Disconnected
+    }
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+pub struct VpnStatus {
+    pub state: VpnConnectionState,
+}
+
+// ==================== VPN Commands ====================
+
+/// Parse and validate a VPN URI, generate sing-box config JSON.
+/// Pure logic — no process management.
+pub fn generate_vpn_config(raw_uri: &str) -> Result<String, String> {
+    let protocol = netok_core::parse_vpn_uri(raw_uri)?;
+    let config = netok_core::generate_singbox_config(&protocol)?;
+    serde_json::to_string_pretty(&config)
+        .map_err(|e| format!("Failed to serialize config: {}", e))
+}
+
+/// Verify VPN connection by checking current public IP.
+pub async fn verify_vpn_ip() -> Result<Option<String>, String> {
+    tokio::task::spawn_blocking(|| {
+        let client = reqwest::blocking::Client::builder()
+            .timeout(std::time::Duration::from_secs(10))
+            .build()
+            .map_err(|e| format!("HTTP client error: {}", e))?;
+
+        let resp = client
+            .get("https://ipinfo.io/json")
+            .send()
+            .map_err(|e| format!("IP check failed: {}", e))?;
+
+        let info: netok_core::IpInfoResponse = resp
+            .json()
+            .map_err(|e| format!("Failed to parse IP response: {}", e))?;
+
+        Ok(info.ip)
+    })
+    .await
+    .map_err(|e| format!("Task join error: {}", e))?
 }
 

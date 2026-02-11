@@ -36,6 +36,7 @@ function areProvidersEqual(a: DnsProvider | null, b: DnsProvider | null): boolea
 
 interface DnsStoreState {
   currentProvider: DnsProvider | null;
+  dnsServers: string[];
   isLoading: boolean;
 }
 
@@ -45,6 +46,7 @@ export function useDnsStore() {
   // Initialize state from store
   const [state, setState] = useState<DnsStoreState>(() => ({
     currentProvider: dnsStore.getCurrentProvider(),
+    dnsServers: dnsStore.getDnsServers(),
     isLoading: dnsStore.isLoadingProvider()
   }));
 
@@ -55,25 +57,29 @@ export function useDnsStore() {
     // Subscribe to store changes
     const unsubscribe = dnsStore.subscribe(() => {
       const newProvider = dnsStore.getCurrentProvider();
+      const newServers = dnsStore.getDnsServers();
       const newIsLoading = dnsStore.isLoadingProvider();
 
       setState(prev => {
         // Only update if values actually changed
         const providerChanged = !areProvidersEqual(prev.currentProvider, newProvider);
+        const serversChanged = prev.dnsServers.join(',') !== newServers.join(',');
         const loadingChanged = prev.isLoading !== newIsLoading;
 
-        if (!providerChanged && !loadingChanged) {
+        if (!providerChanged && !serversChanged && !loadingChanged) {
           return prev; // Return same reference to prevent re-render
         }
 
         logDns(`State updated (id: ${mountId})`, {
           providerChanged,
+          serversChanged,
           loadingChanged,
           newProvider,
+          newServers,
           newIsLoading
         });
 
-        return { currentProvider: newProvider, isLoading: newIsLoading };
+        return { currentProvider: newProvider, dnsServers: newServers, isLoading: newIsLoading };
       });
     });
 
@@ -91,6 +97,7 @@ export function useDnsStore() {
 
   return {
     currentProvider: state.currentProvider,
+    dnsServers: state.dnsServers,
     isLoading: state.isLoading,
     refresh
   };
