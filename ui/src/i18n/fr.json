@@ -3,7 +3,7 @@
     "unknown": "Inconnu"
   },
   "dns_providers": {
-    "title": "Protection DNS",
+    "title": "DNS",
     "cloudflare": "Cloudflare",
     "recommended": "Recommandé",
     "adguard": "AdGuard",
@@ -21,7 +21,10 @@
     "optional": "facultatif",
     "custom_display": "Personnalisé",
     "status_disabled": "Désactivé",
-    "cache_cleared": "Cache DNS vidé"
+    "cache_cleared": "Cache DNS vidé",
+    "system": "DNS standard",
+    "system_desc": "Sans protection",
+    "custom_ip_edit": "Modifier"
   },
   "dns_detail": {
     "ip_copied": "Copié"
@@ -41,10 +44,10 @@
     "speed": "Débit : {down}/{up} Mbps",
     "connection_vpn_detected": "Connexion VPN active",
     "waiting": "Vérification de la connexion...",
-    "dns_protection_with_provider": "Protection DNS activée",
+    "dns_protection_with_provider": "DNS activé",
     "dns_protection_enabled": "Utilisation du DNS {{provider}}",
-    "dns_protection_disabled": "Protection DNS désactivée",
-    "dns_protection_disabled_desc": "Utilisation du DNS standard du FAI"
+    "dns_protection_disabled": "DNS standard",
+    "dns_protection_disabled_desc": "Sans protection"
   },
   "node_detail": {
     "adapter": "Adaptateur",
@@ -144,6 +147,9 @@
       "device_scan": "Analyse des appareils",
       "device_scan_desc": "Voir qui est connecté à votre réseau"
     }
+  },
+  "protection": {
+    "dns_protection": "DNS"
   },
   "speed_test": {
     "title": "Speed test",

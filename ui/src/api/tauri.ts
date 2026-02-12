@@ -176,6 +176,19 @@ export interface VpnStatus {
   state: VpnConnectionState;
 }
 
+export interface VpnKeyValidation {
+  valid: boolean;
+  reachable: boolean;
+  protocol: string;
+  server: string;
+  port: number;
+  error: string | null;
+}
+
+export async function validateVpnKey(rawUri: string): Promise<VpnKeyValidation> {
+  return await invoke<VpnKeyValidation>('validate_vpn_key', { rawUri });
+}
+
 // VPN commands
 export async function connectVpn(rawUri: string): Promise<void> {
   return await invoke('connect_vpn', { rawUri });

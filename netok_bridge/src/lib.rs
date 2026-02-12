@@ -385,6 +385,84 @@ pub async fn test_dns_server_reachable(server_ip: String) -> Result<bool, String
     .map_err(|e| format!("Failed to run DNS server test task: {}", e))?
 }
 
+// ==================== VPN Validation ====================
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+pub struct VpnKeyValidation {
+    pub valid: bool,
+    pub reachable: bool,
+    pub protocol: String,
+    pub server: String,
+    pub port: u16,
+    pub error: Option<String>,
+}
+
+/// Validate a VPN URI: parse it and check if the server is reachable via TCP.
+pub async fn validate_vpn_key(raw_uri: String) -> Result<VpnKeyValidation, String> {
+    tokio::task::spawn_blocking(move || {
+        // Step 1: Parse URI
+        let protocol = match netok_core::parse_vpn_uri(&raw_uri) {
+            Ok(p) => p,
+            Err(e) => {
+                return Ok(VpnKeyValidation {
+                    valid: false,
+                    reachable: false,
+                    protocol: String::new(),
+                    server: String::new(),
+                    port: 0,
+                    error: Some(e),
+                });
+            }
+        };
+
+        // Step 2: Extract server + port
+        let (server, port, proto_name) = match &protocol {
+            netok_core::VpnProtocol::Vless(p) => (p.server.clone(), p.port, "VLESS"),
+            netok_core::VpnProtocol::Vmess(p) => (p.server.clone(), p.port, "VMess"),
+            netok_core::VpnProtocol::Shadowsocks(p) => (p.server.clone(), p.port, "Shadowsocks"),
+            netok_core::VpnProtocol::Trojan(p) => (p.server.clone(), p.port, "Trojan"),
+            netok_core::VpnProtocol::WireGuard(p) => (p.server.clone(), p.port, "WireGuard"),
+        };
+
+        // Step 3: TCP connect to server:port (3s timeout)
+        let addr = format!("{}:{}", server, port);
+        let reachable = match addr.parse::<std::net::SocketAddr>() {
+            Ok(sock_addr) => {
+                std::net::TcpStream::connect_timeout(
+                    &sock_addr,
+                    std::time::Duration::from_secs(3),
+                )
+                .is_ok()
+            }
+            Err(_) => {
+                // Hostname — try resolving + connecting
+                use std::net::ToSocketAddrs;
+                match addr.to_socket_addrs() {
+                    Ok(mut addrs) => addrs.any(|a| {
+                        std::net::TcpStream::connect_timeout(
+                            &a,
+                            std::time::Duration::from_secs(3),
+                        )
+                        .is_ok()
+                    }),
+                    Err(_) => false,
+                }
+            }
+        };
+
+        Ok(VpnKeyValidation {
+            valid: true,
+            reachable,
+            protocol: proto_name.to_string(),
+            server,
+            port,
+            error: None,
+        })
+    })
+    .await
+    .map_err(|e| format!("Task join error: {}", e))?
+}
+
 // ==================== VPN Types ====================
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]

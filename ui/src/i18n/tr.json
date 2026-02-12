@@ -3,7 +3,7 @@
     "unknown": "Bilinmiyor"
   },
   "dns_providers": {
-    "title": "DNS Korumasi",
+    "title": "DNS",
     "cloudflare": "Cloudflare",
     "recommended": "Önerilen",
     "adguard": "AdGuard",
@@ -21,7 +21,10 @@
     "optional": "istege bagli",
     "custom_display": "Ozel",
     "status_disabled": "Devre disi",
-    "cache_cleared": "DNS önbelleği temizlendi"
+    "cache_cleared": "DNS önbelleği temizlendi",
+    "system": "Standart DNS",
+    "system_desc": "Koruma yok",
+    "custom_ip_edit": "Düzenle"
   },
   "dns_detail": {
     "ip_copied": "Kopyalandi"
@@ -41,10 +44,10 @@
     "speed": "Hiz: {down}/{up} Mbps",
     "connection_vpn_detected": "VPN baglantisi etkin",
     "waiting": "Baglanti kontrol ediliyor...",
-    "dns_protection_with_provider": "DNS Korumasi etkin",
+    "dns_protection_with_provider": "DNS etkin",
     "dns_protection_enabled": "{{provider}} DNS kullaniliyor",
-    "dns_protection_disabled": "DNS Korumasi devre disi",
-    "dns_protection_disabled_desc": "Standart ISS DNS'i kullaniliyor"
+    "dns_protection_disabled": "Standart DNS",
+    "dns_protection_disabled_desc": "Koruma yok"
   },
   "node_detail": {
     "adapter": "Adaptator",
@@ -144,6 +147,9 @@
       "device_scan": "Cihaz taramasi",
       "device_scan_desc": "Aginizda kimlerin oldugunu gorun"
     }
+  },
+  "protection": {
+    "dns_protection": "DNS"
   },
   "speed_test": {
     "title": "Speed test",

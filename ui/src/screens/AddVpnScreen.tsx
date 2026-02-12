@@ -1,69 +1,88 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft } from '../components/icons/UIIcons';
+import { ArrowLeft, AlertTriangle } from '../components/icons/UIIcons';
 import { Button } from '@/components/ui/button';
 
 import { CloseButton } from '../components/WindowControls';
 import { useVpnStore, type VpnConfig } from '../stores/vpnStore';
-import { lookupIpLocation } from '../api/tauri';
-import { extractServerHost } from '../utils/vpnUri';
+import { lookupIpLocation, validateVpnKey } from '../api/tauri';
 
 interface AddVpnScreenProps {
   onBack: () => void;
   onAdded: () => void;
 }
 
-function detectProtocol(key: string): string {
-  const lower = key.trim().toLowerCase();
-  if (lower.startsWith('vless://')) return 'VLESS';
-  if (lower.startsWith('vmess://')) return 'VMess';
-  if (lower.startsWith('ss://')) return 'Shadowsocks';
-  if (lower.startsWith('trojan://')) return 'Trojan';
-  if (lower.startsWith('wg://') || lower.startsWith('wireguard://')) return 'WireGuard';
-  if (lower.startsWith('ssconf://')) return 'Outline';
-  return 'Unknown';
-}
+type ValidationPhase = 'idle' | 'validating' | 'looking_up';
 
 export function AddVpnScreen({ onBack, onAdded }: AddVpnScreenProps) {
   const { t } = useTranslation();
   const { config, setConfig } = useVpnStore();
   const [keyValue, setKeyValue] = useState(config?.rawKey ?? '');
-  const [isLookingUp, setIsLookingUp] = useState(false);
+  const [phase, setPhase] = useState<ValidationPhase>('idle');
+  const [error, setError] = useState<string | null>(null);
+  const [warning, setWarning] = useState<string | null>(null);
 
   const handleAdd = async () => {
     const trimmed = keyValue.trim();
     if (!trimmed) return;
 
-    const protocol = detectProtocol(trimmed);
-    let country = '';
-    let city = '';
+    setError(null);
+    setWarning(null);
 
-    const host = extractServerHost(trimmed);
-    if (host) {
-      setIsLookingUp(true);
-      try {
-        const location = await lookupIpLocation(host);
-        country = location.country ?? '';
-        city = location.city ?? '';
-      } catch (e) {
-        console.error('IP location lookup failed:', e);
-      } finally {
-        setIsLookingUp(false);
-      }
+    // Step 1: Validate URI + ping server
+    setPhase('validating');
+    let validation;
+    try {
+      validation = await validateVpnKey(trimmed);
+    } catch (e) {
+      setError(String(e));
+      setPhase('idle');
+      return;
     }
 
-    const config: VpnConfig = {
-      protocol,
-      serverHost: host || '',
+    if (!validation.valid) {
+      setError(validation.error || t('vpn.invalid_key'));
+      setPhase('idle');
+      return;
+    }
+
+    if (!validation.reachable) {
+      setWarning(t('vpn.server_unreachable'));
+    }
+
+    // Step 2: GeoIP lookup
+    setPhase('looking_up');
+    let country = '';
+    let city = '';
+    try {
+      const location = await lookupIpLocation(validation.server);
+      country = location.country ?? '';
+      city = location.city ?? '';
+    } catch (e) {
+      console.error('IP location lookup failed:', e);
+    }
+
+    const newConfig: VpnConfig = {
+      protocol: validation.protocol,
+      serverHost: validation.server,
       country,
       city,
       ping: 0,
       rawKey: trimmed,
     };
 
-    setConfig(config);
+    setConfig(newConfig);
+    setPhase('idle');
     onAdded();
   };
+
+  const isBusy = phase !== 'idle';
+
+  const buttonLabel = phase === 'validating'
+    ? t('vpn.validating')
+    : phase === 'looking_up'
+      ? t('vpn.detecting_location')
+      : t('vpn.save_button');
 
   return (
     <div className="flex flex-col h-full bg-background">
@@ -91,15 +110,32 @@ export function AddVpnScreen({ onBack, onAdded }: AddVpnScreenProps) {
           <textarea
             placeholder=""
             value={keyValue}
-            onChange={(e) => setKeyValue(e.target.value)}
+            onChange={(e) => { setKeyValue(e.target.value); setError(null); setWarning(null); }}
             className="flex-1 min-h-0 w-full rounded-lg bg-accent/50 p-3 text-sm font-mono resize-none outline-none focus:ring-1 focus:ring-ring placeholder:font-light placeholder:text-muted-foreground/60 custom-scrollbar"
           />
+
+          {/* Validation error */}
+          {error && (
+            <div className="flex items-start gap-2 text-destructive text-xs">
+              <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+              <span>{error}</span>
+            </div>
+          )}
+
+          {/* Reachability warning */}
+          {warning && !error && (
+            <div className="flex items-start gap-2 text-warning text-xs">
+              <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+              <span>{warning}</span>
+            </div>
+          )}
+
           <Button
             className="w-full uppercase font-mono tracking-wider text-xs shrink-0"
             onClick={handleAdd}
-            disabled={!keyValue.trim() || isLookingUp}
+            disabled={!keyValue.trim() || isBusy}
           >
-            {isLookingUp ? t('vpn.detecting_location') : t('vpn.save_button')}
+            {buttonLabel}
           </Button>
         </div>
       </div>

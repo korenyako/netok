@@ -3,7 +3,7 @@
     "unknown": "Невідомо"
   },
   "dns_providers": {
-    "title": "Захист DNS",
+    "title": "DNS",
     "cloudflare": "Cloudflare",
     "recommended": "Рекомендовано",
     "adguard": "AdGuard",
@@ -21,7 +21,10 @@
     "optional": "необов'язково",
     "custom_display": "Власний DNS",
     "status_disabled": "Вимкнено",
-    "cache_cleared": "Кеш DNS очищено"
+    "cache_cleared": "Кеш DNS очищено",
+    "system": "Стандартний DNS",
+    "system_desc": "Без захисту",
+    "custom_ip_edit": "Змінити"
   },
   "dns_detail": {
     "ip_copied": "Скопійовано"
@@ -41,10 +44,10 @@
     "speed": "Швидкість: {down}/{up} Мбіт/с",
     "connection_vpn_detected": "VPN з'єднання активне",
     "waiting": "Перевіряємо з'єднання...",
-    "dns_protection_with_provider": "Захист DNS увімкнено",
+    "dns_protection_with_provider": "DNS увімкнено",
     "dns_protection_enabled": "Використовується DNS {{provider}}",
-    "dns_protection_disabled": "Захист DNS вимкнено",
-    "dns_protection_disabled_desc": "Використовується стандартний DNS провайдера"
+    "dns_protection_disabled": "Стандартний DNS",
+    "dns_protection_disabled_desc": "Без захисту"
   },
   "node_detail": {
     "adapter": "Адаптер",
@@ -144,6 +147,9 @@
       "device_scan": "Пристрої в мережі",
       "device_scan_desc": "Подивіться, хто підключений"
     }
+  },
+  "protection": {
+    "dns_protection": "DNS"
   },
   "speed_test": {
     "title": "Speed test",

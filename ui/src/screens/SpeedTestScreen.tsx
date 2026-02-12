@@ -30,19 +30,21 @@ export function SpeedTestScreen({ onBack }: SpeedTestScreenProps) {
   }, [isRunning, cancelTest, reset, startTest]);
 
   return (
-    <div className="flex flex-col flex-1 min-h-0 bg-background">
+    <div className="flex flex-col h-full bg-background">
       {/* Header */}
-      <div data-tauri-drag-region className="px-4 py-4 flex items-center gap-2">
-        <Button variant="ghost" size="icon" onClick={onBack}>
-          <ArrowLeft className="w-5 h-5 text-muted-foreground rtl-flip" />
-        </Button>
-        <h1 className="text-lg font-semibold text-foreground flex-1">
-          {t('speed_test.title')}
-        </h1>
-        <Button variant="ghost" size="icon" onClick={handleRestart} disabled={phase === 'idle'}>
-          <RotateCw className="w-5 h-5 text-muted-foreground" />
-        </Button>
-        <CloseButton />
+      <div data-tauri-drag-region className="px-4 pt-4 pb-3">
+        <div className="flex items-center gap-2 pointer-events-auto">
+          <Button variant="ghost" size="icon" onClick={onBack}>
+            <ArrowLeft className="w-5 h-5 text-muted-foreground rtl-flip" />
+          </Button>
+          <h1 className="flex-1 text-lg font-semibold text-foreground">
+            {t('speed_test.title')}
+          </h1>
+          <Button variant="ghost" size="icon" onClick={handleRestart} disabled={phase === 'idle'}>
+            <RotateCw className="w-5 h-5 text-muted-foreground" />
+          </Button>
+          <CloseButton />
+        </div>
       </div>
 
       <ScrollArea className="flex-1">

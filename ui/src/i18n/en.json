@@ -3,7 +3,7 @@
     "unknown": "Unknown"
   },
   "dns_providers": {
-    "title": "DNS Protection",
+    "title": "DNS",
     "cloudflare": "Cloudflare",
     "recommended": "Recommended",
     "adguard": "AdGuard",
@@ -33,7 +33,10 @@
     "optional": "optional",
     "custom_display": "Custom",
     "status_disabled": "Disabled",
-    "cache_cleared": "DNS cache cleared"
+    "cache_cleared": "DNS cache cleared",
+    "system": "Standard DNS",
+    "system_desc": "No protection",
+    "custom_ip_edit": "Edit"
   },
   "dns_detail": {
     "ip_copied": "Copied"
@@ -53,10 +56,10 @@
     "speed": "Speed: {down}/{up} Mbps",
     "connection_vpn_detected": "VPN connection active",
     "waiting": "Checking connection...",
-    "dns_protection_with_provider": "DNS Protection enabled",
+    "dns_protection_with_provider": "DNS enabled",
     "dns_protection_enabled": "Using {{provider}} DNS",
-    "dns_protection_disabled": "DNS Protection disabled",
-    "dns_protection_disabled_desc": "Using standard ISP DNS"
+    "dns_protection_disabled": "Standard DNS",
+    "dns_protection_disabled_desc": "No protection"
   },
   "node_detail": {
     "adapter": "Adapter",
@@ -156,7 +159,7 @@
   },
   "protection": {
     "title": "Protection",
-    "dns_protection": "DNS Protection",
+    "dns_protection": "DNS",
     "vpn_tunnel": "VPN"
   },
   "vpn": {
@@ -191,7 +194,10 @@
     "connection_failed": "Failed to connect",
     "connection_failed_desc": "Could not establish VPN connection. Check your key and try again.",
     "retry": "Retry",
-    "dismiss": "Dismiss"
+    "dismiss": "Dismiss",
+    "validating": "Validating key...",
+    "invalid_key": "Invalid VPN key",
+    "server_unreachable": "Server is not responding. The key may still work."
   },
   "speed_test": {
     "title": "Speed test",

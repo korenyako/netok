@@ -1,6 +1,6 @@
 @font-face {
-  font-family: 'Geist';
-  src: url('./fonts/Geist-Variable.woff2') format('woff2');
+  font-family: 'Inter';
+  src: url('./fonts/Inter-Variable.ttf') format('truetype');
   font-weight: 100 900;
   font-display: swap;
   font-style: normal;
@@ -8,7 +8,7 @@
 
 @font-face {
   font-family: 'Martian Mono';
-  src: url('./fonts/MartianMono-Variable.woff2') format('woff2');
+  src: url('./fonts/MartianMono-Variable.ttf') format('truetype');
   font-weight: 100 800;
   font-display: swap;
   font-style: normal;
@@ -30,7 +30,7 @@
   :root {
     --background: 0 0% 100%;
     --foreground: 270 3.6% 11%;
-    --card: 309 15% 90.8%;
+    --card: 0 0% 90.8%;
     --card-foreground: 270 3.6% 11%;
     --popover: 0 0% 100%;
     --popover-foreground: 270 3.6% 11%;
@@ -41,12 +41,13 @@
     --secondary-foreground: 270 3.6% 11%;
     --muted: 210 40% 96.1%;
     --muted-foreground: 270 3.6% 11%;
-    --accent: 309 15% 90.8%;
+    --accent: 0 0% 92.9%;
+    --accent-hover: 180 2.3% 83.1%;
     --accent-foreground: 270 3.6% 11%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-    --border: 309 15% 90.8%;
-    --input: 309 12% 83%;
+    --border: 0 0% 90.8%;
+    --input: 0 0% 83%;
     --ring: 152 50% 47%;
     --radius: 0.5rem;
     --chart-1: 12 76% 61%;
@@ -62,11 +63,11 @@
   }
 
   .dark {
-    --background: 300 2.5% 7.6%;
+    --background: 240 2.6% 7.6%;
     --foreground: 292.5 7.3% 78.4%;
     --card: 270 3.6% 11%;
     --card-foreground: 292.5 7.3% 78.4%;
-    --popover: 300 2.5% 7.6%;
+    --popover: 240 2.6% 7.6%;
     --popover-foreground: 292.5 7.3% 78.4%;
     --primary: 152 50% 47%;
     --primary-hover: 152 55% 54%;
@@ -75,7 +76,8 @@
     --secondary-foreground: 292.5 7.3% 78.4%;
     --muted: 270 5% 17.5%;
     --muted-foreground: 292.5 7.3% 78.4%;
-    --accent: 270 2.4% 16.1%;
+    --accent: 180 1.5% 12.7%;
+    --accent-hover: 210 4.8% 16.5%;
     --accent-foreground: 292.5 7.3% 78.4%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
@@ -109,7 +111,7 @@
 .theme-force-light {
   --background: 0 0% 100%;
   --foreground: 270 3.6% 11%;
-  --card: 309 15% 90.8%;
+  --card: 0 0% 90.8%;
   --card-foreground: 270 3.6% 11%;
   --primary: 152 50% 47%;
   --primary-hover: 152 45% 40%;
@@ -118,12 +120,13 @@
   --secondary-foreground: 270 3.6% 11%;
   --muted: 210 40% 96.1%;
   --muted-foreground: 270 3.6% 11%;
-  --accent: 309 15% 90.8%;
+  --accent: 0 0% 92.9%;
+  --accent-hover: 180 2.3% 83.1%;
   --accent-foreground: 270 3.6% 11%;
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 210 40% 98%;
-  --border: 309 15% 90.8%;
-  --input: 309 12% 83%;
+  --border: 0 0% 90.8%;
+  --input: 0 0% 83%;
   --ring: 152 50% 47%;
   --success: 152 50% 47%;
   --success-foreground: 0 0% 100%;
@@ -132,7 +135,7 @@
 }
 
 .theme-force-dark {
-  --background: 300 2.5% 7.6%;
+  --background: 240 2.6% 7.6%;
   --foreground: 292.5 7.3% 78.4%;
   --card: 270 3.6% 11%;
   --card-foreground: 292.5 7.3% 78.4%;
@@ -143,7 +146,8 @@
   --secondary-foreground: 292.5 7.3% 78.4%;
   --muted: 270 5% 17.5%;
   --muted-foreground: 292.5 7.3% 78.4%;
-  --accent: 270 2.4% 16.1%;
+  --accent: 180 1.5% 12.7%;
+  --accent-hover: 210 4.8% 16.5%;
   --accent-foreground: 292.5 7.3% 78.4%;
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 210 40% 98%;
@@ -216,6 +220,13 @@ html, body, #root {
   }
   .radial-hover > * {
     position: relative;
+  }
+
+  /* Ghost action pattern (Material Design):
+     When a .ghost-action button inside a card is hovered,
+     suppress the card's hover background so only the button stands out. */
+  .ghost-action-card:has(.ghost-action:hover) {
+    background-color: transparent;
   }
 }
 

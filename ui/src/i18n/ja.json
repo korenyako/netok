@@ -3,7 +3,7 @@
     "unknown": "不明"
   },
   "dns_providers": {
-    "title": "DNS保護",
+    "title": "DNS",
     "cloudflare": "Cloudflare",
     "recommended": "推奨",
     "adguard": "AdGuard",
@@ -21,7 +21,10 @@
     "optional": "任意",
     "custom_display": "カスタム",
     "status_disabled": "無効",
-    "cache_cleared": "DNSキャッシュをクリアしました"
+    "cache_cleared": "DNSキャッシュをクリアしました",
+    "system": "標準 DNS",
+    "system_desc": "保護なし",
+    "custom_ip_edit": "編集"
   },
   "dns_detail": {
     "ip_copied": "コピーしました"
@@ -41,10 +44,10 @@
     "speed": "速度: {down}/{up} Mbps",
     "connection_vpn_detected": "VPN接続がアクティブです",
     "waiting": "接続を確認中...",
-    "dns_protection_with_provider": "DNS保護が有効です",
+    "dns_protection_with_provider": "DNS 有効",
     "dns_protection_enabled": "{{provider}} DNSを使用中",
-    "dns_protection_disabled": "DNS保護が無効です",
-    "dns_protection_disabled_desc": "標準のISP DNSを使用中"
+    "dns_protection_disabled": "標準 DNS",
+    "dns_protection_disabled_desc": "保護なし"
   },
   "node_detail": {
     "adapter": "アダプター",
@@ -144,6 +147,9 @@
       "device_scan": "デバイススキャン",
       "device_scan_desc": "ネットワーク上のデバイスを確認"
     }
+  },
+  "protection": {
+    "dns_protection": "DNS"
   },
   "speed_test": {
     "title": "Speed test",

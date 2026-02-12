@@ -3,7 +3,7 @@
     "unknown": "Неизвестно"
   },
   "dns_providers": {
-    "title": "Защита DNS",
+    "title": "DNS",
     "cloudflare": "Cloudflare",
     "recommended": "Рекомендуем",
     "adguard": "AdGuard",
@@ -33,7 +33,10 @@
     "optional": "необязательно",
     "custom_display": "Свой DNS",
     "status_disabled": "Отключено",
-    "cache_cleared": "Кэш DNS очищен"
+    "cache_cleared": "Кэш DNS очищен",
+    "system": "Стандартный DNS",
+    "system_desc": "Без защиты",
+    "custom_ip_edit": "Изменить"
   },
   "dns_detail": {
     "ip_copied": "Скопировано"
@@ -53,10 +56,10 @@
     "speed": "Скорость: {down}/{up} Мбит/с",
     "connection_vpn_detected": "VPN соединение обнаружено",
     "waiting": "Проверяем соединение…",
-    "dns_protection_with_provider": "Защита DNS включена",
+    "dns_protection_with_provider": "DNS включён",
     "dns_protection_enabled": "Используется DNS {{provider}}",
-    "dns_protection_disabled": "Защита DNS отключена",
-    "dns_protection_disabled_desc": "Используется стандартный DNS провайдера"
+    "dns_protection_disabled": "Стандартный DNS",
+    "dns_protection_disabled_desc": "Без защиты"
   },
   "node_detail": {
     "adapter": "Адаптер",
@@ -156,7 +159,7 @@
   },
   "protection": {
     "title": "Защита",
-    "dns_protection": "Защита DNS",
+    "dns_protection": "DNS",
     "vpn_tunnel": "VPN"
   },
   "vpn": {
@@ -191,7 +194,10 @@
     "connection_failed": "Не удалось подключиться",
     "connection_failed_desc": "Не удалось установить VPN-соединение. Проверьте ключ и попробуйте ещё раз.",
     "retry": "Повторить",
-    "dismiss": "Скрыть"
+    "dismiss": "Скрыть",
+    "validating": "Проверяем ключ...",
+    "invalid_key": "Неверный VPN-ключ",
+    "server_unreachable": "Сервер не отвечает. Ключ может быть рабочим."
   },
   "speed_test": {
     "title": "Тест скорости",

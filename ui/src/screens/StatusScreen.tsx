@@ -128,10 +128,12 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders }: St
   const showNetworkInfo = !isLoading && (visualState === 'success' || visualState === 'warning');
 
   return (
-    <div className="flex flex-col flex-1 min-h-0 bg-background">
+    <div className="flex flex-col h-full bg-background">
       {/* Drag region with close button */}
-      <div data-tauri-drag-region className="px-4 py-4 flex items-center justify-end shrink-0">
-        <CloseButton />
+      <div data-tauri-drag-region className="px-4 pt-4 pb-3 flex items-center justify-end shrink-0">
+        <div className="pointer-events-auto">
+          <CloseButton />
+        </div>
       </div>
 
       {/* Main Content - Clickable Area */}

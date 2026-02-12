@@ -3,7 +3,7 @@
     "unknown": "未知"
   },
   "dns_providers": {
-    "title": "DNS 防护",
+    "title": "DNS",
     "cloudflare": "Cloudflare",
     "recommended": "推荐",
     "adguard": "AdGuard",
@@ -21,7 +21,10 @@
     "optional": "可选",
     "custom_display": "自定义",
     "status_disabled": "已关闭",
-    "cache_cleared": "DNS 缓存已清除"
+    "cache_cleared": "DNS 缓存已清除",
+    "system": "标准 DNS",
+    "system_desc": "无保护",
+    "custom_ip_edit": "编辑"
   },
   "dns_detail": {
     "ip_copied": "已复制"
@@ -41,10 +44,10 @@
     "speed": "速度：{down}/{up} Mbps",
     "connection_vpn_detected": "VPN 连接已启用",
     "waiting": "正在检查连接...",
-    "dns_protection_with_provider": "DNS 防护已开启",
+    "dns_protection_with_provider": "DNS 已启用",
     "dns_protection_enabled": "正在使用 {{provider}} DNS",
-    "dns_protection_disabled": "DNS 防护已关闭",
-    "dns_protection_disabled_desc": "正在使用运营商标准 DNS"
+    "dns_protection_disabled": "标准 DNS",
+    "dns_protection_disabled_desc": "无保护"
   },
   "node_detail": {
     "adapter": "网络适配器",
@@ -144,6 +147,9 @@
       "device_scan": "设备扫描",
       "device_scan_desc": "查看网络上连接的设备"
     }
+  },
+  "protection": {
+    "dns_protection": "DNS"
   },
   "speed_test": {
     "title": "Speed test",

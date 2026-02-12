@@ -1,15 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Trash2 } from '../components/icons/UIIcons';
+import { ArrowLeft, Loader2 } from '../components/icons/UIIcons';
 import { setDns, type DnsProvider as ApiDnsProvider } from '../api/tauri';
 import { useDnsStore } from '../stores/useDnsStore';
 import { dnsStore } from '../stores/dnsStore';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
 import { MenuCard } from '@/components/MenuCard';
 import { cn } from '@/lib/utils';
 import { CloseButton } from '../components/WindowControls';
-import { toast } from 'sonner';
 import { loadCustomDnsConfig } from '../utils/customDnsStorage';
 import { lookupDnsProvider } from '../utils/dnsProviderLookup';
 
@@ -51,35 +49,21 @@ const PROVIDER_CARDS: ProviderCard[] = [
   },
 ];
 
-const LAST_DNS_KEY = 'netok_last_dns';
-
-function saveLastDns(provider: ApiDnsProvider): void {
-  try {
-    localStorage.setItem(LAST_DNS_KEY, JSON.stringify(provider));
-  } catch {
-    // Ignore localStorage errors
-  }
-}
-
-const VALID_DNS_TYPES = ['Auto', 'Cloudflare', 'Google', 'AdGuard', 'Dns4Eu', 'Quad9', 'OpenDns', 'Custom'];
-
-function loadLastDns(): ApiDnsProvider {
-  try {
-    const raw = localStorage.getItem(LAST_DNS_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw) as ApiDnsProvider;
-      if (VALID_DNS_TYPES.includes(parsed.type)) return parsed;
-      localStorage.removeItem(LAST_DNS_KEY);
-    }
-  } catch {
-    // Ignore parse errors
-  }
-  return { type: 'Cloudflare', variant: 'Standard' };
-}
-
 function isProtected(provider: ApiDnsProvider | null): boolean {
   if (!provider) return false;
   return provider.type !== 'Auto';
+}
+
+function RadioDot({ selected, applying }: { selected: boolean; applying: boolean }) {
+  if (applying) return <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />;
+  return (
+    <div className={cn(
+      "w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors",
+      selected ? "border-primary" : "border-muted-foreground/40"
+    )}>
+      {selected && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
+    </div>
+  );
 }
 
 export function DnsProvidersScreen({ onBack, onCustomIp }: DnsProvidersScreenProps) {
@@ -106,12 +90,6 @@ export function DnsProvidersScreen({ onBack, onCustomIp }: DnsProvidersScreenPro
     return undefined;
   };
 
-  useEffect(() => {
-    if (apiProvider && apiProvider.type !== 'Auto') {
-      saveLastDns(apiProvider);
-    }
-  }, [apiProvider]);
-
   const applyProvider = async (id: string, provider: ApiDnsProvider) => {
     try {
       setApplyingId(id);
@@ -124,33 +102,16 @@ export function DnsProvidersScreen({ onBack, onCustomIp }: DnsProvidersScreenPro
     }
   };
 
-  const handleToggle = async (checked: boolean) => {
-    if (isApplying) return;
-    if (checked) {
-      const lastDns = loadLastDns();
-      const id = PROVIDER_CARDS.find(c => c.matchType === lastDns.type)?.id || lastDns.type;
-      await applyProvider(id, lastDns);
-    } else {
-      await applyProvider('toggle', { type: 'Auto' });
-    }
-  };
-
   const handleCardSelect = async (card: ProviderCard) => {
     if (isApplying) return;
     const isActive = protectionEnabled && apiProvider?.type === card.matchType && !isCustomActive;
-    if (isActive) {
-      await applyProvider(card.id, { type: 'Auto' });
-    } else {
-      await applyProvider(card.id, card.dnsPayload);
-    }
+    if (isActive) return;
+    await applyProvider(card.id, card.dnsPayload);
   };
 
   const handleCustomSelect = async () => {
     if (isApplying) return;
-    if (isCustomActive) {
-      await applyProvider('custom', { type: 'Auto' });
-      return;
-    }
+    if (isCustomActive) return;
     const config = loadCustomDnsConfig();
     if (config) {
       await applyProvider('custom', {
@@ -176,11 +137,6 @@ export function DnsProvidersScreen({ onBack, onCustomIp }: DnsProvidersScreenPro
           <h1 className="flex-1 text-lg font-semibold text-foreground">
             {t('dns_providers.title')}
           </h1>
-          <Switch
-            checked={protectionEnabled}
-            onCheckedChange={handleToggle}
-            disabled={isApplying}
-          />
           <CloseButton />
         </div>
       </div>
@@ -188,6 +144,26 @@ export function DnsProvidersScreen({ onBack, onCustomIp }: DnsProvidersScreenPro
       {/* Content */}
       <div className="flex-1 px-4 pb-4 flex flex-col min-h-0 overflow-y-auto">
         <div className="space-y-2">
+          {/* System DNS card */}
+          {(() => {
+            const isSystemActive = !protectionEnabled;
+            const isSystemApplying = applyingId === 'system';
+            return (
+              <div className={cn(isApplying && !isSystemActive && !isSystemApplying && 'pointer-events-none opacity-50')}>
+                <MenuCard
+                  variant="ghost"
+                  icon={<RadioDot selected={isSystemActive} applying={isSystemApplying} />}
+                  title={t('dns_providers.system')}
+                  subtitle={t('dns_providers.system_desc')}
+                  onClick={async () => {
+                    if (isApplying || isSystemActive) return;
+                    await applyProvider('system', { type: 'Auto' });
+                  }}
+                />
+              </div>
+            );
+          })()}
+
           {PROVIDER_CARDS.map((card) => {
             const isActive = protectionEnabled && apiProvider?.type === card.matchType && !isCustomActive;
             const isCardApplying = applyingId === card.id;
@@ -195,11 +171,11 @@ export function DnsProvidersScreen({ onBack, onCustomIp }: DnsProvidersScreenPro
             return (
               <div key={card.id} className={cn(isApplying && !isActive && !isCardApplying && 'pointer-events-none opacity-50')}>
                 <MenuCard
-                  variant={isActive || isCardApplying ? 'selected' : 'ghost'}
+                  variant="ghost"
+                  icon={<RadioDot selected={isActive} applying={isCardApplying} />}
                   title={t(card.nameKey)}
                   badge={card.badgeKey ? t(card.badgeKey) : undefined}
                   subtitle={t(card.descKey)}
-                  checked={isCardApplying ? 'spinner' : isActive}
                   onClick={() => handleCardSelect(card)}
                 />
               </div>
@@ -212,40 +188,28 @@ export function DnsProvidersScreen({ onBack, onCustomIp }: DnsProvidersScreenPro
             return (
               <div className={cn(isApplying && !isCustomActive && !isCustomApplying && 'pointer-events-none opacity-50')}>
                 <MenuCard
-                  variant={isCustomActive || isCustomApplying ? 'selected' : 'ghost'}
+                  variant="ghost"
+                  className="group ghost-action-card"
+                  icon={<RadioDot selected={isCustomActive} applying={isCustomApplying} />}
                   title={t('dns_providers.custom')}
                   subtitle={customSubtitle() || t('dns_providers.custom_ip_desc')}
-                  checked={isCustomApplying ? 'spinner' : isCustomActive}
+                  trailing={
+                    <button
+                      className="ghost-action px-4 py-1.5 rounded-full text-[10px] font-mono font-medium uppercase tracking-wider text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all shrink-0 opacity-0 group-hover:opacity-100"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onCustomIp();
+                      }}
+                    >
+                      {t('dns_providers.custom_ip_edit')}
+                    </button>
+                  }
                   onClick={handleCustomSelect}
                 />
               </div>
             );
           })()}
         </div>
-
-        <div className="flex-1" />
-
-        {/* Set Custom DNS button */}
-        <Button
-          variant="outline"
-          className="w-full uppercase font-mono tracking-wider text-xs mb-3"
-          onClick={onCustomIp}
-        >
-          {t('dns_providers.set_custom_dns')}
-        </Button>
-
-        {/* Clear DNS cache */}
-        <Button
-          variant="outline"
-          className="w-full uppercase font-mono tracking-wider text-xs"
-          onClick={() => {
-            // TODO: Implement actual DNS cache flush
-            toast.success(t('dns_providers.cache_cleared'));
-          }}
-        >
-          <Trash2 className="w-4 h-4" />
-          {t('settings.tools.flush_dns')}
-        </Button>
       </div>
     </div>
   );

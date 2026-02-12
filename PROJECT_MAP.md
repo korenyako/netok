@@ -1,6 +1,6 @@
 # Project Map - Netok
 
-Generated: 2026-02-11
+Generated: 2026-02-12
 
 ## TREE (ASCII)
 
@@ -169,9 +169,8 @@ Generated: 2026-02-11
 │   │   ├── data
 │   │   │   └── dns-providers.json
 │   │   ├── fonts
-│   │   │   ├── Geist-Variable.woff2
-│   │   │   ├── GeistMono-Variable.woff2
-│   │   │   ├── MartianMono-Variable.woff2
+│   │   │   ├── Inter-Variable.ttf
+│   │   │   ├── MartianMono-Variable.ttf
 │   │   │   └── NotoSansArabic-Variable.ttf
 │   │   ├── hooks
 │   │   │   ├── useNavigation.ts
@@ -265,6 +264,7 @@ Generated: 2026-02-11
 ├── LICENSE.Proprietary
 ├── netok-protection-hub.jsx
 ├── netok-status.jsx
+├── nul
 ├── package-lock.json
 ├── package.json
 ├── PROJECT_CONTEXT.md
@@ -387,16 +387,16 @@ export default {
     extend: {
       fontFamily: {
         sans: [
-          'Geist',
+          'Inter',
+          'Lato',
           'Noto Sans Arabic',
-          'Microsoft YaHei', 'PingFang SC',
-          'Yu Gothic', 'Hiragino Sans',
-          'Malgun Gothic', 'Apple SD Gothic Neo',
-          'system-ui', 'sans-serif',
+          'PingFang SC', 'Microsoft YaHei',
+          'Hiragino Sans', 'Meiryo',
+          'Apple SD Gothic Neo', 'Malgun Gothic',
+          'sans-serif',
         ],
         mono: ['"Martian Mono"', 'monospace'],
-      },
-      colors: {}}}}
+      },}}}
 ```
 
 ### ui/index.html

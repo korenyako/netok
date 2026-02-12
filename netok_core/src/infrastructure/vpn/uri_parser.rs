@@ -172,7 +172,11 @@ fn parse_authority(authority: &str) -> Result<(String, String, u16), String> {
 }
 
 /// Parse `host:port` or `[ipv6]:port`.
+/// Strips any trailing path (e.g. `/` from `host:port/`).
 fn parse_host_port(s: &str) -> Result<(String, u16), String> {
+    // Strip trailing path component (e.g. "host:port/" → "host:port")
+    let s = s.split('/').next().unwrap_or(s);
+
     // IPv6 in brackets: [::1]:port
     if s.starts_with('[') {
         let bracket_end = s
@@ -712,6 +716,31 @@ mod tests {
     fn test_base64_decode_no_padding() {
         // Without padding
         assert_eq!(base64_decode("SGVsbG8").unwrap(), "Hello");
+    }
+
+    #[test]
+    fn test_parse_shadowsocks_with_trailing_slash_and_outline() {
+        // Real-world Outline URI with /?outline=1 query and fragment
+        let userinfo = simple_base64_encode(b"chacha20-ietf-poly1305:bAprO8PQQ12KKo7iPIBYla");
+        let uri = format!("ss://{}@147.45.199.2:24048/?outline=1#vpn-gin%20-%20test", userinfo);
+        let result = parse_vpn_uri(&uri).unwrap();
+        match result {
+            VpnProtocol::Shadowsocks(p) => {
+                assert_eq!(p.method, "chacha20-ietf-poly1305");
+                assert_eq!(p.password, "bAprO8PQQ12KKo7iPIBYla");
+                assert_eq!(p.server, "147.45.199.2");
+                assert_eq!(p.port, 24048);
+                assert_eq!(p.fragment.as_deref(), Some("vpn-gin - test"));
+            }
+            _ => panic!("Expected Shadowsocks"),
+        }
+    }
+
+    #[test]
+    fn test_parse_host_port_with_trailing_slash() {
+        let (host, port) = parse_host_port("1.2.3.4:8080/").unwrap();
+        assert_eq!(host, "1.2.3.4");
+        assert_eq!(port, 8080);
     }
 
     // Helper for tests: simple base64 encoder

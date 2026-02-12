@@ -3,7 +3,7 @@
     "unknown": "ناشناخته"
   },
   "dns_providers": {
-    "title": "حفاظت DNS",
+    "title": "DNS",
     "cloudflare": "Cloudflare",
     "recommended": "پیشنهادی",
     "adguard": "AdGuard",
@@ -21,7 +21,10 @@
     "optional": "اختیاری",
     "custom_display": "سفارشی",
     "status_disabled": "غیرفعال",
-    "cache_cleared": "حافظه کش DNS پاک شد"
+    "cache_cleared": "حافظه کش DNS پاک شد",
+    "system": "DNS استاندارد",
+    "system_desc": "بدون محافظت",
+    "custom_ip_edit": "ویرایش"
   },
   "dns_detail": {
     "ip_copied": "کپی شد"
@@ -41,10 +44,10 @@
     "speed": "سرعت: {down}/{up} مگابیت بر ثانیه",
     "connection_vpn_detected": "اتصال VPN فعال است",
     "waiting": "در حال بررسی اتصال...",
-    "dns_protection_with_provider": "حفاظت DNS فعال است",
+    "dns_protection_with_provider": "DNS فعال",
     "dns_protection_enabled": "استفاده از DNS {{provider}}",
-    "dns_protection_disabled": "حفاظت DNS غیرفعال است",
-    "dns_protection_disabled_desc": "استفاده از DNS استاندارد ارائه‌دهنده اینترنت"
+    "dns_protection_disabled": "DNS استاندارد",
+    "dns_protection_disabled_desc": "بدون محافظت"
   },
   "node_detail": {
     "adapter": "آداپتور",
@@ -144,6 +147,9 @@
       "device_scan": "اسکن دستگاه‌ها",
       "device_scan_desc": "ببینید چه کسی به شبکه شما متصل است"
     }
+  },
+  "protection": {
+    "dns_protection": "DNS"
   },
   "speed_test": {
     "title": "Speed test",

@@ -3,7 +3,7 @@
     "unknown": "알 수 없음"
   },
   "dns_providers": {
-    "title": "DNS 보호",
+    "title": "DNS",
     "cloudflare": "Cloudflare",
     "recommended": "권장",
     "adguard": "AdGuard",
@@ -21,7 +21,10 @@
     "optional": "선택 사항",
     "custom_display": "사용자 지정",
     "status_disabled": "비활성화됨",
-    "cache_cleared": "DNS 캐시 삭제됨"
+    "cache_cleared": "DNS 캐시 삭제됨",
+    "system": "표준 DNS",
+    "system_desc": "보호 없음",
+    "custom_ip_edit": "편집"
   },
   "dns_detail": {
     "ip_copied": "복사됨"
@@ -41,10 +44,10 @@
     "speed": "속도: {down}/{up} Mbps",
     "connection_vpn_detected": "VPN 연결 활성화됨",
     "waiting": "연결 확인 중...",
-    "dns_protection_with_provider": "DNS 보호 활성화됨",
+    "dns_protection_with_provider": "DNS 활성화됨",
     "dns_protection_enabled": "{{provider}} DNS 사용 중",
-    "dns_protection_disabled": "DNS 보호 비활성화됨",
-    "dns_protection_disabled_desc": "표준 ISP DNS 사용 중"
+    "dns_protection_disabled": "표준 DNS",
+    "dns_protection_disabled_desc": "보호 없음"
   },
   "node_detail": {
     "adapter": "어댑터",
@@ -144,6 +147,9 @@
       "device_scan": "장치 스캔",
       "device_scan_desc": "네트워크에 연결된 장치 확인"
     }
+  },
+  "protection": {
+    "dns_protection": "DNS"
   },
   "speed_test": {
     "title": "Speed test",

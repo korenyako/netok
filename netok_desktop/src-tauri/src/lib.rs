@@ -228,6 +228,11 @@ async fn check_internet() -> Result<SingleNodeResult, String> {
 
 // ==================== VPN Commands ====================
 
+#[tauri::command]
+async fn validate_vpn_key(raw_uri: String) -> Result<netok_bridge::VpnKeyValidation, String> {
+    netok_bridge::validate_vpn_key(raw_uri).await
+}
+
 /// Resolve the sing-box sidecar binary path.
 /// Checks resource dir (production), then src-tauri/binaries/ (dev mode).
 fn get_singbox_path(app: &tauri::AppHandle) -> Result<PathBuf, String> {
@@ -601,6 +606,7 @@ pub fn run() {
             check_internet,
             lookup_ip_location,
             update_tray_language,
+            validate_vpn_key,
             connect_vpn,
             disconnect_vpn,
             get_vpn_status

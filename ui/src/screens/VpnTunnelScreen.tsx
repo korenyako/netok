@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, AlertTriangle } from '../components/icons/UIIcons';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
 import { MenuCard } from '@/components/MenuCard';
 import { Card, CardContent } from '@/components/ui/card';
 import { CloseButton } from '../components/WindowControls';
@@ -53,13 +52,6 @@ export function VpnTunnelScreen({ onBack, onAddVpn }: VpnTunnelScreenProps) {
           <h1 className="flex-1 text-lg font-semibold text-foreground">
             {t('vpn.title')}
           </h1>
-          {config && (
-            <Switch
-              checked={isConnected}
-              onCheckedChange={handleToggle}
-              disabled={isBusy}
-            />
-          )}
           <CloseButton />
         </div>
       </div>

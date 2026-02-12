@@ -8,12 +8,13 @@ export default {
     extend: {
       fontFamily: {
         sans: [
-          'Geist',
+          'Inter',
+          'Lato',
           'Noto Sans Arabic',
-          'Microsoft YaHei', 'PingFang SC',
-          'Yu Gothic', 'Hiragino Sans',
-          'Malgun Gothic', 'Apple SD Gothic Neo',
-          'system-ui', 'sans-serif',
+          'PingFang SC', 'Microsoft YaHei',
+          'Hiragino Sans', 'Meiryo',
+          'Apple SD Gothic Neo', 'Malgun Gothic',
+          'sans-serif',
         ],
         mono: ['"Martian Mono"', 'monospace'],
       },
@@ -41,6 +42,7 @@ export default {
         },
         accent: {
           DEFAULT: 'hsl(var(--accent))',
+          hover: 'hsl(var(--accent-hover))',
           foreground: 'hsl(var(--accent-foreground))',
         },
         popover: {
