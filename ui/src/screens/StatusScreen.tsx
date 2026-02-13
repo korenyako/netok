@@ -130,7 +130,7 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, onNa
     : null;
 
   const vpnCompact = vpnConfig
-    ? [vpnConfig.serverHost, vpnConfig.country].filter(Boolean).join(' ') || null
+    ? [vpnConfig.city, vpnConfig.country].filter(Boolean).join(', ') || null
     : null;
 
   // Derive diagnostic scenario from nodes
@@ -236,21 +236,21 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, onNa
       </button>
 
       {/* Status Indicators */}
-      <div className="shrink-0 flex items-center justify-center gap-1 pb-3">
+      <div className="shrink-0 flex flex-col items-center gap-0.5 pb-4">
         <button
           onClick={onNavigateToDnsProviders}
-          className="flex items-center gap-1.5 px-3 py-1 rounded-md text-xs text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
         >
-          <DnsShield className={cn("w-3.5 h-3.5", isDnsProtectionEnabled && "text-primary")} />
+          <DnsShield className={cn("w-4 h-4", isDnsProtectionEnabled && "text-primary")} />
           <span>{isDnsProtectionEnabled && dnsSubtitle ? `DNS ${dnsSubtitle}` : 'DNS'}</span>
         </button>
         <button
           onClick={onNavigateToVpn}
-          className="flex items-center gap-1.5 px-3 py-1 rounded-md text-xs text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
         >
           {connectionState.type === 'connected'
-            ? <Lock className="w-3.5 h-3.5 text-primary" />
-            : <LockOpen className="w-3.5 h-3.5" />
+            ? <Lock className="w-4 h-4 text-primary" />
+            : <LockOpen className="w-4 h-4" />
           }
           <span>{connectionState.type === 'connected' && vpnCompact ? `VPN ${vpnCompact}` : 'VPN'}</span>
         </button>

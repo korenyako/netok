@@ -208,8 +208,8 @@ export function DeviceScanScreen({ onBack }: DeviceScanScreenProps) {
 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-foreground truncate">
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                    <span className="text-sm font-medium text-foreground">
                       {device.vendor ?? t('device_scan.unknown_device')}
                     </span>
                     {device.is_gateway && (
