@@ -109,5 +109,6 @@
   "diagnostic.scenario.weak_signal.title": "Слабый сигнал",
   "diagnostic.scenario.weak_signal.message": "Слабый сигнал Wi-Fi. Подойдите ближе к роутеру или проверьте, нет ли помех.",
 
-  "diagnostics.checking": "Проверка..."
+  "diagnostics.checking": "Проверка...",
+  "diagnostics.via_vpn": "VPN"
 }

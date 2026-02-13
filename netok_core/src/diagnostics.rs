@@ -8,11 +8,12 @@ use time::OffsetDateTime;
 use serde::Deserialize;
 
 use crate::domain::{
-    ComputerInfo, ConnectionType, DiagnosticsSnapshot, DnsProvider, InternetInfo, NetworkInfo,
-    NodeId, NodeInfo, RouterInfo, Settings, Status,
+    ComputerInfo, ConnectionType, DeviceType, DiagnosticsSnapshot, DnsProvider, InternetInfo,
+    NetworkDevice, NetworkInfo, NodeId, NodeInfo, RouterInfo, Settings, Status,
 };
 use crate::infrastructure::{
-    detect_connection_type, get_default_gateway, get_router_mac, get_wifi_info,
+    arp::get_all_arp_entries, detect_connection_type, get_default_gateway, get_router_mac,
+    get_wifi_info,
 };
 use crate::oui_database::OUI_DATABASE;
 
@@ -512,6 +513,138 @@ pub fn detect_dns_provider(dns_servers: &[String]) -> DnsProvider {
         (Some(p), None) => DnsProvider::Custom(p.to_string(), String::new(), None, None),
         _ => DnsProvider::Auto,
     }
+}
+
+/// Classify a vendor name into a device type.
+fn classify_vendor(vendor: &str, is_gateway: bool) -> DeviceType {
+    let v = vendor.to_lowercase();
+
+    // Router vendors — only if this is the gateway
+    const ROUTER_VENDORS: &[&str] = &[
+        "tp-link", "asus", "asustek", "netgear", "d-link", "huawei", "zyxel", "mikrotik",
+        "ubiquiti", "linksys", "tenda", "xiaomi comm", "mercury", "keenetic",
+    ];
+    if is_gateway {
+        for rv in ROUTER_VENDORS {
+            if v.contains(rv) {
+                return DeviceType::Router;
+            }
+        }
+    }
+
+    // Printers
+    const PRINTER_VENDORS: &[&str] = &[
+        "hp ", "hewlett", "canon", "epson", "brother", "xerox", "lexmark", "ricoh", "kyocera",
+    ];
+    for pv in PRINTER_VENDORS {
+        if v.contains(pv) {
+            return DeviceType::Printer;
+        }
+    }
+
+    // Smart TVs
+    const TV_VENDORS: &[&str] = &[
+        "lg electronics", "tcl", "hisense", "roku", "vizio", "sharp",
+    ];
+    for tv in TV_VENDORS {
+        if v.contains(tv) {
+            return DeviceType::SmartTv;
+        }
+    }
+
+    // Game consoles
+    const CONSOLE_VENDORS: &[&str] = &["nintendo", "valve"];
+    for cv in CONSOLE_VENDORS {
+        if v.contains(cv) {
+            return DeviceType::GameConsole;
+        }
+    }
+
+    // Computers
+    const COMPUTER_VENDORS: &[&str] = &[
+        "intel", "dell", "lenovo", "microsoft", "acer", "asus", "asustek", "msi", "gigabyte",
+        "realtek", "qualcomm", "broadcom", "ralink", "mediatek",
+    ];
+    for cv in COMPUTER_VENDORS {
+        if v.contains(cv) {
+            return DeviceType::Computer;
+        }
+    }
+
+    // Phones / tablets (hard to distinguish without mDNS)
+    const PHONE_VENDORS: &[&str] = &[
+        "apple", "samsung", "xiaomi", "google", "oneplus", "oppo", "vivo", "huawei",
+        "motorola", "sony mobile", "nokia", "realme", "honor",
+    ];
+    for pv in PHONE_VENDORS {
+        if v.contains(pv) {
+            return DeviceType::Phone;
+        }
+    }
+
+    // IoT — router vendors not at gateway, plus smart home
+    const IOT_VENDORS: &[&str] = &[
+        "espressif", "tuya", "sonoff", "shelly", "amazon", "nest", "ring", "ecobee",
+    ];
+    for iv in IOT_VENDORS {
+        if v.contains(iv) {
+            return DeviceType::IoT;
+        }
+    }
+
+    // Router vendors on non-gateway IPs → likely IoT / access point
+    if !is_gateway {
+        for rv in ROUTER_VENDORS {
+            if v.contains(rv) {
+                return DeviceType::IoT;
+            }
+        }
+    }
+
+    DeviceType::Unknown
+}
+
+/// Scan the local network by reading the ARP table and classifying devices.
+pub fn scan_network_devices() -> Vec<NetworkDevice> {
+    let gateway_ip = get_default_gateway();
+    let computer_info = get_computer_info();
+    let local_ip = computer_info.local_ip.clone();
+
+    let entries = get_all_arp_entries();
+
+    let mut devices: Vec<NetworkDevice> = entries
+        .into_iter()
+        .map(|entry| {
+            let is_gateway = gateway_ip.as_deref() == Some(&entry.ip);
+            let is_self = local_ip.as_deref() == Some(&entry.ip);
+            let vendor = lookup_vendor_by_mac(&entry.mac);
+            let device_type = match &vendor {
+                Some(v) => classify_vendor(v, is_gateway),
+                None if is_gateway => DeviceType::Router,
+                None => DeviceType::Unknown,
+            };
+
+            NetworkDevice {
+                ip: entry.ip,
+                mac: entry.mac,
+                vendor,
+                hostname: None, // Future: mDNS
+                device_type,
+                is_gateway,
+                is_self,
+            }
+        })
+        .collect();
+
+    // Sort: gateway first, then self, then by IP
+    devices.sort_by(|a, b| {
+        b.is_gateway
+            .cmp(&a.is_gateway)
+            .then(b.is_self.cmp(&a.is_self))
+            .then(a.ip.cmp(&b.ip))
+    });
+
+    devices
 }
 
 #[cfg(test)]

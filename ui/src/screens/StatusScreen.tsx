@@ -2,9 +2,10 @@ import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDiagnosticsStore, shouldRefreshDiagnostics } from '../stores/diagnosticsStore';
 import { useDnsStore } from '../stores/useDnsStore';
+import { useVpnStore } from '../stores/vpnStore';
 import { deriveScenario } from '../utils/deriveScenario';
 import { CloseButton } from '../components/WindowControls';
-import { MenuCard } from '@/components/MenuCard';
+import { DnsShield, Lock, LockOpen } from '../components/icons/UIIcons';
 import { cn } from '@/lib/utils';
 
 // DNS logging helper
@@ -20,12 +21,13 @@ const logDns = (message: string, data?: unknown) => {
 interface StatusScreenProps {
   onOpenDiagnostics: () => void;
   onNavigateToDnsProviders: () => void;
+  onNavigateToVpn: () => void;
 }
 
 // Known providers that count as "protection enabled"
 const KNOWN_PROVIDERS = ['Cloudflare', 'Google', 'AdGuard', 'Dns4Eu', 'Quad9', 'OpenDns', 'Custom'];
 
-// Get display name for DNS provider (brand names stay as-is, Custom is localised)
+// Get display name for DNS provider (brand names stay as-is)
 const PROVIDER_DISPLAY: Record<string, string> = {
   'Cloudflare': 'Cloudflare',
   'Google': 'Google',
@@ -33,6 +35,29 @@ const PROVIDER_DISPLAY: Record<string, string> = {
   'Dns4Eu': 'DNS4EU',
   'Quad9': 'Quad9',
   'OpenDns': 'OpenDNS',
+};
+
+// Well-known DNS IPs → provider name (for custom DNS display)
+const KNOWN_DNS_IPS: Record<string, string> = {
+  '1.1.1.1': 'Cloudflare', '1.0.0.1': 'Cloudflare',
+  '8.8.8.8': 'Google', '8.8.4.4': 'Google',
+  '94.140.14.14': 'AdGuard', '94.140.15.15': 'AdGuard',
+  '9.9.9.9': 'Quad9', '149.112.112.112': 'Quad9',
+  '208.67.222.222': 'OpenDNS', '208.67.220.220': 'OpenDNS',
+};
+
+const formatCustomDns = (ip: string) => {
+  const name = KNOWN_DNS_IPS[ip];
+  return name ? `${ip} (${name})` : ip;
+};
+
+// Map backend connection_type values to i18n keys
+const CONNECTION_TYPE_KEYS: Record<string, string> = {
+  Wifi: 'nodes.network.type_wifi',
+  Ethernet: 'nodes.network.type_cable',
+  Usb: 'nodes.network.type_usb_modem',
+  Mobile: 'nodes.network.type_mobile',
+  Unknown: 'network.unknown',
 };
 
 // SVG circle constants
@@ -56,9 +81,11 @@ const CIRCLE_CLASSES: Record<VisualState, string> = {
   error: '',
 };
 
-export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders }: StatusScreenProps) {
+export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, onNavigateToVpn }: StatusScreenProps) {
   const { t } = useTranslation();
   const { currentProvider: dnsProvider, isLoading: isDnsLoading } = useDnsStore();
+  const { configs, activeIndex, connectionState } = useVpnStore();
+  const vpnConfig = activeIndex !== null ? configs[activeIndex] : null;
   const mountedRef = useRef(false);
 
   // Get diagnostics data from store
@@ -99,7 +126,11 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders }: St
   const isDnsProtectionEnabled = dnsProvider !== null && KNOWN_PROVIDERS.includes(dnsProvider.type);
 
   const dnsSubtitle = isDnsProtectionEnabled && dnsProvider
-    ? (dnsProvider.type === 'Custom' ? t('dns_providers.custom_display') : PROVIDER_DISPLAY[dnsProvider.type] || dnsProvider.type)
+    ? (dnsProvider.type === 'Custom' ? formatCustomDns(dnsProvider.primary) : PROVIDER_DISPLAY[dnsProvider.type] || dnsProvider.type)
+    : null;
+
+  const vpnCompact = vpnConfig
+    ? [vpnConfig.serverHost, vpnConfig.country].filter(Boolean).join(' ') || null
     : null;
 
   // Derive diagnostic scenario from nodes
@@ -139,8 +170,9 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders }: St
       {/* Main Content - Clickable Area */}
       <button
         onClick={onOpenDiagnostics}
-        className="flex-1 flex flex-col items-center justify-center px-4 focus:outline-none"
+        className="flex-1 flex flex-col items-center px-4 focus:outline-none"
       >
+        <div className="flex-1" />
         {/* Status Circle */}
         <div className="relative w-60 h-60 mb-4">
           <svg
@@ -180,11 +212,7 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders }: St
             {/* Network Info inside circle */}
             {showNetworkInfo && networkInfo && (
               <div className="text-xs font-mono text-muted-foreground/60 mt-2">
-                {networkInfo.connection_type === 'Wifi' && 'Wi-Fi'}
-                {networkInfo.connection_type === 'Ethernet' && 'Ethernet'}
-                {networkInfo.connection_type === 'Usb' && 'USB'}
-                {networkInfo.connection_type === 'Mobile' && 'Mobile'}
-                {networkInfo.connection_type === 'Unknown' && t('network.unknown')}
+                {networkInfo.connection_type && t(CONNECTION_TYPE_KEYS[networkInfo.connection_type] ?? 'network.unknown')}
                 {networkInfo.ssid && ` ${networkInfo.ssid}`}
               </div>
             )}
@@ -192,7 +220,7 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders }: St
         </div>
 
         {/* Info area below circle */}
-        <div className="min-h-[48px] flex flex-col items-center gap-1.5">
+        <div className="flex flex-col items-center gap-1.5">
           {/* Scenario message */}
           {messageText && (
             <p className={cn(
@@ -204,24 +232,28 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders }: St
             </p>
           )}
         </div>
+        <div className="flex-1" />
       </button>
 
-      {/* DNS Protection Status */}
-      <div className="px-4 pb-4">
-        <MenuCard
-          variant={isDnsProtectionEnabled ? 'highlighted' : 'filled'}
-          title={isDnsProtectionEnabled
-            ? t('status.dns_protection_with_provider')
-            : t('status.dns_protection_disabled')
-          }
-          subtitle={isDnsProtectionEnabled
-            ? dnsSubtitle ?? undefined
-            : t('status.dns_protection_disabled_desc')
-          }
-          trailing={isDnsProtectionEnabled ? 'check' : undefined}
-          muted={!isDnsProtectionEnabled}
+      {/* Status Indicators */}
+      <div className="shrink-0 flex items-center justify-center gap-1 pb-3">
+        <button
           onClick={onNavigateToDnsProviders}
-        />
+          className="flex items-center gap-1.5 px-3 py-1 rounded-md text-xs text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
+        >
+          <DnsShield className={cn("w-3.5 h-3.5", isDnsProtectionEnabled && "text-primary")} />
+          <span>{isDnsProtectionEnabled && dnsSubtitle ? `DNS ${dnsSubtitle}` : 'DNS'}</span>
+        </button>
+        <button
+          onClick={onNavigateToVpn}
+          className="flex items-center gap-1.5 px-3 py-1 rounded-md text-xs text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
+        >
+          {connectionState.type === 'connected'
+            ? <Lock className="w-3.5 h-3.5 text-primary" />
+            : <LockOpen className="w-3.5 h-3.5" />
+          }
+          <span>{connectionState.type === 'connected' && vpnCompact ? `VPN ${vpnCompact}` : 'VPN'}</span>
+        </button>
       </div>
     </div>
   );

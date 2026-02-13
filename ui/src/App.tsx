@@ -7,6 +7,7 @@ import { StatusScreen } from './screens/StatusScreen';
 import { DiagnosticsScreen } from './screens/DiagnosticsScreen';
 import { ToolsScreen } from './screens/ToolsScreen';
 import { SpeedTestScreen } from './screens/SpeedTestScreen';
+import { DeviceScanScreen } from './screens/DeviceScanScreen';
 import { useNavigation } from './hooks/useNavigation';
 
 function App() {
@@ -14,10 +15,12 @@ function App() {
     currentScreen,
     showDiagnostics,
     showSpeedTest,
+    showDeviceScan,
     settingsSubScreen,
     securitySubScreen,
     setShowDiagnostics,
     setShowSpeedTest,
+    setShowDeviceScan,
     setSettingsSubScreen,
     setSecuritySubScreen,
     navigateToHome,
@@ -25,6 +28,24 @@ function App() {
     navigateToTools,
     navigateToSettings,
   } = useNavigation();
+
+  if (showDeviceScan) {
+    return (
+      <ThemeProvider>
+        <Toaster />
+        <div id="app" className="h-full flex flex-col bg-background">
+          <DeviceScanScreen onBack={() => setShowDeviceScan(false)} />
+          <BottomNav
+            currentScreen={currentScreen}
+            onNavigateToHome={() => { setShowDeviceScan(false); navigateToHome(); }}
+            onNavigateToSecurity={() => { setShowDeviceScan(false); navigateToSecurity(); }}
+            onNavigateToTools={() => { setShowDeviceScan(false); navigateToTools(); }}
+            onNavigateToSettings={() => { setShowDeviceScan(false); navigateToSettings(); }}
+          />
+        </div>
+      </ThemeProvider>
+    );
+  }
 
   if (showSpeedTest) {
     return (
@@ -81,6 +102,10 @@ function App() {
                 navigateToSecurity();
                 setSecuritySubScreen('dns-providers');
               }}
+              onNavigateToVpn={() => {
+                navigateToSecurity();
+                setSecuritySubScreen('vpn');
+              }}
             />
           )}
 
@@ -92,7 +117,7 @@ function App() {
             />
           )}
 
-          {currentScreen === 'tools' && <ToolsScreen onBack={navigateToHome} onOpenDiagnostics={() => setShowDiagnostics(true)} onOpenSpeedTest={() => setShowSpeedTest(true)} />}
+          {currentScreen === 'tools' && <ToolsScreen onBack={navigateToHome} onOpenDiagnostics={() => setShowDiagnostics(true)} onOpenSpeedTest={() => setShowSpeedTest(true)} onOpenDeviceScan={() => setShowDeviceScan(true)} />}
 
           {currentScreen === 'settings' && (
             <SettingsRouter

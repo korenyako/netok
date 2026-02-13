@@ -4,7 +4,6 @@ import { ArrowLeft, Check, X } from '../components/icons/UIIcons';
 import { invoke } from '@tauri-apps/api/core';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { CloseButton } from '../components/WindowControls';
 import { LANGUAGES, type LanguageCode } from '../constants/languages';
 import { resolveSystemLanguage, getSystemLanguageDisplay } from '../i18n';
@@ -88,8 +87,8 @@ export function LanguageSettingsScreen({ onBack }: LanguageSettingsScreenProps) 
       </div>
 
       {/* Language list */}
-      <ScrollArea className="flex-1">
-        <div className="px-4 pb-4 space-y-2">
+      <div className="flex-1 px-4 pb-4 overflow-y-auto">
+        <div className="space-y-2">
           {/* System language option */}
           <LanguageCard
             title={t('lang.system')}
@@ -111,7 +110,7 @@ export function LanguageSettingsScreen({ onBack }: LanguageSettingsScreenProps) 
             );
           })}
         </div>
-      </ScrollArea>
+      </div>
     </div>
   );
 }

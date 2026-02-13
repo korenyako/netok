@@ -4,10 +4,26 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React + TS</title>
+    <title>Netok</title>
+    <script>
+      // Apply saved theme before first paint to prevent flash
+      try {
+        var d = JSON.parse(localStorage.getItem('theme-storage') || '{}');
+        if ((d.state && d.state.theme) === 'dark') document.documentElement.classList.add('dark');
+      } catch(e) {
+        document.documentElement.classList.add('dark');
+      }
+    </script>
+    <style>
+      .app-loader{display:flex;align-items:center;justify-content:center;height:100%;background:hsl(var(--background))}
+      .app-loader-spinner{width:32px;height:32px;border:3px solid hsl(var(--border));border-top-color:hsl(var(--primary));border-radius:50%;animation:loader-spin .8s linear infinite}
+      @keyframes loader-spin{to{transform:rotate(360deg)}}
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="app-loader"><div class="app-loader-spinner"></div></div>
+    </div>
     <script>document.addEventListener('contextmenu', e => e.preventDefault())</script>
     <script type="module" src="/src/main.tsx"></script>
   </body>

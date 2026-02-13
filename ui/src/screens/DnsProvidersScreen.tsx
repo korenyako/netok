@@ -195,7 +195,7 @@ export function DnsProvidersScreen({ onBack, onCustomIp }: DnsProvidersScreenPro
                   subtitle={customSubtitle() || t('dns_providers.custom_ip_desc')}
                   trailing={
                     <button
-                      className="ghost-action px-4 py-1.5 rounded-full text-[10px] font-mono font-medium uppercase tracking-wider text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all shrink-0 opacity-0 group-hover:opacity-100"
+                      className="ghost-action px-4 py-1.5 rounded-full text-[10px] font-medium uppercase tracking-wider text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all shrink-0 opacity-0 group-hover:opacity-100"
                       onClick={(e) => {
                         e.stopPropagation();
                         onCustomIp();

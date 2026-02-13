@@ -94,7 +94,7 @@ export function SettingsScreen({ onNavigateToTheme, onNavigateToLanguage, onNavi
         {/* Clear DNS cache */}
         <Button
           variant="outline"
-          className="w-full uppercase font-mono tracking-wider text-xs"
+          className="w-full text-sm font-medium"
           onClick={() => {
             // TODO: Implement actual DNS cache flush
             toast.success(t('dns_providers.cache_cleared'));

@@ -76,7 +76,7 @@ export function AboutScreen({ onBack }: AboutScreenProps) {
         {/* Website button */}
         <Button
           onClick={() => openUrl('https://netok.app/')}
-          className="w-full uppercase font-mono tracking-wider text-xs"
+          className="w-full text-sm font-medium"
         >
           <ExternalLink className="w-4 h-4 mr-2" />
           {t('settings.about.website_button')}

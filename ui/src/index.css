@@ -60,6 +60,8 @@
     --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
+    --tooltip: 270 3.6% 11%;
+    --tooltip-foreground: 292.5 7.3% 78.4%;
   }
 
   .dark {
@@ -94,6 +96,8 @@
     --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
+    --tooltip: 0 0% 90.8%;
+    --tooltip-foreground: 270 3.6% 11%;
   }
 }
 
@@ -132,6 +136,8 @@
   --success-foreground: 0 0% 100%;
   --warning: 38 92% 50%;
   --warning-foreground: 0 0% 100%;
+  --tooltip: 270 3.6% 11%;
+  --tooltip-foreground: 292.5 7.3% 78.4%;
 }
 
 .theme-force-dark {
@@ -158,26 +164,28 @@
   --success-foreground: 0 0% 100%;
   --warning: 38 92% 50%;
   --warning-foreground: 0 0% 100%;
+  --tooltip: 0 0% 90.8%;
+  --tooltip-foreground: 270 3.6% 11%;
 }
 
 html, body, #root {
   height: 100%;
 }
 
-/* Thin custom scrollbar */
-.custom-scrollbar::-webkit-scrollbar {
+/* Thin custom scrollbar (global) */
+::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
-.custom-scrollbar::-webkit-scrollbar-track {
+::-webkit-scrollbar-track {
   background: transparent;
 }
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted-foreground) / 0.3);
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--accent));
   border-radius: 3px;
 }
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted-foreground) / 0.5);
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--accent));
 }
 
 #root {

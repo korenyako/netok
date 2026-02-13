@@ -109,5 +109,6 @@
   "diagnostic.scenario.weak_signal.title": "Weak Signal",
   "diagnostic.scenario.weak_signal.message": "Weak Wi-Fi signal. Move closer to your router or check for interference.",
 
-  "diagnostics.checking": "Checking..."
+  "diagnostics.checking": "Checking...",
+  "diagnostics.via_vpn": "VPN"
 }

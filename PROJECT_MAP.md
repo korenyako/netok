@@ -1,6 +1,6 @@
 # Project Map - Netok
 
-Generated: 2026-02-12
+Generated: 2026-02-13
 
 ## TREE (ASCII)
 
@@ -197,6 +197,7 @@ Generated: 2026-02-12
 │   │   │   ├── AddVpnScreen.tsx
 │   │   │   ├── CloseBehaviorSettingsScreen.tsx
 │   │   │   ├── CustomIpScreen.tsx
+│   │   │   ├── DeviceScanScreen.tsx
 │   │   │   ├── DiagnosticsScreen.tsx
 │   │   │   ├── DnsProvidersScreen.tsx
 │   │   │   ├── LanguageSettingsScreen.tsx
@@ -310,9 +311,20 @@ Generated: 2026-02-12
   },
 
   "bundle": {
+    "active": true,
+    "targets": ["nsis"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/icon.ico"
+    ],
     "externalBin": [
       "binaries/sing-box"
-    ]
+    ],
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser"
+      }
+    }
   }
 }
 
@@ -368,9 +380,9 @@ Generated: 2026-02-12
     "@vitest/coverage-v8": "^4.0.12",
     "@vitest/ui": "^4.0.11",
     "autoprefixer": "^10.4.21",
+    "baseline-browser-mapping": "^2.9.19",
     "eslint": "^9.33.0",
     "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.20",
 // ... (truncated due to syntax error)
 ```
 
@@ -408,15 +420,20 @@ export default {
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React + TS</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script>document.addEventListener('contextmenu', e => e.preventDefault())</script>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
-
+    <title>Netok</title>
+    <script>
+      // Apply saved theme before first paint to prevent flash
+      try {
+        var d = JSON.parse(localStorage.getItem('theme-storage') || '{}');
+        if ((d.state && d.state.theme) === 'dark') document.documentElement.classList.add('dark');
+      } catch(e) {
+        document.documentElement.classList.add('dark');
+      }
+    </script>
+    <style>
+      .app-loader{display:flex;align-items:center;justify-content:center;height:100%;background:hsl(var(--background))}
+      .app-loader-spinner{width:32px;height:32px;border:3px solid hsl(var(--border));border-top-color:hsl(var(--primary));border-radius:50%;animation:loader-spin .8s linear infinite}
+      @keyframes loader-spin{to{transform:rotate(360deg)}}
 ```
 
 ### ui/src/main.tsx
@@ -448,6 +465,7 @@ import { StatusScreen } from './screens/StatusScreen';
 import { DiagnosticsScreen } from './screens/DiagnosticsScreen';
 import { ToolsScreen } from './screens/ToolsScreen';
 import { SpeedTestScreen } from './screens/SpeedTestScreen';
+import { DeviceScanScreen } from './screens/DeviceScanScreen';
 import { useNavigation } from './hooks/useNavigation';
 
 function App() {
@@ -455,10 +473,12 @@ function App() {
     currentScreen,
     showDiagnostics,
     showSpeedTest,
+    showDeviceScan,
     settingsSubScreen,
     securitySubScreen,
     setShowDiagnostics,
     setShowSpeedTest,
+    setShowDeviceScan,
     setSettingsSubScreen,
     setSecuritySubScreen,
     navigateToHome,
@@ -467,28 +487,25 @@ function App() {
     navigateToSettings,
   } = useNavigation();
 
-  if (showSpeedTest) {
+  if (showDeviceScan) {
     return (
       <ThemeProvider>
         <Toaster />
         <div id="app" className="h-full flex flex-col bg-background">
-          <SpeedTestScreen onBack={() => setShowSpeedTest(false)} />
+          <DeviceScanScreen onBack={() => setShowDeviceScan(false)} />
           <BottomNav
             currentScreen={currentScreen}
-            onNavigateToHome={() => { setShowSpeedTest(false); navigateToHome(); }}
-            onNavigateToSecurity={() => { setShowSpeedTest(false); navigateToSecurity(); }}
-            onNavigateToTools={() => { setShowSpeedTest(false); navigateToTools(); }}
-            onNavigateToSettings={() => { setShowSpeedTest(false); navigateToSettings(); }}
+            onNavigateToHome={() => { setShowDeviceScan(false); navigateToHome(); }}
+            onNavigateToSecurity={() => { setShowDeviceScan(false); navigateToSecurity(); }}
+            onNavigateToTools={() => { setShowDeviceScan(false); navigateToTools(); }}
+            onNavigateToSettings={() => { setShowDeviceScan(false); navigateToSettings(); }}
           />
         </div>
       </ThemeProvider>
     );
   }
 
-  if (showDiagnostics) {
-    return (
-      <ThemeProvider>
-        <Toaster />}}
+  if (showSpeedTest) {}}
 
 export default App;
 ```

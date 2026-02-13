@@ -33,6 +33,7 @@
     "optional": "optional",
     "custom_display": "Custom",
     "status_disabled": "Disabled",
+    "status_applying": "Applying...",
     "cache_cleared": "DNS cache cleared",
     "system": "Standard DNS",
     "system_desc": "No protection",
@@ -47,7 +48,8 @@
     "wifi": "Wi-Fi",
     "router": "Router",
     "internet": "Internet",
-    "checking": "Checking..."
+    "checking": "Checking...",
+    "via_vpn": "VPN"
   },
   "status": {
     "internet_ok": "Connected",
@@ -59,7 +61,10 @@
     "dns_protection_with_provider": "DNS enabled",
     "dns_protection_enabled": "Using {{provider}} DNS",
     "dns_protection_disabled": "Standard DNS",
-    "dns_protection_disabled_desc": "No protection"
+    "dns_protection_disabled_desc": "No protection",
+    "vpn_enabled": "VPN enabled",
+    "vpn_disabled": "VPN disabled",
+    "vpn_disabled_desc": "Traffic is not encrypted"
   },
   "node_detail": {
     "adapter": "Adapter",
@@ -166,15 +171,18 @@
     "title": "VPN",
     "not_configured": "Not configured",
     "disabled": "Disabled",
+    "disabled_desc": "Internet traffic is not routed through VPN",
     "connecting": "Connecting...",
     "connected": "Connected",
     "add_vpn": "Add VPN",
     "add_vpn_desc": "Paste your key or link",
     "supported_formats": "Supports VLESS, Shadowsocks, Trojan, WireGuard, Outline",
     "set_vpn": "Edit VPN Settings",
+    "edit": "Edit",
     "key_label": "Key or link",
     "key_placeholder": "vless://... or ss://... or wg://...",
     "key_hint": "Enter the VPN key or link from your provider. Supported: VLESS, VMess, Shadowsocks, Trojan, WireGuard, Outline",
+    "key_hint_edit": "Replace the VPN key or link for this server",
     "key_example": "e.g. vless://id@host:443?type=tcp&...",
     "add_button": "Add",
     "save_button": "Save",
@@ -197,7 +205,11 @@
     "dismiss": "Dismiss",
     "validating": "Validating key...",
     "invalid_key": "Invalid VPN key",
-    "server_unreachable": "Server is not responding. The key may still work."
+    "server_unreachable": "Server is not responding. The key may not work.",
+    "duplicate_server": "A server with this address already exists",
+    "delete": "Delete",
+    "delete_confirm": "Are you sure you want to delete this server?",
+    "cancel": "Cancel"
   },
   "speed_test": {
     "title": "Speed test",
@@ -234,7 +246,9 @@
     "error_no_server": "Could not find a test server. Check your internet connection.",
     "error_test_failed": "Speed test failed. Please try again.",
     "error_rate_limited": "Too many tests in a row. Please wait a few minutes.",
-    "error_connection": "Could not connect to the server. Check your connection."
+    "error_connection": "Could not connect to the server. Check your connection.",
+    "unit_mbps": "Mbps",
+    "unit_ms": "ms"
   },
   "diagnostic": {
     "scenario": {

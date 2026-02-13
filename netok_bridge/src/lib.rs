@@ -526,3 +526,13 @@ pub async fn verify_vpn_ip() -> Result<Option<String>, String> {
     .map_err(|e| format!("Task join error: {}", e))?
 }
 
+// Re-export device scan types
+pub use netok_core::{DeviceType, NetworkDevice};
+
+/// Scan the local network for devices using the ARP table.
+pub async fn scan_network_devices() -> Result<Vec<NetworkDevice>, String> {
+    tokio::task::spawn_blocking(netok_core::scan_network_devices)
+        .await
+        .map_err(|e| format!("Failed to run network scan task: {}", e))
+}
+

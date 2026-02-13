@@ -69,7 +69,7 @@ export function ToolsScreen({ onBack, onOpenDiagnostics, onOpenSpeedTest }: Tool
               {/* Colorful icon */}
               <div className={tool.iconColorClass}>{tool.icon}</div>
               {/* Tool name */}
-              <span className="text-base font-medium text-foreground">
+              <span className="text-base font-medium text-foreground whitespace-pre-line">
                 {t(tool.nameKey)}
               </span>
             </button>

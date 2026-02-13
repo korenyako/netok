@@ -4,13 +4,13 @@ import { ArrowLeft, RotateCw } from '../components/icons/UIIcons';
 import { NetokLogoIcon, ShieldIcon, ToolsIcon, SettingsIcon } from '../components/icons/NavigationIcons';
 import { NodeOkIcon, NodeWarningIcon, NodeErrorIcon, NodeLoadingIcon } from '../components/icons/DiagnosticStatusIcons';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { MenuCard } from '@/components/MenuCard';
 import { NodeDetailScreen } from './NodeDetailScreen';
 import { DiagnosticMessage } from '../components/DiagnosticMessage';
 import { deriveScenario } from '../utils/deriveScenario';
 import { CloseButton } from '../components/WindowControls';
 import { useDiagnosticsStore, type NetworkNode } from '../stores/diagnosticsStore';
+import { useVpnStore } from '../stores/vpnStore';
 import { useState } from 'react';
 
 interface DiagnosticsScreenProps {
@@ -31,7 +31,6 @@ export function DiagnosticsScreen({ onBack, onNavigateToSecurity, onNavigateToTo
   const { t } = useTranslation();
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
 
-  // Get state and actions from store
   const {
     nodes,
     isRunning,
@@ -41,7 +40,8 @@ export function DiagnosticsScreen({ onBack, onNavigateToSecurity, onNavigateToTo
     getRawResult,
   } = useDiagnosticsStore();
 
-  // Run diagnostics on mount
+  const { connectionState } = useVpnStore();
+
   useEffect(() => {
     runDiagnostics(t);
   }, [runDiagnostics, t]);
@@ -66,6 +66,9 @@ export function DiagnosticsScreen({ onBack, onNavigateToSecurity, onNavigateToTo
   const isActive = currentCheckIndex >= 0 && currentCheckIndex < 4;
   const scenarioResult = !isRunning && nodes.length > 0 ? deriveScenario(nodes) : null;
   const showScenarioCard = scenarioResult !== null && scenarioResult.scenario !== 'all_good';
+
+  const hasLoadingPlaceholder = isActive && currentCheckIndex >= nodes.length;
+  const vpnConnected = connectionState.type === 'connected';
 
   const selectedResult = selectedNode ? getRawResult(selectedNode) : undefined;
   if (selectedNode && selectedResult) {
@@ -110,7 +113,7 @@ export function DiagnosticsScreen({ onBack, onNavigateToSecurity, onNavigateToTo
 
       {/* Scrollable content: message + nodes */}
       {(nodes.length > 0 || isActive) && (
-        <ScrollArea className="flex-1 px-4">
+        <div className="flex-1 px-4 overflow-y-auto pb-4">
           {/* Scenario Message Card */}
           {showScenarioCard && (
             <div className="pb-3 animate-in fade-in duration-300">
@@ -128,36 +131,41 @@ export function DiagnosticsScreen({ onBack, onNavigateToSecurity, onNavigateToTo
             </div>
           )}
 
-          {/* Completed nodes */}
-          <div className="space-y-2">
-            {nodes.map((node) => (
-              <MenuCard
-                key={node.id}
-                variant="ghost"
-                icon={getStatusIcon(node.status)}
-                title={t(node.title)}
-                subtitle={node.details.map((detail) => (
-                  <p key={detail.text}>{detail.text}</p>
-                ))}
-                trailing="chevron"
-                onClick={() => setSelectedNode(node.id)}
-                className="animate-in fade-in slide-in-from-bottom-2 duration-300"
-              />
-            ))}
+          {/* Nodes */}
+          <div>
+            <div className="space-y-2">
+              {/* Completed nodes */}
+              {nodes.map((node) => (
+                <MenuCard
+                  key={node.id}
+                  variant="ghost"
+                  icon={getStatusIcon(node.status)}
+                  title={t(node.title)}
+                  badge={node.id === 'internet' && vpnConnected ? t('diagnostics.via_vpn') : undefined}
+                  subtitle={node.details.map((detail) => (
+                    <p key={detail.text}>{detail.text}</p>
+                  ))}
+                  trailing="chevron"
+                  onClick={() => setSelectedNode(node.id)}
+                  className="animate-in fade-in slide-in-from-bottom-2 duration-300"
+                />
+              ))}
 
-            {/* Loading placeholder for current check (only if no existing node at this position) */}
-            {isActive && currentCheckIndex >= nodes.length && (
-              <MenuCard
-                variant="static"
-                icon={<NodeLoadingIcon className="w-5 h-5 text-muted-foreground animate-spin" />}
-                title={t(LOADING_LABELS[currentCheckIndex])}
-                subtitle={<span className="text-muted-foreground/60">{t('diagnostics.checking')}</span>}
-                muted
-                className="animate-in fade-in duration-200"
-              />
-            )}
+              {/* Loading placeholder for current check */}
+              {hasLoadingPlaceholder && (
+                <MenuCard
+                  variant="static"
+                  icon={<NodeLoadingIcon className="w-5 h-5 text-muted-foreground animate-spin" />}
+                  title={t(LOADING_LABELS[currentCheckIndex])}
+                  subtitle={<span className="text-muted-foreground/60">{t('diagnostics.checking')}</span>}
+                  muted
+                  className="animate-in fade-in duration-200"
+                />
+              )}
+
+            </div>
           </div>
-        </ScrollArea>
+        </div>
       )}
 
       {/* Bottom Navigation Bar */}

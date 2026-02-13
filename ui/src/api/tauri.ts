@@ -201,3 +201,20 @@ export async function disconnectVpn(): Promise<void> {
 export async function getVpnStatus(): Promise<VpnStatus> {
   return await invoke<VpnStatus>('get_vpn_status');
 }
+
+// Device scan types
+export type DeviceType = 'Router' | 'Phone' | 'Computer' | 'Tablet' | 'Printer' | 'SmartTv' | 'GameConsole' | 'IoT' | 'Unknown';
+
+export interface NetworkDevice {
+  ip: string;
+  mac: string;
+  vendor: string | null;
+  hostname: string | null;
+  device_type: DeviceType;
+  is_gateway: boolean;
+  is_self: boolean;
+}
+
+export async function scanNetworkDevices(): Promise<NetworkDevice[]> {
+  return await invoke<NetworkDevice[]>('scan_network_devices');
+}

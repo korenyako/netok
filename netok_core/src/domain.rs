@@ -243,6 +243,32 @@ impl DiagnosticResult {
     }
 }
 
+/// Type of network device detected via vendor classification.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+pub enum DeviceType {
+    Router,
+    Phone,
+    Computer,
+    Tablet,
+    Printer,
+    SmartTv,
+    GameConsole,
+    IoT,
+    Unknown,
+}
+
+/// A device discovered on the local network.
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct NetworkDevice {
+    pub ip: String,
+    pub mac: String,
+    pub vendor: Option<String>,
+    pub hostname: Option<String>,
+    pub device_type: DeviceType,
+    pub is_gateway: bool,
+    pub is_self: bool,
+}
+
 /// Application settings.
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Settings {

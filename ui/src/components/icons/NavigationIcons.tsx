@@ -21,4 +21,4 @@ export function NetokLogoIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-export { ShieldCheck as ShieldIcon, Activity as ToolsIcon, Settings as SettingsIcon } from './UIIcons'
+export { DnsShieldCheck as ShieldIcon, Activity as ToolsIcon, Settings as SettingsIcon } from './UIIcons'

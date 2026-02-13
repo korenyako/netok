@@ -118,12 +118,12 @@ export function MenuCard({
         )}
         <div className="flex-1 min-w-0">
           <div className={cn(
-            "text-base font-medium leading-normal flex items-center gap-2",
+            "flex items-baseline gap-2 text-base font-medium leading-normal",
             muted && "text-muted-foreground"
           )}>
-            {title}
+            <span className="truncate">{title}</span>
             {badge && (
-              <span className={cn("text-xs font-normal px-1.5 py-0.5 rounded", badgeClassName || "text-primary bg-primary/10")}>{badge}</span>
+              <span className={cn("text-xs font-normal px-1.5 py-0.5 rounded shrink-0", badgeClassName || "text-primary bg-primary/10")}>{badge}</span>
             )}
           </div>
           {subtitle && (

@@ -3,8 +3,7 @@ import { ArrowLeft, Copy, ExternalLink } from '../components/icons/UIIcons';
 import { NetokLogoIcon, ShieldIcon, ToolsIcon, SettingsIcon } from '../components/icons/NavigationIcons';
 import { openUrl } from '@tauri-apps/plugin-opener';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
+
 import type { SingleNodeResult } from '../api/tauri';
 import { notifications } from '../utils/notifications';
 import { CloseButton } from '../components/WindowControls';
@@ -125,45 +124,44 @@ export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToHome, onN
         </div>
       </div>
 
-      {/* Content */}
-      <ScrollArea className="flex-1 px-4">
-        <Card className="bg-transparent">
-          <CardContent className="px-4 py-3">
-            <div className="space-y-4">
-              {rows.map((row) => (
-                <div key={row.label}>
-                  <p className="text-sm text-muted-foreground">{row.label}</p>
-                  {row.copyable ? (
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-cyan-600 dark:text-cyan-400 font-mono">{row.value}</span>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6 shrink-0"
-                        onClick={() => handleCopyIp(row.value)}
-                      >
-                        <Copy className="w-3.5 h-3.5 text-muted-foreground" />
-                      </Button>
-                    </div>
-                  ) : (
-                    <p className="text-sm text-foreground">{row.value}</p>
-                  )}
+      {/* Content — ps-12 inside px-4 aligns text under the title (16+48 = 64px) */}
+      <div className="flex-1 px-4 pb-4 flex flex-col min-h-0 overflow-y-auto">
+        <div className="ps-12 space-y-4">
+          {rows.map((row) => (
+            <div key={row.label}>
+              <p className="text-sm text-muted-foreground">{row.label}</p>
+              {row.copyable ? (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-cyan-600 dark:text-cyan-400 font-mono">{row.value}</span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 shrink-0"
+                    onClick={() => handleCopyIp(row.value)}
+                  >
+                    <Copy className="w-3.5 h-3.5 text-muted-foreground" />
+                  </Button>
                 </div>
-              ))}
+              ) : (
+                <p className="text-sm text-foreground">{row.value}</p>
+              )}
             </div>
-          </CardContent>
-        </Card>
+          ))}
+        </div>
+
+        <div className="flex-1" />
+
         {routerIp && (
           <Button
             variant="outline"
-            className="w-full mt-4 uppercase font-mono tracking-wider text-xs"
+            className="w-full text-sm font-medium"
             onClick={handleOpenRouter}
           >
             <ExternalLink className="w-4 h-4 me-2" />
             {t('node_detail.open_router')}
           </Button>
         )}
-      </ScrollArea>
+      </div>
 
       {/* Bottom Navigation Bar */}
       <nav className="bg-background px-4 py-4">

@@ -22,16 +22,16 @@ mod oui_database;
 
 // Re-export all domain types at crate root (backward compatibility)
 pub use domain::{
-    get_default_settings, ComputerInfo, ConnectionType, DiagnosticResult, DiagnosticScenario,
-    DiagnosticSeverity, DiagnosticsSnapshot, DnsProvider, InternetInfo, NetworkInfo, NodeId,
-    NodeInfo, RouterInfo, Settings, Status,
+    get_default_settings, ComputerInfo, ConnectionType, DeviceType, DiagnosticResult,
+    DiagnosticScenario, DiagnosticSeverity, DiagnosticsSnapshot, DnsProvider, InternetInfo,
+    NetworkDevice, NetworkInfo, NodeId, NodeInfo, RouterInfo, Settings, Status,
 };
 
 // Re-export diagnostics functions
 pub use diagnostics::{
     check_computer, check_internet, check_network, check_router, detect_dns_provider,
     get_computer_info, get_internet_info, get_network_info, get_router_info, lookup_ip_location,
-    run_diagnostics, test_dns_server, IpInfoResponse,
+    run_diagnostics, scan_network_devices, test_dns_server, IpInfoResponse,
 };
 
 // Re-export infrastructure functions used by bridge

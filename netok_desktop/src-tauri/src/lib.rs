@@ -226,6 +226,13 @@ async fn check_internet() -> Result<SingleNodeResult, String> {
         .map_err(|e| e.to_string())
 }
 
+// ==================== Device Scan ====================
+
+#[tauri::command]
+async fn scan_network_devices() -> Result<Vec<netok_bridge::NetworkDevice>, String> {
+    netok_bridge::scan_network_devices().await
+}
+
 // ==================== VPN Commands ====================
 
 #[tauri::command]
@@ -570,6 +577,22 @@ fn update_tray_language(app: tauri::AppHandle, lang: String) -> Result<(), Strin
 
 // ==================== App Entry ====================
 
+/// Kill any orphaned sing-box processes left from a previous crash or Ctrl+C.
+fn kill_orphaned_singbox() {
+    #[cfg(target_os = "windows")]
+    {
+        use std::process::Command;
+        let output = Command::new("taskkill")
+            .args(["/F", "/IM", "sing-box-x86_64-pc-windows-msvc.exe"])
+            .output();
+        if let Ok(out) = output {
+            if out.status.success() {
+                eprintln!("[VPN] Killed orphaned sing-box process");
+            }
+        }
+    }
+}
+
 /// Kill VPN process if running (cleanup helper).
 fn cleanup_vpn(vpn_state: &Mutex<VpnProcessState>) {
     if let Ok(state) = vpn_state.lock() {
@@ -606,12 +629,14 @@ pub fn run() {
             check_internet,
             lookup_ip_location,
             update_tray_language,
+            scan_network_devices,
             validate_vpn_key,
             connect_vpn,
             disconnect_vpn,
             get_vpn_status
         ])
         .setup(|app| {
+            kill_orphaned_singbox();
             create_tray(app)?;
             Ok(())
         })

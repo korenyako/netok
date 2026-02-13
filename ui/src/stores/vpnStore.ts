@@ -14,9 +14,22 @@ export interface VpnConfig {
 }
 
 interface VpnState {
-  config: VpnConfig | null;
+  // Persisted
+  configs: VpnConfig[];
+  activeIndex: number | null;
+
+  // Runtime (not persisted)
   connectionState: VpnConnectionState;
-  setConfig: (config: VpnConfig | null) => void;
+  editingIndex: number | null;
+
+  // Actions
+  addConfig: (config: VpnConfig) => void;
+  updateConfig: (index: number, config: VpnConfig) => void;
+  removeConfig: (index: number) => void;
+  setActiveIndex: (index: number | null) => void;
+  setEditingIndex: (index: number | null) => void;
+  hasDuplicateHost: (serverHost: string, excludeIndex?: number) => boolean;
+  connectByIndex: (index: number) => Promise<void>;
   connect: () => Promise<void>;
   disconnect: () => Promise<void>;
   refreshStatus: () => Promise<void>;
@@ -25,12 +38,74 @@ interface VpnState {
 export const useVpnStore = create<VpnState>()(
   persist(
     (set, get) => ({
-      config: null,
+      configs: [],
+      activeIndex: null,
       connectionState: { type: 'disconnected' },
-      setConfig: (config: VpnConfig | null) => set({ config }),
-      connect: async () => {
-        const { config } = get();
+      editingIndex: null,
+
+      addConfig: (config) => {
+        set((state) => ({ configs: [...state.configs, config] }));
+      },
+
+      updateConfig: (index, config) => {
+        set((state) => {
+          const configs = [...state.configs];
+          configs[index] = config;
+          return { configs };
+        });
+      },
+
+      removeConfig: (index) => {
+        const { activeIndex, connectionState } = get();
+        const wasActive = activeIndex === index;
+
+        // If removing the active and connected config, disconnect
+        if (wasActive && (connectionState.type === 'connected' || connectionState.type === 'connecting')) {
+          get().disconnect();
+        }
+
+        set((state) => {
+          const configs = state.configs.filter((_, i) => i !== index);
+          let newActiveIndex = state.activeIndex;
+          if (wasActive) {
+            newActiveIndex = null;
+          } else if (newActiveIndex !== null && newActiveIndex > index) {
+            newActiveIndex = newActiveIndex - 1;
+          }
+          return { configs, activeIndex: newActiveIndex };
+        });
+      },
+
+      setActiveIndex: (index) => set({ activeIndex: index }),
+      setEditingIndex: (index) => set({ editingIndex: index }),
+
+      hasDuplicateHost: (serverHost, excludeIndex) => {
+        const { configs } = get();
+        return configs.some((c, i) => i !== excludeIndex && c.serverHost === serverHost);
+      },
+
+      connectByIndex: async (index) => {
+        const config = get().configs[index];
         if (!config) return;
+        set({ activeIndex: index, connectionState: { type: 'connecting' } });
+        try {
+          await connectVpn(config.rawKey);
+          const status = await getVpnStatus();
+          set({ connectionState: status.state });
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          if (message.includes('elevation') || message.includes('cancelled')) {
+            set({ connectionState: { type: 'elevation_denied' } });
+          } else {
+            set({ connectionState: { type: 'error', message } });
+          }
+        }
+      },
+
+      connect: async () => {
+        const { configs, activeIndex } = get();
+        if (activeIndex === null || !configs[activeIndex]) return;
+        const config = configs[activeIndex];
         set({ connectionState: { type: 'connecting' } });
         try {
           await connectVpn(config.rawKey);
@@ -45,6 +120,7 @@ export const useVpnStore = create<VpnState>()(
           }
         }
       },
+
       disconnect: async () => {
         set({ connectionState: { type: 'disconnecting' } });
         try {
@@ -55,6 +131,7 @@ export const useVpnStore = create<VpnState>()(
           set({ connectionState: { type: 'error', message } });
         }
       },
+
       refreshStatus: async () => {
         try {
           const status = await getVpnStatus();
@@ -66,13 +143,28 @@ export const useVpnStore = create<VpnState>()(
     }),
     {
       name: 'vpn-storage',
-      version: 2,
-      partialize: (state) => ({ config: state.config }),
+      version: 3,
+      partialize: (state) => ({ configs: state.configs, activeIndex: state.activeIndex }),
       migrate: (persisted: unknown, version: number) => {
-        const state = persisted as { config: VpnConfig | null };
-        if (version < 2 && state.config && !state.config.serverHost) {
-          state.config.serverHost = extractServerHost(state.config.rawKey) || '';
+        const state = persisted as Record<string, unknown>;
+
+        // v1 → v2: add serverHost to existing config
+        if (version < 2) {
+          const config = state.config as VpnConfig | null;
+          if (config && !config.serverHost) {
+            config.serverHost = extractServerHost(config.rawKey) || '';
+          }
+          state.config = config;
         }
+
+        // v2 → v3: single config → configs array
+        if (version < 3) {
+          const oldConfig = state.config as VpnConfig | null;
+          state.configs = oldConfig ? [oldConfig] : [];
+          state.activeIndex = null;
+          delete state.config;
+        }
+
         return state;
       },
     }
@@ -84,19 +176,22 @@ listen<VpnConnectionState>('vpn-state-changed', (event) => {
   useVpnStore.setState({ connectionState: event.payload });
 });
 
-// Lazy GeoIP lookup: if config has serverHost but no location, fill it in
+// Lazy GeoIP lookup: fill in missing location data for all configs
 useVpnStore.persist.onFinishHydration((state) => {
-  const { config } = state;
-  if (config?.serverHost && !config.country && !config.city) {
-    lookupIpLocation(config.serverHost).then((location) => {
-      const country = location.country ?? '';
-      const city = location.city ?? '';
-      if (country || city) {
-        const current = useVpnStore.getState().config;
-        if (current && current.rawKey === config.rawKey) {
-          useVpnStore.setState({ config: { ...current, country, city } });
+  state.configs.forEach((config, index) => {
+    if (config.serverHost && !config.country && !config.city) {
+      lookupIpLocation(config.serverHost).then((location) => {
+        const country = location.country ?? '';
+        const city = location.city ?? '';
+        if (country || city) {
+          const current = useVpnStore.getState().configs[index];
+          if (current && current.rawKey === config.rawKey) {
+            const updatedConfigs = [...useVpnStore.getState().configs];
+            updatedConfigs[index] = { ...current, country, city };
+            useVpnStore.setState({ configs: updatedConfigs });
+          }
         }
-      }
-    }).catch(() => { /* ignore */ });
-  }
+      }).catch(() => { /* ignore */ });
+    }
+  });
 });

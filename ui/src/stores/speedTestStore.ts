@@ -67,7 +67,7 @@ const initialState: SpeedTestState = {
   phase: 'idle',
   progress: 0,
   currentValue: 0,
-  currentUnit: 'ms',
+  currentUnit: 'speed_test.unit_ms',
   metrics: { download: null, upload: null, ping: null, latency: null, jitter: null },
   downloadData: [],
   uploadData: [],
@@ -93,7 +93,7 @@ export const useSpeedTestStore = create<SpeedTestStore>((set) => ({
       ...initialState,
       phase: 'ping',
       progress: 0,
-      currentUnit: 'ms',
+      currentUnit: 'speed_test.unit_ms',
     });
 
     try {
@@ -104,7 +104,7 @@ export const useSpeedTestStore = create<SpeedTestStore>((set) => ({
             phase,
             progress,
             currentValue: Math.round(currentMbps),
-            currentUnit: phase === 'ping' ? 'ms' : 'Mbps',
+            currentUnit: phase === 'ping' ? 'speed_test.unit_ms' : 'speed_test.unit_mbps',
           });
         },
         onDataPoint: (phase, mbps) => {

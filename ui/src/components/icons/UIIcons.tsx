@@ -266,12 +266,38 @@ export function Lock(props: IconProps) {
   );
 }
 
+export function LockOpen(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0" />
+    </SvgIcon>
+  );
+}
+
 export function Globe(props: IconProps) {
   return (
     <SvgIcon {...props}>
       <circle cx="12" cy="12" r="10" />
       <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
       <path d="M2 12h20" />
+    </SvgIcon>
+  );
+}
+
+export function DnsShield(props: IconProps) {
+  return (
+    <SvgIcon viewBox="-1 -1 24 24" {...props}>
+      <path d="M11.556 21.031a1.1 1.1 0 0 1-1.122 0C7.616 19.95 5.194 18.039 3.485 15.551 1.776 13.064.863 10.116.864 7.098V2.423c0-.413.164-.81.456-1.102A1.558 1.558 0 0 1 2.423.864h17.143c.413 0 .81.165 1.102.457.292.292.457.689.457 1.102v4.675c.001 3.018-.912 5.965-2.621 8.453-1.708 2.488-4.131 4.398-6.948 5.48Z" />
+    </SvgIcon>
+  );
+}
+
+export function DnsShieldCheck(props: IconProps) {
+  return (
+    <SvgIcon viewBox="-1 -1 24 24" {...props}>
+      <path d="M11.556 21.031a1.1 1.1 0 0 1-1.122 0C7.616 19.95 5.194 18.039 3.485 15.551 1.776 13.064.863 10.116.864 7.098V2.423c0-.413.164-.81.456-1.102A1.558 1.558 0 0 1 2.423.864h17.143c.413 0 .81.165 1.102.457.292.292.457.689.457 1.102v4.675c.001 3.018-.912 5.965-2.621 8.453-1.708 2.488-4.131 4.398-6.948 5.48Z" />
+      <path d="M15.714 6.286 9.429 13.357 6.286 11" />
     </SvgIcon>
   );
 }

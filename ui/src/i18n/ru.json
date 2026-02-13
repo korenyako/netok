@@ -33,6 +33,7 @@
     "optional": "необязательно",
     "custom_display": "Свой DNS",
     "status_disabled": "Отключено",
+    "status_applying": "Применение...",
     "cache_cleared": "Кэш DNS очищен",
     "system": "Стандартный DNS",
     "system_desc": "Без защиты",
@@ -47,7 +48,8 @@
     "wifi": "Wi-Fi",
     "router": "Роутер",
     "internet": "Интернет",
-    "checking": "Проверка..."
+    "checking": "Проверка...",
+    "via_vpn": "VPN"
   },
   "status": {
     "internet_ok": "Подключено",
@@ -59,7 +61,10 @@
     "dns_protection_with_provider": "DNS включён",
     "dns_protection_enabled": "Используется DNS {{provider}}",
     "dns_protection_disabled": "Стандартный DNS",
-    "dns_protection_disabled_desc": "Без защиты"
+    "dns_protection_disabled_desc": "Без защиты",
+    "vpn_enabled": "VPN включён",
+    "vpn_disabled": "VPN выключен",
+    "vpn_disabled_desc": "Трафик не зашифрован"
   },
   "node_detail": {
     "adapter": "Адаптер",
@@ -153,7 +158,7 @@
       "speed_test_desc": "Узнайте, на что способен ваш интернет",
       "flush_dns": "Очистить кэш DNS",
       "flush_dns_desc": "Решить проблему «сайт не открывается»",
-      "device_scan": "Устройства в сети",
+      "device_scan": "Устройства\nв сети",
       "device_scan_desc": "Посмотрите, кто подключён"
     }
   },
@@ -166,15 +171,18 @@
     "title": "VPN",
     "not_configured": "Не настроен",
     "disabled": "Отключён",
+    "disabled_desc": "Интернет-трафик не идёт через VPN",
     "connecting": "Подключение...",
     "connected": "Подключён",
     "add_vpn": "Добавить VPN",
     "add_vpn_desc": "Вставьте ключ или ссылку",
     "supported_formats": "Поддерживает VLESS, Shadowsocks, Trojan, WireGuard, Outline",
     "set_vpn": "Настроить VPN",
+    "edit": "Изменить",
     "key_label": "Ключ или ссылка",
     "key_placeholder": "vless://... или ss://... или wg://...",
     "key_hint": "Введите VPN-ключ или ссылку от вашего провайдера. Поддерживается: VLESS, VMess, Shadowsocks, Trojan, WireGuard, Outline",
+    "key_hint_edit": "Замените VPN-ключ или ссылку для этого сервера",
     "key_example": "например vless://id@host:443?type=tcp&...",
     "add_button": "Добавить",
     "save_button": "Сохранить",
@@ -197,7 +205,11 @@
     "dismiss": "Скрыть",
     "validating": "Проверяем ключ...",
     "invalid_key": "Неверный VPN-ключ",
-    "server_unreachable": "Сервер не отвечает. Ключ может быть рабочим."
+    "server_unreachable": "Сервер не отвечает. Ключ может быть нерабочим.",
+    "duplicate_server": "Сервер с таким адресом уже существует",
+    "delete": "Удалить",
+    "delete_confirm": "Вы уверены, что хотите удалить этот сервер?",
+    "cancel": "Отмена"
   },
   "speed_test": {
     "title": "Тест скорости",
@@ -234,7 +246,9 @@
     "error_no_server": "Не удалось найти сервер для теста. Проверьте подключение к интернету.",
     "error_test_failed": "Тест скорости не удался. Попробуйте ещё раз.",
     "error_rate_limited": "Слишком много тестов подряд. Подождите несколько минут.",
-    "error_connection": "Не удалось подключиться к серверу. Проверьте соединение."
+    "error_connection": "Не удалось подключиться к серверу. Проверьте соединение.",
+    "unit_mbps": "Мбит/с",
+    "unit_ms": "мс"
   },
   "diagnostic": {
     "scenario": {

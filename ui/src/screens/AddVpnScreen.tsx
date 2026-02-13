@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { CloseButton } from '../components/WindowControls';
 import { useVpnStore, type VpnConfig } from '../stores/vpnStore';
 import { lookupIpLocation, validateVpnKey } from '../api/tauri';
+import { notifications } from '../utils/notifications';
 
 interface AddVpnScreenProps {
   onBack: () => void;
@@ -16,13 +17,18 @@ type ValidationPhase = 'idle' | 'validating' | 'looking_up';
 
 export function AddVpnScreen({ onBack, onAdded }: AddVpnScreenProps) {
   const { t } = useTranslation();
-  const { config, setConfig } = useVpnStore();
-  const [keyValue, setKeyValue] = useState(config?.rawKey ?? '');
+  const { configs, editingIndex, addConfig, updateConfig, removeConfig, hasDuplicateHost } = useVpnStore();
+
+  const isEditMode = editingIndex !== null;
+  const editingConfig = isEditMode ? configs[editingIndex] : null;
+
+  const [keyValue, setKeyValue] = useState(editingConfig?.rawKey ?? '');
   const [phase, setPhase] = useState<ValidationPhase>('idle');
   const [error, setError] = useState<string | null>(null);
   const [warning, setWarning] = useState<string | null>(null);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
 
-  const handleAdd = async () => {
+  const handleSave = async () => {
     const trimmed = keyValue.trim();
     if (!trimmed) return;
 
@@ -46,8 +52,17 @@ export function AddVpnScreen({ onBack, onAdded }: AddVpnScreenProps) {
       return;
     }
 
-    if (!validation.reachable) {
+    if (!validation.reachable && !warning) {
       setWarning(t('vpn.server_unreachable'));
+      setPhase('idle');
+      return;
+    }
+
+    // Check for duplicate server host
+    if (hasDuplicateHost(validation.server, isEditMode ? editingIndex : undefined)) {
+      notifications.error(t('vpn.duplicate_server'));
+      setPhase('idle');
+      return;
     }
 
     // Step 2: GeoIP lookup
@@ -71,9 +86,21 @@ export function AddVpnScreen({ onBack, onAdded }: AddVpnScreenProps) {
       rawKey: trimmed,
     };
 
-    setConfig(newConfig);
+    if (isEditMode) {
+      updateConfig(editingIndex, newConfig);
+    } else {
+      addConfig(newConfig);
+    }
+
     setPhase('idle');
     onAdded();
+  };
+
+  const handleDelete = () => {
+    if (isEditMode) {
+      removeConfig(editingIndex);
+      onBack();
+    }
   };
 
   const isBusy = phase !== 'idle';
@@ -82,7 +109,9 @@ export function AddVpnScreen({ onBack, onAdded }: AddVpnScreenProps) {
     ? t('vpn.validating')
     : phase === 'looking_up'
       ? t('vpn.detecting_location')
-      : t('vpn.save_button');
+      : isEditMode
+        ? t('vpn.save_button')
+        : t('vpn.add_button');
 
   return (
     <div className="flex flex-col h-full bg-background">
@@ -101,12 +130,28 @@ export function AddVpnScreen({ onBack, onAdded }: AddVpnScreenProps) {
 
       {/* Content */}
       <div className="flex-1 px-4 pb-4 flex flex-col min-h-0 space-y-6 overflow-y-auto">
+        {/* Server info card (edit mode) */}
+        {isEditMode && editingConfig && (() => {
+          const location = [editingConfig.city, editingConfig.country].filter(Boolean).join(', ');
+          return (
+            <div className="space-y-0.5">
+              <p className="text-sm font-medium text-foreground">{editingConfig.serverHost || editingConfig.protocol}</p>
+              {location && <p className="text-sm text-muted-foreground">{location}</p>}
+              {editingConfig.protocol && (
+                <span className="inline-block text-xs font-normal px-1.5 py-0.5 rounded text-purple-500 bg-purple-500/10 mt-1">{editingConfig.protocol}</span>
+              )}
+            </div>
+          );
+        })()}
+
         <p className="text-sm font-normal text-muted-foreground">
-          {t('vpn.key_hint')}
+          {isEditMode ? t('vpn.key_hint_edit') : t('vpn.key_hint')}
         </p>
 
         <div className="flex-1 flex flex-col min-h-0 gap-3">
-          <span className="text-xs text-muted-foreground/60">{t('vpn.key_example')}</span>
+          {!isEditMode && (
+            <span className="text-xs text-muted-foreground/60">{t('vpn.key_example')}</span>
+          )}
           <textarea
             placeholder=""
             value={keyValue}
@@ -124,19 +169,52 @@ export function AddVpnScreen({ onBack, onAdded }: AddVpnScreenProps) {
 
           {/* Reachability warning */}
           {warning && !error && (
-            <div className="flex items-start gap-2 text-warning text-xs">
-              <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
-              <span>{warning}</span>
+            <div className="flex items-start gap-2 text-xs">
+              <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-warning" />
+              <span className="text-muted-foreground">{warning}</span>
             </div>
           )}
 
           <Button
-            className="w-full uppercase font-mono tracking-wider text-xs shrink-0"
-            onClick={handleAdd}
+            className="w-full text-sm font-medium shrink-0"
+            onClick={handleSave}
             disabled={!keyValue.trim() || isBusy}
           >
             {buttonLabel}
           </Button>
+
+          {isEditMode && !confirmingDelete && (
+            <Button
+              variant="ghost"
+              className="w-full text-sm font-medium shrink-0"
+              onClick={() => setConfirmingDelete(true)}
+              disabled={isBusy}
+            >
+              {t('vpn.delete')}
+            </Button>
+          )}
+
+          {isEditMode && confirmingDelete && (
+            <div className="space-y-2">
+              <p className="text-sm text-center text-muted-foreground">{t('vpn.delete_confirm')}</p>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  className="flex-1 text-sm font-medium"
+                  onClick={() => setConfirmingDelete(false)}
+                >
+                  {t('vpn.cancel')}
+                </Button>
+                <Button
+                  variant="destructive"
+                  className="flex-1 text-sm font-medium"
+                  onClick={handleDelete}
+                >
+                  {t('vpn.delete')}
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

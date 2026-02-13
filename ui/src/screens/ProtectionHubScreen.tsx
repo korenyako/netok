@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Globe, Lock, ChevronRight } from '../components/icons/UIIcons';
+import { ArrowLeft, DnsShield, DnsShieldCheck, Lock, LockOpen, ChevronRight } from '../components/icons/UIIcons';
 import { Button } from '@/components/ui/button';
 import { MenuCard } from '@/components/MenuCard';
 import { CloseButton } from '../components/WindowControls';
@@ -25,12 +25,14 @@ const PROVIDER_DISPLAY: Record<string, string> = {
 
 export function ProtectionHubScreen({ onBack, onNavigateToDns, onNavigateToVpn }: ProtectionHubScreenProps) {
   const { t } = useTranslation();
-  const { currentProvider: dnsProvider } = useDnsStore();
-  const { config: vpnConfig, connectionState } = useVpnStore();
+  const { currentProvider: dnsProvider, isLoading: isDnsLoading } = useDnsStore();
+  const { configs, activeIndex, connectionState } = useVpnStore();
+  const vpnConfig = activeIndex !== null ? configs[activeIndex] : null;
 
   const isDnsEnabled = dnsProvider !== null && KNOWN_PROVIDERS.includes(dnsProvider.type);
 
   const dnsSubtitle = (() => {
+    if (isDnsLoading) return t('dns_providers.status_applying');
     if (!isDnsEnabled) return t('dns_providers.status_disabled');
     if (dnsProvider) {
       if (dnsProvider.type === 'Custom') {
@@ -42,7 +44,7 @@ export function ProtectionHubScreen({ onBack, onNavigateToDns, onNavigateToVpn }
   })();
 
   const vpnSubtitle = (() => {
-    if (!vpnConfig) return t('vpn.not_configured');
+    if (!vpnConfig) return configs.length > 0 ? t('vpn.disabled') : t('vpn.not_configured');
     switch (connectionState.type) {
       case 'connecting': return t('vpn.connecting');
       case 'connected': {
@@ -56,7 +58,9 @@ export function ProtectionHubScreen({ onBack, onNavigateToDns, onNavigateToVpn }
     }
   })();
 
-  const dnsIconColor = isDnsEnabled ? 'text-primary' : 'text-muted-foreground';
+  const dnsIconColor = isDnsLoading
+    ? 'text-warning animate-pulse'
+    : isDnsEnabled ? 'text-primary' : 'text-muted-foreground';
 
   const vpnIconColor = (() => {
     switch (connectionState.type) {
@@ -97,7 +101,10 @@ export function ProtectionHubScreen({ onBack, onNavigateToDns, onNavigateToVpn }
         <div className="space-y-2">
           <MenuCard
             variant="ghost"
-            icon={<Globe className={`w-5 h-5 ${dnsIconColor}`} />}
+            icon={isDnsEnabled
+              ? <DnsShieldCheck className={`w-5 h-5 ${dnsIconColor}`} />
+              : <DnsShield className={`w-5 h-5 ${dnsIconColor}`} />
+            }
             title={t('protection.dns_protection')}
             subtitle={dnsSubtitle}
             trailing={trailing}
@@ -106,7 +113,10 @@ export function ProtectionHubScreen({ onBack, onNavigateToDns, onNavigateToVpn }
 
           <MenuCard
             variant="ghost"
-            icon={<Lock className={`w-5 h-5 ${vpnIconColor}`} />}
+            icon={connectionState.type === 'connected'
+              ? <Lock className={`w-5 h-5 ${vpnIconColor}`} />
+              : <LockOpen className={`w-5 h-5 ${vpnIconColor}`} />
+            }
             title={t('protection.vpn_tunnel')}
             subtitle={vpnSubtitle}
             trailing={trailing}

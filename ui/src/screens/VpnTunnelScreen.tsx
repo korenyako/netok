@@ -1,10 +1,11 @@
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, AlertTriangle } from '../components/icons/UIIcons';
+import { ArrowLeft, AlertTriangle, Loader2 } from '../components/icons/UIIcons';
 import { Button } from '@/components/ui/button';
 import { MenuCard } from '@/components/MenuCard';
 import { Card, CardContent } from '@/components/ui/card';
 import { CloseButton } from '../components/WindowControls';
 import { useVpnStore } from '../stores/vpnStore';
+import { cn } from '@/lib/utils';
 
 
 interface VpnTunnelScreenProps {
@@ -12,9 +13,28 @@ interface VpnTunnelScreenProps {
   onAddVpn: () => void;
 }
 
+function RadioDot({ selected, applying }: { selected: boolean; applying: boolean }) {
+  if (applying) return <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />;
+  return (
+    <div className={cn(
+      "w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors",
+      selected ? "border-primary" : "border-muted-foreground/40"
+    )}>
+      {selected && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
+    </div>
+  );
+}
+
 export function VpnTunnelScreen({ onBack, onAddVpn }: VpnTunnelScreenProps) {
   const { t } = useTranslation();
-  const { config, connectionState, connect, disconnect } = useVpnStore();
+  const {
+    configs,
+    activeIndex,
+    connectionState,
+    connectByIndex,
+    disconnect,
+    setEditingIndex,
+  } = useVpnStore();
 
   const isConnected = connectionState.type === 'connected';
   const isConnecting = connectionState.type === 'connecting';
@@ -23,23 +43,40 @@ export function VpnTunnelScreen({ onBack, onAddVpn }: VpnTunnelScreenProps) {
   const isElevationDenied = connectionState.type === 'elevation_denied';
   const isBusy = isConnecting || isDisconnecting;
 
-  const handleToggle = async (checked: boolean) => {
-    if (!config) return;
-    if (checked) {
-      await connect();
-    } else {
-      await disconnect();
-    }
+  const isVpnActive = isConnected || isConnecting;
+  const isDisabled = !isVpnActive;
+
+  const handleDisable = async () => {
+    if (isBusy || isDisabled) return;
+    await disconnect();
+  };
+
+  const handleSelectServer = async (index: number) => {
+    if (isBusy) return;
+    // If already active and connected, do nothing
+    if (activeIndex === index && isVpnActive) return;
+    await connectByIndex(index);
+  };
+
+  const handleEditServer = (index: number) => {
+    setEditingIndex(index);
+    onAddVpn();
+  };
+
+  const handleAddNew = () => {
+    setEditingIndex(null);
+    onAddVpn();
   };
 
   const handleDismissError = () => {
     useVpnStore.setState({ connectionState: { type: 'disconnected' } });
   };
 
-  // Build title, badge, and subtitle for the server card
-  const serverTitle = config?.serverHost || config?.protocol || '';
-  const serverBadge = config?.protocol || '';
-  const serverSubtitle = [config?.city, config?.country].filter(Boolean).join(', ') || undefined;
+  const handleRetry = () => {
+    if (activeIndex !== null) {
+      connectByIndex(activeIndex);
+    }
+  };
 
   return (
     <div className="flex flex-col h-full bg-background">
@@ -74,7 +111,7 @@ export function VpnTunnelScreen({ onBack, onAddVpn }: VpnTunnelScreenProps) {
                   <Button variant="outline" size="sm" className="flex-1" onClick={handleDismissError}>
                     {t('vpn.dismiss')}
                   </Button>
-                  <Button variant="default" size="sm" className="flex-1" onClick={() => connect()}>
+                  <Button variant="default" size="sm" className="flex-1" onClick={handleRetry}>
                     {t('vpn.retry')}
                   </Button>
                 </div>
@@ -97,7 +134,7 @@ export function VpnTunnelScreen({ onBack, onAddVpn }: VpnTunnelScreenProps) {
                   <Button variant="outline" size="sm" className="flex-1" onClick={handleDismissError}>
                     {t('vpn.dismiss')}
                   </Button>
-                  <Button variant="default" size="sm" className="flex-1" onClick={() => connect()}>
+                  <Button variant="default" size="sm" className="flex-1" onClick={handleRetry}>
                     {t('vpn.retry')}
                   </Button>
                 </div>
@@ -105,60 +142,69 @@ export function VpnTunnelScreen({ onBack, onAddVpn }: VpnTunnelScreenProps) {
             </Card>
           )}
 
-          {/* Server card (when configured) — click to toggle */}
-          {config && (
+          {/* Disabled card */}
+          <div className={cn(isBusy && !isDisconnecting && 'pointer-events-none opacity-50')}>
             <MenuCard
-              variant={isConnected || isBusy ? 'selected' : 'ghost'}
-              title={serverTitle}
-              badge={serverBadge}
-              badgeClassName="text-purple-500 bg-purple-500/10"
-              subtitle={serverSubtitle}
-              checked={isBusy ? 'spinner' : isConnected}
-              onClick={() => !isBusy && handleToggle(!isConnected)}
+              variant="ghost"
+              icon={<RadioDot selected={isDisabled} applying={isDisconnecting} />}
+              title={t('vpn.disabled')}
+              subtitle={t('vpn.disabled_desc')}
+              onClick={handleDisable}
             />
-          )}
+          </div>
 
-          {/* Traffic path (when connected) */}
-          {isConnected && (
-            <Card>
-              <CardContent className="py-3 px-4">
-                <div className="text-sm text-muted-foreground mb-3">{t('vpn.traffic_path')}</div>
-                <div className="flex items-center justify-between text-xs">
-                  <div className="text-center">
-                    <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center mx-auto mb-1 text-base">
-                      💻
-                    </div>
-                    <div className="text-muted-foreground">{t('vpn.you')}</div>
-                  </div>
-                  <div className="flex-1 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent mx-2 rounded" />
-                  <div className="text-center">
-                    <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center mx-auto mb-1 text-base">
-                      🔒
-                    </div>
-                    <div className="text-primary">{t('vpn.vpn_node')}</div>
-                  </div>
-                  <div className="flex-1 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent mx-2 rounded" />
-                  <div className="text-center">
-                    <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center mx-auto mb-1 text-base">
-                      🌍
-                    </div>
-                    <div className="text-muted-foreground">{t('vpn.internet')}</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+          {/* Server cards */}
+          {configs.map((config, index) => {
+            const isActive = activeIndex === index;
+            const isThisConnecting = isActive && isConnecting;
+            const isThisActive = isActive && isVpnActive;
+
+            const serverTitle = config.serverHost || config.protocol || '';
+            const location = [config.city, config.country].filter(Boolean).join(', ');
+            const serverSubtitle = (
+              <>
+                {location && <div>{location}</div>}
+                {config.protocol && (
+                  <span className="inline-block text-xs font-normal px-1.5 py-0.5 rounded text-purple-500 bg-purple-500/10 mt-1.5">{config.protocol}</span>
+                )}
+              </>
+            );
+
+            return (
+              <div key={index} className={cn(isBusy && !isThisConnecting && 'pointer-events-none opacity-50')}>
+                <MenuCard
+                  variant="ghost"
+                  className="group ghost-action-card"
+                  icon={<RadioDot selected={isThisActive} applying={isThisConnecting} />}
+                  title={serverTitle}
+                  subtitle={serverSubtitle}
+                  trailing={
+                    <button
+                      className="ghost-action px-4 py-1.5 rounded-full text-[10px] font-medium uppercase tracking-wider text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all shrink-0 opacity-0 group-hover:opacity-100"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEditServer(index);
+                      }}
+                    >
+                      {t('vpn.edit')}
+                    </button>
+                  }
+                  onClick={() => handleSelectServer(index)}
+                />
+              </div>
+            );
+          })}
         </div>
 
         <div className="flex-1" />
 
-        {/* Set VPN button */}
+        {/* Add VPN button */}
         <Button
           variant="outline"
-          className="w-full uppercase font-mono tracking-wider text-xs"
-          onClick={onAddVpn}
+          className="w-full text-sm font-medium"
+          onClick={handleAddNew}
         >
-          {t('vpn.set_vpn')}
+          {t('vpn.add_button')}
         </Button>
       </div>
     </div>
