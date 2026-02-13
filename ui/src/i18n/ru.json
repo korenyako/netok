@@ -294,6 +294,24 @@
       }
     }
   },
+  "device_scan": {
+    "title": "Устройства",
+    "scanning": "Сканирование сети...",
+    "no_devices": "Устройства не найдены",
+    "found": "Найдено устройств: {{count}}",
+    "unknown_device": "Неизвестное устройство",
+    "badge_router": "Роутер",
+    "badge_this_device": "Это устройство",
+    "type_router": "Роутер",
+    "type_phone": "Телефон",
+    "type_computer": "Компьютер",
+    "type_tablet": "Планшет",
+    "type_printer": "Принтер",
+    "type_smarttv": "Телевизор",
+    "type_gameconsole": "Консоль",
+    "type_iot": "IoT",
+    "type_unknown": ""
+  },
   "lang": {
     "system": "Системный",
     "en": "Английский",

@@ -294,6 +294,24 @@
       }
     }
   },
+  "device_scan": {
+    "title": "Dispositivos",
+    "scanning": "Verificando rede...",
+    "no_devices": "Nenhum dispositivo encontrado",
+    "found": "{{count}} dispositivos encontrados",
+    "unknown_device": "Dispositivo desconhecido",
+    "badge_router": "Roteador",
+    "badge_this_device": "Este dispositivo",
+    "type_router": "Roteador",
+    "type_phone": "Telefone",
+    "type_computer": "Computador",
+    "type_tablet": "Tablet",
+    "type_printer": "Impressora",
+    "type_smarttv": "Smart TV",
+    "type_gameconsole": "Console",
+    "type_iot": "IoT",
+    "type_unknown": ""
+  },
   "lang": {
     "system": "Sistema",
     "en": "Inglês",

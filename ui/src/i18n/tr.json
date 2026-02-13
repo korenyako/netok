@@ -294,6 +294,24 @@
       }
     }
   },
+  "device_scan": {
+    "title": "Cihazlar",
+    "scanning": "Ağ taranıyor...",
+    "no_devices": "Cihaz bulunamadı",
+    "found": "{{count}} cihaz bulundu",
+    "unknown_device": "Bilinmeyen cihaz",
+    "badge_router": "Yönlendirici",
+    "badge_this_device": "Bu cihaz",
+    "type_router": "Yönlendirici",
+    "type_phone": "Telefon",
+    "type_computer": "Bilgisayar",
+    "type_tablet": "Tablet",
+    "type_printer": "Yazıcı",
+    "type_smarttv": "Smart TV",
+    "type_gameconsole": "Konsol",
+    "type_iot": "IoT",
+    "type_unknown": ""
+  },
   "lang": {
     "system": "Sistem",
     "en": "İngilizce",

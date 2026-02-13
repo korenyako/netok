@@ -294,6 +294,24 @@
       }
     }
   },
+  "device_scan": {
+    "title": "장치",
+    "scanning": "네트워크 스캔 중...",
+    "no_devices": "장치를 찾을 수 없습니다",
+    "found": "{{count}}개 장치 발견",
+    "unknown_device": "알 수 없는 장치",
+    "badge_router": "라우터",
+    "badge_this_device": "이 장치",
+    "type_router": "라우터",
+    "type_phone": "전화",
+    "type_computer": "컴퓨터",
+    "type_tablet": "태블릿",
+    "type_printer": "프린터",
+    "type_smarttv": "스마트 TV",
+    "type_gameconsole": "콘솔",
+    "type_iot": "IoT",
+    "type_unknown": ""
+  },
   "lang": {
     "system": "시스템",
     "en": "영어",

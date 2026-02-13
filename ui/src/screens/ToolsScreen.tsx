@@ -7,6 +7,7 @@ interface ToolsScreenProps {
   onBack?: () => void;
   onOpenDiagnostics: () => void;
   onOpenSpeedTest: () => void;
+  onOpenDeviceScan: () => void;
 }
 
 interface ToolTile {
@@ -17,7 +18,7 @@ interface ToolTile {
   onClick: () => void;
 }
 
-export function ToolsScreen({ onBack, onOpenDiagnostics, onOpenSpeedTest }: ToolsScreenProps) {
+export function ToolsScreen({ onBack, onOpenDiagnostics, onOpenSpeedTest, onOpenDeviceScan }: ToolsScreenProps) {
   const { t } = useTranslation();
 
   const tools: ToolTile[] = [
@@ -40,7 +41,7 @@ export function ToolsScreen({ onBack, onOpenDiagnostics, onOpenSpeedTest }: Tool
       nameKey: 'settings.tools.device_scan',
       icon: <Radar className="w-6 h-6" />,
       iconColorClass: 'text-amber-500',
-      onClick: () => {},
+      onClick: onOpenDeviceScan,
     },
   ];
 

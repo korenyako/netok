@@ -8,6 +8,7 @@ export function useNavigation() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('home');
   const [showDiagnostics, setShowDiagnostics] = useState(false);
   const [showSpeedTest, setShowSpeedTest] = useState(false);
+  const [showDeviceScan, setShowDeviceScan] = useState(false);
   const [settingsSubScreen, setSettingsSubScreen] = useState<SettingsSubScreen>('main');
   const [securitySubScreen, setSecuritySubScreen] = useState<SecuritySubScreen>('hub');
 
@@ -39,11 +40,13 @@ export function useNavigation() {
     currentScreen,
     showDiagnostics,
     showSpeedTest,
+    showDeviceScan,
     settingsSubScreen,
     securitySubScreen,
     setCurrentScreen,
     setShowDiagnostics,
     setShowSpeedTest,
+    setShowDeviceScan,
     setSettingsSubScreen,
     setSecuritySubScreen,
     navigateToHome,

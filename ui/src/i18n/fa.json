@@ -294,6 +294,24 @@
       }
     }
   },
+  "device_scan": {
+    "title": "دستگاه‌ها",
+    "scanning": "در حال اسکن شبکه...",
+    "no_devices": "دستگاهی یافت نشد",
+    "found": "{{count}} دستگاه یافت شد",
+    "unknown_device": "دستگاه ناشناس",
+    "badge_router": "روتر",
+    "badge_this_device": "این دستگاه",
+    "type_router": "روتر",
+    "type_phone": "تلفن",
+    "type_computer": "رایانه",
+    "type_tablet": "تبلت",
+    "type_printer": "چاپگر",
+    "type_smarttv": "تلویزیون هوشمند",
+    "type_gameconsole": "کنسول",
+    "type_iot": "IoT",
+    "type_unknown": ""
+  },
   "lang": {
     "system": "سیستم",
     "en": "انگلیسی",

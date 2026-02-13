@@ -223,18 +223,17 @@ export function DeviceScanScreen({ onBack }: DeviceScanScreenProps) {
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-xs text-muted-foreground">{device.ip}</span>
-                    <span className="text-xs text-muted-foreground/50">
-                      {device.mac}
-                    </span>
-                  </div>
+                  <span className="text-xs text-muted-foreground mt-0.5">
+                    {device.ip}
+                  </span>
                 </div>
 
-                {/* Device type label */}
-                <span className="text-xs text-muted-foreground shrink-0">
-                  {t(`device_scan.type_${device.device_type.toLowerCase()}`)}
-                </span>
+                {/* Device type label (hide for Unknown) */}
+                {device.device_type !== 'Unknown' && (
+                  <span className="text-xs text-muted-foreground shrink-0">
+                    {t(`device_scan.type_${device.device_type.toLowerCase()}`)}
+                  </span>
+                )}
               </div>
             ))}
           </div>

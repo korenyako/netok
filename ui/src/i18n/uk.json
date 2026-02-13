@@ -294,6 +294,24 @@
       }
     }
   },
+  "device_scan": {
+    "title": "Пристрої",
+    "scanning": "Сканування мережі...",
+    "no_devices": "Пристрої не знайдені",
+    "found": "Знайдено пристроїв: {{count}}",
+    "unknown_device": "Невідомий пристрій",
+    "badge_router": "Маршрутизатор",
+    "badge_this_device": "Цей пристрій",
+    "type_router": "Маршрутизатор",
+    "type_phone": "Телефон",
+    "type_computer": "Комп'ютер",
+    "type_tablet": "Планшет",
+    "type_printer": "Принтер",
+    "type_smarttv": "Телевізор",
+    "type_gameconsole": "Консоль",
+    "type_iot": "IoT",
+    "type_unknown": ""
+  },
   "lang": {
     "system": "Системна",
     "en": "Англійська",
