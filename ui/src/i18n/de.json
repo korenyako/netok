@@ -299,9 +299,12 @@
   "device_scan": {
     "title": "Geräte",
     "scanning": "Netzwerk wird gescannt...",
+    "stage_scanning": "Netzwerk wird gescannt...",
+    "stage_identifying": "Geräte werden identifiziert...",
     "no_devices": "Keine Geräte gefunden",
     "found": "{{count}} Geräte gefunden",
     "unknown_device": "Unbekanntes Gerät",
+      "private_address": "Private Adresse",
     "badge_router": "Router",
     "badge_this_device": "Dieses Gerät",
     "type_router": "Router",

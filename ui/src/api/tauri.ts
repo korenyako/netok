@@ -213,6 +213,7 @@ export interface NetworkDevice {
   device_type: DeviceType;
   is_gateway: boolean;
   is_self: boolean;
+  is_randomized: boolean;
 }
 
 export async function scanNetworkDevices(): Promise<NetworkDevice[]> {

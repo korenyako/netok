@@ -18,9 +18,9 @@ pub mod vpn;
 pub mod wifi;
 
 // Re-export commonly used functions
-pub use arp::get_router_mac;
+pub use arp::{get_router_mac, ping_sweep};
 pub use connection::detect_connection_type;
-pub use dns::{get_current_dns, set_dns};
+pub use dns::{get_current_dns, reverse_dns_lookup, set_dns};
 pub use gateway::get_default_gateway;
 pub use security::check_wifi_security;
 pub use wifi::get_wifi_info;

@@ -299,9 +299,12 @@
   "device_scan": {
     "title": "Cihazlar",
     "scanning": "Ağ taranıyor...",
+    "stage_scanning": "Ağ taranıyor...",
+    "stage_identifying": "Cihazlar tanımlanıyor...",
     "no_devices": "Cihaz bulunamadı",
     "found": "{{count}} cihaz bulundu",
     "unknown_device": "Bilinmeyen cihaz",
+      "private_address": "Özel adres",
     "badge_router": "Yönlendirici",
     "badge_this_device": "Bu cihaz",
     "type_router": "Yönlendirici",

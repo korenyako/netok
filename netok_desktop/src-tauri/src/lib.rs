@@ -232,8 +232,11 @@ async fn check_internet() -> Result<SingleNodeResult, String> {
 // ==================== Device Scan ====================
 
 #[tauri::command]
-async fn scan_network_devices() -> Result<Vec<netok_bridge::NetworkDevice>, String> {
-    netok_bridge::scan_network_devices().await
+async fn scan_network_devices(app: tauri::AppHandle) -> Result<Vec<netok_bridge::NetworkDevice>, String> {
+    netok_bridge::scan_network_devices_with_progress(move |stage| {
+        let _ = app.emit("scan-progress", stage);
+    })
+    .await
 }
 
 // ==================== WiFi Security ====================

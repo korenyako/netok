@@ -15,6 +15,7 @@
 //! All types and functions are re-exported at the crate root for backward compatibility.
 //! Consumers can use `netok_core::*` without knowing the internal module structure.
 
+mod brand_mapping;
 mod diagnostics;
 mod domain;
 mod infrastructure;
@@ -31,7 +32,8 @@ pub use domain::{
 pub use diagnostics::{
     check_computer, check_internet, check_network, check_router, detect_dns_provider,
     get_computer_info, get_internet_info, get_network_info, get_router_info, lookup_ip_location,
-    run_diagnostics, scan_network_devices, test_dns_server, IpInfoResponse,
+    run_diagnostics, scan_network_devices, scan_network_devices_with_progress, test_dns_server,
+    IpInfoResponse,
 };
 
 // Re-export infrastructure functions used by bridge

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { listen } from '@tauri-apps/api/event';
 import { ArrowLeft, Loader2, RotateCw } from '../components/icons/UIIcons';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -130,11 +131,21 @@ export function DeviceScanScreen({ onBack }: DeviceScanScreenProps) {
   const { t } = useTranslation();
   const [devices, setDevices] = useState<NetworkDevice[]>([]);
   const [loading, setLoading] = useState(false);
+  const [scanStage, setScanStage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Listen for scan progress events from backend
+  useEffect(() => {
+    const unlisten = listen<string>('scan-progress', (event) => {
+      setScanStage(event.payload);
+    });
+    return () => { unlisten.then((f) => f()); };
+  }, []);
 
   const doScan = useCallback(async () => {
     setLoading(true);
     setError(null);
+    setScanStage(null);
     try {
       const result = await scanNetworkDevices();
       setDevices(result);
@@ -142,6 +153,7 @@ export function DeviceScanScreen({ onBack }: DeviceScanScreenProps) {
       setError(String(e));
     } finally {
       setLoading(false);
+      setScanStage(null);
     }
   }, []);
 
@@ -175,7 +187,11 @@ export function DeviceScanScreen({ onBack }: DeviceScanScreenProps) {
         {loading && devices.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16 gap-3">
             <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">{t('device_scan.scanning')}</p>
+            <p className="text-sm text-muted-foreground">
+              {scanStage === 'identifying'
+                ? t('device_scan.stage_identifying')
+                : t('device_scan.stage_scanning')}
+            </p>
           </div>
         )}
 
@@ -210,7 +226,7 @@ export function DeviceScanScreen({ onBack }: DeviceScanScreenProps) {
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                     <span className="text-sm font-medium text-foreground">
-                      {device.vendor ?? t('device_scan.unknown_device')}
+                      {device.vendor ?? (device.is_randomized ? t('device_scan.private_address') : t('device_scan.unknown_device'))}
                     </span>
                     {device.is_gateway && (
                       <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-blue-500/15 text-blue-500 shrink-0">
@@ -223,6 +239,11 @@ export function DeviceScanScreen({ onBack }: DeviceScanScreenProps) {
                       </span>
                     )}
                   </div>
+                  {device.hostname && (
+                    <p className="text-xs text-muted-foreground truncate">
+                      {device.hostname}
+                    </p>
+                  )}
                   <span className="text-xs text-muted-foreground mt-0.5">
                     {device.ip}
                   </span>

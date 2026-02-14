@@ -299,9 +299,12 @@
   "device_scan": {
     "title": "Устройства",
     "scanning": "Сканирование сети...",
+    "stage_scanning": "Сканирование сети...",
+    "stage_identifying": "Определение устройств...",
     "no_devices": "Устройства не найдены",
     "found": "Найдено устройств: {{count}}",
     "unknown_device": "Неизвестное устройство",
+      "private_address": "Частный адрес",
     "badge_router": "Роутер",
     "badge_this_device": "Это устройство",
     "type_router": "Роутер",

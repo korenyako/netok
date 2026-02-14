@@ -652,37 +652,104 @@ fn classify_vendor(vendor: &str, is_gateway: bool) -> DeviceType {
     DeviceType::Unknown
 }
 
+/// Check if a MAC address is a Locally Administered Address (randomized/private).
+///
+/// Modern iOS and Android devices use randomized MACs for privacy.
+/// The second hex character of the MAC is 2, 6, A, or E when the
+/// "locally administered" bit (bit 1 of first octet) is set.
+fn is_randomized_mac(mac: &str) -> bool {
+    let clean = mac.replace([':', '-'], "").to_uppercase();
+    if clean.len() < 2 {
+        return false;
+    }
+    matches!(clean.as_bytes().get(1), Some(b'2' | b'6' | b'A' | b'E'))
+}
+
 /// Scan the local network by reading the ARP table and classifying devices.
 pub fn scan_network_devices() -> Vec<NetworkDevice> {
+    scan_network_devices_with_progress(None)
+}
+
+/// Scan the local network with optional progress reporting.
+///
+/// Progress callback receives stage names: "scanning", "identifying".
+pub fn scan_network_devices_with_progress(
+    on_progress: Option<Box<dyn Fn(&str) + Send + Sync>>,
+) -> Vec<NetworkDevice> {
+    use crate::brand_mapping::map_vendor_to_brand;
+    use crate::infrastructure::{ping_sweep, reverse_dns_lookup};
+
+    let progress = |stage: &str| {
+        if let Some(ref cb) = on_progress {
+            cb(stage);
+        }
+    };
+
     let gateway_ip = get_default_gateway();
     let computer_info = get_computer_info();
     let local_ip = computer_info.local_ip.clone();
 
+    // Phase 0: Ping sweep to populate ARP table with all reachable devices
+    progress("scanning");
+    if let Some(ref gw) = gateway_ip {
+        ping_sweep(gw);
+    }
+
+    // Phase 1: Read ARP table + OUI + classification
+    progress("identifying");
     let entries = get_all_arp_entries();
 
+    // Phase 1: Build devices with OUI lookup, classification, and brand mapping
     let mut devices: Vec<NetworkDevice> = entries
         .into_iter()
         .map(|entry| {
             let is_gateway = gateway_ip.as_deref() == Some(&entry.ip);
             let is_self = local_ip.as_deref() == Some(&entry.ip);
-            let vendor = lookup_vendor_by_mac(&entry.mac);
-            let device_type = match &vendor {
+            let is_randomized = is_randomized_mac(&entry.mac);
+
+            // Skip OUI lookup for randomized MACs (result would be meaningless)
+            let raw_vendor = if is_randomized {
+                None
+            } else {
+                lookup_vendor_by_mac(&entry.mac)
+            };
+
+            let device_type = match &raw_vendor {
                 Some(v) => classify_vendor(v, is_gateway),
                 None if is_gateway => DeviceType::Router,
                 None => DeviceType::Unknown,
             };
 
+            // Apply brand mapping to clean up vendor name for display
+            let vendor = raw_vendor.map(|v| map_vendor_to_brand(&v));
+
             NetworkDevice {
                 ip: entry.ip,
                 mac: entry.mac,
                 vendor,
-                hostname: None, // Future: mDNS
+                hostname: None,
                 device_type,
                 is_gateway,
                 is_self,
+                is_randomized,
             }
         })
         .collect();
+
+    // Phase 2: Parallel reverse DNS lookups for all devices
+    std::thread::scope(|s| {
+        let handles: Vec<_> = devices
+            .iter()
+            .map(|device| {
+                let ip = device.ip.clone();
+                s.spawn(move || reverse_dns_lookup(&ip, 500))
+            })
+            .collect();
+
+        for (device, handle) in devices.iter_mut().zip(handles) {
+            device.hostname = handle.join().ok().flatten();
+        }
+    });
 
     // Sort: gateway first, then self, then by IP
     devices.sort_by(|a, b| {
@@ -698,6 +765,24 @@ pub fn scan_network_devices() -> Vec<NetworkDevice> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_randomized_mac_detection() {
+        // Locally administered: second hex char is 2, 6, A, or E
+        assert!(is_randomized_mac("02:AA:BB:CC:DD:EE"));
+        assert!(is_randomized_mac("A6:11:22:33:44:55"));
+        assert!(is_randomized_mac("3A:00:00:00:00:00"));
+        assert!(is_randomized_mac("FE:12:34:56:78:9A"));
+
+        // Globally unique (real vendor MACs)
+        assert!(!is_randomized_mac("00:1A:2B:3C:4D:5E"));
+        assert!(!is_randomized_mac("AC:DE:48:00:11:22"));
+        assert!(!is_randomized_mac("40:ED:00:11:22:33"));
+
+        // Edge cases
+        assert!(!is_randomized_mac(""));
+        assert!(!is_randomized_mac("X"));
+    }
 
     #[test]
     fn test_private_ip_10_range() {

@@ -202,3 +202,28 @@ pub fn get_current_dns() -> Result<Vec<String>, String> {
 pub fn get_current_dns() -> Result<Vec<String>, String> {
     Err("DNS detection is only supported on Windows".to_string())
 }
+
+/// Perform a reverse DNS (PTR) lookup for an IP address.
+///
+/// Returns the hostname if found, or `None` on timeout/failure.
+/// Uses a short timeout to avoid blocking the network scan.
+pub fn reverse_dns_lookup(ip: &str, timeout_ms: u64) -> Option<String> {
+    use trust_dns_resolver::config::*;
+    use trust_dns_resolver::Resolver;
+
+    let ip_addr: std::net::IpAddr = ip.parse().ok()?;
+
+    let mut opts = ResolverOpts::default();
+    opts.timeout = std::time::Duration::from_millis(timeout_ms);
+    opts.attempts = 1;
+
+    let resolver = Resolver::new(ResolverConfig::default(), opts).ok()?;
+
+    let response = resolver.reverse_lookup(ip_addr).ok()?;
+
+    response.iter().next().map(|name| {
+        let s = name.to_string();
+        // Remove trailing dot from FQDN (e.g., "DESKTOP-ABC.local." → "DESKTOP-ABC.local")
+        s.trim_end_matches('.').to_string()
+    })
+}

@@ -535,6 +535,22 @@ pub async fn scan_network_devices() -> Result<Vec<NetworkDevice>, String> {
         .map_err(|e| format!("Failed to run network scan task: {}", e))
 }
 
+/// Scan the local network with progress reporting via callback.
+///
+/// The callback receives stage names: "scanning" (ping sweep), "identifying" (ARP + OUI + DNS).
+pub async fn scan_network_devices_with_progress<F>(
+    on_progress: F,
+) -> Result<Vec<NetworkDevice>, String>
+where
+    F: Fn(&str) + Send + Sync + 'static,
+{
+    tokio::task::spawn_blocking(move || {
+        netok_core::scan_network_devices_with_progress(Some(Box::new(on_progress)))
+    })
+    .await
+    .map_err(|e| format!("Failed to run network scan task: {}", e))
+}
+
 // ==================== WiFi Security ====================
 
 // Re-export security types

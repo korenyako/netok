@@ -77,6 +77,7 @@ Generated: 2026-02-14
 │   │       ├── .cursorrules
 │   │       ├── .gitattributes
 │   │       ├── .gitignore
+│   │       ├── Cargo.lock
 │   │       ├── Cargo.toml
 │   │       ├── CLAUDE.md
 │   │       ├── CONTRIBUTING.md
@@ -84,6 +85,7 @@ Generated: 2026-02-14
 │   │       ├── etsy-hover-effects-fixed.html
 │   │       ├── LICENSE.Apache-2.0
 │   │       ├── LICENSE.Proprietary
+│   │       ├── nul
 │   │       ├── package-lock.json
 │   │       ├── package.json
 │   │       ├── PROJECT_CONTEXT.md
@@ -149,7 +151,9 @@ Generated: 2026-02-14
 │   │   │   ├── dns.rs
 │   │   │   ├── gateway.rs
 │   │   │   ├── mod.rs
+│   │   │   ├── security.rs
 │   │   │   └── wifi.rs
+│   │   ├── brand_mapping.rs
 │   │   ├── diagnostics.rs
 │   │   ├── domain.rs
 │   │   ├── lib.rs
@@ -214,7 +218,8 @@ Generated: 2026-02-14
 │   └── vite.config.ts
 ├── scripts
 │   ├── generate_oui_database.py
-│   └── generate_project_map.mjs
+│   ├── generate_project_map.mjs
+│   └── process_manuf.py
 ├── ui
 │   ├── public
 │   │   └── vite.svg
@@ -294,7 +299,8 @@ Generated: 2026-02-14
 │   │   │   ├── StatusScreen.tsx
 │   │   │   ├── ThemeSettingsScreen.tsx
 │   │   │   ├── ToolsScreen.tsx
-│   │   │   └── VpnTunnelScreen.tsx
+│   │   │   ├── VpnTunnelScreen.tsx
+│   │   │   └── WiFiSecurityScreen.tsx
 │   │   ├── store
 │   │   ├── stores
 │   │   │   ├── closeBehaviorStore.ts
@@ -349,6 +355,7 @@ Generated: 2026-02-14
 ├── etsy-hover-effects-fixed.html
 ├── LICENSE.Apache-2.0
 ├── LICENSE.Proprietary
+├── manuf.txt
 ├── netok-protection-hub.jsx
 ├── netok-status.jsx
 ├── netok-wifi-security-plan.md

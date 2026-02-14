@@ -267,6 +267,7 @@ pub struct NetworkDevice {
     pub device_type: DeviceType,
     pub is_gateway: bool,
     pub is_self: bool,
+    pub is_randomized: bool,
 }
 
 /// Application settings.

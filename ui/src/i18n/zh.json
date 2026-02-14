@@ -299,9 +299,12 @@
   "device_scan": {
     "title": "设备",
     "scanning": "正在扫描网络...",
+    "stage_scanning": "正在扫描网络...",
+    "stage_identifying": "正在识别设备...",
     "no_devices": "未找到设备",
     "found": "找到 {{count}} 台设备",
     "unknown_device": "未知设备",
+      "private_address": "私有地址",
     "badge_router": "路由器",
     "badge_this_device": "本机",
     "type_router": "路由器",

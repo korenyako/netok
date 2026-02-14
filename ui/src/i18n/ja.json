@@ -299,9 +299,12 @@
   "device_scan": {
     "title": "デバイス",
     "scanning": "ネットワークをスキャン中...",
+    "stage_scanning": "ネットワークをスキャン中...",
+    "stage_identifying": "デバイスを識別中...",
     "no_devices": "デバイスが見つかりません",
     "found": "{{count}} 台のデバイスが見つかりました",
     "unknown_device": "不明なデバイス",
+      "private_address": "プライベートアドレス",
     "badge_router": "ルーター",
     "badge_this_device": "このデバイス",
     "type_router": "ルーター",

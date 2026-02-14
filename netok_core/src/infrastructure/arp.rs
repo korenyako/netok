@@ -104,6 +104,69 @@ fn format_mac(raw: &str) -> Option<String> {
     }
 }
 
+/// Extract subnet prefix from a gateway IP (e.g., "192.168.1.1" → "192.168.1").
+fn subnet_prefix(gateway_ip: &str) -> Option<String> {
+    let parts: Vec<&str> = gateway_ip.split('.').collect();
+    if parts.len() == 4 {
+        Some(format!("{}.{}.{}", parts[0], parts[1], parts[2]))
+    } else {
+        None
+    }
+}
+
+/// Ping sweep: ping all IPs in the /24 subnet to populate the ARP table.
+///
+/// Uses parallel system `ping` commands (no admin rights needed).
+/// Each ping has a 200ms timeout, run in batches of 20 threads.
+/// Total time: ~3-5 seconds for a /24 subnet.
+#[cfg(target_os = "windows")]
+pub fn ping_sweep(gateway_ip: &str) {
+    use std::process::Command;
+
+    let prefix = match subnet_prefix(gateway_ip) {
+        Some(p) => p,
+        None => return,
+    };
+
+    // Ping all 254 hosts in parallel using thread::scope
+    std::thread::scope(|s| {
+        let batch_size = 20;
+        for chunk_start in (1..=254).step_by(batch_size) {
+            let chunk_end = (chunk_start + batch_size).min(255);
+            let handles: Vec<_> = (chunk_start..chunk_end)
+                .map(|i| {
+                    let ip = format!("{}.{}", prefix, i);
+                    s.spawn(move || {
+                        // -n 1: single ping, -w 200: 200ms timeout
+                        #[cfg(target_os = "windows")]
+                        use std::os::windows::process::CommandExt;
+
+                        let mut cmd = Command::new("ping");
+                        cmd.args(["-n", "1", "-w", "200", &ip]);
+
+                        // Hide console windows for ping processes
+                        #[cfg(target_os = "windows")]
+                        cmd.creation_flags(0x08000000); // CREATE_NO_WINDOW
+
+                        let _ = cmd.output();
+                    })
+                })
+                .collect();
+
+            for handle in handles {
+                let _ = handle.join();
+            }
+        }
+    });
+}
+
+#[cfg(not(target_os = "windows"))]
+pub fn ping_sweep(_gateway_ip: &str) {
+    // TODO: Implement for Linux/macOS
+    // Linux: ping -c 1 -W 1 <ip>
+    // macOS: ping -c 1 -t 1 <ip>
+}
+
 /// Get all reachable entries from the ARP table (IPv4 only).
 #[cfg(target_os = "windows")]
 pub fn get_all_arp_entries() -> Vec<ArpEntry> {

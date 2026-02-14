@@ -299,9 +299,12 @@
   "device_scan": {
     "title": "دستگاه‌ها",
     "scanning": "در حال اسکن شبکه...",
+    "stage_scanning": "در حال اسکن شبکه...",
+    "stage_identifying": "در حال شناسایی دستگاه‌ها...",
     "no_devices": "دستگاهی یافت نشد",
     "found": "{{count}} دستگاه یافت شد",
     "unknown_device": "دستگاه ناشناس",
+      "private_address": "آدرس خصوصی",
     "badge_router": "روتر",
     "badge_this_device": "این دستگاه",
     "type_router": "روتر",

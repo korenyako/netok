@@ -299,9 +299,12 @@
   "device_scan": {
     "title": "Пристрої",
     "scanning": "Сканування мережі...",
+    "stage_scanning": "Сканування мережі...",
+    "stage_identifying": "Визначення пристроїв...",
     "no_devices": "Пристрої не знайдені",
     "found": "Знайдено пристроїв: {{count}}",
     "unknown_device": "Невідомий пристрій",
+      "private_address": "Приватна адреса",
     "badge_router": "Маршрутизатор",
     "badge_this_device": "Цей пристрій",
     "type_router": "Маршрутизатор",
