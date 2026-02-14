@@ -122,8 +122,12 @@ pub fn check_encryption() -> SecurityCheck {
             details: Some("not_connected".to_string()),
         };
 
+        // InterfaceInfo is a C flexible array member declared as [T; 1]
+        // in Windows bindings. We must use raw pointer arithmetic instead
+        // of Rust array indexing to avoid out-of-bounds panics.
+        let interface_ptr = list.InterfaceInfo.as_ptr();
         for i in 0..list.dwNumberOfItems as usize {
-            let interface = &list.InterfaceInfo[i];
+            let interface = &*interface_ptr.add(i);
             if interface.isState != wlan_interface_state_connected {
                 continue;
             }
@@ -263,8 +267,10 @@ pub fn check_evil_twin() -> SecurityCheck {
             details: None,
         };
 
+        // InterfaceInfo is a C flexible array member — use raw pointer arithmetic.
+        let interface_ptr = list.InterfaceInfo.as_ptr();
         for i in 0..list.dwNumberOfItems as usize {
-            let interface = &list.InterfaceInfo[i];
+            let interface = &*interface_ptr.add(i);
             if interface.isState != wlan_interface_state_connected {
                 continue;
             }
@@ -338,8 +344,10 @@ pub fn check_evil_twin() -> SecurityCheck {
             let mut has_encrypted = false;
             let mut has_open = false;
 
+            // wlanBssEntries is a C flexible array member — use raw pointer arithmetic.
+            let bss_entry_ptr = bss_list.wlanBssEntries.as_ptr();
             for j in 0..bss_list.dwNumberOfItems as usize {
-                let entry = &bss_list.wlanBssEntries[j];
+                let entry = &*bss_entry_ptr.add(j);
 
                 let entry_ssid_len = entry.dot11Ssid.uSSIDLength as usize;
                 if entry_ssid_len == 0 || entry_ssid_len > 32 {
@@ -587,20 +595,28 @@ fn parse_dns_response(data: &[u8]) -> Vec<String> {
     // Skip header (12 bytes) and question section
     let mut pos = 12;
 
-    // Skip question section
-    while pos < data.len() {
+    // Skip question section (QNAME + QTYPE + QCLASS)
+    loop {
+        if pos >= data.len() {
+            return ips;
+        }
         let b = data[pos];
         if b == 0 {
             pos += 1;
             break;
         }
         if (b & 0xC0) == 0xC0 {
+            // Compression pointer — 2 bytes
             pos += 2;
             break;
         }
-        pos += 1 + b as usize;
+        let label_len = b as usize;
+        pos += 1 + label_len;
     }
-    // Skip QTYPE and QCLASS
+    // Skip QTYPE (2) and QCLASS (2)
+    if pos + 4 > data.len() {
+        return ips;
+    }
     pos += 4;
 
     // Parse answers
@@ -609,14 +625,38 @@ fn parse_dns_response(data: &[u8]) -> Vec<String> {
             break;
         }
 
-        // Name (may be a pointer)
+        // Name (may be a compression pointer)
+        if pos >= data.len() {
+            break;
+        }
         if (data[pos] & 0xC0) == 0xC0 {
+            // Compression pointer — 2 bytes
+            if pos + 2 > data.len() {
+                break;
+            }
             pos += 2;
         } else {
-            while pos < data.len() && data[pos] != 0 {
-                pos += 1 + data[pos] as usize;
+            // Walk labels until null terminator
+            loop {
+                if pos >= data.len() {
+                    break;
+                }
+                let b = data[pos];
+                if b == 0 {
+                    pos += 1;
+                    break;
+                }
+                if (b & 0xC0) == 0xC0 {
+                    // Compression pointer inside name
+                    if pos + 2 > data.len() {
+                        break;
+                    }
+                    pos += 2;
+                    break;
+                }
+                let label_len = b as usize;
+                pos += 1 + label_len;
             }
-            pos += 1;
         }
 
         if pos + 10 > data.len() {
