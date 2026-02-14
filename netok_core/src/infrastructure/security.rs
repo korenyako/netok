@@ -76,6 +76,7 @@ impl std::fmt::Display for EncryptionType {
 /// Check Wi-Fi encryption type on Windows.
 #[cfg(target_os = "windows")]
 pub fn check_encryption() -> SecurityCheck {
+    let start = std::time::Instant::now();
     use std::ptr;
     use windows::Win32::Foundation::*;
     use windows::Win32::NetworkManagement::WiFi::*;
@@ -201,6 +202,11 @@ pub fn check_encryption() -> SecurityCheck {
         }
 
         WlanFreeMemory(interface_list as *const core::ffi::c_void);
+        println!(
+            "[security] check_encryption: {:?} in {:.1}ms",
+            check_result.status,
+            start.elapsed().as_secs_f64() * 1000.0
+        );
         check_result
     }
 }
@@ -221,6 +227,7 @@ pub fn check_encryption() -> SecurityCheck {
 /// but one is Open while others are encrypted.
 #[cfg(target_os = "windows")]
 pub fn check_evil_twin() -> SecurityCheck {
+    let start = std::time::Instant::now();
     use std::ptr;
     use windows::Win32::Foundation::*;
     use windows::Win32::NetworkManagement::WiFi::*;
@@ -266,6 +273,7 @@ pub fn check_evil_twin() -> SecurityCheck {
             status: SecurityStatus::Safe,
             details: None,
         };
+        let mut bss_scanned: u32 = 0;
 
         // InterfaceInfo is a C flexible array member — use raw pointer arithmetic.
         let interface_ptr = list.InterfaceInfo.as_ptr();
@@ -375,6 +383,7 @@ pub fn check_evil_twin() -> SecurityCheck {
                 }
             }
 
+            bss_scanned = bss_list.dwNumberOfItems;
             WlanFreeMemory(bss_list_ptr as *const core::ffi::c_void);
 
             // Suspicious: same SSID has both open and encrypted APs
@@ -390,6 +399,12 @@ pub fn check_evil_twin() -> SecurityCheck {
         }
 
         WlanFreeMemory(interface_list as *const core::ffi::c_void);
+        println!(
+            "[security] check_evil_twin: {:?} (scanned {} BSSIDs) in {:.1}ms",
+            check_result.status,
+            bss_scanned,
+            start.elapsed().as_secs_f64() * 1000.0
+        );
         check_result
     }
 }
@@ -407,6 +422,7 @@ pub fn check_evil_twin() -> SecurityCheck {
 
 /// Check for ARP spoofing by looking for duplicate MACs in the ARP table.
 pub fn check_arp_spoofing() -> SecurityCheck {
+    let start = std::time::Instant::now();
     use super::arp::get_all_arp_entries;
     use super::gateway::get_default_gateway;
     use std::collections::HashMap;
@@ -414,7 +430,13 @@ pub fn check_arp_spoofing() -> SecurityCheck {
     let gateway_ip = get_default_gateway();
     let entries = get_all_arp_entries();
 
+    let entry_count = entries.len();
+
     if entries.is_empty() {
+        println!(
+            "[security] check_arp_spoofing: Safe (empty ARP table) in {:.1}ms",
+            start.elapsed().as_secs_f64() * 1000.0
+        );
         return SecurityCheck {
             check_type: SecurityCheckType::ArpSpoofing,
             status: SecurityStatus::Safe,
@@ -448,42 +470,74 @@ pub fn check_arp_spoofing() -> SecurityCheck {
         let gateway_involved = ips.iter().any(|ip| ip == gateway_ip_str);
 
         if gateway_involved {
-            return SecurityCheck {
+            let r = SecurityCheck {
                 check_type: SecurityCheckType::ArpSpoofing,
                 status: SecurityStatus::Danger,
                 details: Some(format!("gateway_mac_duplicate:{}", mac)),
             };
+            println!(
+                "[security] check_arp_spoofing: Danger (gateway MAC dup: {}) ({} entries) in {:.1}ms",
+                mac, entry_count, start.elapsed().as_secs_f64() * 1000.0
+            );
+            return r;
         }
 
         // Other duplicates are suspicious but not critical
-        return SecurityCheck {
+        let r = SecurityCheck {
             check_type: SecurityCheckType::ArpSpoofing,
             status: SecurityStatus::Warning,
             details: Some(format!("mac_duplicate:{}", mac)),
         };
+        println!(
+            "[security] check_arp_spoofing: Warning (MAC dup: {}) ({} entries) in {:.1}ms",
+            mac, entry_count, start.elapsed().as_secs_f64() * 1000.0
+        );
+        return r;
     }
 
-    SecurityCheck {
+    let result = SecurityCheck {
         check_type: SecurityCheckType::ArpSpoofing,
         status: SecurityStatus::Safe,
         details: None,
-    }
+    };
+    println!(
+        "[security] check_arp_spoofing: {:?} ({} ARP entries, gateway={:?}) in {:.1}ms",
+        result.status,
+        entry_count,
+        gateway_ip,
+        start.elapsed().as_secs_f64() * 1000.0
+    );
+    result
 }
 
 // ==================== DNS Hijacking Detection ====================
 
 /// Check for DNS hijacking by comparing system DNS response with a trusted DNS.
 pub fn check_dns_hijacking() -> SecurityCheck {
+    let start = std::time::Instant::now();
     let test_domain = "example.com";
 
     // Resolve via system DNS
+    let t0 = std::time::Instant::now();
     let system_ips = resolve_domain_system(test_domain);
+    let system_ms = t0.elapsed().as_secs_f64() * 1000.0;
 
     // Resolve via trusted DNS (1.1.1.1)
+    let t1 = std::time::Instant::now();
     let trusted_ips = resolve_domain_direct(test_domain, "1.1.1.1:53");
+    let trusted_ms = t1.elapsed().as_secs_f64() * 1000.0;
+
+    println!(
+        "[security] check_dns_hijacking: system DNS -> {:?} ({:.1}ms), trusted DNS -> {:?} ({:.1}ms)",
+        system_ips, system_ms, trusted_ips, trusted_ms
+    );
 
     // If either fails, we can't determine — report safe to avoid false positives
     if system_ips.is_empty() || trusted_ips.is_empty() {
+        println!(
+            "[security] check_dns_hijacking: Safe (dns_check_failed) in {:.1}ms",
+            start.elapsed().as_secs_f64() * 1000.0
+        );
         return SecurityCheck {
             check_type: SecurityCheckType::DnsHijacking,
             status: SecurityStatus::Safe,
@@ -494,7 +548,7 @@ pub fn check_dns_hijacking() -> SecurityCheck {
     // Compare: if system DNS returns completely different IPs, it's suspicious
     let has_overlap = system_ips.iter().any(|ip| trusted_ips.contains(ip));
 
-    if has_overlap {
+    let result = if has_overlap {
         SecurityCheck {
             check_type: SecurityCheckType::DnsHijacking,
             status: SecurityStatus::Safe,
@@ -510,7 +564,13 @@ pub fn check_dns_hijacking() -> SecurityCheck {
                 trusted_ips.join(",")
             )),
         }
-    }
+    };
+    println!(
+        "[security] check_dns_hijacking: {:?} in {:.1}ms",
+        result.status,
+        start.elapsed().as_secs_f64() * 1000.0
+    );
+    result
 }
 
 /// Resolve a domain using the system's default DNS.
@@ -699,16 +759,21 @@ fn get_current_ssid() -> Option<String> {
 
 /// Run all 4 security checks and produce a report.
 pub fn check_wifi_security() -> WiFiSecurityReport {
+    let total_start = std::time::Instant::now();
+    println!("[security] ===== Starting WiFi security scan =====");
+
     let ssid = get_current_ssid();
+    println!("[security] Network SSID: {:?}", ssid);
+
     let timestamp = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .map(|d| d.as_secs())
         .unwrap_or(0);
 
     let encryption = check_encryption();
+    let evil_twin = check_evil_twin();
     let arp = check_arp_spoofing();
     let dns = check_dns_hijacking();
-    let evil_twin = check_evil_twin();
 
     let checks = vec![encryption, evil_twin, arp, dns];
 
@@ -722,6 +787,12 @@ pub fn check_wifi_security() -> WiFiSecurityReport {
             SecurityStatus::Danger => 2,
         })
         .unwrap_or(SecurityStatus::Safe);
+
+    println!(
+        "[security] ===== Scan complete: {:?} in {:.1}ms =====",
+        overall_status,
+        total_start.elapsed().as_secs_f64() * 1000.0
+    );
 
     WiFiSecurityReport {
         checks,
