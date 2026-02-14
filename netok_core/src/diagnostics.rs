@@ -3,9 +3,9 @@
 //! This module combines infrastructure calls to produce domain objects,
 //! implementing the core diagnostic logic.
 
+use serde::Deserialize;
 use std::time::{Duration, Instant};
 use time::OffsetDateTime;
-use serde::Deserialize;
 
 use crate::domain::{
     ComputerInfo, ConnectionType, DeviceType, DiagnosticsSnapshot, DnsProvider, InternetInfo,
@@ -43,9 +43,9 @@ fn test_dns() -> bool {
 /// Test if a specific DNS server is reachable by trying to resolve a domain.
 /// Returns Ok(true) if server responds, Ok(false) if timeout, Err on invalid IP.
 pub fn test_dns_server(server_ip: &str, timeout_secs: u64) -> Result<bool, String> {
+    use std::net::IpAddr;
     use trust_dns_resolver::config::*;
     use trust_dns_resolver::Resolver;
-    use std::net::IpAddr;
 
     use std::net::{Ipv4Addr, Ipv6Addr};
 
@@ -61,8 +61,14 @@ pub fn test_dns_server(server_ip: &str, timeout_secs: u64) -> Result<bool, Strin
 
     // Bind to matching address family — IPv6 server needs an IPv6 socket
     let bind_addr = match ip {
-        IpAddr::V4(_) => Some(std::net::SocketAddr::new(IpAddr::V4(Ipv4Addr::UNSPECIFIED), 0)),
-        IpAddr::V6(_) => Some(std::net::SocketAddr::new(IpAddr::V6(Ipv6Addr::UNSPECIFIED), 0)),
+        IpAddr::V4(_) => Some(std::net::SocketAddr::new(
+            IpAddr::V4(Ipv4Addr::UNSPECIFIED),
+            0,
+        )),
+        IpAddr::V6(_) => Some(std::net::SocketAddr::new(
+            IpAddr::V6(Ipv6Addr::UNSPECIFIED),
+            0,
+        )),
     };
 
     let name_server = NameServerConfig {
@@ -75,8 +81,8 @@ pub fn test_dns_server(server_ip: &str, timeout_secs: u64) -> Result<bool, Strin
 
     let config = ResolverConfig::from_parts(None, vec![], vec![name_server]);
 
-    let resolver = Resolver::new(config, opts)
-        .map_err(|e| format!("Failed to create resolver: {}", e))?;
+    let resolver =
+        Resolver::new(config, opts).map_err(|e| format!("Failed to create resolver: {}", e))?;
 
     // Try to resolve google.com - a domain that should always exist
     Ok(resolver.lookup_ip("google.com").is_ok())
@@ -286,7 +292,9 @@ pub fn get_router_info() -> RouterInfo {
     let gateway_mac = gateway_ip.as_ref().and_then(|ip| get_router_mac(ip));
 
     // Try to lookup vendor if we have MAC address
-    let vendor = gateway_mac.as_ref().and_then(|mac| lookup_vendor_by_mac(mac));
+    let vendor = gateway_mac
+        .as_ref()
+        .and_then(|mac| lookup_vendor_by_mac(mac));
 
     RouterInfo {
         gateway_ip,
@@ -521,8 +529,20 @@ fn classify_vendor(vendor: &str, is_gateway: bool) -> DeviceType {
 
     // Router vendors — only if this is the gateway
     const ROUTER_VENDORS: &[&str] = &[
-        "tp-link", "asus", "asustek", "netgear", "d-link", "huawei", "zyxel", "mikrotik",
-        "ubiquiti", "linksys", "tenda", "xiaomi comm", "mercury", "keenetic",
+        "tp-link",
+        "asus",
+        "asustek",
+        "netgear",
+        "d-link",
+        "huawei",
+        "zyxel",
+        "mikrotik",
+        "ubiquiti",
+        "linksys",
+        "tenda",
+        "xiaomi comm",
+        "mercury",
+        "keenetic",
     ];
     if is_gateway {
         for rv in ROUTER_VENDORS {
@@ -543,9 +563,7 @@ fn classify_vendor(vendor: &str, is_gateway: bool) -> DeviceType {
     }
 
     // Smart TVs
-    const TV_VENDORS: &[&str] = &[
-        "lg electronics", "tcl", "hisense", "roku", "vizio", "sharp",
-    ];
+    const TV_VENDORS: &[&str] = &["lg electronics", "tcl", "hisense", "roku", "vizio", "sharp"];
     for tv in TV_VENDORS {
         if v.contains(tv) {
             return DeviceType::SmartTv;
@@ -562,8 +580,20 @@ fn classify_vendor(vendor: &str, is_gateway: bool) -> DeviceType {
 
     // Computers
     const COMPUTER_VENDORS: &[&str] = &[
-        "intel", "dell", "lenovo", "microsoft", "acer", "asus", "asustek", "msi", "gigabyte",
-        "realtek", "qualcomm", "broadcom", "ralink", "mediatek",
+        "intel",
+        "dell",
+        "lenovo",
+        "microsoft",
+        "acer",
+        "asus",
+        "asustek",
+        "msi",
+        "gigabyte",
+        "realtek",
+        "qualcomm",
+        "broadcom",
+        "ralink",
+        "mediatek",
     ];
     for cv in COMPUTER_VENDORS {
         if v.contains(cv) {
@@ -573,8 +603,19 @@ fn classify_vendor(vendor: &str, is_gateway: bool) -> DeviceType {
 
     // Phones / tablets (hard to distinguish without mDNS)
     const PHONE_VENDORS: &[&str] = &[
-        "apple", "samsung", "xiaomi", "google", "oneplus", "oppo", "vivo", "huawei",
-        "motorola", "sony mobile", "nokia", "realme", "honor",
+        "apple",
+        "samsung",
+        "xiaomi",
+        "google",
+        "oneplus",
+        "oppo",
+        "vivo",
+        "huawei",
+        "motorola",
+        "sony mobile",
+        "nokia",
+        "realme",
+        "honor",
     ];
     for pv in PHONE_VENDORS {
         if v.contains(pv) {
@@ -584,7 +625,14 @@ fn classify_vendor(vendor: &str, is_gateway: bool) -> DeviceType {
 
     // IoT — router vendors not at gateway, plus smart home
     const IOT_VENDORS: &[&str] = &[
-        "espressif", "tuya", "sonoff", "shelly", "amazon", "nest", "ring", "ecobee",
+        "espressif",
+        "tuya",
+        "sonoff",
+        "shelly",
+        "amazon",
+        "nest",
+        "ring",
+        "ecobee",
     ];
     for iv in IOT_VENDORS {
         if v.contains(iv) {

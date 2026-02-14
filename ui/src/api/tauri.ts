@@ -218,3 +218,24 @@ export interface NetworkDevice {
 export async function scanNetworkDevices(): Promise<NetworkDevice[]> {
   return await invoke<NetworkDevice[]>('scan_network_devices');
 }
+
+// WiFi Security types
+export type SecurityStatus = 'safe' | 'warning' | 'danger';
+export type SecurityCheckType = 'encryption' | 'evil_twin' | 'arp_spoofing' | 'dns_hijacking';
+
+export interface SecurityCheck {
+  check_type: SecurityCheckType;
+  status: SecurityStatus;
+  details: string | null;
+}
+
+export interface WiFiSecurityReport {
+  checks: SecurityCheck[];
+  overall_status: SecurityStatus;
+  network_ssid: string | null;
+  timestamp: number;
+}
+
+export async function checkWifiSecurity(): Promise<WiFiSecurityReport> {
+  return await invoke<WiFiSecurityReport>('check_wifi_security');
+}

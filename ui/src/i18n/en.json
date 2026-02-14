@@ -165,7 +165,9 @@
   "protection": {
     "title": "Protection",
     "dns_protection": "DNS",
-    "vpn_tunnel": "VPN"
+    "vpn_tunnel": "VPN",
+    "wifi_security": "Network Security",
+    "wifi_security_desc": "Check Wi-Fi for threats"
   },
   "vpn": {
     "title": "VPN",
@@ -311,6 +313,31 @@
     "type_gameconsole": "Console",
     "type_iot": "IoT",
     "type_unknown": ""
+  },
+  "wifi_security": {
+    "title": "Network Security",
+    "scanning": "Checking security...",
+    "network": "Network: {{ssid}}",
+    "overall_safe": "Network is secure",
+    "overall_warning": "Potential threats detected",
+    "overall_danger": "Threats detected",
+    "check_encryption": "Encryption",
+    "check_evil_twin": "Network authenticity",
+    "check_arp_spoofing": "Traffic interception",
+    "check_dns_hijacking": "DNS integrity",
+    "encryption_safe": "Protected with modern encryption",
+    "encryption_warning_wep": "Outdated WEP encryption — easily cracked",
+    "encryption_warning_wpa": "Outdated WPA encryption",
+    "encryption_danger": "Network is not encrypted. Your traffic can be intercepted by others nearby",
+    "evil_twin_safe": "No suspicious access points nearby",
+    "evil_twin_warning": "Suspicious copy of this network without encryption detected. Someone may be trying to intercept traffic",
+    "arp_safe": "No signs of traffic interception",
+    "arp_warning": "Suspicious activity in the network — possible traffic interception",
+    "arp_danger": "Traffic interception attempt detected. Do not enter passwords or open banking apps",
+    "dns_safe": "DNS is working correctly — websites open at real addresses",
+    "dns_warning": "This network may be spoofing website addresses. Enable DNS protection in Netok settings",
+    "recommend_dns": "Enable DNS protection",
+    "recommend_vpn": "Use VPN"
   },
   "lang": {
     "system": "System",

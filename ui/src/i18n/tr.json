@@ -165,7 +165,9 @@
   "protection": {
     "title": "Koruma",
     "dns_protection": "DNS",
-    "vpn_tunnel": "VPN"
+    "vpn_tunnel": "VPN",
+    "wifi_security": "Ağ Güvenliği",
+    "wifi_security_desc": "Wi-Fi tehditlerini kontrol et"
   },
   "vpn": {
     "title": "VPN",
@@ -311,6 +313,31 @@
     "type_gameconsole": "Konsol",
     "type_iot": "IoT",
     "type_unknown": ""
+  },
+  "wifi_security": {
+    "title": "Ağ Güvenliği",
+    "scanning": "Güvenlik kontrol ediliyor...",
+    "network": "Ağ: {{ssid}}",
+    "overall_safe": "Ağ güvenli",
+    "overall_warning": "Olası tehditler tespit edildi",
+    "overall_danger": "Tehditler tespit edildi",
+    "check_encryption": "Şifreleme",
+    "check_evil_twin": "Ağ özgünlüğü",
+    "check_arp_spoofing": "Trafik dinleme",
+    "check_dns_hijacking": "DNS bütünlüğü",
+    "encryption_safe": "Modern şifreleme ile korunuyor",
+    "encryption_warning_wep": "Eski WEP şifreleme — kolayca kırılır",
+    "encryption_warning_wpa": "Eski WPA şifreleme",
+    "encryption_danger": "Ağ şifrelenmemiş. Trafiğiniz yakınlardaki başkaları tarafından ele geçirilebilir",
+    "evil_twin_safe": "Yakınlarda şüpheli erişim noktası yok",
+    "evil_twin_warning": "Bu ağın şifrelemesiz şüpheli kopyası tespit edildi. Birisi trafiği ele geçirmeye çalışıyor olabilir",
+    "arp_safe": "Trafik dinleme belirtisi yok",
+    "arp_warning": "Ağda şüpheli etkinlik — olası trafik dinleme",
+    "arp_danger": "Trafik dinleme girişimi tespit edildi. Şifre girmeyin ve bankacılık uygulamalarını açmayın",
+    "dns_safe": "DNS doğru çalışıyor — siteler gerçek adreslerle açılıyor",
+    "dns_warning": "Bu ağ site adreslerini taklit ediyor olabilir. Netok ayarlarından DNS korumasını etkinleştirin",
+    "recommend_dns": "DNS korumasını etkinleştir",
+    "recommend_vpn": "VPN kullan"
   },
   "lang": {
     "system": "Sistem",

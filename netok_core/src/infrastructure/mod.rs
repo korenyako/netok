@@ -13,6 +13,7 @@ pub mod arp;
 pub mod connection;
 pub mod dns;
 pub mod gateway;
+pub mod security;
 pub mod vpn;
 pub mod wifi;
 
@@ -21,4 +22,5 @@ pub use arp::get_router_mac;
 pub use connection::detect_connection_type;
 pub use dns::{get_current_dns, set_dns};
 pub use gateway::get_default_gateway;
+pub use security::check_wifi_security;
 pub use wifi::get_wifi_info;

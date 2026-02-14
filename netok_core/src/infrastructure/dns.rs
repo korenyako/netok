@@ -117,7 +117,10 @@ pub fn set_dns(provider: DnsProvider) -> Result<(), String> {
                 }
 
                 // Set secondary IPv6 DNS if available and different from primary
-                if let Some(secondary_v6) = provider.secondary_ipv6().filter(|s| Some(s.clone()) != provider.primary_ipv6()) {
+                if let Some(secondary_v6) = provider
+                    .secondary_ipv6()
+                    .filter(|s| Some(s.clone()) != provider.primary_ipv6())
+                {
                     let output = Command::new("netsh")
                         .args([
                             "interface",

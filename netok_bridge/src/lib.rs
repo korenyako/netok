@@ -101,8 +101,7 @@ pub async fn run_diagnostics_struct() -> Result<Snapshot, anyhow::Error> {
 // ==================== Progressive Diagnostics Commands ====================
 
 pub async fn check_computer_node() -> Result<SingleNodeResult, anyhow::Error> {
-    let (node_info, computer) =
-        tokio::task::spawn_blocking(netok_core::check_computer).await?;
+    let (node_info, computer) = tokio::task::spawn_blocking(netok_core::check_computer).await?;
     Ok(SingleNodeResult {
         node: convert_node(&node_info),
         computer: Some(computer),
@@ -112,10 +111,11 @@ pub async fn check_computer_node() -> Result<SingleNodeResult, anyhow::Error> {
     })
 }
 
-pub async fn check_network_node(adapter: Option<String>) -> Result<SingleNodeResult, anyhow::Error> {
+pub async fn check_network_node(
+    adapter: Option<String>,
+) -> Result<SingleNodeResult, anyhow::Error> {
     let (node_info, network) =
-        tokio::task::spawn_blocking(move || netok_core::check_network(adapter.as_deref()))
-            .await?;
+        tokio::task::spawn_blocking(move || netok_core::check_network(adapter.as_deref())).await?;
     Ok(SingleNodeResult {
         node: convert_node(&node_info),
         computer: None,
@@ -126,8 +126,7 @@ pub async fn check_network_node(adapter: Option<String>) -> Result<SingleNodeRes
 }
 
 pub async fn check_router_node() -> Result<SingleNodeResult, anyhow::Error> {
-    let (node_info, router) =
-        tokio::task::spawn_blocking(netok_core::check_router).await?;
+    let (node_info, router) = tokio::task::spawn_blocking(netok_core::check_router).await?;
     Ok(SingleNodeResult {
         node: convert_node(&node_info),
         computer: None,
@@ -138,8 +137,7 @@ pub async fn check_router_node() -> Result<SingleNodeResult, anyhow::Error> {
 }
 
 pub async fn check_internet_node() -> Result<SingleNodeResult, anyhow::Error> {
-    let (node_info, internet) =
-        tokio::task::spawn_blocking(netok_core::check_internet).await?;
+    let (node_info, internet) = tokio::task::spawn_blocking(netok_core::check_internet).await?;
     Ok(SingleNodeResult {
         node: convert_node(&node_info),
         computer: None,
@@ -164,12 +162,22 @@ pub async fn lookup_ip_location(ip: String) -> Result<IpInfoResponse, String> {
 #[serde(tag = "type")]
 pub enum DnsProviderType {
     Auto,
-    Cloudflare { variant: CloudflareVariant },
+    Cloudflare {
+        variant: CloudflareVariant,
+    },
     Google,
-    AdGuard { variant: AdGuardVariant },
-    Dns4Eu { variant: Dns4EuVariant },
-    Quad9 { variant: Quad9Variant },
-    OpenDns { variant: OpenDnsVariant },
+    AdGuard {
+        variant: AdGuardVariant,
+    },
+    Dns4Eu {
+        variant: Dns4EuVariant,
+    },
+    Quad9 {
+        variant: Quad9Variant,
+    },
+    OpenDns {
+        variant: OpenDnsVariant,
+    },
     #[serde(rename_all = "camelCase")]
     Custom {
         primary: String,
@@ -369,11 +377,9 @@ pub async fn get_dns_provider() -> Result<DnsProviderType, String> {
 
 // Get raw DNS server IPs currently configured on the system
 pub async fn get_dns_servers() -> Result<Vec<String>, String> {
-    tokio::task::spawn_blocking(|| {
-        netok_core::get_current_dns()
-    })
-    .await
-    .map_err(|e| format!("Failed to run DNS servers task: {}", e))?
+    tokio::task::spawn_blocking(|| netok_core::get_current_dns())
+        .await
+        .map_err(|e| format!("Failed to run DNS servers task: {}", e))?
 }
 
 // Test if a DNS server is reachable (async wrapper)
@@ -428,22 +434,16 @@ pub async fn validate_vpn_key(raw_uri: String) -> Result<VpnKeyValidation, Strin
         let addr = format!("{}:{}", server, port);
         let reachable = match addr.parse::<std::net::SocketAddr>() {
             Ok(sock_addr) => {
-                std::net::TcpStream::connect_timeout(
-                    &sock_addr,
-                    std::time::Duration::from_secs(3),
-                )
-                .is_ok()
+                std::net::TcpStream::connect_timeout(&sock_addr, std::time::Duration::from_secs(3))
+                    .is_ok()
             }
             Err(_) => {
                 // Hostname — try resolving + connecting
                 use std::net::ToSocketAddrs;
                 match addr.to_socket_addrs() {
                     Ok(mut addrs) => addrs.any(|a| {
-                        std::net::TcpStream::connect_timeout(
-                            &a,
-                            std::time::Duration::from_secs(3),
-                        )
-                        .is_ok()
+                        std::net::TcpStream::connect_timeout(&a, std::time::Duration::from_secs(3))
+                            .is_ok()
                     }),
                     Err(_) => false,
                 }
@@ -499,8 +499,7 @@ pub struct VpnStatus {
 pub fn generate_vpn_config(raw_uri: &str) -> Result<String, String> {
     let protocol = netok_core::parse_vpn_uri(raw_uri)?;
     let config = netok_core::generate_singbox_config(&protocol)?;
-    serde_json::to_string_pretty(&config)
-        .map_err(|e| format!("Failed to serialize config: {}", e))
+    serde_json::to_string_pretty(&config).map_err(|e| format!("Failed to serialize config: {}", e))
 }
 
 /// Verify VPN connection by checking current public IP.
@@ -536,3 +535,14 @@ pub async fn scan_network_devices() -> Result<Vec<NetworkDevice>, String> {
         .map_err(|e| format!("Failed to run network scan task: {}", e))
 }
 
+// ==================== WiFi Security ====================
+
+// Re-export security types
+pub use netok_core::{SecurityCheck, SecurityCheckType, SecurityStatus, WiFiSecurityReport};
+
+/// Run all WiFi security checks (encryption, evil twin, ARP spoofing, DNS hijacking).
+pub async fn check_wifi_security() -> Result<WiFiSecurityReport, String> {
+    tokio::task::spawn_blocking(netok_core::check_wifi_security)
+        .await
+        .map_err(|e| format!("Failed to run WiFi security check task: {}", e))
+}

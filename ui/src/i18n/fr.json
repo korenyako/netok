@@ -165,7 +165,9 @@
   "protection": {
     "title": "Protection",
     "dns_protection": "DNS",
-    "vpn_tunnel": "VPN"
+    "vpn_tunnel": "VPN",
+    "wifi_security": "Sécurité réseau",
+    "wifi_security_desc": "Vérifier les menaces Wi-Fi"
   },
   "vpn": {
     "title": "VPN",
@@ -311,6 +313,31 @@
     "type_gameconsole": "Console",
     "type_iot": "IoT",
     "type_unknown": ""
+  },
+  "wifi_security": {
+    "title": "Sécurité réseau",
+    "scanning": "Vérification de la sécurité...",
+    "network": "Réseau : {{ssid}}",
+    "overall_safe": "Le réseau est sécurisé",
+    "overall_warning": "Menaces potentielles détectées",
+    "overall_danger": "Menaces détectées",
+    "check_encryption": "Chiffrement",
+    "check_evil_twin": "Authenticité du réseau",
+    "check_arp_spoofing": "Interception du trafic",
+    "check_dns_hijacking": "Intégrité DNS",
+    "encryption_safe": "Protégé par un chiffrement moderne",
+    "encryption_warning_wep": "Chiffrement WEP obsolète — facile à pirater",
+    "encryption_warning_wpa": "Chiffrement WPA obsolète",
+    "encryption_danger": "Le réseau n'est pas chiffré. Votre trafic peut être intercepté par d'autres personnes à proximité",
+    "evil_twin_safe": "Aucun point d'accès suspect à proximité",
+    "evil_twin_warning": "Copie suspecte de ce réseau sans chiffrement détectée. Quelqu'un pourrait tenter d'intercepter le trafic",
+    "arp_safe": "Aucun signe d'interception du trafic",
+    "arp_warning": "Activité suspecte sur le réseau — interception du trafic possible",
+    "arp_danger": "Tentative d'interception du trafic détectée. Ne saisissez pas de mots de passe et n'ouvrez pas d'applications bancaires",
+    "dns_safe": "Le DNS fonctionne correctement — les sites s'ouvrent avec de vraies adresses",
+    "dns_warning": "Ce réseau pourrait falsifier les adresses des sites. Activez la protection DNS dans les paramètres Netok",
+    "recommend_dns": "Activer la protection DNS",
+    "recommend_vpn": "Utiliser le VPN"
   },
   "lang": {
     "system": "Système",

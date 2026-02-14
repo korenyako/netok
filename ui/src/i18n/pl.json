@@ -165,7 +165,9 @@
   "protection": {
     "title": "Ochrona",
     "dns_protection": "DNS",
-    "vpn_tunnel": "VPN"
+    "vpn_tunnel": "VPN",
+    "wifi_security": "Bezpieczeństwo sieci",
+    "wifi_security_desc": "Sprawdź zagrożenia Wi-Fi"
   },
   "vpn": {
     "title": "VPN",
@@ -311,6 +313,31 @@
     "type_gameconsole": "Konsola",
     "type_iot": "IoT",
     "type_unknown": ""
+  },
+  "wifi_security": {
+    "title": "Bezpieczeństwo sieci",
+    "scanning": "Sprawdzanie bezpieczeństwa...",
+    "network": "Sieć: {{ssid}}",
+    "overall_safe": "Sieć jest bezpieczna",
+    "overall_warning": "Wykryto potencjalne zagrożenia",
+    "overall_danger": "Wykryto zagrożenia",
+    "check_encryption": "Szyfrowanie",
+    "check_evil_twin": "Autentyczność sieci",
+    "check_arp_spoofing": "Przechwytywanie ruchu",
+    "check_dns_hijacking": "Integralność DNS",
+    "encryption_safe": "Chroniona nowoczesnym szyfrowaniem",
+    "encryption_warning_wep": "Przestarzałe szyfrowanie WEP — łatwe do złamania",
+    "encryption_warning_wpa": "Przestarzałe szyfrowanie WPA",
+    "encryption_danger": "Sieć nie jest zaszyfrowana. Twój ruch może być przechwycony przez osoby w pobliżu",
+    "evil_twin_safe": "Brak podejrzanych punktów dostępu w pobliżu",
+    "evil_twin_warning": "Wykryto podejrzaną kopię tej sieci bez szyfrowania. Ktoś może próbować przechwycić ruch",
+    "arp_safe": "Brak oznak przechwytywania ruchu",
+    "arp_warning": "Podejrzana aktywność w sieci — możliwe przechwytywanie ruchu",
+    "arp_danger": "Wykryto próbę przechwycenia ruchu. Nie wpisuj haseł ani nie otwieraj aplikacji bankowych",
+    "dns_safe": "DNS działa poprawnie — strony otwierają się pod prawdziwymi adresami",
+    "dns_warning": "Ta sieć może fałszować adresy stron. Włącz ochronę DNS w ustawieniach Netok",
+    "recommend_dns": "Włącz ochronę DNS",
+    "recommend_vpn": "Użyj VPN"
   },
   "lang": {
     "system": "Systemowy",

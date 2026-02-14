@@ -241,8 +241,7 @@ async fn test_set_dns_custom_provider() {
 #[test]
 fn test_dns_provider_all_variants_serialize() {
     use netok_bridge::{
-        AdGuardVariant, CloudflareVariant, Dns4EuVariant, OpenDnsVariant,
-        Quad9Variant,
+        AdGuardVariant, CloudflareVariant, Dns4EuVariant, OpenDnsVariant, Quad9Variant,
     };
 
     let variants = vec![

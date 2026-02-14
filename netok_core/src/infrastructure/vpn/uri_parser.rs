@@ -107,7 +107,10 @@ pub fn parse_vpn_uri(uri: &str) -> Result<VpnProtocol, String> {
     } else if lower.starts_with("wg://") || lower.starts_with("wireguard://") {
         parse_wireguard(trimmed)
     } else {
-        Err("Unsupported VPN protocol. Supported: vless://, vmess://, ss://, trojan://, wg://".to_string())
+        Err(
+            "Unsupported VPN protocol. Supported: vless://, vmess://, ss://, trojan://, wg://"
+                .to_string(),
+        )
     }
 }
 
@@ -118,10 +121,7 @@ fn parse_query(query: &str) -> HashMap<String, String> {
     let mut map = HashMap::new();
     for pair in query.split('&') {
         if let Some((k, v)) = pair.split_once('=') {
-            map.insert(
-                url_decode(k).to_lowercase(),
-                url_decode(v),
-            );
+            map.insert(url_decode(k).to_lowercase(), url_decode(v));
         }
     }
     map
@@ -204,7 +204,11 @@ fn parse_host_port(s: &str) -> Result<(String, u16), String> {
 }
 
 fn non_empty(s: &str) -> Option<String> {
-    if s.is_empty() { None } else { Some(s.to_string()) }
+    if s.is_empty() {
+        None
+    } else {
+        Some(s.to_string())
+    }
 }
 
 // ==================== Protocol-Specific Parsers ====================
@@ -248,7 +252,7 @@ fn parse_vless(uri: &str) -> Result<VpnProtocol, String> {
                 Some(s.split(',').map(|a| a.to_string()).collect())
             }
         }),
-        fragment: fragment.map(|f| url_decode(f)),
+        fragment: fragment.map(url_decode),
     }))
 }
 
@@ -272,9 +276,7 @@ fn parse_vmess(uri: &str) -> Result<VpnProtocol, String> {
         .to_string();
 
     let port = match &json["port"] {
-        serde_json::Value::Number(n) => n
-            .as_u64()
-            .ok_or("VMess: invalid port")? as u16,
+        serde_json::Value::Number(n) => n.as_u64().ok_or("VMess: invalid port")? as u16,
         serde_json::Value::String(s) => s
             .parse::<u16>()
             .map_err(|_| format!("VMess: invalid port: {}", s))?,
@@ -292,10 +294,7 @@ fn parse_vmess(uri: &str) -> Result<VpnProtocol, String> {
         _ => 0,
     };
 
-    let security = json["scy"]
-        .as_str()
-        .unwrap_or("auto")
-        .to_string();
+    let security = json["scy"].as_str().unwrap_or("auto").to_string();
 
     let net = json["net"].as_str().unwrap_or("tcp");
     let tls_str = json["tls"].as_str().unwrap_or("");
@@ -311,7 +310,7 @@ fn parse_vmess(uri: &str) -> Result<VpnProtocol, String> {
         sni: json["sni"].as_str().and_then(non_empty),
         path: json["path"].as_str().and_then(non_empty),
         host: json["host"].as_str().and_then(non_empty),
-        fragment: fragment.map(|f| url_decode(f)),
+        fragment: fragment.map(url_decode),
     }))
 }
 
@@ -355,15 +354,13 @@ fn parse_shadowsocks(uri: &str) -> Result<VpnProtocol, String> {
             port,
             plugin: query.get("plugin").and_then(|s| non_empty(s)),
             plugin_opts: query.get("plugin-opts").and_then(|s| non_empty(s)),
-            fragment: fragment.map(|f| url_decode(f)),
+            fragment: fragment.map(url_decode),
         }));
     }
 
     // Legacy format: ss://base64(method:password@server:port)
     let decoded = base64_decode(before_frag)?;
-    let (method_pass, hostport) = decoded
-        .split_once('@')
-        .ok_or("SS legacy: missing '@'")?;
+    let (method_pass, hostport) = decoded.split_once('@').ok_or("SS legacy: missing '@'")?;
     let (method, password) = method_pass
         .split_once(':')
         .ok_or("SS legacy: invalid method:password")?;
@@ -376,7 +373,7 @@ fn parse_shadowsocks(uri: &str) -> Result<VpnProtocol, String> {
         port,
         plugin: None,
         plugin_opts: None,
-        fragment: fragment.map(|f| url_decode(f)),
+        fragment: fragment.map(url_decode),
     }))
 }
 
@@ -413,7 +410,7 @@ fn parse_trojan(uri: &str) -> Result<VpnProtocol, String> {
         path: query.get("path").and_then(|s| non_empty(s)),
         host: query.get("host").and_then(|s| non_empty(s)),
         fingerprint: query.get("fp").and_then(|s| non_empty(s)),
-        fragment: fragment.map(|f| url_decode(f)),
+        fragment: fragment.map(url_decode),
     }))
 }
 
@@ -461,7 +458,7 @@ fn parse_wireguard(uri: &str) -> Result<VpnProtocol, String> {
         pre_shared_key: query.get("presharedkey").cloned(),
         mtu: query.get("mtu").and_then(|s| s.parse().ok()),
         reserved,
-        fragment: fragment.map(|f| url_decode(f)),
+        fragment: fragment.map(url_decode),
     }))
 }
 
@@ -501,7 +498,7 @@ fn decode_base64_bytes(input: &str) -> Result<Vec<u8>, String> {
         .filter(|&b| b != b'\n' && b != b'\r' && b != b' ')
         .collect();
 
-    if chars.len() % 4 != 0 {
+    if !chars.len().is_multiple_of(4) {
         return Err(format!(
             "Invalid base64 length: {} (must be multiple of 4)",
             chars.len()
@@ -722,7 +719,10 @@ mod tests {
     fn test_parse_shadowsocks_with_trailing_slash_and_outline() {
         // Real-world Outline URI with /?outline=1 query and fragment
         let userinfo = simple_base64_encode(b"chacha20-ietf-poly1305:bAprO8PQQ12KKo7iPIBYla");
-        let uri = format!("ss://{}@147.45.199.2:24048/?outline=1#vpn-gin%20-%20test", userinfo);
+        let uri = format!(
+            "ss://{}@147.45.199.2:24048/?outline=1#vpn-gin%20-%20test",
+            userinfo
+        );
         let result = parse_vpn_uri(&uri).unwrap();
         match result {
             VpnProtocol::Shadowsocks(p) => {

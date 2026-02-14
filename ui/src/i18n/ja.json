@@ -165,7 +165,9 @@
   "protection": {
     "title": "保護",
     "dns_protection": "DNS",
-    "vpn_tunnel": "VPN"
+    "vpn_tunnel": "VPN",
+    "wifi_security": "ネットワークセキュリティ",
+    "wifi_security_desc": "Wi-Fiの脅威をチェック"
   },
   "vpn": {
     "title": "VPN",
@@ -311,6 +313,31 @@
     "type_gameconsole": "ゲーム機",
     "type_iot": "IoT",
     "type_unknown": ""
+  },
+  "wifi_security": {
+    "title": "ネットワークセキュリティ",
+    "scanning": "セキュリティを確認中...",
+    "network": "ネットワーク：{{ssid}}",
+    "overall_safe": "ネットワークは安全です",
+    "overall_warning": "潜在的な脅威が検出されました",
+    "overall_danger": "脅威が検出されました",
+    "check_encryption": "暗号化",
+    "check_evil_twin": "ネットワークの真正性",
+    "check_arp_spoofing": "トラフィック傍受",
+    "check_dns_hijacking": "DNSの整合性",
+    "encryption_safe": "最新の暗号化で保護されています",
+    "encryption_warning_wep": "古いWEP暗号化 — 簡単に解読可能",
+    "encryption_warning_wpa": "古いWPA暗号化",
+    "encryption_danger": "ネットワークは暗号化されていません。近くの人にトラフィックを傍受される可能性があります",
+    "evil_twin_safe": "近くに不審なアクセスポイントはありません",
+    "evil_twin_warning": "暗号化されていない不審なネットワークのコピーが検出されました。トラフィックの傍受が試みられている可能性があります",
+    "arp_safe": "トラフィック傍受の兆候はありません",
+    "arp_warning": "ネットワークで不審な活動 — トラフィック傍受の可能性",
+    "arp_danger": "トラフィック傍受の試みが検出されました。パスワードを入力したり、バンキングアプリを開かないでください",
+    "dns_safe": "DNSは正常に動作しています — ウェブサイトは正しいアドレスで開きます",
+    "dns_warning": "このネットワークはウェブサイトのアドレスを偽装している可能性があります。NetokのDNS保護を有効にしてください",
+    "recommend_dns": "DNS保護を有効にする",
+    "recommend_vpn": "VPNを使用する"
   },
   "lang": {
     "system": "システム",

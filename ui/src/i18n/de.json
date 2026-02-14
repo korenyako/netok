@@ -165,7 +165,9 @@
   "protection": {
     "title": "Schutz",
     "dns_protection": "DNS",
-    "vpn_tunnel": "VPN"
+    "vpn_tunnel": "VPN",
+    "wifi_security": "Netzwerksicherheit",
+    "wifi_security_desc": "Wi-Fi auf Bedrohungen prüfen"
   },
   "vpn": {
     "title": "VPN",
@@ -311,6 +313,31 @@
     "type_gameconsole": "Konsole",
     "type_iot": "IoT",
     "type_unknown": ""
+  },
+  "wifi_security": {
+    "title": "Netzwerksicherheit",
+    "scanning": "Sicherheit wird geprüft...",
+    "network": "Netzwerk: {{ssid}}",
+    "overall_safe": "Netzwerk ist sicher",
+    "overall_warning": "Mögliche Bedrohungen erkannt",
+    "overall_danger": "Bedrohungen erkannt",
+    "check_encryption": "Verschlüsselung",
+    "check_evil_twin": "Netzwerk-Authentizität",
+    "check_arp_spoofing": "Datenverkehrsabfang",
+    "check_dns_hijacking": "DNS-Integrität",
+    "encryption_safe": "Durch moderne Verschlüsselung geschützt",
+    "encryption_warning_wep": "Veraltete WEP-Verschlüsselung — leicht zu knacken",
+    "encryption_warning_wpa": "Veraltete WPA-Verschlüsselung",
+    "encryption_danger": "Netzwerk ist nicht verschlüsselt. Ihr Datenverkehr kann von anderen in der Nähe abgefangen werden",
+    "evil_twin_safe": "Keine verdächtigen Zugangspunkte in der Nähe",
+    "evil_twin_warning": "Verdächtige Kopie dieses Netzwerks ohne Verschlüsselung erkannt. Jemand könnte versuchen, den Datenverkehr abzufangen",
+    "arp_safe": "Keine Anzeichen für Datenverkehrsabfang",
+    "arp_warning": "Verdächtige Aktivität im Netzwerk — möglicher Datenverkehrsabfang",
+    "arp_danger": "Versuch des Datenverkehrsabfangs erkannt. Geben Sie keine Passwörter ein und öffnen Sie keine Banking-Apps",
+    "dns_safe": "DNS funktioniert korrekt — Websites öffnen sich unter echten Adressen",
+    "dns_warning": "Dieses Netzwerk könnte Website-Adressen fälschen. Aktivieren Sie den DNS-Schutz in den Netok-Einstellungen",
+    "recommend_dns": "DNS-Schutz aktivieren",
+    "recommend_vpn": "VPN verwenden"
   },
   "lang": {
     "system": "System",

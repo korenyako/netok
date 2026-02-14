@@ -165,7 +165,9 @@
   "protection": {
     "title": "보호",
     "dns_protection": "DNS",
-    "vpn_tunnel": "VPN"
+    "vpn_tunnel": "VPN",
+    "wifi_security": "네트워크 보안",
+    "wifi_security_desc": "Wi-Fi 위협 확인"
   },
   "vpn": {
     "title": "VPN",
@@ -311,6 +313,31 @@
     "type_gameconsole": "콘솔",
     "type_iot": "IoT",
     "type_unknown": ""
+  },
+  "wifi_security": {
+    "title": "네트워크 보안",
+    "scanning": "보안 확인 중...",
+    "network": "네트워크: {{ssid}}",
+    "overall_safe": "네트워크가 안전합니다",
+    "overall_warning": "잠재적 위협이 감지되었습니다",
+    "overall_danger": "위협이 감지되었습니다",
+    "check_encryption": "암호화",
+    "check_evil_twin": "네트워크 진위",
+    "check_arp_spoofing": "트래픽 가로채기",
+    "check_dns_hijacking": "DNS 무결성",
+    "encryption_safe": "최신 암호화로 보호됨",
+    "encryption_warning_wep": "구식 WEP 암호화 — 쉽게 해독 가능",
+    "encryption_warning_wpa": "구식 WPA 암호화",
+    "encryption_danger": "네트워크가 암호화되지 않았습니다. 근처의 다른 사람이 트래픽을 가로챌 수 있습니다",
+    "evil_twin_safe": "근처에 의심스러운 액세스 포인트가 없습니다",
+    "evil_twin_warning": "암호화되지 않은 의심스러운 네트워크 사본이 감지되었습니다. 누군가 트래픽을 가로채려 할 수 있습니다",
+    "arp_safe": "트래픽 가로채기 징후 없음",
+    "arp_warning": "네트워크에서 의심스러운 활동 — 트래픽 가로채기 가능성",
+    "arp_danger": "트래픽 가로채기 시도가 감지되었습니다. 비밀번호를 입력하거나 뱅킹 앱을 열지 마세요",
+    "dns_safe": "DNS가 정상 작동 중 — 사이트가 실제 주소로 열림",
+    "dns_warning": "이 네트워크가 사이트 주소를 위조할 수 있습니다. Netok 설정에서 DNS 보호를 활성화하세요",
+    "recommend_dns": "DNS 보호 활성화",
+    "recommend_vpn": "VPN 사용"
   },
   "lang": {
     "system": "시스템",

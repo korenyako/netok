@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 export type Screen = 'home' | 'security' | 'tools' | 'settings';
 export type SettingsSubScreen = 'main' | 'theme' | 'language' | 'close-behavior' | 'about';
-export type SecuritySubScreen = 'hub' | 'dns-providers' | 'custom-ip' | 'vpn' | 'vpn-add';
+export type SecuritySubScreen = 'hub' | 'dns-providers' | 'custom-ip' | 'vpn' | 'vpn-add' | 'wifi-security';
 
 export function useNavigation() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('home');

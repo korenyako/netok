@@ -3,6 +3,7 @@ import { DnsProvidersScreen } from '../screens/DnsProvidersScreen';
 import { CustomIpScreen } from '../screens/CustomIpScreen';
 import { VpnTunnelScreen } from '../screens/VpnTunnelScreen';
 import { AddVpnScreen } from '../screens/AddVpnScreen';
+import { WiFiSecurityScreen } from '../screens/WiFiSecurityScreen';
 import type { SecuritySubScreen } from '../hooks/useNavigation';
 
 interface SecurityRouterProps {
@@ -57,6 +58,15 @@ export function SecurityRouter({ subScreen, onSetSubScreen, onBack }: SecurityRo
         />
       );
 
+    case 'wifi-security':
+      return (
+        <WiFiSecurityScreen
+          onBack={handleBackToHub}
+          onNavigateToDns={() => onSetSubScreen('dns-providers')}
+          onNavigateToVpn={() => onSetSubScreen('vpn')}
+        />
+      );
+
     case 'hub':
     default:
       return (
@@ -64,6 +74,7 @@ export function SecurityRouter({ subScreen, onSetSubScreen, onBack }: SecurityRo
           onBack={handleBackToHome}
           onNavigateToDns={() => onSetSubScreen('dns-providers')}
           onNavigateToVpn={() => onSetSubScreen('vpn')}
+          onNavigateToWifiSecurity={() => onSetSubScreen('wifi-security')}
         />
       );
   }

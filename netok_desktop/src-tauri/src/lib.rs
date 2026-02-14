@@ -69,7 +69,10 @@ mod win_elevation {
         sei.nShow = 0; // SW_HIDE
 
         unsafe { ShellExecuteExW(&mut sei) }.map_err(|e| {
-            format!("Failed to launch elevated process (UAC denied or error): {}", e)
+            format!(
+                "Failed to launch elevated process (UAC denied or error): {}",
+                e
+            )
         })?;
 
         let hprocess = sei.hProcess;
@@ -233,6 +236,13 @@ async fn scan_network_devices() -> Result<Vec<netok_bridge::NetworkDevice>, Stri
     netok_bridge::scan_network_devices().await
 }
 
+// ==================== WiFi Security ====================
+
+#[tauri::command]
+async fn check_wifi_security() -> Result<netok_bridge::WiFiSecurityReport, String> {
+    netok_bridge::check_wifi_security().await
+}
+
 // ==================== VPN Commands ====================
 
 #[tauri::command]
@@ -280,8 +290,7 @@ fn get_config_path(app: &tauri::AppHandle) -> Result<PathBuf, String> {
         .app_data_dir()
         .map_err(|e| format!("Failed to get app data dir: {}", e))?;
 
-    std::fs::create_dir_all(&data_dir)
-        .map_err(|e| format!("Failed to create data dir: {}", e))?;
+    std::fs::create_dir_all(&data_dir).map_err(|e| format!("Failed to create data dir: {}", e))?;
 
     Ok(data_dir.join("singbox-config.json"))
 }
@@ -337,11 +346,10 @@ async fn connect_vpn(
                 tokio::time::sleep(std::time::Duration::from_secs(3)).await;
 
                 // Step 7: Verify process is still alive
-                let alive = tokio::task::spawn_blocking(move || {
-                    win_elevation::is_process_alive(pid)
-                })
-                .await
-                .map_err(|e| e.to_string())?;
+                let alive =
+                    tokio::task::spawn_blocking(move || win_elevation::is_process_alive(pid))
+                        .await
+                        .map_err(|e| e.to_string())?;
 
                 if !alive {
                     let mut state = vpn_state.lock().map_err(|e| e.to_string())?;
@@ -378,9 +386,7 @@ async fn connect_vpn(
                 if e.contains("UAC denied") || e.contains("cancelled") {
                     state.state = netok_bridge::VpnConnectionState::ElevationDenied;
                 } else {
-                    state.state = netok_bridge::VpnConnectionState::Error {
-                        message: e.clone(),
-                    };
+                    state.state = netok_bridge::VpnConnectionState::Error { message: e.clone() };
                 }
                 state.elevated_pid = None;
                 Err(e)
@@ -446,11 +452,7 @@ fn get_vpn_status(
 
 /// Monitor the VPN process in the background.
 /// Updates state and emits event when process exits unexpectedly.
-async fn monitor_vpn_process(
-    pid: u32,
-    state: Arc<Mutex<VpnProcessState>>,
-    app: tauri::AppHandle,
-) {
+async fn monitor_vpn_process(pid: u32, state: Arc<Mutex<VpnProcessState>>, app: tauri::AppHandle) {
     loop {
         tokio::time::sleep(std::time::Duration::from_secs(2)).await;
 
@@ -630,6 +632,7 @@ pub fn run() {
             lookup_ip_location,
             update_tray_language,
             scan_network_devices,
+            check_wifi_security,
             validate_vpn_key,
             connect_vpn,
             disconnect_vpn,
