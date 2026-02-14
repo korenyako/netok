@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Sun, Moon, Languages, Minimize2, Info, Trash2 } from '../components/icons/UIIcons';
+import { ArrowLeft, Sun, Moon, Languages, Minimize2, Info, BrushCleaning } from '../components/icons/UIIcons';
 import { toast } from 'sonner';
 import { useThemeStore } from '../stores/themeStore';
 import { useCloseBehaviorStore } from '../stores/closeBehaviorStore';
@@ -100,7 +100,7 @@ export function SettingsScreen({ onNavigateToTheme, onNavigateToLanguage, onNavi
             toast.success(t('dns_providers.cache_cleared'));
           }}
         >
-          <Trash2 className="w-4 h-4" />
+          <BrushCleaning className="w-4 h-4" />
           {t('settings.tools.flush_dns')}
         </Button>
       </div>

@@ -357,6 +357,132 @@ export function Radar(props: IconProps) {
   );
 }
 
+export function BrushCleaning(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <path d="m16 22-1-4" />
+      <path d="M19 14a1 1 0 0 0 1-1v-1a2 2 0 0 0-2-2h-3a1 1 0 0 1-1-1V4a2 2 0 0 0-4 0v5a1 1 0 0 1-1 1H6a2 2 0 0 0-2 2v1a1 1 0 0 0 1 1" />
+      <path d="M19 14H5l-1.973 6.767A1 1 0 0 0 4 22h16a1 1 0 0 0 .973-1.233z" />
+      <path d="m8 22 1-4" />
+    </SvgIcon>
+  );
+}
+
+// ── Device scan ────────────────────────────────────────
+
+export function Wifi(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <path d="M12 20h.01" />
+      <path d="M2 8.82a15 15 0 0 1 20 0" />
+      <path d="M5 12.859a10 10 0 0 1 14 0" />
+      <path d="M8.5 16.429a5 5 0 0 1 7 0" />
+    </SvgIcon>
+  );
+}
+
+export function Monitor(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <rect width="20" height="14" x="2" y="3" rx="2" />
+      <line x1="8" x2="16" y1="21" y2="21" />
+      <line x1="12" x2="12" y1="17" y2="21" />
+    </SvgIcon>
+  );
+}
+
+export function Smartphone(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <rect width="14" height="20" x="5" y="2" rx="2" ry="2" />
+      <path d="M12 18h.01" />
+    </SvgIcon>
+  );
+}
+
+export function Tablet(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <rect width="16" height="20" x="4" y="2" rx="2" ry="2" />
+      <line x1="12" x2="12.01" y1="18" y2="18" />
+    </SvgIcon>
+  );
+}
+
+export function Printer(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+      <path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6" />
+      <rect x="6" y="14" width="12" height="8" rx="1" />
+    </SvgIcon>
+  );
+}
+
+export function Tv(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <rect width="20" height="15" x="2" y="7" rx="2" ry="2" />
+      <polyline points="17 2 12 7 7 2" />
+    </SvgIcon>
+  );
+}
+
+export function Gamepad2(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <line x1="6" x2="10" y1="11" y2="11" />
+      <line x1="8" x2="8" y1="9" y2="13" />
+      <line x1="15" x2="15.01" y1="12" y2="12" />
+      <line x1="18" x2="18.01" y1="10" y2="10" />
+      <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" />
+    </SvgIcon>
+  );
+}
+
+export function Cpu(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <rect x="4" y="4" width="16" height="16" rx="2" />
+      <rect x="9" y="9" width="6" height="6" />
+      <path d="M15 2v2" /><path d="M15 20v2" />
+      <path d="M2 15h2" /><path d="M2 9h2" />
+      <path d="M20 15h2" /><path d="M20 9h2" />
+      <path d="M9 2v2" /><path d="M9 20v2" />
+    </SvgIcon>
+  );
+}
+
+export function ShieldQuestion(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+      <path d="M9.1 9a3 3 0 0 1 5.82 1c0 2-3 3-3 3" />
+      <path d="M12 17h.01" />
+    </SvgIcon>
+  );
+}
+
+export function Ghost(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <path d="M9 10h.01" />
+      <path d="M15 10h.01" />
+      <path d="M12 2a8 8 0 0 0-8 8v12l3-3 2.5 2.5L12 19l2.5 2.5L17 19l3 3V10a8 8 0 0 0-8-8z" />
+    </SvgIcon>
+  );
+}
+
+export function HelpCircle(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+      <path d="M12 17h.01" />
+    </SvgIcon>
+  );
+}
+
 // ── Bottom nav ──────────────────────────────────────────
 
 export function ShieldCheck(props: IconProps) {
