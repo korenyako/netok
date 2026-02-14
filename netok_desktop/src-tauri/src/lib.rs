@@ -304,11 +304,18 @@ async fn connect_vpn(
     vpn_state: tauri::State<'_, Arc<Mutex<VpnProcessState>>>,
     raw_uri: String,
 ) -> Result<(), String> {
-    // Step 1: Generate sing-box config from URI
-    let config_json = netok_bridge::generate_vpn_config(&raw_uri)?;
+    // Step 1: Generate sing-box config from URI (with log file for debugging)
+    let config_path = get_config_path(&app)?;
+    let log_path = config_path
+        .parent()
+        .unwrap()
+        .join("singbox.log")
+        .to_string_lossy()
+        .to_string();
+    let config_json =
+        netok_bridge::generate_vpn_config_with_log(&raw_uri, Some(&log_path))?;
 
     // Step 2: Write config to disk
-    let config_path = get_config_path(&app)?;
     std::fs::write(&config_path, &config_json)
         .map_err(|e| format!("Failed to write config: {}", e))?;
 
@@ -326,7 +333,8 @@ async fn connect_vpn(
     #[cfg(target_os = "windows")]
     {
         let args = format!("run -c \"{}\"", config_path.to_string_lossy());
-        let working_dir = config_path.parent().unwrap().to_path_buf();
+        // Use the sing-box binary directory as working dir so wintun.dll is found
+        let working_dir = singbox_path.parent().unwrap().to_path_buf();
         let singbox_path_clone = singbox_path;
 
         let pid_result = tokio::task::spawn_blocking(move || {

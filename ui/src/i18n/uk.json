@@ -166,8 +166,9 @@
     "title": "Захист",
     "dns_protection": "DNS",
     "vpn_tunnel": "VPN",
-    "wifi_security": "Безпека мережі",
-    "wifi_security_desc": "Перевірити Wi-Fi на загрози"
+    "check_security": "Перевірити безпеку",
+    "no_threats": "Загроз не виявлено",
+    "threats_detected": "Виявлено загрози"
   },
   "vpn": {
     "title": "VPN",

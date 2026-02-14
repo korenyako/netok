@@ -1,11 +1,12 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { listen } from '@tauri-apps/api/event';
 import { ArrowLeft, Loader2, RotateCw } from '../components/icons/UIIcons';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { MenuCard } from '@/components/MenuCard';
 import { CloseButton } from '../components/WindowControls';
-import { scanNetworkDevices, type NetworkDevice, type DeviceType } from '../api/tauri';
+import { useDeviceScanStore, formatTimeAgo } from '../stores/deviceScanStore';
+import type { DeviceType } from '../api/tauri';
 
 interface DeviceScanScreenProps {
   onBack: () => void;
@@ -27,7 +28,6 @@ function DeviceIcon({ type, className }: { type: DeviceType; className?: string 
 
   switch (type) {
     case 'Router':
-      // Wifi icon
       return (
         <svg {...base} className={cn}>
           <path d="M12 20h.01" />
@@ -37,7 +37,6 @@ function DeviceIcon({ type, className }: { type: DeviceType; className?: string 
         </svg>
       );
     case 'Phone':
-      // Smartphone icon
       return (
         <svg {...base} className={cn}>
           <rect width="14" height="20" x="5" y="2" rx="2" ry="2" />
@@ -45,7 +44,6 @@ function DeviceIcon({ type, className }: { type: DeviceType; className?: string 
         </svg>
       );
     case 'Computer':
-      // Monitor icon
       return (
         <svg {...base} className={cn}>
           <rect width="20" height="14" x="2" y="3" rx="2" />
@@ -54,7 +52,6 @@ function DeviceIcon({ type, className }: { type: DeviceType; className?: string 
         </svg>
       );
     case 'Tablet':
-      // Tablet icon
       return (
         <svg {...base} className={cn}>
           <rect width="16" height="20" x="4" y="2" rx="2" ry="2" />
@@ -62,7 +59,6 @@ function DeviceIcon({ type, className }: { type: DeviceType; className?: string 
         </svg>
       );
     case 'Printer':
-      // Printer icon
       return (
         <svg {...base} className={cn}>
           <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
@@ -71,7 +67,6 @@ function DeviceIcon({ type, className }: { type: DeviceType; className?: string 
         </svg>
       );
     case 'SmartTv':
-      // TV icon
       return (
         <svg {...base} className={cn}>
           <rect width="20" height="15" x="2" y="7" rx="2" ry="2" />
@@ -79,7 +74,6 @@ function DeviceIcon({ type, className }: { type: DeviceType; className?: string 
         </svg>
       );
     case 'GameConsole':
-      // Gamepad icon
       return (
         <svg {...base} className={cn}>
           <line x1="6" x2="10" y1="11" y2="11" />
@@ -90,7 +84,6 @@ function DeviceIcon({ type, className }: { type: DeviceType; className?: string 
         </svg>
       );
     case 'IoT':
-      // Cpu icon
       return (
         <svg {...base} className={cn}>
           <rect x="4" y="4" width="16" height="16" rx="2" />
@@ -102,7 +95,6 @@ function DeviceIcon({ type, className }: { type: DeviceType; className?: string 
         </svg>
       );
     default:
-      // Circle-help / question mark
       return (
         <svg {...base} className={cn}>
           <circle cx="12" cy="12" r="10" />
@@ -119,7 +111,7 @@ function deviceTypeColor(type: DeviceType): string {
     case 'Phone': return 'text-green-500';
     case 'Computer': return 'text-purple-500';
     case 'Tablet': return 'text-indigo-500';
-    case 'Printer': return 'text-orange-500';
+    case 'Printer': return 'text-teal-500';
     case 'SmartTv': return 'text-pink-500';
     case 'GameConsole': return 'text-red-500';
     case 'IoT': return 'text-amber-500';
@@ -129,37 +121,24 @@ function deviceTypeColor(type: DeviceType): string {
 
 export function DeviceScanScreen({ onBack }: DeviceScanScreenProps) {
   const { t } = useTranslation();
-  const [devices, setDevices] = useState<NetworkDevice[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [scanStage, setScanStage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { devices, lastUpdated, isScanning, scanStage, error, runScan } = useDeviceScanStore();
 
-  // Listen for scan progress events from backend
+  // Tick every 30s to refresh the "updated X min ago" label
+  const [, setTick] = useState(0);
   useEffect(() => {
-    const unlisten = listen<string>('scan-progress', (event) => {
-      setScanStage(event.payload);
-    });
-    return () => { unlisten.then((f) => f()); };
-  }, []);
+    if (!lastUpdated) return;
+    const id = setInterval(() => setTick((n) => n + 1), 30_000);
+    return () => clearInterval(id);
+  }, [lastUpdated]);
 
-  const doScan = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    setScanStage(null);
-    try {
-      const result = await scanNetworkDevices();
-      setDevices(result);
-    } catch (e) {
-      setError(String(e));
-    } finally {
-      setLoading(false);
-      setScanStage(null);
+  // Auto-scan on first visit (no cached data)
+  useEffect(() => {
+    if (devices.length === 0 && !lastUpdated && !isScanning) {
+      runScan();
     }
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
-    doScan();
-  }, [doScan]);
+  const showLoading = isScanning && devices.length === 0;
 
   return (
     <div className="flex flex-col h-full bg-background">
@@ -172,19 +151,21 @@ export function DeviceScanScreen({ onBack }: DeviceScanScreenProps) {
           <h1 className="flex-1 text-lg font-semibold text-foreground">
             {t('device_scan.title')}
           </h1>
-          <Button variant="ghost" size="icon" onClick={doScan} disabled={loading}>
-            {loading
-              ? <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-              : <RotateCw className="w-5 h-5 text-muted-foreground" />
-            }
-          </Button>
+          {!showLoading && (
+            <Button variant="ghost" size="icon" onClick={runScan} disabled={isScanning}>
+              {isScanning
+                ? <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+                : <RotateCw className="w-5 h-5 text-muted-foreground" />
+              }
+            </Button>
+          )}
           <CloseButton />
         </div>
       </div>
 
       {/* Content */}
       <ScrollArea className="flex-1 px-4 pb-4">
-        {loading && devices.length === 0 && (
+        {showLoading && (
           <div className="flex flex-col items-center justify-center py-16 gap-3">
             <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
             <p className="text-sm text-muted-foreground">
@@ -199,7 +180,7 @@ export function DeviceScanScreen({ onBack }: DeviceScanScreenProps) {
           <div className="text-sm text-destructive text-center py-8">{error}</div>
         )}
 
-        {!loading && !error && devices.length === 0 && (
+        {!isScanning && !error && devices.length === 0 && lastUpdated && (
           <div className="text-sm text-muted-foreground text-center py-16">
             {t('device_scan.no_devices')}
           </div>
@@ -207,56 +188,59 @@ export function DeviceScanScreen({ onBack }: DeviceScanScreenProps) {
 
         {devices.length > 0 && (
           <div className="space-y-2">
-            {/* Device count */}
-            <p className="text-xs text-muted-foreground px-1 pb-1">
-              {t('device_scan.found', { count: devices.length })}
-            </p>
+            {/* Device count + last updated */}
+            <div className="flex items-baseline justify-between px-1 pb-1">
+              <p className="text-xs text-muted-foreground">
+                {t('device_scan.found', { count: devices.length })}
+              </p>
+              {lastUpdated && (
+                <p className="text-xs text-muted-foreground">
+                  {formatTimeAgo(lastUpdated, t)}
+                </p>
+              )}
+            </div>
 
-            {devices.map((device) => (
-              <div
-                key={`${device.ip}-${device.mac}`}
-                className="flex items-center gap-3 p-3 rounded-xl bg-accent"
-              >
-                {/* Device icon */}
-                <div className={`shrink-0 ${deviceTypeColor(device.device_type)}`}>
-                  <DeviceIcon type={device.device_type} className="w-5 h-5" />
-                </div>
+            {devices.map((device) => {
+              const title = device.vendor
+                ?? (device.is_randomized ? t('device_scan.private_address') : t('device_scan.unknown_device'));
 
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                    <span className="text-sm font-medium text-foreground">
-                      {device.vendor ?? (device.is_randomized ? t('device_scan.private_address') : t('device_scan.unknown_device'))}
+              // Role badge (gateway/self) takes priority, otherwise show device type
+              let badge: string | undefined;
+              let badgeClassName: string | undefined;
+              if (device.is_gateway) {
+                badge = t('device_scan.badge_router');
+                badgeClassName = 'text-blue-500 bg-blue-500/10';
+              } else if (device.is_self) {
+                badge = t('device_scan.badge_this_device');
+                badgeClassName = 'text-primary bg-primary/10';
+              } else if (device.device_type !== 'Unknown') {
+                badge = t(`device_scan.type_${device.device_type.toLowerCase()}`);
+                badgeClassName = 'text-muted-foreground bg-muted';
+              }
+
+              const subtitle = (
+                <>
+                  {device.hostname && <div className="truncate">{device.hostname}</div>}
+                  <div>{device.ip}</div>
+                </>
+              );
+
+              return (
+                <MenuCard
+                  key={`${device.ip}-${device.mac}`}
+                  variant="ghost"
+                  icon={
+                    <span className={deviceTypeColor(device.device_type)}>
+                      <DeviceIcon type={device.device_type} className="w-5 h-5" />
                     </span>
-                    {device.is_gateway && (
-                      <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-blue-500/15 text-blue-500 shrink-0">
-                        {t('device_scan.badge_router')}
-                      </span>
-                    )}
-                    {device.is_self && (
-                      <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-primary/15 text-primary shrink-0">
-                        {t('device_scan.badge_this_device')}
-                      </span>
-                    )}
-                  </div>
-                  {device.hostname && (
-                    <p className="text-xs text-muted-foreground truncate">
-                      {device.hostname}
-                    </p>
-                  )}
-                  <span className="text-xs text-muted-foreground mt-0.5">
-                    {device.ip}
-                  </span>
-                </div>
-
-                {/* Device type label (hide for Unknown) */}
-                {device.device_type !== 'Unknown' && (
-                  <span className="text-xs text-muted-foreground shrink-0">
-                    {t(`device_scan.type_${device.device_type.toLowerCase()}`)}
-                  </span>
-                )}
-              </div>
-            ))}
+                  }
+                  title={title}
+                  badge={badge}
+                  badgeClassName={badgeClassName}
+                  subtitle={subtitle}
+                />
+              );
+            })}
           </div>
         )}
       </ScrollArea>

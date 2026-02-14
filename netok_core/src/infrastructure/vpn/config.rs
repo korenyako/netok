@@ -8,7 +8,16 @@ use serde_json::{json, Value};
 use super::uri_parser::*;
 
 /// Generate a complete sing-box config JSON for the given VPN protocol.
+/// Optional `log_path` writes sing-box logs to a file (useful for debugging elevated processes).
 pub fn generate_singbox_config(protocol: &VpnProtocol) -> Result<Value, String> {
+    generate_singbox_config_with_log(protocol, None)
+}
+
+/// Generate config with optional log file path.
+pub fn generate_singbox_config_with_log(
+    protocol: &VpnProtocol,
+    log_path: Option<&str>,
+) -> Result<Value, String> {
     let outbound = match protocol {
         VpnProtocol::Vless(p) => generate_vless_outbound(p),
         VpnProtocol::Vmess(p) => generate_vmess_outbound(p),
@@ -18,11 +27,16 @@ pub fn generate_singbox_config(protocol: &VpnProtocol) -> Result<Value, String> 
     }?;
 
     // sing-box 1.12+ config format
+    let mut log_config = json!({
+        "level": "info",
+        "timestamp": true
+    });
+    if let Some(path) = log_path {
+        log_config["output"] = json!(path);
+    }
+
     Ok(json!({
-        "log": {
-            "level": "warn",
-            "timestamp": true
-        },
+        "log": log_config,
         "dns": {
             "servers": [
                 {

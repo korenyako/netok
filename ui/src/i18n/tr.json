@@ -166,8 +166,9 @@
     "title": "Koruma",
     "dns_protection": "DNS",
     "vpn_tunnel": "VPN",
-    "wifi_security": "Ağ Güvenliği",
-    "wifi_security_desc": "Wi-Fi tehditlerini kontrol et"
+    "check_security": "Güvenliği kontrol et",
+    "no_threats": "Tehdit algılanmadı",
+    "threats_detected": "Tehditler algılandı"
   },
   "vpn": {
     "title": "VPN",

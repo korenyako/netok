@@ -1,12 +1,12 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, RotateCw } from '../components/icons/UIIcons';
 import { NodeOkIcon, NodeWarningIcon, NodeErrorIcon, NodeLoadingIcon } from '../components/icons/DiagnosticStatusIcons';
 import { Button } from '@/components/ui/button';
 import { MenuCard } from '@/components/MenuCard';
 import { CloseButton } from '../components/WindowControls';
-import { cn } from '@/lib/utils';
-import { checkWifiSecurity, type WiFiSecurityReport, type SecurityCheck, type SecurityStatus } from '../api/tauri';
+import { useWifiSecurityStore } from '../stores/wifiSecurityStore';
+import type { SecurityCheck, SecurityStatus } from '../api/tauri';
 
 interface WiFiSecurityScreenProps {
   onBack: () => void;
@@ -60,28 +60,20 @@ function getCheckDescription(check: SecurityCheck, t: (key: string) => string): 
   }
 }
 
-function getOverallSeverity(status: SecurityStatus): 'success' | 'warning' | 'error' {
-  if (status === 'safe') return 'success';
-  if (status === 'warning') return 'warning';
-  return 'error';
-}
-
-const severityStyles = {
-  success: { bead: 'bg-primary', title: 'text-primary' },
-  warning: { bead: 'bg-warning', title: 'text-warning' },
-  error: { bead: 'bg-destructive', title: 'text-destructive' },
-};
-
 export function WiFiSecurityScreen({ onBack, onNavigateToDns, onNavigateToVpn }: WiFiSecurityScreenProps) {
   const { t } = useTranslation();
-  const [report, setReport] = useState<WiFiSecurityReport | null>(null);
-  const [isRunning, setIsRunning] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // How many results are currently revealed (0 to 4)
-  const [revealedCount, setRevealedCount] = useState(0);
-  // Which check index is currently "loading" (-1 = none)
-  const [currentCheckIndex, setCurrentCheckIndex] = useState(-1);
+  const {
+    report,
+    isRunning,
+    error,
+    revealedCount,
+    currentCheckIndex,
+    runScan,
+    resetReveal,
+    setRevealedCount,
+    setCurrentCheckIndex,
+    setRunningDone,
+  } = useWifiSecurityStore();
 
   const revealTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -104,44 +96,39 @@ export function WiFiSecurityScreen({ onBack, onNavigateToDns, onNavigateToVpn }:
           revealTimerRef.current = setTimeout(revealNext, REVEAL_DELAY);
         } else {
           // All revealed — done
-          setIsRunning(false);
-          setCurrentCheckIndex(-1);
+          setRunningDone();
         }
       }
     };
     revealTimerRef.current = setTimeout(revealNext, REVEAL_DELAY);
-  }, []);
+  }, [setRevealedCount, setCurrentCheckIndex, setRunningDone]);
 
-  const doCheck = useCallback(async () => {
-    clearRevealTimer();
-    setIsRunning(true);
-    setError(null);
-    setReport(null);
-    setRevealedCount(0);
-    setCurrentCheckIndex(0); // Show loading for first check
-
-    try {
-      const result = await checkWifiSecurity();
-      setReport(result);
-
-      // Sort checks into the canonical order
+  // Start reveal animation when report arrives
+  useEffect(() => {
+    if (report && isRunning && revealedCount === 0) {
       const orderedChecks = CHECK_ORDER.map(({ type }) =>
-        result.checks.find(c => c.check_type === type)
+        report.checks.find(c => c.check_type === type)
       ).filter((c): c is SecurityCheck => c !== undefined);
 
-      // Progressively reveal results
       revealResults(orderedChecks);
-    } catch (e) {
-      setError(String(e));
-      setIsRunning(false);
-      setCurrentCheckIndex(-1);
     }
-  }, [clearRevealTimer, revealResults]);
-
-  useEffect(() => {
-    doCheck();
     return clearRevealTimer;
-  }, [doCheck, clearRevealTimer]);
+  }, [report, isRunning, revealedCount, revealResults, clearRevealTimer]);
+
+  // On mount: if no report, start scan; if report exists, show all instantly
+  useEffect(() => {
+    if (!report && !isRunning) {
+      runScan();
+    } else if (report && !isRunning) {
+      resetReveal();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const doRefresh = useCallback(() => {
+    clearRevealTimer();
+    runScan();
+  }, [clearRevealTimer, runScan]);
 
   // Get ordered checks from report
   const orderedChecks = report
@@ -153,13 +140,13 @@ export function WiFiSecurityScreen({ onBack, onNavigateToDns, onNavigateToVpn }:
   const visibleChecks = orderedChecks.slice(0, revealedCount);
   const allRevealed = revealedCount >= orderedChecks.length && orderedChecks.length > 0;
 
-  // Show scenario message card after all checks are revealed
-  const showOverallMessage = allRevealed && report && !isRunning;
-  const severity = report ? getOverallSeverity(report.overall_status) : 'success';
   const hasIssues = report && report.overall_status !== 'safe';
 
   // Show loading placeholder when a check is in progress
   const showLoadingPlaceholder = currentCheckIndex >= 0 && currentCheckIndex < CHECK_ORDER.length;
+
+  // Show recommendations after all checks revealed + issues found
+  const showRecommendations = allRevealed && !isRunning && hasIssues;
 
   return (
     <div className="flex flex-col h-full bg-background">
@@ -172,7 +159,7 @@ export function WiFiSecurityScreen({ onBack, onNavigateToDns, onNavigateToVpn }:
           <h1 className="flex-1 text-lg font-semibold text-foreground">
             {t('wifi_security.title')}
           </h1>
-          <Button variant="ghost" size="icon" onClick={doCheck} disabled={isRunning}>
+          <Button variant="ghost" size="icon" onClick={doRefresh} disabled={isRunning}>
             <RotateCw className="w-5 h-5 text-muted-foreground" />
           </Button>
           <CloseButton />
@@ -192,33 +179,6 @@ export function WiFiSecurityScreen({ onBack, onNavigateToDns, onNavigateToVpn }:
       {/* Scrollable content */}
       {(visibleChecks.length > 0 || showLoadingPlaceholder) && (
         <div className="flex-1 px-4 overflow-y-auto pb-4">
-          {/* Overall message card — appears after all checks complete */}
-          {showOverallMessage && report && (
-            <div className="pb-3 animate-in fade-in duration-300">
-              <div className="rounded-lg bg-accent p-4">
-                <div className="flex items-start gap-3">
-                  <span className="flex items-center justify-center w-4 h-4 shrink-0 mt-1">
-                    <span className={cn('w-2 h-2 rounded-full', severityStyles[severity].bead)} />
-                  </span>
-                  <div className="flex-1">
-                    <p className={cn('text-base font-medium leading-normal mb-1', severityStyles[severity].title)}>
-                      {report.overall_status === 'safe'
-                        ? t('wifi_security.overall_safe')
-                        : report.overall_status === 'warning'
-                          ? t('wifi_security.overall_warning')
-                          : t('wifi_security.overall_danger')}
-                    </p>
-                    {report.network_ssid && (
-                      <p className="text-sm text-muted-foreground leading-normal">
-                        {t('wifi_security.network', { ssid: report.network_ssid })}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* Error inline — shown after partial results */}
           {error && visibleChecks.length > 0 && (
             <div className="mb-4 text-sm text-destructive animate-in fade-in duration-300">
@@ -234,7 +194,7 @@ export function WiFiSecurityScreen({ onBack, onNavigateToDns, onNavigateToVpn }:
               return (
                 <MenuCard
                   key={check.check_type}
-                  variant="ghost"
+                  variant="static"
                   icon={getStatusIcon(check.status)}
                   title={t(checkDef?.labelKey ?? check.check_type)}
                   subtitle={<p>{getCheckDescription(check, t)}</p>}
@@ -257,7 +217,7 @@ export function WiFiSecurityScreen({ onBack, onNavigateToDns, onNavigateToVpn }:
           </div>
 
           {/* Recommendations — appears after all checks, if issues found */}
-          {showOverallMessage && hasIssues && (
+          {showRecommendations && (
             <div className="space-y-2 pt-4">
               {report!.checks.some(c => c.check_type === 'dns_hijacking' && c.status !== 'safe') && (
                 <MenuCard

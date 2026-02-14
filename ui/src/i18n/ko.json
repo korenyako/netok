@@ -166,8 +166,9 @@
     "title": "보호",
     "dns_protection": "DNS",
     "vpn_tunnel": "VPN",
-    "wifi_security": "네트워크 보안",
-    "wifi_security_desc": "Wi-Fi 위협 확인"
+    "check_security": "보안 확인",
+    "no_threats": "위협이 감지되지 않았습니다",
+    "threats_detected": "위협이 감지되었습니다"
   },
   "vpn": {
     "title": "VPN",

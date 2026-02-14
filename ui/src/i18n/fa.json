@@ -166,8 +166,9 @@
     "title": "محافظت",
     "dns_protection": "DNS",
     "vpn_tunnel": "VPN",
-    "wifi_security": "امنیت شبکه",
-    "wifi_security_desc": "بررسی تهدیدات Wi-Fi"
+    "check_security": "بررسی امنیت",
+    "no_threats": "تهدیدی شناسایی نشد",
+    "threats_detected": "تهدیدهایی شناسایی شد"
   },
   "vpn": {
     "title": "VPN",

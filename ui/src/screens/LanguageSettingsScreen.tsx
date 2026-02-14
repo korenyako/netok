@@ -131,7 +131,7 @@ function LanguageCard({
       className={cn(
         'cursor-pointer transition-colors',
         isSelected
-          ? 'border-muted-foreground/30 bg-accent hover:bg-accent/80'
+          ? 'border-muted-foreground/30 bg-accent hover:bg-accent-hover'
           : 'bg-transparent hover:bg-accent'
       )}
       onClick={onClick}

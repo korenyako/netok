@@ -154,7 +154,7 @@
     },
     "tools": {
       "diagnostics_desc": "Verbindungsdetails anzeigen",
-      "speed_test": "Geschwindigkeitstest",
+      "speed_test": "Speed-Test",
       "speed_test_desc": "Prüfen Sie, was Ihr Internet leisten kann",
       "flush_dns": "DNS-Cache leeren",
       "flush_dns_desc": "Probleme mit \"Seite lädt nicht\" beheben",
@@ -166,8 +166,9 @@
     "title": "Schutz",
     "dns_protection": "DNS",
     "vpn_tunnel": "VPN",
-    "wifi_security": "Netzwerksicherheit",
-    "wifi_security_desc": "Wi-Fi auf Bedrohungen prüfen"
+    "check_security": "Sicherheit prüfen",
+    "no_threats": "Keine Bedrohungen erkannt",
+    "threats_detected": "Bedrohungen erkannt"
   },
   "vpn": {
     "title": "VPN",

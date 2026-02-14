@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 
 export type MenuCardVariant =
   | 'ghost'       // transparent + hover:accent (navigation, unselected items)
-  | 'filled'      // accent bg + hover:accent/80 (inactive status with background)
+  | 'filled'      // accent bg + hover:accent-hover (inactive status with background)
   | 'highlighted' // primary/10 + hover:primary/15 (active status, no border)
   | 'selected'    // primary/10 + border-primary (selected item in lists)
   | 'static'      // transparent, no hover (info display)
@@ -47,7 +47,7 @@ interface MenuCardProps {
 
 const variantStyles: Record<MenuCardVariant, string> = {
   ghost: 'bg-transparent hover:bg-accent',
-  filled: 'bg-accent hover:bg-accent/80',
+  filled: 'bg-accent hover:bg-accent-hover',
   highlighted: 'bg-primary/10 hover:bg-primary/15',
   selected: 'border-primary bg-primary/10 hover:bg-primary/15',
   static: 'bg-transparent',

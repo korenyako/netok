@@ -166,8 +166,9 @@
     "title": "Protection",
     "dns_protection": "DNS",
     "vpn_tunnel": "VPN",
-    "wifi_security": "Network Security",
-    "wifi_security_desc": "Check Wi-Fi for threats"
+    "check_security": "Check security",
+    "no_threats": "No threats detected",
+    "threats_detected": "Threats detected"
   },
   "vpn": {
     "title": "VPN",

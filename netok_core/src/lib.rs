@@ -46,8 +46,8 @@ pub use infrastructure::security::{
 
 // Re-export VPN types and functions
 pub use infrastructure::vpn::{
-    generate_singbox_config, parse_vpn_uri, ShadowsocksParams, TrojanParams, VlessParams,
-    VmessParams, VpnProtocol, WireGuardParams,
+    generate_singbox_config, generate_singbox_config_with_log, parse_vpn_uri, ShadowsocksParams,
+    TrojanParams, VlessParams, VmessParams, VpnProtocol, WireGuardParams,
 };
 
 #[cfg(test)]

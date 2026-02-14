@@ -166,8 +166,9 @@
     "title": "防护",
     "dns_protection": "DNS",
     "vpn_tunnel": "VPN",
-    "wifi_security": "网络安全",
-    "wifi_security_desc": "检查 Wi-Fi 威胁"
+    "check_security": "检查安全性",
+    "no_threats": "未检测到威胁",
+    "threats_detected": "检测到威胁"
   },
   "vpn": {
     "title": "VPN",

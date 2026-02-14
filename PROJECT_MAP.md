@@ -185,7 +185,8 @@ Generated: 2026-02-14
 │   │   └── vite-env.d.ts
 │   ├── src-tauri
 │   │   ├── binaries
-│   │   │   └── sing-box-x86_64-pc-windows-msvc.exe
+│   │   │   ├── sing-box-x86_64-pc-windows-msvc.exe
+│   │   │   └── wintun.dll
 │   │   ├── capabilities
 │   │   │   └── default.json
 │   │   ├── gen
@@ -304,12 +305,14 @@ Generated: 2026-02-14
 │   │   ├── store
 │   │   ├── stores
 │   │   │   ├── closeBehaviorStore.ts
+│   │   │   ├── deviceScanStore.ts
 │   │   │   ├── diagnosticsStore.ts
 │   │   │   ├── dnsStore.ts
 │   │   │   ├── speedTestStore.ts
 │   │   │   ├── themeStore.ts
 │   │   │   ├── useDnsStore.ts
-│   │   │   └── vpnStore.ts
+│   │   │   ├── vpnStore.ts
+│   │   │   └── wifiSecurityStore.ts
 │   │   ├── tests
 │   │   │   ├── dnsStore.test.ts
 │   │   │   ├── formatUpdatedAt.test.ts

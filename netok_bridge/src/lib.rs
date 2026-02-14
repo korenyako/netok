@@ -497,8 +497,16 @@ pub struct VpnStatus {
 /// Parse and validate a VPN URI, generate sing-box config JSON.
 /// Pure logic — no process management.
 pub fn generate_vpn_config(raw_uri: &str) -> Result<String, String> {
+    generate_vpn_config_with_log(raw_uri, None)
+}
+
+/// Parse and validate a VPN URI, generate sing-box config with optional log file.
+pub fn generate_vpn_config_with_log(
+    raw_uri: &str,
+    log_path: Option<&str>,
+) -> Result<String, String> {
     let protocol = netok_core::parse_vpn_uri(raw_uri)?;
-    let config = netok_core::generate_singbox_config(&protocol)?;
+    let config = netok_core::generate_singbox_config_with_log(&protocol, log_path)?;
     serde_json::to_string_pretty(&config).map_err(|e| format!("Failed to serialize config: {}", e))
 }
 
