@@ -108,6 +108,15 @@ export function ExternalLink(props: IconProps) {
   );
 }
 
+export function ArrowUpRight(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <path d="M7 7h10v10" />
+      <path d="M7 17 17 7" />
+    </SvgIcon>
+  );
+}
+
 // ── Actions ─────────────────────────────────────────────
 
 export function Check(props: IconProps) {

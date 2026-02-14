@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, ExternalLink } from '../components/icons/UIIcons';
+import { ArrowLeft, ArrowUpRight } from '../components/icons/UIIcons';
 import { getVersion } from '@tauri-apps/api/app';
 import { openUrl } from '@tauri-apps/plugin-opener';
 import { Button } from '@/components/ui/button';
@@ -78,8 +78,8 @@ export function AboutScreen({ onBack }: AboutScreenProps) {
           onClick={() => openUrl('https://netok.app/')}
           className="w-full text-sm font-medium"
         >
-          <ExternalLink className="w-4 h-4 mr-2" />
           {t('settings.about.website_button')}
+          <ArrowUpRight className="w-4 h-4 ms-2" />
         </Button>
       </div>
     </div>

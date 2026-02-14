@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Copy, ExternalLink } from '../components/icons/UIIcons';
+import { ArrowLeft, Copy, ArrowUpRight } from '../components/icons/UIIcons';
 import { NetokLogoIcon, ShieldIcon, ToolsIcon, SettingsIcon } from '../components/icons/NavigationIcons';
 import { openUrl } from '@tauri-apps/plugin-opener';
 import { Button } from '@/components/ui/button';
@@ -157,8 +157,8 @@ export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToHome, onN
             className="w-full text-sm font-medium"
             onClick={handleOpenRouter}
           >
-            <ExternalLink className="w-4 h-4 me-2" />
             {t('node_detail.open_router')}
+            <ArrowUpRight className="w-4 h-4 ms-2" />
           </Button>
         )}
       </div>
