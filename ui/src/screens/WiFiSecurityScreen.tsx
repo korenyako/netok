@@ -70,12 +70,10 @@ export function WiFiSecurityScreen({ onBack, onNavigateToDns, onNavigateToVpn }:
     currentCheckIndex,
     runScan,
     resetReveal,
-    setRevealedCount,
-    setCurrentCheckIndex,
-    setRunningDone,
   } = useWifiSecurityStore();
 
   const revealTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const revealStartedRef = useRef(false);
 
   const clearRevealTimer = useCallback(() => {
     if (revealTimerRef.current) {
@@ -84,36 +82,42 @@ export function WiFiSecurityScreen({ onBack, onNavigateToDns, onNavigateToVpn }:
     }
   }, []);
 
-  // Reveal results one by one with staggered timing
-  const revealResults = useCallback((checks: SecurityCheck[]) => {
+  // Staggered reveal: called once when report arrives during a scan
+  const startReveal = useCallback((checks: SecurityCheck[]) => {
     let idx = 0;
     const revealNext = () => {
       if (idx < checks.length) {
-        setRevealedCount(idx + 1);
-        setCurrentCheckIndex(idx + 1 < checks.length ? idx + 1 : -1);
+        // Use direct store access to avoid stale closures
+        useWifiSecurityStore.setState({
+          revealedCount: idx + 1,
+          currentCheckIndex: idx + 1 < checks.length ? idx + 1 : -1,
+        });
         idx++;
         if (idx < checks.length) {
           revealTimerRef.current = setTimeout(revealNext, REVEAL_DELAY);
         } else {
           // All revealed — done
-          setRunningDone();
+          useWifiSecurityStore.setState({ isRunning: false, currentCheckIndex: -1 });
         }
       }
     };
     revealTimerRef.current = setTimeout(revealNext, REVEAL_DELAY);
-  }, [setRevealedCount, setCurrentCheckIndex, setRunningDone]);
+  }, []);
 
-  // Start reveal animation when report arrives
+  // When report arrives and we're running a scan → start reveal animation
   useEffect(() => {
-    if (report && isRunning && revealedCount === 0) {
+    if (report && isRunning && !revealStartedRef.current) {
+      revealStartedRef.current = true;
       const orderedChecks = CHECK_ORDER.map(({ type }) =>
         report.checks.find(c => c.check_type === type)
       ).filter((c): c is SecurityCheck => c !== undefined);
-
-      revealResults(orderedChecks);
+      startReveal(orderedChecks);
     }
-    return clearRevealTimer;
-  }, [report, isRunning, revealedCount, revealResults, clearRevealTimer]);
+    // Reset the flag when not running (new scan can start fresh)
+    if (!isRunning) {
+      revealStartedRef.current = false;
+    }
+  }, [report, isRunning, startReveal]);
 
   // On mount: if no report, start scan; if report exists, show all instantly
   useEffect(() => {
@@ -122,11 +126,13 @@ export function WiFiSecurityScreen({ onBack, onNavigateToDns, onNavigateToVpn }:
     } else if (report && !isRunning) {
       resetReveal();
     }
+    return clearRevealTimer;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const doRefresh = useCallback(() => {
     clearRevealTimer();
+    revealStartedRef.current = false;
     runScan();
   }, [clearRevealTimer, runScan]);
 
