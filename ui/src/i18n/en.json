@@ -301,6 +301,8 @@
     "scanning": "Scanning network...",
     "stage_scanning": "Scanning network...",
     "stage_identifying": "Identifying devices...",
+    "updated_just_now": "Just now",
+    "updated_ago": "{{count}} min ago",
     "no_devices": "No devices found",
     "found": "{{count}} devices found",
     "unknown_device": "Unknown device",
@@ -318,8 +320,9 @@
     "type_unknown": ""
   },
   "wifi_security": {
-    "title": "Network Security",
+    "title": "Security",
     "scanning": "Checking security...",
+    "checking": "Checking...",
     "network": "Network: {{ssid}}",
     "overall_safe": "Network is secure",
     "overall_warning": "Potential threats detected",

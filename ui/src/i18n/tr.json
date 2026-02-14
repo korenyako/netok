@@ -301,6 +301,8 @@
     "scanning": "Ağ taranıyor...",
     "stage_scanning": "Ağ taranıyor...",
     "stage_identifying": "Cihazlar tanımlanıyor...",
+    "updated_just_now": "Az önce",
+    "updated_ago": "{{count}} dk önce",
     "no_devices": "Cihaz bulunamadı",
     "found": "{{count}} cihaz bulundu",
     "unknown_device": "Bilinmeyen cihaz",
@@ -318,8 +320,9 @@
     "type_unknown": ""
   },
   "wifi_security": {
-    "title": "Ağ Güvenliği",
+    "title": "Güvenlik",
     "scanning": "Güvenlik kontrol ediliyor...",
+    "checking": "Kontrol ediliyor...",
     "network": "Ağ: {{ssid}}",
     "overall_safe": "Ağ güvenli",
     "overall_warning": "Olası tehditler tespit edildi",

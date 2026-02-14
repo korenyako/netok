@@ -301,6 +301,8 @@
     "scanning": "در حال اسکن شبکه...",
     "stage_scanning": "در حال اسکن شبکه...",
     "stage_identifying": "در حال شناسایی دستگاه‌ها...",
+    "updated_just_now": "همین الان",
+    "updated_ago": "{{count}} دقیقه پیش",
     "no_devices": "دستگاهی یافت نشد",
     "found": "{{count}} دستگاه یافت شد",
     "unknown_device": "دستگاه ناشناس",
@@ -318,8 +320,9 @@
     "type_unknown": ""
   },
   "wifi_security": {
-    "title": "امنیت شبکه",
+    "title": "امنیت",
     "scanning": "بررسی امنیت...",
+    "checking": "در حال بررسی...",
     "network": "شبکه: {{ssid}}",
     "overall_safe": "شبکه امن است",
     "overall_warning": "تهدیدات احتمالی شناسایی شد",

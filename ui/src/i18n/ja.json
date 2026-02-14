@@ -301,6 +301,8 @@
     "scanning": "ネットワークをスキャン中...",
     "stage_scanning": "ネットワークをスキャン中...",
     "stage_identifying": "デバイスを識別中...",
+    "updated_just_now": "たった今",
+    "updated_ago": "{{count}}分前",
     "no_devices": "デバイスが見つかりません",
     "found": "{{count}} 台のデバイスが見つかりました",
     "unknown_device": "不明なデバイス",
@@ -318,8 +320,9 @@
     "type_unknown": ""
   },
   "wifi_security": {
-    "title": "ネットワークセキュリティ",
+    "title": "セキュリティ",
     "scanning": "セキュリティを確認中...",
+    "checking": "確認中...",
     "network": "ネットワーク：{{ssid}}",
     "overall_safe": "ネットワークは安全です",
     "overall_warning": "潜在的な脅威が検出されました",

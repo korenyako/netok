@@ -301,6 +301,8 @@
     "scanning": "Verificando rede...",
     "stage_scanning": "Verificando a rede...",
     "stage_identifying": "Identificando dispositivos...",
+    "updated_just_now": "Agora mesmo",
+    "updated_ago": "{{count}} min atrás",
     "no_devices": "Nenhum dispositivo encontrado",
     "found": "{{count}} dispositivos encontrados",
     "unknown_device": "Dispositivo desconhecido",
@@ -318,8 +320,9 @@
     "type_unknown": ""
   },
   "wifi_security": {
-    "title": "Segurança da rede",
+    "title": "Segurança",
     "scanning": "Verificando segurança...",
+    "checking": "Verificando...",
     "network": "Rede: {{ssid}}",
     "overall_safe": "A rede é segura",
     "overall_warning": "Ameaças potenciais detectadas",
