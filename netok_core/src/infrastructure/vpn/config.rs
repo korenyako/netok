@@ -115,7 +115,13 @@ fn generate_vless_outbound(p: &VlessParams) -> Result<Value, String> {
     }
 
     // Transport
-    add_transport(&mut outbound, p.transport_type.as_deref(), p.path.as_deref(), p.host.as_deref(), p.service_name.as_deref());
+    add_transport(
+        &mut outbound,
+        p.transport_type.as_deref(),
+        p.path.as_deref(),
+        p.host.as_deref(),
+        p.service_name.as_deref(),
+    );
 
     Ok(outbound)
 }
@@ -140,7 +146,13 @@ fn generate_vmess_outbound(p: &VmessParams) -> Result<Value, String> {
     }
 
     // Transport
-    add_transport(&mut outbound, p.transport_type.as_deref(), p.path.as_deref(), p.host.as_deref(), None);
+    add_transport(
+        &mut outbound,
+        p.transport_type.as_deref(),
+        p.path.as_deref(),
+        p.host.as_deref(),
+        None,
+    );
 
     Ok(outbound)
 }
@@ -188,7 +200,13 @@ fn generate_trojan_outbound(p: &TrojanParams) -> Result<Value, String> {
     outbound["tls"] = tls;
 
     // Transport
-    add_transport(&mut outbound, p.transport_type.as_deref(), p.path.as_deref(), p.host.as_deref(), None);
+    add_transport(
+        &mut outbound,
+        p.transport_type.as_deref(),
+        p.path.as_deref(),
+        p.host.as_deref(),
+        None,
+    );
 
     Ok(outbound)
 }
@@ -273,7 +291,8 @@ mod tests {
 
     #[test]
     fn test_vless_config_structure() {
-        let uri = "vless://test-uuid@1.2.3.4:443?type=tcp&security=tls&sni=example.com&fp=chrome#Test";
+        let uri =
+            "vless://test-uuid@1.2.3.4:443?type=tcp&security=tls&sni=example.com&fp=chrome#Test";
         let protocol = parse_vpn_uri(uri).unwrap();
         let config = generate_singbox_config(&protocol).unwrap();
 
@@ -295,7 +314,10 @@ mod tests {
         assert_eq!(config["outbounds"][0]["uuid"], "test-uuid");
         assert_eq!(config["outbounds"][0]["tls"]["enabled"], true);
         assert_eq!(config["outbounds"][0]["tls"]["server_name"], "example.com");
-        assert_eq!(config["outbounds"][0]["tls"]["utls"]["fingerprint"], "chrome");
+        assert_eq!(
+            config["outbounds"][0]["tls"]["utls"]["fingerprint"],
+            "chrome"
+        );
 
         // Check direct outbound (no dns-out in 1.12+)
         assert_eq!(config["outbounds"][1]["type"], "direct");
@@ -333,7 +355,8 @@ mod tests {
 
     #[test]
     fn test_trojan_config() {
-        let uri = "trojan://password@server.com:443?sni=server.com&fp=chrome&alpn=h2,http/1.1#Trojan";
+        let uri =
+            "trojan://password@server.com:443?sni=server.com&fp=chrome&alpn=h2,http/1.1#Trojan";
         let protocol = parse_vpn_uri(uri).unwrap();
         let config = generate_singbox_config(&protocol).unwrap();
 

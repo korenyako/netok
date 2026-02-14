@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, DnsShield, DnsShieldCheck, Lock, LockOpen, ChevronRight } from '../components/icons/UIIcons';
+import { ArrowLeft, DnsShield, DnsShieldCheck, Lock, LockOpen, ShieldCheck, ChevronRight } from '../components/icons/UIIcons';
 import { Button } from '@/components/ui/button';
 import { MenuCard } from '@/components/MenuCard';
 import { CloseButton } from '../components/WindowControls';
@@ -10,6 +10,7 @@ interface ProtectionHubScreenProps {
   onBack: () => void;
   onNavigateToDns: () => void;
   onNavigateToVpn: () => void;
+  onNavigateToWifiSecurity: () => void;
 }
 
 const KNOWN_PROVIDERS = ['Cloudflare', 'Google', 'AdGuard', 'Dns4Eu', 'Quad9', 'OpenDns', 'Custom'];
@@ -23,7 +24,7 @@ const PROVIDER_DISPLAY: Record<string, string> = {
   OpenDns: 'OpenDNS',
 };
 
-export function ProtectionHubScreen({ onBack, onNavigateToDns, onNavigateToVpn }: ProtectionHubScreenProps) {
+export function ProtectionHubScreen({ onBack, onNavigateToDns, onNavigateToVpn, onNavigateToWifiSecurity }: ProtectionHubScreenProps) {
   const { t } = useTranslation();
   const { currentProvider: dnsProvider, isLoading: isDnsLoading } = useDnsStore();
   const { configs, activeIndex, connectionState } = useVpnStore();
@@ -121,6 +122,15 @@ export function ProtectionHubScreen({ onBack, onNavigateToDns, onNavigateToVpn }
             subtitle={vpnSubtitle}
             trailing={trailing}
             onClick={onNavigateToVpn}
+          />
+
+          <MenuCard
+            variant="ghost"
+            icon={<ShieldCheck className="w-5 h-5 text-muted-foreground" />}
+            title={t('protection.wifi_security')}
+            subtitle={t('protection.wifi_security_desc')}
+            trailing={trailing}
+            onClick={onNavigateToWifiSecurity}
           />
         </div>
       </div>

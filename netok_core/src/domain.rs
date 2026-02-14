@@ -370,7 +370,11 @@ impl DnsProvider {
             DnsProvider::OpenDnsFamilyShield => Some("208.67.222.123".to_string()),
             DnsProvider::OpenDnsHome => Some("208.67.222.222".to_string()),
             DnsProvider::Custom(primary, _, _, _) => {
-                if primary.is_empty() { None } else { Some(primary.clone()) }
+                if primary.is_empty() {
+                    None
+                } else {
+                    Some(primary.clone())
+                }
             }
         }
     }
@@ -403,7 +407,11 @@ impl DnsProvider {
             DnsProvider::OpenDnsFamilyShield => Some("208.67.220.123".to_string()),
             DnsProvider::OpenDnsHome => Some("208.67.220.220".to_string()),
             DnsProvider::Custom(_, secondary, _, _) => {
-                if secondary.is_empty() { None } else { Some(secondary.clone()) }
+                if secondary.is_empty() {
+                    None
+                } else {
+                    Some(secondary.clone())
+                }
             }
         }
     }
@@ -487,8 +495,14 @@ mod tests {
 
     #[test]
     fn test_dns_provider_cloudflare() {
-        assert_eq!(DnsProvider::Cloudflare.primary(), Some("1.1.1.1".to_string()));
-        assert_eq!(DnsProvider::Cloudflare.secondary(), Some("1.0.0.1".to_string()));
+        assert_eq!(
+            DnsProvider::Cloudflare.primary(),
+            Some("1.1.1.1".to_string())
+        );
+        assert_eq!(
+            DnsProvider::Cloudflare.secondary(),
+            Some("1.0.0.1".to_string())
+        );
     }
 
     #[test]
@@ -552,9 +566,18 @@ mod tests {
 
     #[test]
     fn test_diagnostic_scenario_from_id() {
-        assert_eq!(DiagnosticScenario::from_id(0), Some(DiagnosticScenario::AllGood));
-        assert_eq!(DiagnosticScenario::from_id(1), Some(DiagnosticScenario::WifiDisabled));
-        assert_eq!(DiagnosticScenario::from_id(7), Some(DiagnosticScenario::WeakSignal));
+        assert_eq!(
+            DiagnosticScenario::from_id(0),
+            Some(DiagnosticScenario::AllGood)
+        );
+        assert_eq!(
+            DiagnosticScenario::from_id(1),
+            Some(DiagnosticScenario::WifiDisabled)
+        );
+        assert_eq!(
+            DiagnosticScenario::from_id(7),
+            Some(DiagnosticScenario::WeakSignal)
+        );
         assert_eq!(DiagnosticScenario::from_id(8), None);
         assert_eq!(DiagnosticScenario::from_id(255), None);
     }
@@ -575,17 +598,35 @@ mod tests {
 
     #[test]
     fn test_diagnostic_scenario_severity() {
-        assert_eq!(DiagnosticScenario::AllGood.severity(), DiagnosticSeverity::Success);
-        assert_eq!(DiagnosticScenario::WeakSignal.severity(), DiagnosticSeverity::Warning);
-        assert_eq!(DiagnosticScenario::WifiDisabled.severity(), DiagnosticSeverity::Error);
-        assert_eq!(DiagnosticScenario::DnsFailure.severity(), DiagnosticSeverity::Error);
+        assert_eq!(
+            DiagnosticScenario::AllGood.severity(),
+            DiagnosticSeverity::Success
+        );
+        assert_eq!(
+            DiagnosticScenario::WeakSignal.severity(),
+            DiagnosticSeverity::Warning
+        );
+        assert_eq!(
+            DiagnosticScenario::WifiDisabled.severity(),
+            DiagnosticSeverity::Error
+        );
+        assert_eq!(
+            DiagnosticScenario::DnsFailure.severity(),
+            DiagnosticSeverity::Error
+        );
     }
 
     #[test]
     fn test_diagnostic_scenario_keys() {
         let scenario = DiagnosticScenario::WifiDisabled;
-        assert_eq!(scenario.title_key(), "diagnostic.scenario.wifi_disabled.title");
-        assert_eq!(scenario.message_key(), "diagnostic.scenario.wifi_disabled.message");
+        assert_eq!(
+            scenario.title_key(),
+            "diagnostic.scenario.wifi_disabled.title"
+        );
+        assert_eq!(
+            scenario.message_key(),
+            "diagnostic.scenario.wifi_disabled.message"
+        );
     }
 
     #[test]

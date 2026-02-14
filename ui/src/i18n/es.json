@@ -165,7 +165,9 @@
   "protection": {
     "title": "Protección",
     "dns_protection": "DNS",
-    "vpn_tunnel": "VPN"
+    "vpn_tunnel": "VPN",
+    "wifi_security": "Seguridad de red",
+    "wifi_security_desc": "Comprobar amenazas en Wi-Fi"
   },
   "vpn": {
     "title": "VPN",
@@ -311,6 +313,31 @@
     "type_gameconsole": "Consola",
     "type_iot": "IoT",
     "type_unknown": ""
+  },
+  "wifi_security": {
+    "title": "Seguridad de red",
+    "scanning": "Comprobando seguridad...",
+    "network": "Red: {{ssid}}",
+    "overall_safe": "La red es segura",
+    "overall_warning": "Amenazas potenciales detectadas",
+    "overall_danger": "Amenazas detectadas",
+    "check_encryption": "Cifrado",
+    "check_evil_twin": "Autenticidad de red",
+    "check_arp_spoofing": "Interceptación de tráfico",
+    "check_dns_hijacking": "Integridad DNS",
+    "encryption_safe": "Protegida con cifrado moderno",
+    "encryption_warning_wep": "Cifrado WEP obsoleto — fácil de descifrar",
+    "encryption_warning_wpa": "Cifrado WPA obsoleto",
+    "encryption_danger": "La red no está cifrada. Tu tráfico puede ser interceptado por otros cercanos",
+    "evil_twin_safe": "No hay puntos de acceso sospechosos cerca",
+    "evil_twin_warning": "Copia sospechosa de esta red sin cifrado detectada. Alguien podría estar interceptando el tráfico",
+    "arp_safe": "Sin indicios de interceptación de tráfico",
+    "arp_warning": "Actividad sospechosa en la red — posible interceptación de tráfico",
+    "arp_danger": "Intento de interceptación de tráfico detectado. No introduzcas contraseñas ni abras apps bancarias",
+    "dns_safe": "DNS funciona correctamente — los sitios se abren con direcciones reales",
+    "dns_warning": "Esta red podría falsificar direcciones de sitios. Activa la protección DNS en la configuración de Netok",
+    "recommend_dns": "Activar protección DNS",
+    "recommend_vpn": "Usar VPN"
   },
   "lang": {
     "system": "Sistema",

@@ -165,7 +165,9 @@
   "protection": {
     "title": "防护",
     "dns_protection": "DNS",
-    "vpn_tunnel": "VPN"
+    "vpn_tunnel": "VPN",
+    "wifi_security": "网络安全",
+    "wifi_security_desc": "检查 Wi-Fi 威胁"
   },
   "vpn": {
     "title": "VPN",
@@ -311,6 +313,31 @@
     "type_gameconsole": "游戏主机",
     "type_iot": "IoT",
     "type_unknown": ""
+  },
+  "wifi_security": {
+    "title": "网络安全",
+    "scanning": "正在检查安全性...",
+    "network": "网络：{{ssid}}",
+    "overall_safe": "网络安全",
+    "overall_warning": "检测到潜在威胁",
+    "overall_danger": "检测到威胁",
+    "check_encryption": "加密",
+    "check_evil_twin": "网络真实性",
+    "check_arp_spoofing": "流量拦截",
+    "check_dns_hijacking": "DNS 完整性",
+    "encryption_safe": "受现代加密保护",
+    "encryption_warning_wep": "过时的 WEP 加密 - 容易被破解",
+    "encryption_warning_wpa": "过时的 WPA 加密",
+    "encryption_danger": "网络未加密。您的流量可能被附近的人拦截",
+    "evil_twin_safe": "附近没有可疑的接入点",
+    "evil_twin_warning": "检测到此网络的可疑未加密副本。有人可能正在尝试拦截流量",
+    "arp_safe": "没有流量拦截的迹象",
+    "arp_warning": "网络中存在可疑活动 - 可能存在流量拦截",
+    "arp_danger": "检测到流量拦截尝试。请勿输入密码或打开银行应用",
+    "dns_safe": "DNS 正常工作 - 网站以真实地址打开",
+    "dns_warning": "此网络可能在伪造网站地址。请在 Netok 设置中启用 DNS 保护",
+    "recommend_dns": "启用 DNS 保护",
+    "recommend_vpn": "使用 VPN"
   },
   "lang": {
     "system": "跟随系统",
