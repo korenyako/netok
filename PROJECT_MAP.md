@@ -1,19 +1,107 @@
 # Project Map - Netok
 
-Generated: 2026-02-14
+Generated: 2026-02-17
 
 ## TREE (ASCII)
 
 ```text
 ├── .claude
 │   ├── worktrees
-│   │   └── tender-almeida
+│   │   ├── tender-almeida
+│   │   │   ├── .claude
+│   │   │   │   └── settings.local.json
+│   │   │   ├── .github
+│   │   │   │   ├── ISSUE_TEMPLATE
+│   │   │   │   └── workflows
+│   │   │   ├── .husky
+│   │   │   │   └── pre-commit
+│   │   │   ├── docs
+│   │   │   │   ├── deprecated
+│   │   │   │   ├── ACTION_PLAN.md
+│   │   │   │   ├── CODE_ANALYSIS.md
+│   │   │   │   ├── IMPLEMENTATION-PLAN.md
+│   │   │   │   ├── PROGRESS.md
+│   │   │   │   ├── README.md
+│   │   │   │   ├── RECOMMENDATIONS.md
+│   │   │   │   ├── REFACTORING-PLAN-SOLID.md
+│   │   │   │   ├── REVISED_PRIORITIES.md
+│   │   │   │   ├── SECURITY_AUDIT.md
+│   │   │   │   ├── SoT-ARCH.md
+│   │   │   │   ├── TESTING_PLAN.md
+│   │   │   │   └── UI-SPEC.md
+│   │   │   ├── i18n
+│   │   │   │   ├── en.json
+│   │   │   │   ├── README.md
+│   │   │   │   └── ru.json
+│   │   │   ├── netok_bridge
+│   │   │   │   ├── src
+│   │   │   │   ├── tests
+│   │   │   │   └── Cargo.toml
+│   │   │   ├── netok_core
+│   │   │   │   ├── benches
+│   │   │   │   ├── src
+│   │   │   │   └── Cargo.toml
+│   │   │   ├── netok_desktop
+│   │   │   │   ├── public
+│   │   │   │   ├── src
+│   │   │   │   ├── src-tauri
+│   │   │   │   ├── .gitignore
+│   │   │   │   ├── index.html
+│   │   │   │   ├── package-lock.json
+│   │   │   │   ├── package.json
+│   │   │   │   ├── postcss.config.js
+│   │   │   │   ├── README.md
+│   │   │   │   ├── tailwind.config.js
+│   │   │   │   ├── tsconfig.json
+│   │   │   │   ├── tsconfig.node.json
+│   │   │   │   └── vite.config.ts
+│   │   │   ├── scripts
+│   │   │   │   ├── generate_oui_database.py
+│   │   │   │   └── generate_project_map.mjs
+│   │   │   ├── ui
+│   │   │   │   ├── public
+│   │   │   │   ├── src
+│   │   │   │   ├── .gitignore
+│   │   │   │   ├── eslint.config.js
+│   │   │   │   ├── index.html
+│   │   │   │   ├── package-lock.json
+│   │   │   │   ├── package.json
+│   │   │   │   ├── postcss.config.js
+│   │   │   │   ├── README.md
+│   │   │   │   ├── tailwind.config.js
+│   │   │   │   ├── tsconfig.app.json
+│   │   │   │   ├── tsconfig.json
+│   │   │   │   ├── tsconfig.node.json
+│   │   │   │   ├── vite.config.ts
+│   │   │   │   └── vitest.config.ts
+│   │   │   ├── .cursorrules
+│   │   │   ├── .gitattributes
+│   │   │   ├── .gitignore
+│   │   │   ├── Cargo.lock
+│   │   │   ├── Cargo.toml
+│   │   │   ├── CLAUDE.md
+│   │   │   ├── CONTRIBUTING.md
+│   │   │   ├── DNS_PROVIDERS.md
+│   │   │   ├── etsy-hover-effects-fixed.html
+│   │   │   ├── LICENSE.Apache-2.0
+│   │   │   ├── LICENSE.Proprietary
+│   │   │   ├── nul
+│   │   │   ├── package-lock.json
+│   │   │   ├── package.json
+│   │   │   ├── PROJECT_CONTEXT.md
+│   │   │   ├── PROJECT_MAP.md
+│   │   │   ├── README_DEV.md
+│   │   │   ├── README.md
+│   │   │   ├── SETUP-PRECOMMIT.md
+│   │   │   └── TESTING.md
+│   │   └── xenodochial-jones
 │   │       ├── .claude
 │   │       │   └── settings.local.json
 │   │       ├── .github
 │   │       │   ├── ISSUE_TEMPLATE
 │   │       │   └── workflows
 │   │       ├── .husky
+│   │       │   ├── _
 │   │       │   └── pre-commit
 │   │       ├── docs
 │   │       │   ├── deprecated
@@ -57,7 +145,8 @@ Generated: 2026-02-14
 │   │       │   └── vite.config.ts
 │   │       ├── scripts
 │   │       │   ├── generate_oui_database.py
-│   │       │   └── generate_project_map.mjs
+│   │       │   ├── generate_project_map.mjs
+│   │       │   └── process_manuf.py
 │   │       ├── ui
 │   │       │   ├── public
 │   │       │   ├── src
@@ -77,7 +166,6 @@ Generated: 2026-02-14
 │   │       ├── .cursorrules
 │   │       ├── .gitattributes
 │   │       ├── .gitignore
-│   │       ├── Cargo.lock
 │   │       ├── Cargo.toml
 │   │       ├── CLAUDE.md
 │   │       ├── CONTRIBUTING.md
@@ -85,7 +173,6 @@ Generated: 2026-02-14
 │   │       ├── etsy-hover-effects-fixed.html
 │   │       ├── LICENSE.Apache-2.0
 │   │       ├── LICENSE.Proprietary
-│   │       ├── nul
 │   │       ├── package-lock.json
 │   │       ├── package.json
 │   │       ├── PROJECT_CONTEXT.md
@@ -150,6 +237,7 @@ Generated: 2026-02-14
 │   │   │   ├── connection.rs
 │   │   │   ├── dns.rs
 │   │   │   ├── gateway.rs
+│   │   │   ├── mdns.rs
 │   │   │   ├── mod.rs
 │   │   │   ├── security.rs
 │   │   │   └── wifi.rs

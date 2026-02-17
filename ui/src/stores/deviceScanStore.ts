@@ -40,7 +40,7 @@ export const useDeviceScanStore = create<DeviceScanStore>((set, get) => {
 
     runScan: async () => {
       if (get().isScanning) return;
-      set({ isScanning: true, error: null, scanStage: null });
+      set({ isScanning: true, error: null, scanStage: null, devices: [], lastUpdated: null });
       try {
         const result = await scanNetworkDevices();
         set({ devices: result, lastUpdated: Date.now() });

@@ -307,6 +307,7 @@
     "no_devices": "Пристрої не знайдені",
     "found": "Знайдено пристроїв: {{count}}",
     "unknown_device": "Невідомий пристрій",
+    "branded_device": "Пристрій {{name}}",
       "private_address": "Приватна адреса",
     "badge_router": "Маршрутизатор",
     "badge_this_device": "Цей пристрій",
@@ -318,7 +319,7 @@
     "type_smarttv": "Телевізор",
     "type_gameconsole": "Консоль",
     "type_iot": "IoT",
-    "type_unknown": ""
+    "type_unknown": "Пристрій"
   },
   "wifi_security": {
     "title": "Безпека",

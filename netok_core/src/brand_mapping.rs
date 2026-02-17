@@ -11452,7 +11452,7 @@ static BRAND_MAP: LazyLock<HashMap<&'static str, &'static str>> = LazyLock::new(
     map.insert("ingenic semiconductor co.,ltd", "Ingenic");
     map.insert("ingenico international", "Ingenico");
     map.insert("ingenieria electronica comercial inelcom s.a.", "Ingenieria Electronica Comercial Inelcom");
-    map.insert("ingeniería almudã­ s.l.", "Ingeniería AlmudÃ­ S.L");
+    map.insert("ingenier\u{ED}a almud\u{E3}\u{AD} s.l.", "Ingenier\u{ED}a Almud\u{E3}\u{AD} S.L");
     map.insert("ingenieurbuero bickele und buehler gmbh", "Ingenieurbuero Bickele Und Buehler");
     map.insert("ingenieurbuero somtronik", "Ingenieurbuero Somtronik");
     map.insert("ingenieurbuero stark gmbh und ko. kg", "Ingenieurbuero Stark GmbH Und Ko. KG");
@@ -27481,7 +27481,7 @@ static BRAND_MAP: LazyLock<HashMap<&'static str, &'static str>> = LazyLock::new(
     map.insert("éolane", "Éolane");
     map.insert("öresundskraft ab", "Öresundskraft");
     map.insert("östling marking systems gmbh", "Östling Marking");
-    map.insert("​asung techno co.,ltd", "​asung Techno");
+    map.insert("\u{200B}asung techno co.,ltd", "\u{200B}asung Techno");
     map.insert("杭州德澜科技有限公司（hangzhou delan technology co.,ltd）", "杭州德澜科技有限公司（HangZhou Delan Co.,Ltd）");
     map
 });
@@ -27654,7 +27654,7 @@ fn clean_vendor_name(vendor: &str) -> String {
 
     // Clean up whitespace and trailing punctuation
     let name = name.split_whitespace().collect::<Vec<&str>>().join(" ");
-    let name = name.trim_end_matches(|c: char| c == ',' || c == '.' || c == ' ' || c == '-');
+    let name = name.trim_end_matches([',', '.', ' ', '-']);
 
     if name.is_empty() {
         return vendor.to_string();

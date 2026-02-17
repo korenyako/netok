@@ -307,6 +307,7 @@
     "no_devices": "Устройства не найдены",
     "found": "Найдено устройств: {{count}}",
     "unknown_device": "Неизвестное устройство",
+    "branded_device": "Устройство {{name}}",
       "private_address": "Частный адрес",
     "badge_router": "Роутер",
     "badge_this_device": "Это устройство",
@@ -318,7 +319,7 @@
     "type_smarttv": "Телевизор",
     "type_gameconsole": "Консоль",
     "type_iot": "IoT",
-    "type_unknown": ""
+    "type_unknown": "Устройство"
   },
   "wifi_security": {
     "title": "Безопасность",

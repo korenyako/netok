@@ -307,6 +307,7 @@
     "no_devices": "Nie znaleziono urządzeń",
     "found": "Znaleziono {{count}} urządzeń",
     "unknown_device": "Nieznane urządzenie",
+    "branded_device": "Urządzenie {{name}}",
       "private_address": "Adres prywatny",
     "badge_router": "Router",
     "badge_this_device": "To urządzenie",
@@ -318,7 +319,7 @@
     "type_smarttv": "Smart TV",
     "type_gameconsole": "Konsola",
     "type_iot": "IoT",
-    "type_unknown": ""
+    "type_unknown": "Urządzenie"
   },
   "wifi_security": {
     "title": "Bezpieczeństwo",

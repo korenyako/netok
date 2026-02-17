@@ -307,6 +307,7 @@
     "no_devices": "デバイスが見つかりません",
     "found": "{{count}} 台のデバイスが見つかりました",
     "unknown_device": "不明なデバイス",
+    "branded_device": "{{name}} デバイス",
       "private_address": "プライベートアドレス",
     "badge_router": "ルーター",
     "badge_this_device": "このデバイス",
@@ -318,7 +319,7 @@
     "type_smarttv": "スマートTV",
     "type_gameconsole": "ゲーム機",
     "type_iot": "IoT",
-    "type_unknown": ""
+    "type_unknown": "デバイス"
   },
   "wifi_security": {
     "title": "セキュリティ",

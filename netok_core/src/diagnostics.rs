@@ -13,8 +13,9 @@ use crate::domain::{
 };
 use crate::infrastructure::{
     arp::get_all_arp_entries, detect_connection_type, get_default_gateway, get_router_mac,
-    get_wifi_info,
+    get_wifi_info, mdns_discover,
 };
+use crate::infrastructure::mdns::infer_device_type_from_services;
 use crate::oui_database::OUI_DATABASE;
 
 /// DNS Test: try to resolve known domains.
@@ -543,13 +544,16 @@ fn classify_vendor(vendor: &str, is_gateway: bool) -> DeviceType {
         "xiaomi comm",
         "mercury",
         "keenetic",
+        "zte",
+        "sagemcom",
+        "arris",
+        "technicolor",
+        "sercomm",
+        "arcadyan",
     ];
     if is_gateway {
-        for rv in ROUTER_VENDORS {
-            if v.contains(rv) {
-                return DeviceType::Router;
-            }
-        }
+        // Any gateway device is a router, even if vendor is unknown
+        return DeviceType::Router;
     }
 
     // Printers
@@ -601,7 +605,15 @@ fn classify_vendor(vendor: &str, is_gateway: bool) -> DeviceType {
         }
     }
 
-    // Phones / tablets (hard to distinguish without mDNS)
+    // Tablets (check before phones — "iPad" is specific)
+    const TABLET_KEYWORDS: &[&str] = &["ipad"];
+    for tk in TABLET_KEYWORDS {
+        if v.contains(tk) {
+            return DeviceType::Tablet;
+        }
+    }
+
+    // Phones (generic brand match — may also be tablets)
     const PHONE_VENDORS: &[&str] = &[
         "apple",
         "samsung",
@@ -616,6 +628,7 @@ fn classify_vendor(vendor: &str, is_gateway: bool) -> DeviceType {
         "nokia",
         "realme",
         "honor",
+        "iphone",
     ];
     for pv in PHONE_VENDORS {
         if v.contains(pv) {
@@ -673,8 +686,11 @@ pub fn scan_network_devices() -> Vec<NetworkDevice> {
 /// Scan the local network with optional progress reporting.
 ///
 /// Progress callback receives stage names: "scanning", "identifying".
+/// Type alias for the optional progress callback.
+pub type ProgressCallback = Option<Box<dyn Fn(&str) + Send + Sync>>;
+
 pub fn scan_network_devices_with_progress(
-    on_progress: Option<Box<dyn Fn(&str) + Send + Sync>>,
+    on_progress: ProgressCallback,
 ) -> Vec<NetworkDevice> {
     use crate::brand_mapping::map_vendor_to_brand;
     use crate::infrastructure::{ping_sweep, reverse_dns_lookup};
@@ -694,6 +710,11 @@ pub fn scan_network_devices_with_progress(
     if let Some(ref gw) = gateway_ip {
         ping_sweep(gw);
     }
+
+    // Phase 0.5: Start mDNS discovery in background (runs concurrently with ARP + reverse DNS)
+    let mdns_handle = std::thread::spawn(|| {
+        mdns_discover(Duration::from_secs(3))
+    });
 
     // Phase 1: Read ARP table + OUI + classification
     progress("identifying");
@@ -751,12 +772,52 @@ pub fn scan_network_devices_with_progress(
         }
     });
 
-    // Sort: gateway first, then self, then by IP
+    // Phase 3: Join mDNS results and enrich devices with human-readable names
+    let mdns_results = mdns_handle.join().unwrap_or_default();
+    if !mdns_results.is_empty() {
+        println!(
+            "[scan] Enriching {} devices with mDNS data ({} mDNS entries)",
+            devices.len(),
+            mdns_results.len()
+        );
+
+        for device in &mut devices {
+            if let Some(mdns_info) = mdns_results.get(&device.ip) {
+                // mDNS name overrides reverse DNS hostname (more human-readable)
+                device.hostname = Some(mdns_info.name.clone());
+
+                // Refine device type if mDNS gives a stronger signal
+                // (don't reclassify gateway devices)
+                if !device.is_gateway {
+                    if let Some(inferred) =
+                        infer_device_type_from_services(&mdns_info.service_types)
+                    {
+                        device.device_type = inferred;
+                    }
+                }
+            }
+        }
+
+        // Second pass: try to classify Unknown devices by hostname
+        // (e.g. randomized-MAC devices where OUI was skipped but mDNS/DNS gave a name)
+        for device in &mut devices {
+            if device.device_type == DeviceType::Unknown && !device.is_gateway {
+                if let Some(ref name) = device.hostname {
+                    let inferred = classify_vendor(name, false);
+                    if inferred != DeviceType::Unknown {
+                        device.device_type = inferred;
+                    }
+                }
+            }
+        }
+    }
+
+    // Sort by numeric IP (e.g. 192.168.1.7 before 192.168.1.21)
     devices.sort_by(|a, b| {
-        b.is_gateway
-            .cmp(&a.is_gateway)
-            .then(b.is_self.cmp(&a.is_self))
-            .then(a.ip.cmp(&b.ip))
+        let parse_ip = |ip: &str| -> Vec<u32> {
+            ip.split('.').filter_map(|s| s.parse().ok()).collect()
+        };
+        parse_ip(&a.ip).cmp(&parse_ip(&b.ip))
     });
 
     devices

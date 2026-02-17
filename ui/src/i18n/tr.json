@@ -307,6 +307,7 @@
     "no_devices": "Cihaz bulunamadı",
     "found": "{{count}} cihaz bulundu",
     "unknown_device": "Bilinmeyen cihaz",
+    "branded_device": "{{name}} cihazı",
       "private_address": "Özel adres",
     "badge_router": "Yönlendirici",
     "badge_this_device": "Bu cihaz",
@@ -318,7 +319,7 @@
     "type_smarttv": "Smart TV",
     "type_gameconsole": "Konsol",
     "type_iot": "IoT",
-    "type_unknown": ""
+    "type_unknown": "Cihaz"
   },
   "wifi_security": {
     "title": "Güvenlik",

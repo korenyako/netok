@@ -7,7 +7,7 @@ import {
 } from '../components/icons/UIIcons';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { MenuCard } from '@/components/MenuCard';
+import { Card, CardContent } from '@/components/ui/card';
 import { CloseButton } from '../components/WindowControls';
 import { useDeviceScanStore, formatTimeAgo } from '../stores/deviceScanStore';
 import type { DeviceType, NetworkDevice } from '../api/tauri';
@@ -29,21 +29,21 @@ const DEVICE_TYPE_ICONS: Record<DeviceType, (props: { className?: string }) => R
 };
 
 const DEVICE_TYPE_COLORS: Record<DeviceType, string> = {
-  Router: 'text-blue-500',
-  Phone: 'text-green-500',
-  Computer: 'text-purple-500',
-  Tablet: 'text-indigo-500',
-  Printer: 'text-teal-500',
-  SmartTv: 'text-pink-500',
-  GameConsole: 'text-red-500',
-  IoT: 'text-amber-500',
+  Router: 'text-primary',
+  Phone: 'text-primary',
+  Computer: 'text-primary',
+  Tablet: 'text-primary',
+  Printer: 'text-primary',
+  SmartTv: 'text-primary',
+  GameConsole: 'text-primary',
+  IoT: 'text-primary',
   Unknown: 'text-muted-foreground',
 };
 
 /** Pick icon + color with priority: is_gateway → is_randomized → device_type → unknown */
 function getDeviceVisual(device: NetworkDevice) {
   if (device.is_gateway) {
-    return { Icon: Wifi, color: 'text-blue-500' };
+    return { Icon: Wifi, color: 'text-primary' };
   }
   if (device.is_randomized && device.device_type === 'Unknown') {
     return { Icon: Ghost, color: 'text-muted-foreground' };
@@ -136,46 +136,29 @@ export function DeviceScanScreen({ onBack }: DeviceScanScreenProps) {
             </div>
 
             {devices.map((device) => {
-              const title = device.vendor
-                ?? (device.is_randomized ? t('device_scan.private_address') : t('device_scan.unknown_device'));
-
-              // Role badge (gateway/self) takes priority, otherwise show device type
-              let badge: string | undefined;
-              let badgeClassName: string | undefined;
-              if (device.is_gateway) {
-                badge = t('device_scan.badge_router');
-                badgeClassName = 'text-blue-500 bg-blue-500/10';
-              } else if (device.is_self) {
-                badge = t('device_scan.badge_this_device');
-                badgeClassName = 'text-primary bg-primary/10';
-              } else if (device.device_type !== 'Unknown') {
-                badge = t(`device_scan.type_${device.device_type.toLowerCase()}`);
-                badgeClassName = 'text-muted-foreground bg-muted';
-              }
-
-              const subtitle = (
-                <>
-                  {device.hostname && <div className="truncate">{device.hostname}</div>}
-                  <div>{device.ip}</div>
-                </>
-              );
-
+              const typeLabel = t(`device_scan.type_${device.device_type.toLowerCase()}`);
+              const name = device.hostname ?? device.vendor;
               const { Icon, color } = getDeviceVisual(device);
 
               return (
-                <MenuCard
-                  key={`${device.ip}-${device.mac}`}
-                  variant="ghost"
-                  icon={
-                    <span className={color}>
+                <Card key={`${device.ip}-${device.mac}`} className="bg-transparent hover:bg-accent">
+                  <CardContent className="flex items-start gap-3 py-3 px-4">
+                    <span className={`shrink-0 mt-2.5 ${color}`}>
                       <Icon className="w-5 h-5" />
                     </span>
-                  }
-                  title={title}
-                  badge={badge}
-                  badgeClassName={badgeClassName}
-                  subtitle={subtitle}
-                />
+                    <div className="flex-1 min-w-0">
+                      {name ? (
+                        <>
+                          <div className="text-sm text-muted-foreground leading-normal">{typeLabel}</div>
+                          <div className="text-base font-medium leading-normal truncate">{name}</div>
+                        </>
+                      ) : (
+                        <div className="text-base font-medium leading-normal">{t('device_scan.unknown_device')}</div>
+                      )}
+                      <div className="text-sm text-muted-foreground leading-normal">{device.ip}</div>
+                    </div>
+                  </CardContent>
+                </Card>
               );
             })}
           </div>

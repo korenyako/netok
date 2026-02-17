@@ -307,6 +307,7 @@
     "no_devices": "دستگاهی یافت نشد",
     "found": "{{count}} دستگاه یافت شد",
     "unknown_device": "دستگاه ناشناس",
+    "branded_device": "دستگاه {{name}}",
       "private_address": "آدرس خصوصی",
     "badge_router": "روتر",
     "badge_this_device": "این دستگاه",
@@ -318,7 +319,7 @@
     "type_smarttv": "تلویزیون هوشمند",
     "type_gameconsole": "کنسول",
     "type_iot": "IoT",
-    "type_unknown": ""
+    "type_unknown": "دستگاه"
   },
   "wifi_security": {
     "title": "امنیت",
