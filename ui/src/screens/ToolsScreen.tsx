@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Activity, Gauge, Radar } from '../components/icons/UIIcons';
+import { ArrowLeft, Activity, Gauge, Radar, ShieldCheck } from '../components/icons/UIIcons';
 import { Button } from '@/components/ui/button';
 import { CloseButton } from '../components/WindowControls';
 
@@ -8,6 +8,7 @@ interface ToolsScreenProps {
   onOpenDiagnostics: () => void;
   onOpenSpeedTest: () => void;
   onOpenDeviceScan: () => void;
+  onOpenWifiSecurity: () => void;
 }
 
 interface ToolTile {
@@ -18,7 +19,7 @@ interface ToolTile {
   onClick: () => void;
 }
 
-export function ToolsScreen({ onBack, onOpenDiagnostics, onOpenSpeedTest, onOpenDeviceScan }: ToolsScreenProps) {
+export function ToolsScreen({ onBack, onOpenDiagnostics, onOpenSpeedTest, onOpenDeviceScan, onOpenWifiSecurity }: ToolsScreenProps) {
   const { t } = useTranslation();
 
   const tools: ToolTile[] = [
@@ -42,6 +43,13 @@ export function ToolsScreen({ onBack, onOpenDiagnostics, onOpenSpeedTest, onOpen
       icon: <Radar className="w-6 h-6" />,
       iconColorClass: 'text-amber-500',
       onClick: onOpenDeviceScan,
+    },
+    {
+      id: 'wifi-security',
+      nameKey: 'settings.tools.wifi_security',
+      icon: <ShieldCheck className="w-6 h-6" />,
+      iconColorClass: 'text-emerald-500',
+      onClick: onOpenWifiSecurity,
     },
   ];
 
