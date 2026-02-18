@@ -5,8 +5,9 @@ interface ScanProgressRingProps {
   stageLabel?: string;
 }
 
-const SIZE = 200;
-const STROKE_WIDTH = 4;
+// Match StatusScreen circle dimensions (240px, stroke 2)
+const SIZE = 240;
+const STROKE_WIDTH = 2;
 const RADIUS = (SIZE - STROKE_WIDTH * 2) / 2;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
@@ -16,7 +17,7 @@ export function ScanProgressRing({ percent, stageLabel }: ScanProgressRingProps)
 
   return (
     <div className="flex flex-col items-center justify-center py-12 gap-4">
-      <div className="relative" style={{ width: SIZE, height: SIZE }}>
+      <div className="relative w-60 h-60">
         <svg
           className="w-full h-full"
           viewBox={`0 0 ${SIZE} ${SIZE}`}
@@ -50,11 +51,11 @@ export function ScanProgressRing({ percent, stageLabel }: ScanProgressRingProps)
         </svg>
 
         {/* Percentage text */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-4xl font-semibold text-foreground tabular-nums">
+        <div className="absolute inset-0 flex items-baseline justify-center pt-[6.25rem]">
+          <span className="font-mono text-4xl font-semibold text-foreground">
             {Math.round(clamped)}
-            <span className="text-2xl text-muted-foreground">%</span>
           </span>
+          <span className="font-mono text-base text-muted-foreground ml-0.5">%</span>
         </div>
       </div>
 
