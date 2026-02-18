@@ -307,6 +307,7 @@
     "no_devices": "未找到设备",
     "found": "找到 {{count}} 台设备",
     "unknown_device": "未知设备",
+    "branded_device": "{{name}} 设备",
       "private_address": "私有地址",
     "badge_router": "路由器",
     "badge_this_device": "本机",
@@ -318,7 +319,7 @@
     "type_smarttv": "智能电视",
     "type_gameconsole": "游戏主机",
     "type_iot": "IoT",
-    "type_unknown": ""
+    "type_unknown": "设备"
   },
   "wifi_security": {
     "title": "安全",

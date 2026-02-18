@@ -808,7 +808,7 @@ mod tests {
 
     #[test]
     fn test_security_status_ordering() {
-        let statuses = vec![
+        let statuses = [
             SecurityStatus::Safe,
             SecurityStatus::Warning,
             SecurityStatus::Danger,

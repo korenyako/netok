@@ -61,6 +61,7 @@ Generated: 2026-02-18
 │   │   │   ├── connection.rs
 │   │   │   ├── dns.rs
 │   │   │   ├── gateway.rs
+│   │   │   ├── mdns.rs
 │   │   │   ├── mod.rs
 │   │   │   ├── security.rs
 │   │   │   └── wifi.rs
