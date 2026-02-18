@@ -147,6 +147,14 @@
       "author": "作者",
       "author_value": "Anton Korenyako",
       "website_button": "官网",
+      "check_updates": "检查更新",
+      "checking_updates": "正在检查更新...",
+      "update_to": "更新到 v{{version}}",
+      "update_available_toast": "有可用更新: v{{version}}",
+      "update_downloading": "下载中... {{progress}}%",
+      "update_up_to_date": "已是最新版本",
+      "update_error": "无法检查更新",
+      "update_version_date": "v{{version}} — {{date}}",
       "changes": [
         "测速功能由 M-Lab NDT7 提供支持",
         "界面优化：新字体、精致图标和样式"

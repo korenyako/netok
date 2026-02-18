@@ -14,16 +14,16 @@ interface SettingsRouterProps {
 export function SettingsRouter({ subScreen, onSetSubScreen, onBack }: SettingsRouterProps) {
   switch (subScreen) {
     case 'theme':
-      return <ThemeSettingsScreen onBack={() => onSetSubScreen('main')} />;
+      return <ThemeSettingsScreen onBack={onBack} />;
 
     case 'language':
-      return <LanguageSettingsScreen onBack={() => onSetSubScreen('main')} />;
+      return <LanguageSettingsScreen onBack={onBack} />;
 
     case 'close-behavior':
-      return <CloseBehaviorSettingsScreen onBack={() => onSetSubScreen('main')} />;
+      return <CloseBehaviorSettingsScreen onBack={onBack} />;
 
     case 'about':
-      return <AboutScreen onBack={() => onSetSubScreen('main')} />;
+      return <AboutScreen onBack={onBack} />;
 
     case 'main':
     default:

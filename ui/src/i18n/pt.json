@@ -147,6 +147,14 @@
       "author": "Autor",
       "author_value": "Anton Korenyako",
       "website_button": "Site",
+      "check_updates": "Verificar atualizações",
+      "checking_updates": "Verificando atualizações...",
+      "update_to": "Atualizar para v{{version}}",
+      "update_available_toast": "Atualização disponível: v{{version}}",
+      "update_downloading": "Baixando... {{progress}}%",
+      "update_up_to_date": "Você tem a versão mais recente",
+      "update_error": "Não foi possível verificar atualizações",
+      "update_version_date": "v{{version}} — {{date}}",
       "changes": [
         "Speed Test com tecnologia M-Lab NDT7",
         "Melhorias na UI: nova fonte, ícones e estilo refinados"

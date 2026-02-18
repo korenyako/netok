@@ -147,6 +147,14 @@
       "author": "Author",
       "author_value": "Anton Korenyako",
       "website_button": "Website",
+      "check_updates": "Check for updates",
+      "checking_updates": "Checking for updates...",
+      "update_to": "Update to v{{version}}",
+      "update_available_toast": "Update available: v{{version}}",
+      "update_downloading": "Downloading... {{progress}}%",
+      "update_up_to_date": "You have the latest version",
+      "update_error": "Could not check for updates",
+      "update_version_date": "v{{version}} — {{date}}",
       "changes": [
         "Speed Test powered by M-Lab NDT7",
         "UI polish: new font, refined icons and styling"

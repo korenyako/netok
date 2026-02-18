@@ -147,6 +147,14 @@
       "author": "Yazar",
       "author_value": "Anton Korenyako",
       "website_button": "Web sitesi",
+      "check_updates": "Güncellemeleri kontrol et",
+      "checking_updates": "Güncellemeler kontrol ediliyor...",
+      "update_to": "v{{version}} sürümüne güncelle",
+      "update_available_toast": "Güncelleme mevcut: v{{version}}",
+      "update_downloading": "İndiriliyor... {{progress}}%",
+      "update_up_to_date": "En son sürüme sahipsiniz",
+      "update_error": "Güncellemeler kontrol edilemedi",
+      "update_version_date": "v{{version}} — {{date}}",
       "changes": [
         "M-Lab NDT7 destekli Speed Test",
         "Arayüz iyileştirmeleri: yeni yazı tipi, geliştirilmiş simgeler ve stil"

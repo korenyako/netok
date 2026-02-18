@@ -147,6 +147,14 @@
       "author": "سازنده",
       "author_value": "Anton Korenyako",
       "website_button": "وب‌سایت",
+      "check_updates": "بررسی به‌روزرسانی",
+      "checking_updates": "در حال بررسی به‌روزرسانی...",
+      "update_to": "به‌روزرسانی به v{{version}}",
+      "update_available_toast": "به‌روزرسانی موجود: v{{version}}",
+      "update_downloading": "در حال دانلود... {{progress}}%",
+      "update_up_to_date": "آخرین نسخه را دارید",
+      "update_error": "بررسی به‌روزرسانی ممکن نیست",
+      "update_version_date": "v{{version}} — {{date}}",
       "changes": [
         "تست سرعت با فناوری M-Lab NDT7",
         "بهبود ظاهری: فونت جدید، آیکون‌ها و استایل بهتر"

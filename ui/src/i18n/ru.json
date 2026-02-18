@@ -147,6 +147,14 @@
       "author": "Автор",
       "author_value": "Антон Кореняко",
       "website_button": "Сайт",
+      "check_updates": "Проверить обновления",
+      "checking_updates": "Проверка обновлений...",
+      "update_to": "Обновить до v{{version}}",
+      "update_available_toast": "Доступно обновление: v{{version}}",
+      "update_downloading": "Загрузка... {{progress}}%",
+      "update_up_to_date": "У вас последняя версия",
+      "update_error": "Не удалось проверить обновления",
+      "update_version_date": "v{{version}} — {{date}}",
       "changes": [
         "Тест скорости на базе M-Lab NDT7",
         "Улучшения интерфейса: новый шрифт, иконки и стили"

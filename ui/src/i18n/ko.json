@@ -147,6 +147,14 @@
       "author": "제작자",
       "author_value": "Anton Korenyako",
       "website_button": "웹사이트",
+      "check_updates": "업데이트 확인",
+      "checking_updates": "업데이트 확인 중...",
+      "update_to": "v{{version}}으로 업데이트",
+      "update_available_toast": "업데이트 가능: v{{version}}",
+      "update_downloading": "다운로드 중... {{progress}}%",
+      "update_up_to_date": "최신 버전입니다",
+      "update_error": "업데이트를 확인할 수 없습니다",
+      "update_version_date": "v{{version}} — {{date}}",
       "changes": [
         "M-Lab NDT7 기반 속도 테스트",
         "UI 개선: 새로운 글꼴, 아이콘 및 스타일 다듬기"

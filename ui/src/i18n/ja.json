@@ -147,6 +147,14 @@
       "author": "作者",
       "author_value": "Anton Korenyako",
       "website_button": "ウェブサイト",
+      "check_updates": "アップデートを確認",
+      "checking_updates": "アップデートを確認中...",
+      "update_to": "v{{version}}にアップデート",
+      "update_available_toast": "アップデート可能: v{{version}}",
+      "update_downloading": "ダウンロード中... {{progress}}%",
+      "update_up_to_date": "最新バージョンです",
+      "update_error": "アップデートを確認できません",
+      "update_version_date": "v{{version}} — {{date}}",
       "changes": [
         "M-Lab NDT7 によるスピードテスト",
         "UI改善：新フォント、洗練されたアイコンとスタイル"

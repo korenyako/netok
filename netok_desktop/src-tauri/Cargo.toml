@@ -21,6 +21,8 @@ tauri-build = { version = "2.0", features = [] }
 tauri = { version = "2.0", features = ["tray-icon"] }
 tauri-plugin-opener = "2.0"
 tauri-plugin-shell = "2"
+tauri-plugin-updater = "2"
+tauri-plugin-process = "2"
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 netok_bridge = { path = "../../netok_bridge" }

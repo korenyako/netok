@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ArrowUpRight } from '../components/icons/UIIcons';
+import Spinner from '../components/Spinner';
 import { getVersion } from '@tauri-apps/api/app';
 import { openUrl } from '@tauri-apps/plugin-opener';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { CloseButton } from '../components/WindowControls';
+import { useUpdateChecker } from '../hooks/useUpdateChecker';
 
 interface AboutScreenProps {
   onBack: () => void;
@@ -14,12 +16,41 @@ interface AboutScreenProps {
 export function AboutScreen({ onBack }: AboutScreenProps) {
   const { t } = useTranslation();
   const [appVersion, setAppVersion] = useState('...');
+  const { status, updateVersion, updateDate, progress, checkForUpdates, downloadAndInstall } = useUpdateChecker();
 
   useEffect(() => {
     getVersion().then(setAppVersion).catch(() => setAppVersion('0.1.0'));
   }, []);
 
   const changes = t('settings.about.changes', { returnObjects: true }) as string[];
+
+  const isChecking = status === 'checking';
+  const isAvailable = status === 'available';
+  const isDownloading = status === 'downloading';
+
+  const handleUpdateClick = () => {
+    if (isAvailable) {
+      downloadAndInstall();
+    } else {
+      checkForUpdates();
+    }
+  };
+
+  const formatDate = (dateStr: string | null) => {
+    if (!dateStr) return '';
+    try {
+      return new Date(dateStr).toLocaleDateString();
+    } catch {
+      return '';
+    }
+  };
+
+  let statusText: string | null = null;
+  if (isChecking) statusText = t('settings.about.checking_updates');
+  else if (isAvailable && updateVersion) statusText = t('settings.about.update_version_date', { version: updateVersion, date: formatDate(updateDate) });
+  else if (isDownloading) statusText = t('settings.about.update_downloading', { progress: String(progress) });
+  else if (status === 'up-to-date') statusText = t('settings.about.update_up_to_date');
+  else if (status === 'error') statusText = t('settings.about.update_error');
 
   return (
     <div className="flex flex-col h-full bg-background">
@@ -72,6 +103,26 @@ export function AboutScreen({ onBack }: AboutScreenProps) {
             </ul>
           </CardContent>
         </Card>
+
+        {/* Check for updates */}
+        <div>
+          <Button
+            variant={isAvailable ? 'default' : 'outline'}
+            className="w-full text-sm font-medium"
+            disabled={isChecking || isDownloading}
+            onClick={handleUpdateClick}
+          >
+            {(isChecking || isDownloading) && <Spinner className="w-4 h-4 me-2" />}
+            {isAvailable
+              ? t('settings.about.update_to', { version: updateVersion })
+              : isDownloading
+                ? t('settings.about.update_downloading', { progress: String(progress) })
+                : t('settings.about.check_updates')}
+          </Button>
+          {statusText && (
+            <p className="text-xs text-muted-foreground text-center mt-2">{statusText}</p>
+          )}
+        </div>
 
         {/* Website button */}
         <Button

@@ -147,6 +147,14 @@
       "author": "Auteur",
       "author_value": "Anton Korenyako",
       "website_button": "Site web",
+      "check_updates": "Rechercher des mises à jour",
+      "checking_updates": "Recherche de mises à jour...",
+      "update_to": "Mettre à jour vers v{{version}}",
+      "update_available_toast": "Mise à jour disponible : v{{version}}",
+      "update_downloading": "Téléchargement... {{progress}}%",
+      "update_up_to_date": "Vous avez la dernière version",
+      "update_error": "Impossible de vérifier les mises à jour",
+      "update_version_date": "v{{version}} — {{date}}",
       "changes": [
         "Test de débit avec M-Lab NDT7",
         "Améliorations visuelles : nouvelle police, icônes et styles affinés"

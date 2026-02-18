@@ -13,23 +13,11 @@ interface SecurityRouterProps {
 }
 
 export function SecurityRouter({ subScreen, onSetSubScreen, onBack }: SecurityRouterProps) {
-  const handleBackToHub = () => {
-    onSetSubScreen('hub');
-  };
-
-  const handleBackToHome = () => {
-    onBack();
-  };
-
-  const handleBackToProviders = () => {
-    onSetSubScreen('dns-providers');
-  };
-
   switch (subScreen) {
     case 'dns-providers':
       return (
         <DnsProvidersScreen
-          onBack={handleBackToHub}
+          onBack={onBack}
           onCustomIp={() => onSetSubScreen('custom-ip')}
         />
       );
@@ -37,15 +25,15 @@ export function SecurityRouter({ subScreen, onSetSubScreen, onBack }: SecurityRo
     case 'custom-ip':
       return (
         <CustomIpScreen
-          onBack={handleBackToProviders}
-          onApplied={handleBackToProviders}
+          onBack={onBack}
+          onApplied={onBack}
         />
       );
 
     case 'vpn':
       return (
         <VpnTunnelScreen
-          onBack={handleBackToHub}
+          onBack={onBack}
           onAddVpn={() => onSetSubScreen('vpn-add')}
         />
       );
@@ -53,15 +41,15 @@ export function SecurityRouter({ subScreen, onSetSubScreen, onBack }: SecurityRo
     case 'vpn-add':
       return (
         <AddVpnScreen
-          onBack={() => onSetSubScreen('vpn')}
-          onAdded={() => onSetSubScreen('vpn')}
+          onBack={onBack}
+          onAdded={onBack}
         />
       );
 
     case 'wifi-security':
       return (
         <WiFiSecurityScreen
-          onBack={handleBackToHub}
+          onBack={onBack}
           onNavigateToDns={() => onSetSubScreen('dns-providers')}
           onNavigateToVpn={() => onSetSubScreen('vpn')}
         />
@@ -71,7 +59,7 @@ export function SecurityRouter({ subScreen, onSetSubScreen, onBack }: SecurityRo
     default:
       return (
         <ProtectionHubScreen
-          onBack={handleBackToHome}
+          onBack={onBack}
           onNavigateToDns={() => onSetSubScreen('dns-providers')}
           onNavigateToVpn={() => onSetSubScreen('vpn')}
         />

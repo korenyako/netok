@@ -22,15 +22,16 @@ function App() {
     showDeviceScan,
     settingsSubScreen,
     securitySubScreen,
-    setShowDiagnostics,
-    setShowSpeedTest,
-    setShowDeviceScan,
-    setSettingsSubScreen,
-    setSecuritySubScreen,
+    goBack,
     navigateToHome,
     navigateToSecurity,
     navigateToTools,
     navigateToSettings,
+    navigateToSecuritySubScreen,
+    navigateToSettingsSubScreen,
+    openDiagnostics,
+    openSpeedTest,
+    openDeviceScan,
   } = useNavigation();
 
   const { t } = useTranslation();
@@ -55,13 +56,13 @@ function App() {
       <ThemeProvider>
         <Toaster />
         <div id="app" className="h-full flex flex-col bg-background">
-          <DeviceScanScreen onBack={() => setShowDeviceScan(false)} />
+          <DeviceScanScreen onBack={goBack} />
           <BottomNav
             currentScreen={currentScreen}
-            onNavigateToHome={() => { setShowDeviceScan(false); navigateToHome(); }}
-            onNavigateToSecurity={() => { setShowDeviceScan(false); navigateToSecurity(); }}
-            onNavigateToTools={() => { setShowDeviceScan(false); navigateToTools(); }}
-            onNavigateToSettings={() => { setShowDeviceScan(false); navigateToSettings(); }}
+            onNavigateToHome={navigateToHome}
+            onNavigateToSecurity={navigateToSecurity}
+            onNavigateToTools={navigateToTools}
+            onNavigateToSettings={navigateToSettings}
           />
         </div>
       </ThemeProvider>
@@ -73,13 +74,13 @@ function App() {
       <ThemeProvider>
         <Toaster />
         <div id="app" className="h-full flex flex-col bg-background">
-          <SpeedTestScreen onBack={() => setShowSpeedTest(false)} />
+          <SpeedTestScreen onBack={goBack} />
           <BottomNav
             currentScreen={currentScreen}
-            onNavigateToHome={() => { setShowSpeedTest(false); navigateToHome(); }}
-            onNavigateToSecurity={() => { setShowSpeedTest(false); navigateToSecurity(); }}
-            onNavigateToTools={() => { setShowSpeedTest(false); navigateToTools(); }}
-            onNavigateToSettings={() => { setShowSpeedTest(false); navigateToSettings(); }}
+            onNavigateToHome={navigateToHome}
+            onNavigateToSecurity={navigateToSecurity}
+            onNavigateToTools={navigateToTools}
+            onNavigateToSettings={navigateToSettings}
           />
         </div>
       </ThemeProvider>
@@ -92,19 +93,10 @@ function App() {
         <Toaster />
                 <div id="app" className="h-full flex flex-col bg-background">
           <DiagnosticsScreen
-            onBack={() => setShowDiagnostics(false)}
-            onNavigateToSecurity={() => {
-              setShowDiagnostics(false);
-              navigateToSecurity();
-            }}
-            onNavigateToTools={() => {
-              setShowDiagnostics(false);
-              navigateToTools();
-            }}
-            onNavigateToSettings={() => {
-              setShowDiagnostics(false);
-              navigateToSettings();
-            }}
+            onBack={goBack}
+            onNavigateToSecurity={navigateToSecurity}
+            onNavigateToTools={navigateToTools}
+            onNavigateToSettings={navigateToSettings}
           />
         </div>
       </ThemeProvider>
@@ -118,37 +110,28 @@ function App() {
         <div className="flex-1 flex flex-col min-h-0">
           {currentScreen === 'home' && (
             <StatusScreen
-              onOpenDiagnostics={() => setShowDiagnostics(true)}
-              onNavigateToDnsProviders={() => {
-                navigateToSecurity();
-                setSecuritySubScreen('dns-providers');
-              }}
-              onNavigateToVpn={() => {
-                navigateToSecurity();
-                setSecuritySubScreen('vpn');
-              }}
-              onNavigateToWifiSecurity={() => {
-                navigateToSecurity();
-                setSecuritySubScreen('wifi-security');
-              }}
+              onOpenDiagnostics={openDiagnostics}
+              onNavigateToDnsProviders={() => navigateToSecuritySubScreen('dns-providers')}
+              onNavigateToVpn={() => navigateToSecuritySubScreen('vpn')}
+              onNavigateToWifiSecurity={() => navigateToSecuritySubScreen('wifi-security')}
             />
           )}
 
           {currentScreen === 'security' && (
             <SecurityRouter
               subScreen={securitySubScreen}
-              onSetSubScreen={setSecuritySubScreen}
-              onBack={navigateToHome}
+              onSetSubScreen={navigateToSecuritySubScreen}
+              onBack={goBack}
             />
           )}
 
-          {currentScreen === 'tools' && <ToolsScreen onBack={navigateToHome} onOpenDiagnostics={() => setShowDiagnostics(true)} onOpenSpeedTest={() => setShowSpeedTest(true)} onOpenDeviceScan={() => setShowDeviceScan(true)} onOpenWifiSecurity={() => { navigateToSecurity(); setSecuritySubScreen('wifi-security'); }} />}
+          {currentScreen === 'tools' && <ToolsScreen onBack={goBack} onOpenDiagnostics={openDiagnostics} onOpenSpeedTest={openSpeedTest} onOpenDeviceScan={openDeviceScan} onOpenWifiSecurity={() => navigateToSecuritySubScreen('wifi-security')} />}
 
           {currentScreen === 'settings' && (
             <SettingsRouter
               subScreen={settingsSubScreen}
-              onSetSubScreen={setSettingsSubScreen}
-              onBack={navigateToHome}
+              onSetSubScreen={navigateToSettingsSubScreen}
+              onBack={goBack}
             />
           )}
         </div>

@@ -147,6 +147,14 @@
       "author": "Autor",
       "author_value": "Anton Korenyako",
       "website_button": "Strona",
+      "check_updates": "Sprawdź aktualizacje",
+      "checking_updates": "Sprawdzanie aktualizacji...",
+      "update_to": "Zaktualizuj do v{{version}}",
+      "update_available_toast": "Dostępna aktualizacja: v{{version}}",
+      "update_downloading": "Pobieranie... {{progress}}%",
+      "update_up_to_date": "Masz najnowszą wersję",
+      "update_error": "Nie udało się sprawdzić aktualizacji",
+      "update_version_date": "v{{version}} — {{date}}",
       "changes": [
         "Test prędkości oparty na M-Lab NDT7",
         "Udoskonalenia interfejsu: nowa czcionka, dopracowane ikony i style"

@@ -12,6 +12,8 @@
     "core:window:allow-set-focus",
     "opener:default",
     "shell:default",
+    "updater:default",
+    "process:allow-restart",
     {
       "identifier": "shell:allow-spawn",
       "allow": [

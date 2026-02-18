@@ -73,6 +73,10 @@ Generated: 2026-02-18
 │   │   └── oui_database.rs
 │   └── Cargo.toml
 ├── netok_desktop
+│   ├── ~
+│   │   └── .tauri
+│   │       ├── netok.key
+│   │       └── netok.key.pub
 │   ├── public
 │   │   ├── tauri.svg
 │   │   └── vite.svg
@@ -324,7 +328,7 @@ Generated: 2026-02-18
 
   "plugins": {
     "updater": {
-      "pubkey": "REPLACE_WITH_PUBLIC_KEY",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEMzNjhCNUFCODkwMjg3RkIKUldUN2h3S0pxN1ZvdzVnUTE4aXU3RnNYY01KYWFCUHhVeWZOSWJ1eFhWSlA5bnZiMURpMC83aXMK",
       "endpoints": [
         "https://github.com/korenyako/netok/releases/latest/download/latest.json"
       ]
@@ -497,15 +501,16 @@ function App() {
     showDeviceScan,
     settingsSubScreen,
     securitySubScreen,
-    setShowDiagnostics,
-    setShowSpeedTest,
-    setShowDeviceScan,
-    setSettingsSubScreen,
-    setSecuritySubScreen,
+    goBack,
     navigateToHome,
     navigateToSecurity,
     navigateToTools,
     navigateToSettings,
+    navigateToSecuritySubScreen,
+    navigateToSettingsSubScreen,
+    openDiagnostics,
+    openSpeedTest,
+    openDeviceScan,
   } = useNavigation();
 
   const { t } = useTranslation();
@@ -521,8 +526,7 @@ function App() {
             onClick: () => downloadAndInstall(),
           },
         });
-      }
-    });}}
+      }}}}))
 ```
 
 ## MAP
