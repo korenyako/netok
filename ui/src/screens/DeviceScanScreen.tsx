@@ -7,7 +7,6 @@ import {
 } from '../components/icons/UIIcons';
 import { ScanProgressRing } from '../components/ScanProgressRing';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent } from '@/components/ui/card';
 import { CloseButton } from '../components/WindowControls';
 import { useDeviceScanStore, formatTimeAgo } from '../stores/deviceScanStore';
@@ -100,7 +99,7 @@ export function DeviceScanScreen({ onBack }: DeviceScanScreenProps) {
       </div>
 
       {/* Content */}
-      <ScrollArea className="flex-1 px-4 pb-4">
+      <div className="flex-1 px-4 pb-4 overflow-y-auto">
         {showLoading && (
           <ScanProgressRing
             percent={scanProgress}
@@ -162,7 +161,7 @@ export function DeviceScanScreen({ onBack }: DeviceScanScreenProps) {
             })}
           </div>
         )}
-      </ScrollArea>
+      </div>
     </div>
   );
 }
