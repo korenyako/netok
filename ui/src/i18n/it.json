@@ -217,6 +217,7 @@
   "speed_test": {
     "title": "Test di velocità",
     "start": "Avvia",
+    "cooldown_wait": "Attendi",
     "repeat": "Ripeti test",
     "download": "Download",
     "upload": "Upload",

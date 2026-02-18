@@ -217,6 +217,7 @@
   "speed_test": {
     "title": "Test de débit",
     "start": "Démarrer",
+    "cooldown_wait": "Patientez",
     "repeat": "Refaire le test",
     "download": "Download",
     "upload": "Upload",

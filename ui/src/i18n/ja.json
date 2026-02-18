@@ -217,6 +217,7 @@
   "speed_test": {
     "title": "スピードテスト",
     "start": "開始",
+    "cooldown_wait": "お待ちください",
     "repeat": "再テスト",
     "download": "ダウンロード",
     "upload": "アップロード",

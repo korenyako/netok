@@ -44,6 +44,7 @@ interface SpeedTestState {
   experienceRatings: ExperienceRating[];
   serverName: string | null;
   error: string | null;
+  cooldownSecondsLeft: number;
 }
 
 interface SpeedTestActions {
@@ -55,6 +56,8 @@ interface SpeedTestActions {
 export type SpeedTestStore = SpeedTestState & SpeedTestActions;
 
 // --- Constants ---
+
+const COOLDOWN_SECONDS = 60;
 
 const RATING_COLORS: Record<RatingLevel, string> = {
   excellent: 'hsl(var(--primary))',
@@ -75,14 +78,40 @@ const initialState: SpeedTestState = {
   experienceRatings: [],
   serverName: null,
   error: null,
+  cooldownSecondsLeft: 0,
 };
 
 // --- Run ID for cancellation ---
 let runIdCounter = 0;
 
+// --- Cooldown timer ---
+let cooldownInterval: ReturnType<typeof setInterval> | null = null;
+
+function clearCooldown() {
+  if (cooldownInterval) {
+    clearInterval(cooldownInterval);
+    cooldownInterval = null;
+  }
+}
+
 // --- Store ---
 
-export const useSpeedTestStore = create<SpeedTestStore>((set) => ({
+export const useSpeedTestStore = create<SpeedTestStore>((set) => {
+  function startCooldown() {
+    clearCooldown();
+    set({ cooldownSecondsLeft: COOLDOWN_SECONDS });
+    cooldownInterval = setInterval(() => {
+      const current = useSpeedTestStore.getState().cooldownSecondsLeft;
+      if (current <= 1) {
+        clearCooldown();
+        set({ cooldownSecondsLeft: 0 });
+      } else {
+        set({ cooldownSecondsLeft: current - 1 });
+      }
+    }, 1000);
+  }
+
+  return {
   ...initialState,
 
   startTest: async () => {
@@ -157,6 +186,7 @@ export const useSpeedTestStore = create<SpeedTestStore>((set) => ({
         serverName: result.serverName,
         error: null,
       });
+      startCooldown();
     } catch (err) {
       if (stale()) return;
       const message = err instanceof Error ? err.message : 'Unknown error';
@@ -176,19 +206,23 @@ export const useSpeedTestStore = create<SpeedTestStore>((set) => ({
         phase: 'error',
         error: errorKey,
       });
+      startCooldown();
     }
   },
 
   cancelTest: () => {
     runIdCounter++;
     abortNdt7();
+    clearCooldown();
     set({ ...initialState });
   },
 
   reset: () => {
+    clearCooldown();
     set({ ...initialState });
   },
-}));
+};
+});
 
 // --- Analysis helpers ---
 

@@ -219,6 +219,7 @@
   "speed_test": {
     "title": "Тест скорости",
     "start": "Начать",
+    "cooldown_wait": "Ждите",
     "repeat": "Повторить тест",
     "download": "Загрузка",
     "upload": "Выгрузка",

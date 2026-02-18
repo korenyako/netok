@@ -217,6 +217,7 @@
   "speed_test": {
     "title": "تست سرعت",
     "start": "شروع",
+    "cooldown_wait": "صبر کنید",
     "repeat": "تکرار تست",
     "download": "دانلود",
     "upload": "آپلود",

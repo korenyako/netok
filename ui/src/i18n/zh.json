@@ -217,6 +217,7 @@
   "speed_test": {
     "title": "测速",
     "start": "开始",
+    "cooldown_wait": "请稍候",
     "repeat": "重新测试",
     "download": "下载",
     "upload": "上传",

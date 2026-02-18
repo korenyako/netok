@@ -219,6 +219,7 @@
   "speed_test": {
     "title": "Speed test",
     "start": "Start",
+    "cooldown_wait": "Wait",
     "repeat": "Repeat test",
     "download": "Download",
     "upload": "Upload",

@@ -217,6 +217,7 @@
   "speed_test": {
     "title": "Hız testi",
     "start": "Başlat",
+    "cooldown_wait": "Bekleyin",
     "repeat": "Testi tekrarla",
     "download": "Download",
     "upload": "Upload",

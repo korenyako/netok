@@ -19,9 +19,10 @@ interface SpeedTestScreenProps {
 
 export function SpeedTestScreen({ onBack }: SpeedTestScreenProps) {
   const { t } = useTranslation();
-  const { phase, startTest, reset, cancelTest } = useSpeedTestStore();
+  const { phase, cooldownSecondsLeft, startTest, reset, cancelTest } = useSpeedTestStore();
 
   const isRunning = phase === 'ping' || phase === 'download' || phase === 'upload';
+  const isCoolingDown = cooldownSecondsLeft > 0;
 
   const handleRestart = useCallback(() => {
     if (isRunning) cancelTest();
@@ -40,7 +41,7 @@ export function SpeedTestScreen({ onBack }: SpeedTestScreenProps) {
           <h1 className="flex-1 text-lg font-semibold text-foreground">
             {t('speed_test.title')}
           </h1>
-          <Button variant="ghost" size="icon" onClick={handleRestart} disabled={phase === 'idle'}>
+          <Button variant="ghost" size="icon" onClick={handleRestart} disabled={phase === 'idle' || isCoolingDown}>
             <RotateCw className="w-5 h-5 text-muted-foreground" />
           </Button>
           <CloseButton />
@@ -82,7 +83,7 @@ const CIRCUMFERENCE = 2 * Math.PI * CIRCLE_R;
 
 function CircleProgress() {
   const { t } = useTranslation();
-  const { phase, progress, currentValue, currentUnit, startTest } = useSpeedTestStore();
+  const { phase, progress, currentValue, currentUnit, cooldownSecondsLeft, startTest } = useSpeedTestStore();
 
   const offset = CIRCUMFERENCE - (progress / 100) * CIRCUMFERENCE;
 
@@ -112,7 +113,18 @@ function CircleProgress() {
         </svg>
 
         <div className="absolute inset-0 flex items-center justify-center">
-          {phase === 'idle' && (
+          {phase === 'idle' && cooldownSecondsLeft > 0 && (
+            <div className="text-center">
+              <div className="text-4xl font-semibold text-muted-foreground font-mono">
+                {cooldownSecondsLeft}
+              </div>
+              <div className="text-sm text-muted-foreground">
+                {t('speed_test.cooldown_wait')}
+              </div>
+            </div>
+          )}
+
+          {phase === 'idle' && cooldownSecondsLeft === 0 && (
             <button onClick={() => startTest()} className="text-center">
               <span className="text-lg font-medium text-primary">
                 {t('speed_test.start')}
@@ -140,7 +152,18 @@ function CircleProgress() {
             </div>
           )}
 
-          {phase === 'error' && (
+          {phase === 'error' && cooldownSecondsLeft > 0 && (
+            <div className="text-center">
+              <div className="text-4xl font-semibold text-muted-foreground font-mono">
+                {cooldownSecondsLeft}
+              </div>
+              <div className="text-sm text-muted-foreground">
+                {t('speed_test.cooldown_wait')}
+              </div>
+            </div>
+          )}
+
+          {phase === 'error' && cooldownSecondsLeft === 0 && (
             <button onClick={() => startTest()} className="text-center">
               <span className="text-lg font-medium text-primary">
                 {t('speed_test.start')}
