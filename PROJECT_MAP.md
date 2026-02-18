@@ -305,8 +305,8 @@ Generated: 2026-02-18
   "identifier": "netok",
 
   "build": {
-    "beforeDevCommand": "npm run dev --prefix ui",
-    "beforeBuildCommand": "npm run build --prefix ui",
+    "beforeDevCommand": "npm run dev --prefix ../ui",
+    "beforeBuildCommand": "npm run build --prefix ../ui",
     "devUrl": "http://localhost:5173",
     "frontendDist": "../../ui/dist"
   },
@@ -533,8 +533,8 @@ function App() {
 
 ### Build Commands
 
-- **Dev Command**: npm run dev --prefix ui
-- **Build Command**: npm run build --prefix ui
+- **Dev Command**: npm run dev --prefix ../ui
+- **Build Command**: npm run build --prefix ../ui
 - **Dev Path**: <http://localhost:5173>
 - **Dist Dir**: ../../ui/dist
 - **Window Title**: Netok
