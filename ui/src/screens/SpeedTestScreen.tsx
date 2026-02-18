@@ -77,7 +77,7 @@ export function SpeedTestScreen({ onBack }: SpeedTestScreenProps) {
 
 // ── Circle Progress ────────────────────────────────────────
 
-const CIRCLE_R = 72;
+const CIRCLE_R = 90;
 const CIRCUMFERENCE = 2 * Math.PI * CIRCLE_R;
 
 function CircleProgress() {
@@ -92,16 +92,16 @@ function CircleProgress() {
 
   return (
     <div className="flex flex-col items-center mb-6">
-      <div className="relative w-[180px] h-[180px]">
-        <svg className="-rotate-90" width="180" height="180">
+      <div className="relative w-[220px] h-[220px]">
+        <svg className="-rotate-90" width="220" height="220">
           <circle
             className="fill-none stroke-accent"
-            cx="90" cy="90" r={CIRCLE_R}
+            cx="110" cy="110" r={CIRCLE_R}
             strokeWidth="2"
           />
           <circle
             className="fill-none"
-            cx="90" cy="90" r={CIRCLE_R}
+            cx="110" cy="110" r={CIRCLE_R}
             strokeWidth="2"
             strokeLinecap="round"
             stroke={strokeColor}
@@ -122,7 +122,7 @@ function CircleProgress() {
 
           {(phase === 'ping' || phase === 'download' || phase === 'upload') && (
             <div className="text-center">
-              <div className="text-3xl font-semibold text-foreground font-mono">
+              <div className="text-4xl font-semibold text-foreground font-mono">
                 {currentValue}
               </div>
               <div className="text-sm text-muted-foreground font-mono">{t(currentUnit)}</div>
@@ -161,19 +161,27 @@ function SpeedMetrics() {
 
   return (
     <div className="flex justify-around mb-3">
-      <div className="flex items-center justify-center gap-1">
-        <ArrowDown className="w-6 h-6 text-primary" />
-        <span className={`text-[28px] font-semibold font-mono ${metrics.download !== null ? 'text-primary' : 'text-muted-foreground'}`}>
-          {metrics.download !== null ? Math.round(metrics.download) : '—'}
-        </span>
-        <span className="text-sm text-muted-foreground font-mono">{t('speed_test.unit_mbps')}</span>
+      <div className="flex items-center justify-center gap-2">
+        <ArrowDown className="w-5 h-5 text-primary" />
+        <div className="text-center">
+          <div className={`text-[28px] leading-tight font-semibold font-mono ${metrics.download !== null ? 'text-primary' : 'text-muted-foreground'}`}>
+            {metrics.download !== null ? Math.round(metrics.download) : '—'}
+          </div>
+          {metrics.download !== null && (
+            <div className="text-xs text-muted-foreground font-mono">{t('speed_test.unit_mbps')}</div>
+          )}
+        </div>
       </div>
-      <div className="flex items-center justify-center gap-1">
-        <ArrowUp className="w-6 h-6 text-purple-500" />
-        <span className={`text-[28px] font-semibold font-mono ${metrics.upload !== null ? 'text-purple-500' : 'text-muted-foreground'}`}>
-          {metrics.upload !== null ? Math.round(metrics.upload) : '—'}
-        </span>
-        <span className="text-sm text-muted-foreground font-mono">{t('speed_test.unit_mbps')}</span>
+      <div className="flex items-center justify-center gap-2">
+        <ArrowUp className="w-5 h-5 text-purple-500" />
+        <div className="text-center">
+          <div className={`text-[28px] leading-tight font-semibold font-mono ${metrics.upload !== null ? 'text-purple-500' : 'text-muted-foreground'}`}>
+            {metrics.upload !== null ? Math.round(metrics.upload) : '—'}
+          </div>
+          {metrics.upload !== null && (
+            <div className="text-xs text-muted-foreground font-mono">{t('speed_test.unit_mbps')}</div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -268,11 +276,33 @@ function drawLine(
 
   if (points.length < 2) return;
 
+  // Trace path using midpoint subdivision for gentle smoothing:
+  // straight lines to midpoints between data points, with
+  // quadratic curves through the actual data points as control points.
+  function tracePath(fromIndex: number) {
+    for (let i = fromIndex; i < points.length - 1; i++) {
+      const curr = points[i];
+      const next = points[i + 1];
+      const midX = (curr.x + next.x) / 2;
+      const midY = (curr.y + next.y) / 2;
+
+      if (i === fromIndex) {
+        ctx.lineTo(curr.x, curr.y);
+        ctx.lineTo(midX, midY);
+      } else {
+        ctx.quadraticCurveTo(curr.x, curr.y, midX, midY);
+      }
+    }
+    // Final segment to last point
+    const last = points[points.length - 1];
+    ctx.lineTo(last.x, last.y);
+  }
+
   // Gradient fill (extend 1px each side to match round lineCap overhang)
   ctx.beginPath();
   ctx.moveTo(points[0].x - 1, height);
   ctx.lineTo(points[0].x - 1, points[0].y);
-  points.forEach((p) => ctx.lineTo(p.x, p.y));
+  tracePath(0);
   ctx.lineTo(points[points.length - 1].x + 1, points[points.length - 1].y);
   ctx.lineTo(points[points.length - 1].x + 1, height);
   ctx.closePath();
@@ -290,10 +320,8 @@ function drawLine(
   ctx.lineJoin = 'round';
   ctx.lineCap = 'round';
 
-  points.forEach((p, i) => {
-    if (i === 0) ctx.moveTo(p.x, p.y);
-    else ctx.lineTo(p.x, p.y);
-  });
+  ctx.moveTo(points[0].x, points[0].y);
+  tracePath(0);
 
   ctx.stroke();
 }
@@ -362,10 +390,16 @@ function LatencyItem({ label, value, tooltipKey, onShow, onHide }: LatencyItemPr
         <InfoCircleFilled className="w-3.5 h-3.5 opacity-50" />
       </div>
       <div className="flex items-baseline gap-0.5">
-        <span className="text-xl font-semibold text-foreground font-mono">
-          {value !== null ? Math.round(value) : '—'}
-        </span>
-        <span className="text-sm text-muted-foreground font-mono">{t('speed_test.unit_ms')}</span>
+        {value !== null ? (
+          <>
+            <span className="text-xl font-semibold text-foreground font-mono">
+              {Math.round(value)}
+            </span>
+            <span className="text-sm text-muted-foreground font-mono">{t('speed_test.unit_ms')}</span>
+          </>
+        ) : (
+          <span className="text-xl font-semibold text-foreground font-mono">—</span>
+        )}
       </div>
     </div>
   );

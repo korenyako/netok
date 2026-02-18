@@ -463,8 +463,8 @@ async function runMockSpeedTest(
   signal: AbortSignal,
 ): Promise<SpeedTestResult> {
   const mockPing = noise(45, 8);
-  const mockDownload = noise(62, 15);
-  const mockUpload = noise(18, 6);
+  const mockDownload = noise(620, 150);
+  const mockUpload = noise(180, 60);
   const mockLatency = noise(58, 10);
   const mockJitter = noise(12, 4);
 
@@ -482,7 +482,7 @@ async function runMockSpeedTest(
     if (signal.aborted) throw new Error('Aborted');
     await sleep(MOCK_TICK_MS);
     const progress = (i / dlSteps) * 100;
-    const currentMbps = noise(mockDownload, 20) * Math.min(i / 5, 1); // ramp up
+    const currentMbps = noise(mockDownload, 200) * Math.min(i / 5, 1); // ramp up
     callbacks.onProgress('download', progress, Math.round(currentMbps * 10) / 10);
     if (i > 5 && i % 2 === 0) {
       callbacks.onDataPoint('download', currentMbps);
@@ -497,7 +497,7 @@ async function runMockSpeedTest(
     if (signal.aborted) throw new Error('Aborted');
     await sleep(MOCK_TICK_MS);
     const progress = (i / ulSteps) * 100;
-    const currentMbps = noise(mockUpload, 10) * Math.min(i / 5, 1);
+    const currentMbps = noise(mockUpload, 100) * Math.min(i / 5, 1);
     callbacks.onProgress('upload', progress, Math.round(currentMbps * 10) / 10);
     if (i > 5 && i % 2 === 0) {
       callbacks.onDataPoint('upload', currentMbps);
