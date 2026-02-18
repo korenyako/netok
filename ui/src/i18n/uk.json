@@ -143,7 +143,6 @@
     "about": {
       "title": "Про програму",
       "version": "Версія",
-      "whats_new": "Що нового",
       "author": "Автор",
       "author_value": "Anton Korenyako",
       "website_button": "Сайт",
@@ -154,11 +153,7 @@
       "update_downloading": "Завантаження... {{progress}}%",
       "update_up_to_date": "У вас остання версія",
       "update_error": "Не вдалося перевірити оновлення",
-      "update_version_date": "v{{version}} — {{date}}",
-      "changes": [
-        "Тест швидкості на базі M-Lab NDT7",
-        "Покращення інтерфейсу: новий шрифт, оновлені іконки та стилі"
-      ]
+      "update_version_date": "v{{version}} — {{date}}"
     },
     "tools": {
       "diagnostics_desc": "Стан підключення",
@@ -317,7 +312,7 @@
     "found": "Знайдено пристроїв: {{count}}",
     "unknown_device": "Невідомий пристрій",
     "branded_device": "Пристрій {{name}}",
-      "private_address": "Приватна адреса",
+    "private_address": "Приватна адреса",
     "badge_router": "Маршрутизатор",
     "badge_this_device": "Цей пристрій",
     "type_router": "Маршрутизатор",

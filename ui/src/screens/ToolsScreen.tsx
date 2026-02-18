@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Activity, Gauge, Radar, Wifi } from '../components/icons/UIIcons';
+import { ArrowLeft, Activity, Gauge, MonitorSmartphone, Wifi } from '../components/icons/UIIcons';
 import { Button } from '@/components/ui/button';
 import { CloseButton } from '../components/WindowControls';
 
@@ -40,7 +40,7 @@ export function ToolsScreen({ onBack, onOpenDiagnostics, onOpenSpeedTest, onOpen
     {
       id: 'device-scan',
       nameKey: 'settings.tools.device_scan',
-      icon: <Radar className="w-6 h-6" />,
+      icon: <MonitorSmartphone className="w-6 h-6" />,
       iconColorClass: 'text-amber-500',
       onClick: onOpenDeviceScan,
     },

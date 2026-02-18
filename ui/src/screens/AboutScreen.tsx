@@ -22,8 +22,6 @@ export function AboutScreen({ onBack }: AboutScreenProps) {
     getVersion().then(setAppVersion).catch(() => setAppVersion('0.1.0'));
   }, []);
 
-  const changes = t('settings.about.changes', { returnObjects: true }) as string[];
-
   const isChecking = status === 'checking';
   const isAvailable = status === 'available';
   const isDownloading = status === 'downloading';
@@ -86,21 +84,6 @@ export function AboutScreen({ onBack }: AboutScreenProps) {
                 </button>
               </div>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* What's new */}
-        <Card className="bg-transparent">
-          <CardContent className="px-4 py-3">
-            <p className="text-sm text-muted-foreground mb-2">{t('settings.about.whats_new')}</p>
-            <ul className="space-y-1">
-              {Array.isArray(changes) && changes.map((item) => (
-                <li key={item} className="text-sm text-foreground flex gap-2">
-                  <span className="text-muted-foreground shrink-0">•</span>
-                  {item}
-                </li>
-              ))}
-            </ul>
           </CardContent>
         </Card>
 

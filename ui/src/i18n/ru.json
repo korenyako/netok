@@ -143,7 +143,6 @@
     "about": {
       "title": "О программе",
       "version": "Версия",
-      "whats_new": "Что нового",
       "author": "Автор",
       "author_value": "Антон Кореняко",
       "website_button": "Сайт",
@@ -154,11 +153,7 @@
       "update_downloading": "Загрузка... {{progress}}%",
       "update_up_to_date": "У вас последняя версия",
       "update_error": "Не удалось проверить обновления",
-      "update_version_date": "v{{version}} — {{date}}",
-      "changes": [
-        "Тест скорости на базе M-Lab NDT7",
-        "Улучшения интерфейса: новый шрифт, иконки и стили"
-      ]
+      "update_version_date": "v{{version}} — {{date}}"
     },
     "tools": {
       "diagnostics_desc": "Состояние подключения",
@@ -319,7 +314,7 @@
     "found": "Найдено устройств: {{count}}",
     "unknown_device": "Неизвестное устройство",
     "branded_device": "Устройство {{name}}",
-      "private_address": "Частный адрес",
+    "private_address": "Частный адрес",
     "badge_router": "Роутер",
     "badge_this_device": "Это устройство",
     "type_router": "Роутер",

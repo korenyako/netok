@@ -143,7 +143,6 @@
     "about": {
       "title": "درباره",
       "version": "نسخه",
-      "whats_new": "تازه‌ها",
       "author": "سازنده",
       "author_value": "Anton Korenyako",
       "website_button": "وب‌سایت",
@@ -154,11 +153,7 @@
       "update_downloading": "در حال دانلود... {{progress}}%",
       "update_up_to_date": "آخرین نسخه را دارید",
       "update_error": "بررسی به‌روزرسانی ممکن نیست",
-      "update_version_date": "v{{version}} — {{date}}",
-      "changes": [
-        "تست سرعت با فناوری M-Lab NDT7",
-        "بهبود ظاهری: فونت جدید، آیکون‌ها و استایل بهتر"
-      ]
+      "update_version_date": "v{{version}} — {{date}}"
     },
     "tools": {
       "diagnostics_desc": "مشاهده جزئیات اتصال",
@@ -317,7 +312,7 @@
     "found": "{{count}} دستگاه یافت شد",
     "unknown_device": "دستگاه ناشناس",
     "branded_device": "دستگاه {{name}}",
-      "private_address": "آدرس خصوصی",
+    "private_address": "آدرس خصوصی",
     "badge_router": "روتر",
     "badge_this_device": "این دستگاه",
     "type_router": "روتر",

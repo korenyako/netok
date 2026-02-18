@@ -114,7 +114,7 @@
     }
   },
   "meta": {
-    "no_data": "Keine Daten. Klicken Sie auf \u201EAktualisieren\u201C."
+    "no_data": "Keine Daten. Klicken Sie auf „Aktualisieren“."
   },
   "errors": {
     "diagnostics": "Diagnosefehler",
@@ -143,7 +143,6 @@
     "about": {
       "title": "Über",
       "version": "Version",
-      "whats_new": "Was ist neu",
       "author": "Autor",
       "author_value": "Anton Korenyako",
       "website_button": "Website",
@@ -154,11 +153,7 @@
       "update_downloading": "Herunterladen... {{progress}}%",
       "update_up_to_date": "Sie haben die neueste Version",
       "update_error": "Updates konnten nicht geprüft werden",
-      "update_version_date": "v{{version}} — {{date}}",
-      "changes": [
-        "Geschwindigkeitstest mit M-Lab NDT7",
-        "Designverbesserungen: neue Schriftart, Icons und Stile"
-      ]
+      "update_version_date": "v{{version}} — {{date}}"
     },
     "tools": {
       "diagnostics_desc": "Verbindungsdetails anzeigen",
@@ -317,7 +312,7 @@
     "found": "{{count}} Geräte gefunden",
     "unknown_device": "Unbekanntes Gerät",
     "branded_device": "{{name}}-Gerät",
-      "private_address": "Private Adresse",
+    "private_address": "Private Adresse",
     "badge_router": "Router",
     "badge_this_device": "Dieses Gerät",
     "type_router": "Router",

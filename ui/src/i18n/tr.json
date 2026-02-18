@@ -143,7 +143,6 @@
     "about": {
       "title": "Hakkında",
       "version": "Sürüm",
-      "whats_new": "Yenilikler",
       "author": "Yazar",
       "author_value": "Anton Korenyako",
       "website_button": "Web sitesi",
@@ -154,11 +153,7 @@
       "update_downloading": "İndiriliyor... {{progress}}%",
       "update_up_to_date": "En son sürüme sahipsiniz",
       "update_error": "Güncellemeler kontrol edilemedi",
-      "update_version_date": "v{{version}} — {{date}}",
-      "changes": [
-        "M-Lab NDT7 destekli Speed Test",
-        "Arayüz iyileştirmeleri: yeni yazı tipi, geliştirilmiş simgeler ve stil"
-      ]
+      "update_version_date": "v{{version}} — {{date}}"
     },
     "tools": {
       "diagnostics_desc": "Bağlantı ayrıntılarını görüntüle",
@@ -317,7 +312,7 @@
     "found": "{{count}} cihaz bulundu",
     "unknown_device": "Bilinmeyen cihaz",
     "branded_device": "{{name}} cihazı",
-      "private_address": "Özel adres",
+    "private_address": "Özel adres",
     "badge_router": "Yönlendirici",
     "badge_this_device": "Bu cihaz",
     "type_router": "Yönlendirici",

@@ -143,7 +143,6 @@
     "about": {
       "title": "Sobre",
       "version": "Versão",
-      "whats_new": "Novidades",
       "author": "Autor",
       "author_value": "Anton Korenyako",
       "website_button": "Site",
@@ -154,11 +153,7 @@
       "update_downloading": "Baixando... {{progress}}%",
       "update_up_to_date": "Você tem a versão mais recente",
       "update_error": "Não foi possível verificar atualizações",
-      "update_version_date": "v{{version}} — {{date}}",
-      "changes": [
-        "Speed Test com tecnologia M-Lab NDT7",
-        "Melhorias na UI: nova fonte, ícones e estilo refinados"
-      ]
+      "update_version_date": "v{{version}} — {{date}}"
     },
     "tools": {
       "diagnostics_desc": "Ver detalhes da conexão",
@@ -317,7 +312,7 @@
     "found": "{{count}} dispositivos encontrados",
     "unknown_device": "Dispositivo desconhecido",
     "branded_device": "Dispositivo {{name}}",
-      "private_address": "Endereço privado",
+    "private_address": "Endereço privado",
     "badge_router": "Roteador",
     "badge_this_device": "Este dispositivo",
     "type_router": "Roteador",
