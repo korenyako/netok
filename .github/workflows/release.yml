@@ -40,6 +40,7 @@ jobs:
         working-directory: netok_desktop
 
       - name: Download sing-box binary
+        shell: bash
         run: |
           mkdir -p netok_desktop/src-tauri/binaries
           curl -sL "https://github.com/SagerNet/sing-box/releases/download/v1.12.21/sing-box-1.12.21-windows-amd64.zip" -o sing-box.zip
