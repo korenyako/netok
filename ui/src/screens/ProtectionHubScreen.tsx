@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, DnsShield, DnsShieldCheck, Lock, LockOpen, ChevronRight } from '../components/icons/UIIcons';
+import { ArrowLeft, Globe, Lock, LockOpen, ChevronRight } from '../components/icons/UIIcons';
 import { Button } from '@/components/ui/button';
 import { MenuCard } from '@/components/MenuCard';
 import { CloseButton } from '../components/WindowControls';
@@ -110,10 +110,7 @@ export function ProtectionHubScreen({ onBack, onNavigateToDns, onNavigateToVpn }
         <div className="space-y-2">
           <MenuCard
             variant="ghost"
-            icon={isDnsEnabled
-              ? <DnsShieldCheck className={`w-5 h-5 ${dnsIconColor}`} />
-              : <DnsShield className={`w-5 h-5 ${dnsIconColor}`} />
-            }
+            icon={<Globe className={`w-5 h-5 ${dnsIconColor}`} />}
             title={t('protection.dns_protection')}
             subtitle={dnsSubtitle}
             trailing={trailing}
