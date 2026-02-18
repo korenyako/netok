@@ -159,7 +159,9 @@
       "flush_dns": "Очистить кэш DNS",
       "flush_dns_desc": "Решить проблему «сайт не открывается»",
       "device_scan": "Устройства\nв сети",
-      "device_scan_desc": "Посмотрите, кто подключён"
+      "device_scan_desc": "Посмотрите, кто подключён",
+      "wifi_security": "Безопасность\nWi-Fi",
+      "wifi_security_desc": "Проверьте безопасность сети"
     }
   },
   "protection": {

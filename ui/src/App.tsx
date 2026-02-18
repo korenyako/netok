@@ -117,7 +117,7 @@ function App() {
             />
           )}
 
-          {currentScreen === 'tools' && <ToolsScreen onBack={navigateToHome} onOpenDiagnostics={() => setShowDiagnostics(true)} onOpenSpeedTest={() => setShowSpeedTest(true)} onOpenDeviceScan={() => setShowDeviceScan(true)} />}
+          {currentScreen === 'tools' && <ToolsScreen onBack={navigateToHome} onOpenDiagnostics={() => setShowDiagnostics(true)} onOpenSpeedTest={() => setShowSpeedTest(true)} onOpenDeviceScan={() => setShowDeviceScan(true)} onOpenWifiSecurity={() => { navigateToSecurity(); setSecuritySubScreen('wifi-security'); }} />}
 
           {currentScreen === 'settings' && (
             <SettingsRouter

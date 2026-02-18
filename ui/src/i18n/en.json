@@ -159,7 +159,9 @@
       "flush_dns": "Clear DNS cache",
       "flush_dns_desc": "Fix \"site not loading\" issues",
       "device_scan": "Device scan",
-      "device_scan_desc": "See who's on your network"
+      "device_scan_desc": "See who's on your network",
+      "wifi_security": "Wi-Fi\nsecurity",
+      "wifi_security_desc": "Check your network security"
     }
   },
   "protection": {

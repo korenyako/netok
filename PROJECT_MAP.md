@@ -1,186 +1,11 @@
 # Project Map - Netok
 
-Generated: 2026-02-17
+Generated: 2026-02-18
 
 ## TREE (ASCII)
 
 ```text
 ├── .claude
-│   ├── worktrees
-│   │   ├── tender-almeida
-│   │   │   ├── .claude
-│   │   │   │   └── settings.local.json
-│   │   │   ├── .github
-│   │   │   │   ├── ISSUE_TEMPLATE
-│   │   │   │   └── workflows
-│   │   │   ├── .husky
-│   │   │   │   └── pre-commit
-│   │   │   ├── docs
-│   │   │   │   ├── deprecated
-│   │   │   │   ├── ACTION_PLAN.md
-│   │   │   │   ├── CODE_ANALYSIS.md
-│   │   │   │   ├── IMPLEMENTATION-PLAN.md
-│   │   │   │   ├── PROGRESS.md
-│   │   │   │   ├── README.md
-│   │   │   │   ├── RECOMMENDATIONS.md
-│   │   │   │   ├── REFACTORING-PLAN-SOLID.md
-│   │   │   │   ├── REVISED_PRIORITIES.md
-│   │   │   │   ├── SECURITY_AUDIT.md
-│   │   │   │   ├── SoT-ARCH.md
-│   │   │   │   ├── TESTING_PLAN.md
-│   │   │   │   └── UI-SPEC.md
-│   │   │   ├── i18n
-│   │   │   │   ├── en.json
-│   │   │   │   ├── README.md
-│   │   │   │   └── ru.json
-│   │   │   ├── netok_bridge
-│   │   │   │   ├── src
-│   │   │   │   ├── tests
-│   │   │   │   └── Cargo.toml
-│   │   │   ├── netok_core
-│   │   │   │   ├── benches
-│   │   │   │   ├── src
-│   │   │   │   └── Cargo.toml
-│   │   │   ├── netok_desktop
-│   │   │   │   ├── public
-│   │   │   │   ├── src
-│   │   │   │   ├── src-tauri
-│   │   │   │   ├── .gitignore
-│   │   │   │   ├── index.html
-│   │   │   │   ├── package-lock.json
-│   │   │   │   ├── package.json
-│   │   │   │   ├── postcss.config.js
-│   │   │   │   ├── README.md
-│   │   │   │   ├── tailwind.config.js
-│   │   │   │   ├── tsconfig.json
-│   │   │   │   ├── tsconfig.node.json
-│   │   │   │   └── vite.config.ts
-│   │   │   ├── scripts
-│   │   │   │   ├── generate_oui_database.py
-│   │   │   │   └── generate_project_map.mjs
-│   │   │   ├── ui
-│   │   │   │   ├── public
-│   │   │   │   ├── src
-│   │   │   │   ├── .gitignore
-│   │   │   │   ├── eslint.config.js
-│   │   │   │   ├── index.html
-│   │   │   │   ├── package-lock.json
-│   │   │   │   ├── package.json
-│   │   │   │   ├── postcss.config.js
-│   │   │   │   ├── README.md
-│   │   │   │   ├── tailwind.config.js
-│   │   │   │   ├── tsconfig.app.json
-│   │   │   │   ├── tsconfig.json
-│   │   │   │   ├── tsconfig.node.json
-│   │   │   │   ├── vite.config.ts
-│   │   │   │   └── vitest.config.ts
-│   │   │   ├── .cursorrules
-│   │   │   ├── .gitattributes
-│   │   │   ├── .gitignore
-│   │   │   ├── Cargo.lock
-│   │   │   ├── Cargo.toml
-│   │   │   ├── CLAUDE.md
-│   │   │   ├── CONTRIBUTING.md
-│   │   │   ├── DNS_PROVIDERS.md
-│   │   │   ├── etsy-hover-effects-fixed.html
-│   │   │   ├── LICENSE.Apache-2.0
-│   │   │   ├── LICENSE.Proprietary
-│   │   │   ├── nul
-│   │   │   ├── package-lock.json
-│   │   │   ├── package.json
-│   │   │   ├── PROJECT_CONTEXT.md
-│   │   │   ├── PROJECT_MAP.md
-│   │   │   ├── README_DEV.md
-│   │   │   ├── README.md
-│   │   │   ├── SETUP-PRECOMMIT.md
-│   │   │   └── TESTING.md
-│   │   └── xenodochial-jones
-│   │       ├── .claude
-│   │       │   └── settings.local.json
-│   │       ├── .github
-│   │       │   ├── ISSUE_TEMPLATE
-│   │       │   └── workflows
-│   │       ├── .husky
-│   │       │   ├── _
-│   │       │   └── pre-commit
-│   │       ├── docs
-│   │       │   ├── deprecated
-│   │       │   ├── ACTION_PLAN.md
-│   │       │   ├── CODE_ANALYSIS.md
-│   │       │   ├── IMPLEMENTATION-PLAN.md
-│   │       │   ├── PROGRESS.md
-│   │       │   ├── README.md
-│   │       │   ├── RECOMMENDATIONS.md
-│   │       │   ├── REFACTORING-PLAN-SOLID.md
-│   │       │   ├── REVISED_PRIORITIES.md
-│   │       │   ├── SECURITY_AUDIT.md
-│   │       │   ├── SoT-ARCH.md
-│   │       │   ├── TESTING_PLAN.md
-│   │       │   └── UI-SPEC.md
-│   │       ├── i18n
-│   │       │   ├── en.json
-│   │       │   ├── README.md
-│   │       │   └── ru.json
-│   │       ├── netok_bridge
-│   │       │   ├── src
-│   │       │   ├── tests
-│   │       │   └── Cargo.toml
-│   │       ├── netok_core
-│   │       │   ├── benches
-│   │       │   ├── src
-│   │       │   └── Cargo.toml
-│   │       ├── netok_desktop
-│   │       │   ├── public
-│   │       │   ├── src
-│   │       │   ├── src-tauri
-│   │       │   ├── .gitignore
-│   │       │   ├── index.html
-│   │       │   ├── package-lock.json
-│   │       │   ├── package.json
-│   │       │   ├── postcss.config.js
-│   │       │   ├── README.md
-│   │       │   ├── tailwind.config.js
-│   │       │   ├── tsconfig.json
-│   │       │   ├── tsconfig.node.json
-│   │       │   └── vite.config.ts
-│   │       ├── scripts
-│   │       │   ├── generate_oui_database.py
-│   │       │   ├── generate_project_map.mjs
-│   │       │   └── process_manuf.py
-│   │       ├── ui
-│   │       │   ├── public
-│   │       │   ├── src
-│   │       │   ├── .gitignore
-│   │       │   ├── eslint.config.js
-│   │       │   ├── index.html
-│   │       │   ├── package-lock.json
-│   │       │   ├── package.json
-│   │       │   ├── postcss.config.js
-│   │       │   ├── README.md
-│   │       │   ├── tailwind.config.js
-│   │       │   ├── tsconfig.app.json
-│   │       │   ├── tsconfig.json
-│   │       │   ├── tsconfig.node.json
-│   │       │   ├── vite.config.ts
-│   │       │   └── vitest.config.ts
-│   │       ├── .cursorrules
-│   │       ├── .gitattributes
-│   │       ├── .gitignore
-│   │       ├── Cargo.toml
-│   │       ├── CLAUDE.md
-│   │       ├── CONTRIBUTING.md
-│   │       ├── DNS_PROVIDERS.md
-│   │       ├── etsy-hover-effects-fixed.html
-│   │       ├── LICENSE.Apache-2.0
-│   │       ├── LICENSE.Proprietary
-│   │       ├── package-lock.json
-│   │       ├── package.json
-│   │       ├── PROJECT_CONTEXT.md
-│   │       ├── PROJECT_MAP.md
-│   │       ├── README_DEV.md
-│   │       ├── README.md
-│   │       ├── SETUP-PRECOMMIT.md
-│   │       └── TESTING.md
 │   └── settings.local.json
 ├── .github
 │   ├── ISSUE_TEMPLATE
@@ -192,7 +17,6 @@ Generated: 2026-02-17
 │       └── test.yml
 ├── .husky
 │   ├── _
-│   │   ├── .gitignore
 │   │   └── husky.sh
 │   └── pre-commit
 ├── docs
@@ -273,16 +97,9 @@ Generated: 2026-02-17
 │   │   └── vite-env.d.ts
 │   ├── src-tauri
 │   │   ├── binaries
-│   │   │   ├── sing-box-x86_64-pc-windows-msvc.exe
 │   │   │   └── wintun.dll
 │   │   ├── capabilities
 │   │   │   └── default.json
-│   │   ├── gen
-│   │   │   └── schemas
-│   │   │       ├── acl-manifests.json
-│   │   │       ├── capabilities.json
-│   │   │       ├── desktop-schema.json
-│   │   │       └── windows-schema.json
 │   │   ├── icons
 │   │   │   ├── 32x32.png
 │   │   │   └── icon.ico
@@ -390,7 +207,6 @@ Generated: 2026-02-17
 │   │   │   ├── ToolsScreen.tsx
 │   │   │   ├── VpnTunnelScreen.tsx
 │   │   │   └── WiFiSecurityScreen.tsx
-│   │   ├── store
 │   │   ├── stores
 │   │   │   ├── closeBehaviorStore.ts
 │   │   │   ├── deviceScanStore.ts
@@ -421,7 +237,6 @@ Generated: 2026-02-17
 │   │   ├── index.css
 │   │   ├── main.tsx
 │   │   └── vite-env.d.ts
-│   ├── .env.development
 │   ├── .gitignore
 │   ├── eslint.config.js
 │   ├── index.html
@@ -438,7 +253,6 @@ Generated: 2026-02-17
 ├── .cursorrules
 ├── .gitattributes
 ├── .gitignore
-├── Cargo.lock
 ├── Cargo.toml
 ├── CLAUDE.md
 ├── CONTRIBUTING.md
@@ -446,11 +260,6 @@ Generated: 2026-02-17
 ├── etsy-hover-effects-fixed.html
 ├── LICENSE.Apache-2.0
 ├── LICENSE.Proprietary
-├── manuf.txt
-├── netok-protection-hub.jsx
-├── netok-status.jsx
-├── netok-wifi-security-plan.md
-├── nul
 ├── package-lock.json
 ├── package.json
 ├── PROJECT_CONTEXT.md
@@ -458,7 +267,6 @@ Generated: 2026-02-17
 ├── README_DEV.md
 ├── README.md
 ├── SETUP-PRECOMMIT.md
-├── speedtest-prototype-v2.html
 └── TESTING.md
 
 ```

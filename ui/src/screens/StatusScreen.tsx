@@ -242,7 +242,7 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, onNa
           className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
         >
           <DnsShield className={cn("w-4 h-4", isDnsProtectionEnabled && "text-primary")} />
-          <span>{isDnsProtectionEnabled && dnsSubtitle ? `DNS ${dnsSubtitle}` : `DNS · ${t('dns_providers.system_desc')}`}</span>
+          <span>{isDnsProtectionEnabled && dnsSubtitle ? `DNS ${dnsSubtitle}` : t('status.dns_protection_disabled')}</span>
         </button>
         <button
           onClick={onNavigateToVpn}
@@ -252,7 +252,7 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, onNa
             ? <Lock className="w-4 h-4 text-primary" />
             : <LockOpen className="w-4 h-4" />
           }
-          <span>{connectionState.type === 'connected' && vpnCompact ? `VPN ${vpnCompact}` : `VPN · ${t('vpn.disabled')}`}</span>
+          <span>{connectionState.type === 'connected' && vpnCompact ? `VPN ${vpnCompact}` : t('status.vpn_disabled')}</span>
         </button>
       </div>
     </div>

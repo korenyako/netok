@@ -74,7 +74,6 @@ export function SecurityRouter({ subScreen, onSetSubScreen, onBack }: SecurityRo
           onBack={handleBackToHome}
           onNavigateToDns={() => onSetSubScreen('dns-providers')}
           onNavigateToVpn={() => onSetSubScreen('vpn')}
-          onNavigateToWifiSecurity={() => onSetSubScreen('wifi-security')}
         />
       );
   }
