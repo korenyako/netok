@@ -35,6 +35,10 @@ jobs:
         run: npm ci
         working-directory: ui
 
+      - name: Install Tauri CLI dependencies
+        run: npm ci
+        working-directory: netok_desktop
+
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
