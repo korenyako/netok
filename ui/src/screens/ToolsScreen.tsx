@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Activity, Gauge, Radar, ShieldCheck } from '../components/icons/UIIcons';
+import { ArrowLeft, Activity, Gauge, Radar, Wifi } from '../components/icons/UIIcons';
 import { Button } from '@/components/ui/button';
 import { CloseButton } from '../components/WindowControls';
 
@@ -47,7 +47,7 @@ export function ToolsScreen({ onBack, onOpenDiagnostics, onOpenSpeedTest, onOpen
     {
       id: 'wifi-security',
       nameKey: 'settings.tools.wifi_security',
-      icon: <ShieldCheck className="w-6 h-6" />,
+      icon: <Wifi className="w-6 h-6" />,
       iconColorClass: 'text-emerald-500',
       onClick: onOpenWifiSecurity,
     },

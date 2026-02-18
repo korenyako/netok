@@ -5,7 +5,7 @@ import { useDnsStore } from '../stores/useDnsStore';
 import { useVpnStore } from '../stores/vpnStore';
 import { deriveScenario } from '../utils/deriveScenario';
 import { CloseButton } from '../components/WindowControls';
-import { DnsShield, Lock, LockOpen } from '../components/icons/UIIcons';
+import { Globe, Lock, LockOpen } from '../components/icons/UIIcons';
 import { cn } from '@/lib/utils';
 
 // DNS logging helper
@@ -241,7 +241,7 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, onNa
           onClick={onNavigateToDnsProviders}
           className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
         >
-          <DnsShield className={cn("w-4 h-4", isDnsProtectionEnabled && "text-primary")} />
+          <Globe className={cn("w-4 h-4", isDnsProtectionEnabled && "text-primary")} />
           <span>{isDnsProtectionEnabled && dnsSubtitle ? `DNS ${dnsSubtitle}` : t('status.dns_protection_disabled')}</span>
         </button>
         <button

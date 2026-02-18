@@ -5,6 +5,7 @@ import {
   Wifi, Monitor, Smartphone, Tablet, Printer, Tv, Gamepad2, Cpu,
   Ghost, HelpCircle,
 } from '../components/icons/UIIcons';
+import { ScanProgressRing } from '../components/ScanProgressRing';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent } from '@/components/ui/card';
@@ -56,7 +57,7 @@ function getDeviceVisual(device: NetworkDevice) {
 
 export function DeviceScanScreen({ onBack }: DeviceScanScreenProps) {
   const { t } = useTranslation();
-  const { devices, lastUpdated, isScanning, scanStage, error, runScan } = useDeviceScanStore();
+  const { devices, lastUpdated, isScanning, scanStage, scanProgress, error, runScan } = useDeviceScanStore();
 
   // Tick every 30s to refresh the "updated X min ago" label
   const [, setTick] = useState(0);
@@ -101,14 +102,12 @@ export function DeviceScanScreen({ onBack }: DeviceScanScreenProps) {
       {/* Content */}
       <ScrollArea className="flex-1 px-4 pb-4">
         {showLoading && (
-          <div className="flex flex-col items-center justify-center py-16 gap-3">
-            <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">
-              {scanStage === 'identifying'
-                ? t('device_scan.stage_identifying')
-                : t('device_scan.stage_scanning')}
-            </p>
-          </div>
+          <ScanProgressRing
+            percent={scanProgress}
+            stageLabel={scanStage === 'identifying'
+              ? t('device_scan.stage_identifying')
+              : t('device_scan.stage_scanning')}
+          />
         )}
 
         {error && (

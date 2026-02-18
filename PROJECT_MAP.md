@@ -156,6 +156,7 @@ Generated: 2026-02-18
 │   │   │   ├── HeaderStatus.tsx
 │   │   │   ├── MenuCard.tsx
 │   │   │   ├── NodeCard.tsx
+│   │   │   ├── ScanProgressRing.tsx
 │   │   │   ├── SecurityRouter.tsx
 │   │   │   ├── SettingsRouter.tsx
 │   │   │   ├── Spinner.tsx
