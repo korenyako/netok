@@ -5,7 +5,8 @@ import { useDnsStore } from '../stores/useDnsStore';
 import { useVpnStore } from '../stores/vpnStore';
 import { deriveScenario } from '../utils/deriveScenario';
 import { CloseButton } from '../components/WindowControls';
-import { Globe, Lock, LockOpen } from '../components/icons/UIIcons';
+import { Globe, Lock, LockOpen, Wifi } from '../components/icons/UIIcons';
+import { useWifiSecurityStore } from '../stores/wifiSecurityStore';
 import { cn } from '@/lib/utils';
 
 // DNS logging helper
@@ -22,6 +23,7 @@ interface StatusScreenProps {
   onOpenDiagnostics: () => void;
   onNavigateToDnsProviders: () => void;
   onNavigateToVpn: () => void;
+  onNavigateToWifiSecurity: () => void;
 }
 
 // Known providers that count as "protection enabled"
@@ -81,10 +83,13 @@ const CIRCLE_CLASSES: Record<VisualState, string> = {
   error: '',
 };
 
-export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, onNavigateToVpn }: StatusScreenProps) {
+export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, onNavigateToVpn, onNavigateToWifiSecurity }: StatusScreenProps) {
   const { t } = useTranslation();
   const { currentProvider: dnsProvider, isLoading: isDnsLoading } = useDnsStore();
   const { configs, activeIndex, connectionState } = useVpnStore();
+  const wifiReport = useWifiSecurityStore(s => s.report);
+  const wifiIsRunning = useWifiSecurityStore(s => s.isRunning);
+  const runQuietWifiScan = useWifiSecurityStore(s => s.runQuietScan);
   const vpnConfig = activeIndex !== null ? configs[activeIndex] : null;
   const mountedRef = useRef(false);
 
@@ -120,6 +125,14 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, onNa
       runDiagnostics(t);
     }
   }, [lastUpdated, isRunning, runDiagnostics, t]);
+
+  // Auto-run WiFi security check on mount if never run
+  useEffect(() => {
+    if (!wifiReport && !wifiIsRunning) {
+      runQuietWifiScan();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Determine if DNS protection is enabled (only known providers count as enabled)
   // Only Auto is treated as "protection disabled"
@@ -253,6 +266,26 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, onNa
             : <LockOpen className="w-4 h-4" />
           }
           <span>{connectionState.type === 'connected' && vpnCompact ? `VPN ${vpnCompact}` : t('status.vpn_disabled')}</span>
+        </button>
+        <button
+          onClick={onNavigateToWifiSecurity}
+          className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
+        >
+          <Wifi className={cn("w-4 h-4",
+            wifiReport && wifiReport.overall_status === 'safe' && "text-primary",
+            wifiReport && wifiReport.overall_status === 'warning' && "text-warning",
+            wifiReport && wifiReport.overall_status === 'danger' && "text-destructive",
+          )} />
+          <span>
+            {wifiIsRunning
+              ? t('wifi_security.checking')
+              : wifiReport
+                ? wifiReport.overall_status === 'safe'
+                  ? t('protection.no_threats')
+                  : t('protection.threats_detected')
+                : t('protection.check_security')
+            }
+          </span>
         </button>
       </div>
     </div>

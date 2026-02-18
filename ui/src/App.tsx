@@ -1,3 +1,6 @@
+import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import { Toaster } from '@/components/ui/sonner';
 import { ThemeProvider } from './components/ThemeProvider';
 import { BottomNav } from './components/BottomNav';
@@ -9,6 +12,7 @@ import { ToolsScreen } from './screens/ToolsScreen';
 import { SpeedTestScreen } from './screens/SpeedTestScreen';
 import { DeviceScanScreen } from './screens/DeviceScanScreen';
 import { useNavigation } from './hooks/useNavigation';
+import { useUpdateChecker } from './hooks/useUpdateChecker';
 
 function App() {
   const {
@@ -28,6 +32,23 @@ function App() {
     navigateToTools,
     navigateToSettings,
   } = useNavigation();
+
+  const { t } = useTranslation();
+  const { checkForUpdates, downloadAndInstall } = useUpdateChecker();
+
+  useEffect(() => {
+    checkForUpdates().then((update) => {
+      if (update) {
+        toast(t('settings.about.update_available_toast', { version: update.version }), {
+          duration: 8000,
+          action: {
+            label: t('settings.about.update_to', { version: update.version }),
+            onClick: () => downloadAndInstall(),
+          },
+        });
+      }
+    });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (showDeviceScan) {
     return (
@@ -105,6 +126,10 @@ function App() {
               onNavigateToVpn={() => {
                 navigateToSecurity();
                 setSecuritySubScreen('vpn');
+              }}
+              onNavigateToWifiSecurity={() => {
+                navigateToSecurity();
+                setSecuritySubScreen('wifi-security');
               }}
             />
           )}

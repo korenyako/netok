@@ -48,7 +48,7 @@ export function ToolsScreen({ onBack, onOpenDiagnostics, onOpenSpeedTest, onOpen
       id: 'wifi-security',
       nameKey: 'settings.tools.wifi_security',
       icon: <Wifi className="w-6 h-6" />,
-      iconColorClass: 'text-emerald-500',
+      iconColorClass: 'text-cyan-600 dark:text-cyan-400',
       onClick: onOpenWifiSecurity,
     },
   ];

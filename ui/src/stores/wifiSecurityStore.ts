@@ -22,6 +22,8 @@ interface WifiSecurityState {
 interface WifiSecurityActions {
   /** Run a full WiFi security scan */
   runScan: () => Promise<void>;
+  /** Run a quiet background scan (no animation state changes, just fetch report) */
+  runQuietScan: () => Promise<void>;
   /** Reset animation state for re-entering the results screen */
   resetReveal: () => void;
   /** Update revealed count (called by animation timer) */
@@ -66,6 +68,20 @@ export const useWifiSecurityStore = create<WifiSecurityStore>((set, get) => ({
         isRunning: false,
         currentCheckIndex: -1,
       });
+    }
+  },
+
+  runQuietScan: async () => {
+    const { isRunning } = get();
+    if (isRunning) return;
+    try {
+      const result = await checkWifiSecurity();
+      const count = CHECK_ORDER.filter(type =>
+        result.checks.some(c => c.check_type === type),
+      ).length;
+      set({ report: result, revealedCount: count, currentCheckIndex: -1, isRunning: false, error: null });
+    } catch (e) {
+      set({ error: String(e) });
     }
   },
 

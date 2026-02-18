@@ -180,7 +180,8 @@ Generated: 2026-02-18
 │   │   │   └── NotoSansArabic-Variable.ttf
 │   │   ├── hooks
 │   │   │   ├── useNavigation.ts
-│   │   │   └── useTheme.ts
+│   │   │   ├── useTheme.ts
+│   │   │   └── useUpdateChecker.ts
 │   │   ├── i18n
 │   │   │   ├── de.json
 │   │   │   ├── en.json
@@ -321,6 +322,15 @@ Generated: 2026-02-18
     ]
   },
 
+  "plugins": {
+    "updater": {
+      "pubkey": "REPLACE_WITH_PUBLIC_KEY",
+      "endpoints": [
+        "https://github.com/korenyako/netok/releases/latest/download/latest.json"
+      ]
+    }
+  },
+
   "bundle": {
     "active": true,
     "targets": ["nsis"],
@@ -334,11 +344,7 @@ Generated: 2026-02-18
     "windows": {
       "nsis": {
         "installMode": "currentUser"
-      }
-    }
-  }
-}
-
+      }}}}
 ```
 
 ### ui/package.json
@@ -367,6 +373,8 @@ Generated: 2026-02-18
     "@radix-ui/react-switch": "^1.2.6",
     "@tauri-apps/api": "^2.9.0",
     "@tauri-apps/plugin-opener": "^2.5.3",
+    "@tauri-apps/plugin-process": "^2.3.1",
+    "@tauri-apps/plugin-updater": "^2.10.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "geist": "^1.5.1",
@@ -392,8 +400,6 @@ Generated: 2026-02-18
     "@vitest/ui": "^4.0.11",
     "autoprefixer": "^10.4.21",
     "baseline-browser-mapping": "^2.9.19",
-    "eslint": "^9.33.0",
-    "eslint-plugin-react-hooks": "^5.2.0",
 // ... (truncated due to syntax error)
 ```
 
@@ -467,6 +473,9 @@ createRoot(document.getElementById('root')!).render(
 ### ui/src/App.tsx
 
 ```typescript
+import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import { Toaster } from '@/components/ui/sonner';
 import { ThemeProvider } from './components/ThemeProvider';
 import { BottomNav } from './components/BottomNav';
@@ -478,6 +487,7 @@ import { ToolsScreen } from './screens/ToolsScreen';
 import { SpeedTestScreen } from './screens/SpeedTestScreen';
 import { DeviceScanScreen } from './screens/DeviceScanScreen';
 import { useNavigation } from './hooks/useNavigation';
+import { useUpdateChecker } from './hooks/useUpdateChecker';
 
 function App() {
   const {
@@ -498,27 +508,21 @@ function App() {
     navigateToSettings,
   } = useNavigation();
 
-  if (showDeviceScan) {
-    return (
-      <ThemeProvider>
-        <Toaster />
-        <div id="app" className="h-full flex flex-col bg-background">
-          <DeviceScanScreen onBack={() => setShowDeviceScan(false)} />
-          <BottomNav
-            currentScreen={currentScreen}
-            onNavigateToHome={() => { setShowDeviceScan(false); navigateToHome(); }}
-            onNavigateToSecurity={() => { setShowDeviceScan(false); navigateToSecurity(); }}
-            onNavigateToTools={() => { setShowDeviceScan(false); navigateToTools(); }}
-            onNavigateToSettings={() => { setShowDeviceScan(false); navigateToSettings(); }}
-          />
-        </div>
-      </ThemeProvider>
-    );
-  }
+  const { t } = useTranslation();
+  const { checkForUpdates, downloadAndInstall } = useUpdateChecker();
 
-  if (showSpeedTest) {}}
-
-export default App;
+  useEffect(() => {
+    checkForUpdates().then((update) => {
+      if (update) {
+        toast(t('settings.about.update_available_toast', { version: update.version }), {
+          duration: 8000,
+          action: {
+            label: t('settings.about.update_to', { version: update.version }),
+            onClick: () => downloadAndInstall(),
+          },
+        });
+      }
+    });}}
 ```
 
 ## MAP
