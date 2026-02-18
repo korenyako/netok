@@ -77,7 +77,7 @@ export function DeviceScanScreen({ onBack }: DeviceScanScreenProps) {
   const showLoading = isScanning && devices.length === 0;
 
   return (
-    <div className="flex flex-col h-full bg-background">
+    <div className="flex flex-col flex-1 min-h-0 bg-background">
       {/* Header */}
       <div data-tauri-drag-region className="px-4 pt-4 pb-3">
         <div className="flex items-center gap-2 pointer-events-auto">

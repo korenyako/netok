@@ -51,11 +51,11 @@ export function ScanProgressRing({ percent, stageLabel }: ScanProgressRingProps)
         </svg>
 
         {/* Percentage text */}
-        <div className="absolute inset-0 flex items-baseline justify-center pt-[6.25rem]">
-          <span className="font-mono text-4xl font-semibold text-foreground">
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="font-mono text-4xl font-semibold text-foreground leading-none">
             {Math.round(clamped)}
           </span>
-          <span className="font-mono text-base text-muted-foreground ml-0.5">%</span>
+          <span className="font-mono text-base text-muted-foreground ml-0.5 self-start mt-[4.25rem]">%</span>
         </div>
       </div>
 
