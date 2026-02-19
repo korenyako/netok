@@ -1,15 +1,15 @@
-import React, { useState, useCallback } from 'react';
+import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import Svg, { Circle as SvgCircle } from 'react-native-svg';
 import { ArrowLeft } from '../components/icons/UIIcons';
 import { useTheme } from '../hooks/useTheme';
+import { useSpeedTestStore } from '../stores/speedTestStore';
 
 interface SpeedTestScreenProps {
   onBack: () => void;
 }
-
-type Phase = 'idle' | 'ping' | 'download' | 'upload' | 'done';
 
 const CIRCLE_SIZE = 200;
 const STROKE_WIDTH = 6;
@@ -19,47 +19,17 @@ const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 export function SpeedTestScreen({ onBack }: SpeedTestScreenProps) {
   const { t } = useTranslation();
   const { themeColors } = useTheme();
-  const [phase, setPhase] = useState<Phase>('idle');
-  const [progress, setProgress] = useState(0);
-  const [results, setResults] = useState<{
-    ping: number;
-    download: number;
-    upload: number;
-  } | null>(null);
+  const {
+    phase,
+    progress,
+    currentValue,
+    metrics,
+    error,
+    cooldownSecondsLeft,
+    startTest,
+  } = useSpeedTestStore();
 
-  const runTest = useCallback(async () => {
-    setResults(null);
-
-    // Simulate ping phase
-    setPhase('ping');
-    for (let i = 0; i <= 100; i += 10) {
-      setProgress(i / 3);
-      await new Promise(r => setTimeout(r, 100));
-    }
-
-    // Simulate download phase
-    setPhase('download');
-    for (let i = 0; i <= 100; i += 5) {
-      setProgress(33 + i / 3);
-      await new Promise(r => setTimeout(r, 100));
-    }
-
-    // Simulate upload phase
-    setPhase('upload');
-    for (let i = 0; i <= 100; i += 5) {
-      setProgress(66 + i / 3);
-      await new Promise(r => setTimeout(r, 100));
-    }
-
-    setPhase('done');
-    setProgress(100);
-    setResults({
-      ping: 12,
-      download: 95.4,
-      upload: 48.2,
-    });
-  }, []);
-
+  const isRunning = phase === 'ping' || phase === 'download' || phase === 'upload';
   const strokeDashoffset = CIRCUMFERENCE - (progress / 100) * CIRCUMFERENCE;
 
   const phaseLabel = (() => {
@@ -71,8 +41,17 @@ export function SpeedTestScreen({ onBack }: SpeedTestScreenProps) {
     }
   })();
 
+  const canStart = phase === 'idle' || phase === 'done' || phase === 'error';
+  const isCoolingDown = cooldownSecondsLeft > 0 && canStart;
+
+  const handleStart = () => {
+    if (canStart && !isCoolingDown) {
+      startTest();
+    }
+  };
+
   return (
-    <View style={[styles.container, { backgroundColor: themeColors.background }]}>
+    <SafeAreaView edges={['top']} style={[styles.container, { backgroundColor: themeColors.background }]}>
       <View style={styles.header}>
         <TouchableOpacity onPress={onBack} style={styles.headerButton}>
           <ArrowLeft size={20} color={themeColors.mutedForeground} />
@@ -94,7 +73,7 @@ export function SpeedTestScreen({ onBack }: SpeedTestScreenProps) {
               stroke={themeColors.accent}
               fill="none"
             />
-            {phase !== 'idle' && (
+            {isRunning && (
               <SvgCircle
                 cx={CIRCLE_SIZE / 2}
                 cy={CIRCLE_SIZE / 2}
@@ -115,44 +94,53 @@ export function SpeedTestScreen({ onBack }: SpeedTestScreenProps) {
             {phase === 'idle' ? (
               <TouchableOpacity
                 style={[styles.startButton, { backgroundColor: themeColors.primary }]}
-                onPress={runTest}
+                onPress={handleStart}
                 activeOpacity={0.8}
               >
                 <Text style={[styles.startButtonText, { color: themeColors.primaryForeground }]}>
                   {t('speed_test.start')}
                 </Text>
               </TouchableOpacity>
-            ) : phase === 'done' && results ? (
+            ) : phase === 'done' && metrics.download !== null ? (
               <View style={styles.resultInCircle}>
                 <Text style={[styles.bigNumber, { color: themeColors.foreground }]}>
-                  {results.download.toFixed(1)}
+                  {metrics.download.toFixed(1)}
                 </Text>
                 <Text style={[styles.unitLabel, { color: themeColors.mutedForeground }]}>
                   {t('speed_test.unit_mbps')}
                 </Text>
               </View>
-            ) : (
+            ) : phase === 'error' ? (
+              <View style={styles.phaseInfo}>
+                <Text style={[styles.errorText, { color: themeColors.destructive }]}>
+                  {t(error || 'speed_test.error_test_failed')}
+                </Text>
+              </View>
+            ) : isRunning ? (
               <View style={styles.phaseInfo}>
                 <Text style={[styles.phaseLabel, { color: themeColors.mutedForeground }]}>
                   {phaseLabel}
                 </Text>
-                <Text style={[styles.phasePercent, { color: themeColors.foreground }]}>
-                  {Math.round(progress)}%
+                <Text style={[styles.bigNumber, { color: themeColors.foreground }]}>
+                  {currentValue}
+                </Text>
+                <Text style={[styles.unitLabel, { color: themeColors.mutedForeground }]}>
+                  {phase === 'ping' ? t('speed_test.unit_ms') : t('speed_test.unit_mbps')}
                 </Text>
               </View>
-            )}
+            ) : null}
           </View>
         </View>
 
         {/* Results */}
-        {phase === 'done' && results && (
+        {phase === 'done' && metrics.download !== null && (
           <View style={styles.resultsGrid}>
             <View style={[styles.resultCard, { backgroundColor: themeColors.accent }]}>
               <Text style={[styles.resultLabel, { color: themeColors.mutedForeground }]}>
                 {t('speed_test.download')}
               </Text>
               <Text style={[styles.resultValue, { color: themeColors.foreground }]}>
-                {results.download.toFixed(1)}
+                {metrics.download!.toFixed(1)}
               </Text>
               <Text style={[styles.resultUnit, { color: themeColors.mutedForeground }]}>
                 {t('speed_test.unit_mbps')}
@@ -164,7 +152,7 @@ export function SpeedTestScreen({ onBack }: SpeedTestScreenProps) {
                 {t('speed_test.upload')}
               </Text>
               <Text style={[styles.resultValue, { color: themeColors.foreground }]}>
-                {results.upload.toFixed(1)}
+                {metrics.upload!.toFixed(1)}
               </Text>
               <Text style={[styles.resultUnit, { color: themeColors.mutedForeground }]}>
                 {t('speed_test.unit_mbps')}
@@ -176,7 +164,7 @@ export function SpeedTestScreen({ onBack }: SpeedTestScreenProps) {
                 {t('speed_test.ping')}
               </Text>
               <Text style={[styles.resultValue, { color: themeColors.foreground }]}>
-                {results.ping}
+                {metrics.ping}
               </Text>
               <Text style={[styles.resultUnit, { color: themeColors.mutedForeground }]}>
                 {t('speed_test.unit_ms')}
@@ -185,20 +173,29 @@ export function SpeedTestScreen({ onBack }: SpeedTestScreenProps) {
           </View>
         )}
 
-        {/* Repeat button */}
-        {phase === 'done' && (
+        {/* Repeat / Start button */}
+        {(phase === 'done' || phase === 'error') && (
           <TouchableOpacity
-            style={[styles.repeatButton, { borderColor: themeColors.border }]}
-            onPress={runTest}
+            style={[
+              styles.repeatButton,
+              {
+                borderColor: themeColors.border,
+                opacity: isCoolingDown ? 0.5 : 1,
+              },
+            ]}
+            onPress={handleStart}
+            disabled={isCoolingDown}
             activeOpacity={0.7}
           >
             <Text style={[styles.repeatText, { color: themeColors.foreground }]}>
-              {t('speed_test.repeat')}
+              {isCoolingDown
+                ? `${t('speed_test.cooldown_wait')} ${cooldownSecondsLeft}s`
+                : t('speed_test.repeat')}
             </Text>
           </TouchableOpacity>
         )}
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -223,7 +220,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     flex: 1,
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '600',
   },
   content: {
@@ -253,32 +250,32 @@ const styles = StyleSheet.create({
     borderRadius: 24,
   },
   startButtonText: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '600',
   },
   resultInCircle: {
     alignItems: 'center',
   },
   bigNumber: {
-    fontSize: 36,
+    fontSize: 40,
     fontWeight: '700',
     fontVariant: ['tabular-nums'],
   },
   unitLabel: {
-    fontSize: 14,
+    fontSize: 15,
     marginTop: 2,
   },
   phaseInfo: {
     alignItems: 'center',
   },
   phaseLabel: {
-    fontSize: 14,
+    fontSize: 15,
     marginBottom: 4,
   },
-  phasePercent: {
-    fontSize: 24,
-    fontWeight: '600',
-    fontVariant: ['tabular-nums'],
+  errorText: {
+    fontSize: 14,
+    textAlign: 'center',
+    paddingHorizontal: 16,
   },
   resultsGrid: {
     flexDirection: 'row',
@@ -292,16 +289,16 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   resultLabel: {
-    fontSize: 13,
+    fontSize: 14,
     marginBottom: 4,
   },
   resultValue: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '700',
     fontVariant: ['tabular-nums'],
   },
   resultUnit: {
-    fontSize: 12,
+    fontSize: 13,
     marginTop: 2,
   },
   repeatButton: {
@@ -312,7 +309,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   repeatText: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '500',
   },
 });

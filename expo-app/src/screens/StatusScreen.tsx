@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import Svg, { Circle as SvgCircle } from 'react-native-svg';
 import { useDiagnosticsStore, shouldRefreshDiagnostics } from '../stores/diagnosticsStore';
@@ -15,7 +16,7 @@ const CONNECTION_TYPE_KEYS: Record<string, string> = {
   Unknown: 'network.unknown',
 };
 
-const CIRCLE_SIZE = 220;
+const CIRCLE_SIZE = 260;
 const STROKE_WIDTH = 2;
 const RADIUS = (CIRCLE_SIZE - STROKE_WIDTH * 2) / 2;
 
@@ -65,7 +66,7 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, onNa
   const showNetworkInfo = !isLoading && (visualState === 'success' || visualState === 'warning');
 
   return (
-    <View style={[styles.container, { backgroundColor: themeColors.background }]}>
+    <SafeAreaView edges={['top']} style={[styles.container, { backgroundColor: themeColors.background }]}>
       {/* Main circle area */}
       <TouchableOpacity
         style={styles.mainContent}
@@ -157,7 +158,7 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, onNa
           </Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -190,13 +191,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
   },
   circleTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '500',
     textAlign: 'center',
-    lineHeight: 24,
+    lineHeight: 28,
   },
   networkInfo: {
-    fontSize: 12,
+    fontSize: 14,
     fontFamily: 'monospace',
     marginTop: 8,
   },
@@ -205,10 +206,10 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   messageText: {
-    fontSize: 14,
+    fontSize: 16,
     textAlign: 'center',
-    lineHeight: 20,
-    maxWidth: 240,
+    lineHeight: 22,
+    maxWidth: 260,
   },
   indicators: {
     flexShrink: 0,
@@ -225,6 +226,6 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   indicatorText: {
-    fontSize: 14,
+    fontSize: 15,
   },
 });

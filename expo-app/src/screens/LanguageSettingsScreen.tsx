@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft } from '../components/icons/UIIcons';
 import { MenuCard } from '../components/MenuCard';
@@ -22,7 +23,7 @@ export function LanguageSettingsScreen({ onBack }: LanguageSettingsScreenProps) 
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: themeColors.background }]}>
+    <SafeAreaView edges={['top']} style={[styles.container, { backgroundColor: themeColors.background }]}>
       <View style={styles.header}>
         <TouchableOpacity onPress={onBack} style={styles.headerButton}>
           <ArrowLeft size={20} color={themeColors.mutedForeground} />
@@ -51,7 +52,7 @@ export function LanguageSettingsScreen({ onBack }: LanguageSettingsScreenProps) 
           )}
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -76,7 +77,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     flex: 1,
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '600',
   },
   scrollContent: {

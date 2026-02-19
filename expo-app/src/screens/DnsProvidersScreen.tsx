@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft } from '../components/icons/UIIcons';
 import { MenuCard } from '../components/MenuCard';
@@ -8,7 +9,7 @@ import type { DnsProvider } from '../api/types';
 import { setDns } from '../api/network';
 
 interface DnsProvidersScreenProps {
-  onBack: () => void;
+  onBack?: () => void;
 }
 
 interface ProviderCard {
@@ -74,11 +75,13 @@ export function DnsProvidersScreen({ onBack }: DnsProvidersScreenProps) {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: themeColors.background }]}>
+    <SafeAreaView edges={['top']} style={[styles.container, { backgroundColor: themeColors.background }]}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={onBack} style={styles.headerButton}>
-          <ArrowLeft size={20} color={themeColors.mutedForeground} />
-        </TouchableOpacity>
+        {onBack && (
+          <TouchableOpacity onPress={onBack} style={styles.headerButton}>
+            <ArrowLeft size={20} color={themeColors.mutedForeground} />
+          </TouchableOpacity>
+        )}
         <Text style={[styles.headerTitle, { color: themeColors.foreground }]}>
           {t('dns_providers.title')}
         </Text>
@@ -121,7 +124,7 @@ export function DnsProvidersScreen({ onBack }: DnsProvidersScreenProps) {
           ))}
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -146,7 +149,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     flex: 1,
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '600',
   },
   scrollContent: {

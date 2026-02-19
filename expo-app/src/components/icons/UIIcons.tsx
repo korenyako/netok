@@ -233,6 +233,24 @@ export function Tv({ size = defaultSize, color = 'currentColor' }: IconProps) {
   );
 }
 
+export function Copy({ size = defaultSize, color = 'currentColor' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={defaultStrokeWidth} strokeLinecap="round" strokeLinejoin="round">
+      <Rect width={14} height={14} x={8} y={8} rx={2} ry={2} />
+      <Path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+    </Svg>
+  );
+}
+
+export function ArrowUpRight({ size = defaultSize, color = 'currentColor' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={defaultStrokeWidth} strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M7 7h10v10" />
+      <Path d="M7 17 17 7" />
+    </Svg>
+  );
+}
+
 export function Cpu({ size = defaultSize, color = 'currentColor' }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={defaultStrokeWidth} strokeLinecap="round" strokeLinejoin="round">

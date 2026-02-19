@@ -1,6 +1,8 @@
 {
   "network": {
-    "unknown": "Неизвестно"
+    "unknown": "Неизвестно",
+    "wifi": "Wi-Fi",
+    "cellular": "Мобильная сеть"
   },
   "dns_providers": {
     "title": "DNS",

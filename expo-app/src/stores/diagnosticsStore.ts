@@ -58,8 +58,13 @@ function transformSingleNode(
   const { node } = result;
   const details: NodeDetail[] = [];
   let ip: string | undefined;
+  let titleOverride: string | null = null;
 
   if (node.id === 'computer' && result.computer) {
+    // Use device model as the title (e.g. "Pixel 4a") instead of generic "Computer"
+    if (result.computer.model) {
+      titleOverride = result.computer.model;
+    }
     if (result.computer.adapter) {
       details.push({ text: result.computer.adapter });
     }
@@ -83,6 +88,13 @@ function transformSingleNode(
         labelKey = 'nodes.network.signal_label_weak';
       }
       details.push({ text: t(labelKey) });
+    }
+    // Show connection type when SSID is unavailable
+    if (!result.network.ssid && result.network.connection_type) {
+      const ct = result.network.connection_type;
+      if (ct === 'Wifi') details.push({ text: t('network.wifi') });
+      else if (ct === 'Mobile') details.push({ text: t('network.cellular') });
+      else if (ct !== 'Unknown') details.push({ text: ct });
     }
   }
 
@@ -112,7 +124,7 @@ function transformSingleNode(
 
   return {
     id: node.id,
-    title: node.label,
+    title: titleOverride ?? node.label,
     status: node.status,
     ip,
     details,

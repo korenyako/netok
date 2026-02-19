@@ -90,7 +90,7 @@ export function MenuCard({
         </View>
         {subtitle && (
           typeof subtitle === 'string' ? (
-            <Text style={[styles.subtitle, { color: themeColors.mutedForeground }]} numberOfLines={2}>
+            <Text style={[styles.subtitle, { color: themeColors.mutedForeground }]} numberOfLines={3}>
               {subtitle}
             </Text>
           ) : (
@@ -145,9 +145,9 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   title: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '500',
-    lineHeight: 22,
+    lineHeight: 24,
     flexShrink: 1,
   },
   badge: {
@@ -156,12 +156,12 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   badgeText: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '400',
   },
   subtitle: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 15,
+    lineHeight: 21,
     marginTop: 2,
   },
   subtitleContainer: {

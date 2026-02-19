@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, RotateCw } from '../components/icons/UIIcons';
 import { NodeOkIcon, NodeWarningIcon, NodeErrorIcon, NodeLoadingIcon } from '../components/icons/DiagnosticStatusIcons';
@@ -17,9 +18,10 @@ const LOADING_LABELS = [
 
 interface DiagnosticsScreenProps {
   onBack: () => void;
+  onNodePress?: (nodeId: string) => void;
 }
 
-export function DiagnosticsScreen({ onBack }: DiagnosticsScreenProps) {
+export function DiagnosticsScreen({ onBack, onNodePress }: DiagnosticsScreenProps) {
   const { t } = useTranslation();
   const { themeColors } = useTheme();
   const {
@@ -51,7 +53,7 @@ export function DiagnosticsScreen({ onBack }: DiagnosticsScreenProps) {
   const hasLoadingPlaceholder = isActive && currentCheckIndex >= nodes.length;
 
   return (
-    <View style={[styles.container, { backgroundColor: themeColors.background }]}>
+    <SafeAreaView edges={['top']} style={[styles.container, { backgroundColor: themeColors.background }]}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={onBack} style={styles.headerButton}>
@@ -112,16 +114,20 @@ export function DiagnosticsScreen({ onBack }: DiagnosticsScreenProps) {
 
           {/* Node cards */}
           <View style={styles.nodeList}>
-            {nodes.map((node) => (
-              <MenuCard
-                key={node.id}
-                variant="ghost"
-                icon={getStatusIcon(node.status)}
-                title={t(node.title)}
-                subtitle={node.details.map(d => d.text).join(' · ') || undefined}
-                trailing="chevron"
-              />
-            ))}
+            {nodes.map((node) => {
+              const subtitle = node.details.map(d => d.text).join('\n') || undefined;
+              return (
+                <MenuCard
+                  key={node.id}
+                  variant="ghost"
+                  icon={getStatusIcon(node.status)}
+                  title={t(node.title, { defaultValue: node.title })}
+                  subtitle={subtitle}
+                  trailing="chevron"
+                  onClick={onNodePress ? () => onNodePress(node.id) : undefined}
+                />
+              );
+            })}
 
             {/* Loading placeholder */}
             {hasLoadingPlaceholder && (
@@ -136,7 +142,7 @@ export function DiagnosticsScreen({ onBack }: DiagnosticsScreenProps) {
           </View>
         </ScrollView>
       )}
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -161,7 +167,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     flex: 1,
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '600',
   },
   errorContainer: {
@@ -171,11 +177,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   errorTitle: {
-    fontSize: 16,
+    fontSize: 17,
     marginBottom: 16,
   },
   errorDetail: {
-    fontSize: 14,
+    fontSize: 15,
   },
   scrollContent: {
     flex: 1,
@@ -191,16 +197,16 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   scenarioTitle: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '600',
     marginBottom: 4,
   },
   scenarioMessage: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 15,
+    lineHeight: 22,
   },
   errorInline: {
-    fontSize: 14,
+    fontSize: 15,
     marginBottom: 16,
   },
   nodeList: {

@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, RotateCw, Smartphone, Monitor, Tv, Cpu } from '../components/icons/UIIcons';
 import { useTheme } from '../hooks/useTheme';
@@ -46,7 +47,7 @@ export function DeviceScanScreen({ onBack }: DeviceScanScreenProps) {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: themeColors.background }]}>
+    <SafeAreaView edges={['top']} style={[styles.container, { backgroundColor: themeColors.background }]}>
       <View style={styles.header}>
         <TouchableOpacity onPress={onBack} style={styles.headerButton}>
           <ArrowLeft size={20} color={themeColors.mutedForeground} />
@@ -120,7 +121,7 @@ export function DeviceScanScreen({ onBack }: DeviceScanScreenProps) {
           </View>
         </ScrollView>
       )}
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -145,7 +146,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     flex: 1,
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '600',
   },
   emptyState: {
@@ -160,11 +161,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   scanButtonText: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '600',
   },
   scanningText: {
-    fontSize: 16,
+    fontSize: 17,
   },
   scrollContent: {
     flex: 1,
@@ -174,7 +175,7 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   countText: {
-    fontSize: 14,
+    fontSize: 15,
     marginBottom: 12,
   },
   deviceList: {
@@ -201,7 +202,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   deviceName: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '500',
   },
   deviceBadge: {
@@ -210,11 +211,11 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   deviceBadgeText: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '500',
   },
   deviceIp: {
-    fontSize: 13,
+    fontSize: 14,
     marginTop: 2,
     fontFamily: 'monospace',
   },

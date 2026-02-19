@@ -1,6 +1,8 @@
 {
   "network": {
-    "unknown": "Unknown"
+    "unknown": "Unknown",
+    "wifi": "Wi-Fi",
+    "cellular": "Cellular"
   },
   "dns_providers": {
     "title": "DNS",

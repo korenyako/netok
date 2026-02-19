@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ShieldCheck } from '../components/icons/UIIcons';
 import { NodeOkIcon, NodeWarningIcon, NodeErrorIcon } from '../components/icons/DiagnosticStatusIcons';
@@ -80,7 +81,7 @@ export function WiFiSecurityScreen({ onBack }: WiFiSecurityScreenProps) {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: themeColors.background }]}>
+    <SafeAreaView edges={['top']} style={[styles.container, { backgroundColor: themeColors.background }]}>
       <View style={styles.header}>
         <TouchableOpacity onPress={onBack} style={styles.headerButton}>
           <ArrowLeft size={20} color={themeColors.mutedForeground} />
@@ -150,7 +151,7 @@ export function WiFiSecurityScreen({ onBack }: WiFiSecurityScreenProps) {
           </View>
         </ScrollView>
       ) : null}
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -175,7 +176,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     flex: 1,
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '600',
   },
   loadingState: {
@@ -185,7 +186,7 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   loadingText: {
-    fontSize: 16,
+    fontSize: 17,
   },
   scrollContent: {
     flex: 1,
@@ -203,11 +204,11 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   overallText: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '600',
   },
   networkName: {
-    fontSize: 14,
+    fontSize: 15,
     marginBottom: 16,
   },
   checkList: {
@@ -224,12 +225,12 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   checkName: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '500',
   },
   checkDetail: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 15,
+    lineHeight: 22,
     paddingLeft: 28,
   },
 });

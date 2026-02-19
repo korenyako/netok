@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft } from '../components/icons/UIIcons';
 import { NetokLogoIcon } from '../components/icons/NavigationIcons';
@@ -14,7 +15,7 @@ export function AboutScreen({ onBack }: AboutScreenProps) {
   const { themeColors } = useTheme();
 
   return (
-    <View style={[styles.container, { backgroundColor: themeColors.background }]}>
+    <SafeAreaView edges={['top']} style={[styles.container, { backgroundColor: themeColors.background }]}>
       <View style={styles.header}>
         <TouchableOpacity onPress={onBack} style={styles.headerButton}>
           <ArrowLeft size={20} color={themeColors.mutedForeground} />
@@ -53,7 +54,7 @@ export function AboutScreen({ onBack }: AboutScreenProps) {
           </View>
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -78,7 +79,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     flex: 1,
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '600',
   },
   content: {
@@ -91,12 +92,12 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   appName: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: '700',
     marginTop: 8,
   },
   version: {
-    fontSize: 14,
+    fontSize: 15,
   },
   infoList: {
     marginTop: 16,
@@ -109,10 +110,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   infoLabel: {
-    fontSize: 15,
+    fontSize: 16,
   },
   infoValue: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '500',
   },
 });

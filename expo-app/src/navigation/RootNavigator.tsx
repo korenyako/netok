@@ -1,7 +1,8 @@
 import React from 'react';
-import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme, DarkTheme, useNavigation } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../hooks/useTheme';
 import { useTranslation } from 'react-i18next';
 
@@ -20,11 +21,14 @@ import { WiFiSecurityScreen } from '../screens/WiFiSecurityScreen';
 import { ThemeSettingsScreen } from '../screens/ThemeSettingsScreen';
 import { LanguageSettingsScreen } from '../screens/LanguageSettingsScreen';
 import { AboutScreen } from '../screens/AboutScreen';
+import { NodeDetailScreen } from '../screens/NodeDetailScreen';
+import { useDiagnosticsStore } from '../stores/diagnosticsStore';
 
 // Stack param lists
 export type HomeStackParamList = {
   HomeMain: undefined;
   Diagnostics: undefined;
+  NodeDetail: { nodeId: string };
   DnsProviders: undefined;
   WiFiSecurity: undefined;
 };
@@ -38,6 +42,7 @@ export type SecurityStackParamList = {
 export type ToolsStackParamList = {
   ToolsMain: undefined;
   Diagnostics: undefined;
+  NodeDetail: { nodeId: string };
   SpeedTest: undefined;
   DeviceScan: undefined;
   WiFiSecurity: undefined;
@@ -70,8 +75,23 @@ function HomeNavigator() {
       </HomeStack.Screen>
       <HomeStack.Screen name="Diagnostics">
         {({ navigation }) => (
-          <DiagnosticsScreen onBack={() => navigation.goBack()} />
+          <DiagnosticsScreen
+            onBack={() => navigation.goBack()}
+            onNodePress={(nodeId) => navigation.navigate('NodeDetail', { nodeId })}
+          />
         )}
+      </HomeStack.Screen>
+      <HomeStack.Screen name="NodeDetail">
+        {({ navigation, route }) => {
+          const result = useDiagnosticsStore.getState().getRawResult(route.params.nodeId);
+          return result ? (
+            <NodeDetailScreen
+              nodeId={route.params.nodeId}
+              result={result}
+              onBack={() => navigation.goBack()}
+            />
+          ) : null;
+        }}
       </HomeStack.Screen>
       <HomeStack.Screen name="DnsProviders">
         {({ navigation }) => (
@@ -88,11 +108,12 @@ function HomeNavigator() {
 }
 
 function SecurityNavigator() {
+  const tabNav = useNavigation<any>();
   return (
     <SecurityStack.Navigator screenOptions={{ headerShown: false }}>
       <SecurityStack.Screen name="SecurityMain">
-        {({ navigation }) => (
-          <DnsProvidersScreen onBack={() => navigation.goBack()} />
+        {() => (
+          <DnsProvidersScreen onBack={() => tabNav.navigate('Home')} />
         )}
       </SecurityStack.Screen>
       <SecurityStack.Screen name="WiFiSecurity">
@@ -105,11 +126,13 @@ function SecurityNavigator() {
 }
 
 function ToolsNavigator() {
+  const tabNav = useNavigation<any>();
   return (
     <ToolsStack.Navigator screenOptions={{ headerShown: false }}>
       <ToolsStack.Screen name="ToolsMain">
         {({ navigation }) => (
           <ToolsScreen
+            onBack={() => tabNav.navigate('Home')}
             onOpenDiagnostics={() => navigation.navigate('Diagnostics')}
             onOpenSpeedTest={() => navigation.navigate('SpeedTest')}
             onOpenDeviceScan={() => navigation.navigate('DeviceScan')}
@@ -119,8 +142,23 @@ function ToolsNavigator() {
       </ToolsStack.Screen>
       <ToolsStack.Screen name="Diagnostics">
         {({ navigation }) => (
-          <DiagnosticsScreen onBack={() => navigation.goBack()} />
+          <DiagnosticsScreen
+            onBack={() => navigation.goBack()}
+            onNodePress={(nodeId) => navigation.navigate('NodeDetail', { nodeId })}
+          />
         )}
+      </ToolsStack.Screen>
+      <ToolsStack.Screen name="NodeDetail">
+        {({ navigation, route }) => {
+          const result = useDiagnosticsStore.getState().getRawResult(route.params.nodeId);
+          return result ? (
+            <NodeDetailScreen
+              nodeId={route.params.nodeId}
+              result={result}
+              onBack={() => navigation.goBack()}
+            />
+          ) : null;
+        }}
       </ToolsStack.Screen>
       <ToolsStack.Screen name="SpeedTest">
         {({ navigation }) => (
@@ -142,11 +180,13 @@ function ToolsNavigator() {
 }
 
 function SettingsNavigator() {
+  const tabNav = useNavigation<any>();
   return (
     <SettingsStack.Navigator screenOptions={{ headerShown: false }}>
       <SettingsStack.Screen name="SettingsMain">
         {({ navigation }) => (
           <SettingsScreen
+            onBack={() => tabNav.navigate('Home')}
             onNavigateToTheme={() => navigation.navigate('ThemeSettings')}
             onNavigateToLanguage={() => navigation.navigate('LanguageSettings')}
             onNavigateToAbout={() => navigation.navigate('About')}
@@ -175,6 +215,7 @@ function SettingsNavigator() {
 export function RootNavigator() {
   const { isDark, themeColors } = useTheme();
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
 
   const navTheme = isDark ? {
     ...DarkTheme,
@@ -207,13 +248,14 @@ export function RootNavigator() {
           tabBarInactiveTintColor: themeColors.mutedForeground,
           tabBarStyle: {
             backgroundColor: themeColors.background,
-            borderTopColor: themeColors.border,
-            height: 64,
-            paddingBottom: 8,
+            borderTopWidth: 0,
+            elevation: 0,
             paddingTop: 8,
+            paddingBottom: insets.bottom + 12,
+            height: 60 + insets.bottom + 12,
           },
           tabBarLabelStyle: {
-            fontSize: 11,
+            fontSize: 13,
           },
         }}
       >

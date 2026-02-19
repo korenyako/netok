@@ -1,17 +1,19 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
-import { Activity, Gauge, MonitorSmartphone, Wifi } from '../components/icons/UIIcons';
+import { ArrowLeft, Activity, Gauge, MonitorSmartphone, Wifi } from '../components/icons/UIIcons';
 import { useTheme } from '../hooks/useTheme';
 
 interface ToolsScreenProps {
+  onBack: () => void;
   onOpenDiagnostics: () => void;
   onOpenSpeedTest: () => void;
   onOpenDeviceScan: () => void;
   onOpenWifiSecurity: () => void;
 }
 
-export function ToolsScreen({ onOpenDiagnostics, onOpenSpeedTest, onOpenDeviceScan, onOpenWifiSecurity }: ToolsScreenProps) {
+export function ToolsScreen({ onBack, onOpenDiagnostics, onOpenSpeedTest, onOpenDeviceScan, onOpenWifiSecurity }: ToolsScreenProps) {
   const { t } = useTranslation();
   const { themeColors } = useTheme();
 
@@ -43,8 +45,11 @@ export function ToolsScreen({ onOpenDiagnostics, onOpenSpeedTest, onOpenDeviceSc
   ];
 
   return (
-    <View style={[styles.container, { backgroundColor: themeColors.background }]}>
+    <SafeAreaView edges={['top']} style={[styles.container, { backgroundColor: themeColors.background }]}>
       <View style={styles.header}>
+        <TouchableOpacity onPress={onBack} style={styles.headerButton}>
+          <ArrowLeft size={20} color={themeColors.mutedForeground} />
+        </TouchableOpacity>
         <Text style={[styles.headerTitle, { color: themeColors.foreground }]}>
           {t('settings.tabs.tools')}
         </Text>
@@ -65,7 +70,7 @@ export function ToolsScreen({ onOpenDiagnostics, onOpenSpeedTest, onOpenDeviceSc
           </TouchableOpacity>
         ))}
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -74,12 +79,23 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 16,
     paddingTop: 8,
     paddingBottom: 12,
+    gap: 8,
+  },
+  headerButton: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
   },
   headerTitle: {
-    fontSize: 18,
+    flex: 1,
+    fontSize: 20,
     fontWeight: '600',
   },
   grid: {
@@ -97,7 +113,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   tileName: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '500',
   },
 });
