@@ -3,12 +3,12 @@
 /// Get default gateway IP address.
 #[cfg(target_os = "windows")]
 pub fn get_default_gateway() -> Option<String> {
-    use std::process::Command;
+    use super::hidden_cmd;
 
     // Run "route print" and parse the output
     // LOCALE-INDEPENDENT: We parse IP addresses (0.0.0.0) which are not localized
     // The route table format is consistent across locales
-    let output = Command::new("cmd")
+    let output = hidden_cmd("cmd")
         .args(["/C", "route print 0.0.0.0"])
         .output()
         .ok()?;

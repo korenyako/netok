@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import { ArrowLeft, Loader2, XThick } from '../components/icons/UIIcons';
 import { setDns, testDnsServer, type DnsProvider as ApiDnsProvider } from '../api/tauri';
 import { dnsStore } from '../stores/dnsStore';
@@ -174,10 +175,15 @@ export function CustomIpScreen({ onBack, onApplied }: CustomIpScreenProps) {
         secondaryIpv6: secondaryV6 || null,
       });
 
+      toast.success(t('dns_providers.applied'));
       onApplied();
     } catch (err) {
-      console.error('Failed to set custom DNS:', err);
-      setServerUnreachable(true);
+      const msg = String(err);
+      if (msg.includes('elevation_denied')) {
+        toast.error(t('dns_providers.error_elevation_denied'));
+      } else {
+        toast.error(t('dns_providers.error_set_failed'));
+      }
     } finally {
       setIsApplying(false);
     }

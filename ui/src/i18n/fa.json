@@ -37,7 +37,10 @@
     "cache_cleared": "حافظه کش DNS پاک شد",
     "system": "DNS استاندارد",
     "system_desc": "بدون محافظت",
-    "custom_ip_edit": "ویرایش"
+    "custom_ip_edit": "ویرایش",
+    "error_elevation_denied": "برای تغییر DNS نیاز به دسترسی مدیر است",
+    "error_set_failed": "اعمال تنظیمات DNS ناموفق بود",
+    "applied": "DNS اعمال شد"
   },
   "dns_detail": {
     "ip_copied": "کپی شد"

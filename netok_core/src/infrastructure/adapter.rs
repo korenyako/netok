@@ -4,7 +4,6 @@
 #[cfg(target_os = "windows")]
 pub fn get_active_adapter_name() -> Option<String> {
     use super::wifi::get_wifi_info;
-    use std::process::Command;
 
     fn run_powershell(command: &str) -> Option<String> {
         // Force English culture to ensure locale-independent output
@@ -13,7 +12,7 @@ pub fn get_active_adapter_name() -> Option<String> {
             "[System.Threading.Thread]::CurrentThread.CurrentUICulture = 'en-US'; ";
         let full_command = format!("{}{}", culture_prefix, command);
 
-        let output = Command::new("powershell")
+        let output = super::hidden_cmd("powershell")
             .args(["-NoProfile", "-Command", &full_command])
             .output()
             .ok()?;

@@ -180,14 +180,16 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, onNa
         </div>
       </div>
 
-      {/* Main Content - Clickable Area */}
-      <button
-        onClick={onOpenDiagnostics}
-        className="flex-1 flex flex-col items-center px-4 focus:outline-none"
+      {/* Main Content */}
+      <div
+        className="flex-1 flex flex-col items-center px-4"
       >
         <div className="flex-1" />
-        {/* Status Circle */}
-        <div className="relative w-60 h-60 mb-4">
+        {/* Status Circle - Clickable */}
+        <button
+          onClick={onOpenDiagnostics}
+          className="relative w-60 h-60 mb-4 rounded-full focus:outline-none cursor-pointer"
+        >
           <svg
             className="w-full h-full overflow-visible"
             viewBox={`0 0 ${CIRCLE_SIZE} ${CIRCLE_SIZE}`}
@@ -230,7 +232,7 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, onNa
               </div>
             )}
           </div>
-        </div>
+        </button>
 
         {/* Info area below circle */}
         <div className="flex flex-col items-center gap-1.5">
@@ -246,7 +248,7 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, onNa
           )}
         </div>
         <div className="flex-1" />
-      </button>
+      </div>
 
       {/* Status Indicators */}
       <div className="shrink-0 flex flex-col items-center gap-0.5 pb-4">

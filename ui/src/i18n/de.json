@@ -37,7 +37,10 @@
     "cache_cleared": "DNS-Cache geleert",
     "system": "Standard-DNS",
     "system_desc": "Kein Schutz",
-    "custom_ip_edit": "Bearbeiten"
+    "custom_ip_edit": "Bearbeiten",
+    "error_elevation_denied": "Administratorrechte erforderlich, um DNS zu ändern",
+    "error_set_failed": "DNS-Einstellungen konnten nicht angewendet werden",
+    "applied": "DNS angewendet"
   },
   "dns_detail": {
     "ip_copied": "Kopiert"

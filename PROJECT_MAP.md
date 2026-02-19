@@ -1,6 +1,6 @@
 # Project Map - Netok
 
-Generated: 2026-02-18
+Generated: 2026-02-19
 
 ## TREE (ASCII)
 
@@ -28,6 +28,7 @@ Generated: 2026-02-18
 │   ├── ACTION_PLAN.md
 │   ├── CODE_ANALYSIS.md
 │   ├── IMPLEMENTATION-PLAN.md
+│   ├── MOBILE-PLAN.md
 │   ├── PROGRESS.md
 │   ├── README.md
 │   ├── RECOMMENDATIONS.md
@@ -37,6 +38,64 @@ Generated: 2026-02-18
 │   ├── SoT-ARCH.md
 │   ├── TESTING_PLAN.md
 │   └── UI-SPEC.md
+├── expo-app
+│   ├── .expo
+│   │   ├── devices.json
+│   │   └── README.md
+│   ├── assets
+│   │   ├── adaptive-icon.png
+│   │   ├── favicon.png
+│   │   ├── icon.png
+│   │   └── splash-icon.png
+│   ├── src
+│   │   ├── api
+│   │   │   ├── network.ts
+│   │   │   └── types.ts
+│   │   ├── components
+│   │   │   ├── icons
+│   │   │   │   ├── DiagnosticStatusIcons.tsx
+│   │   │   │   ├── NavigationIcons.tsx
+│   │   │   │   └── UIIcons.tsx
+│   │   │   └── MenuCard.tsx
+│   │   ├── constants
+│   │   │   └── languages.ts
+│   │   ├── hooks
+│   │   │   └── useTheme.ts
+│   │   ├── i18n
+│   │   │   ├── en.json
+│   │   │   ├── index.ts
+│   │   │   └── ru.json
+│   │   ├── navigation
+│   │   │   └── RootNavigator.tsx
+│   │   ├── screens
+│   │   │   ├── AboutScreen.tsx
+│   │   │   ├── DeviceScanScreen.tsx
+│   │   │   ├── DiagnosticsScreen.tsx
+│   │   │   ├── DnsProvidersScreen.tsx
+│   │   │   ├── LanguageSettingsScreen.tsx
+│   │   │   ├── NodeDetailScreen.tsx
+│   │   │   ├── SettingsScreen.tsx
+│   │   │   ├── SpeedTestScreen.tsx
+│   │   │   ├── StatusScreen.tsx
+│   │   │   ├── ThemeSettingsScreen.tsx
+│   │   │   ├── ToolsScreen.tsx
+│   │   │   └── WiFiSecurityScreen.tsx
+│   │   ├── stores
+│   │   │   ├── diagnosticsStore.ts
+│   │   │   ├── speedTestStore.ts
+│   │   │   └── themeStore.ts
+│   │   ├── theme
+│   │   │   └── colors.ts
+│   │   └── utils
+│   │       ├── deriveScenario.ts
+│   │       └── ndt7Client.ts
+│   ├── .gitignore
+│   ├── app.json
+│   ├── App.tsx
+│   ├── index.ts
+│   ├── package-lock.json
+│   ├── package.json
+│   └── tsconfig.json
 ├── i18n
 │   ├── en.json
 │   ├── README.md
@@ -375,7 +434,7 @@ Generated: 2026-02-18
     "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-slot": "^1.2.4",
     "@radix-ui/react-switch": "^1.2.6",
-    "@tauri-apps/api": "^2.9.0",
+    "@tauri-apps/api": "^2.10.1",
     "@tauri-apps/plugin-opener": "^2.5.3",
     "@tauri-apps/plugin-process": "^2.3.1",
     "@tauri-apps/plugin-updater": "^2.10.0",

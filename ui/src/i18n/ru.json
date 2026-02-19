@@ -37,7 +37,10 @@
     "cache_cleared": "Кэш DNS очищен",
     "system": "Стандартный DNS",
     "system_desc": "Без защиты",
-    "custom_ip_edit": "Изменить"
+    "custom_ip_edit": "Изменить",
+    "error_elevation_denied": "Для смены DNS нужны права администратора",
+    "error_set_failed": "Не удалось применить настройки DNS",
+    "applied": "DNS применён"
   },
   "dns_detail": {
     "ip_copied": "Скопировано"

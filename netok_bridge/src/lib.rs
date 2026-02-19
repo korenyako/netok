@@ -334,7 +334,17 @@ fn dns_provider_from_core(provider: netok_core::DnsProvider) -> DnsProviderType 
     }
 }
 
-// Set DNS provider (async wrapper)
+/// Build the netsh command lines needed to apply a DNS provider.
+///
+/// Does NOT execute anything — the caller must run them (usually elevated).
+pub async fn build_dns_commands(provider: DnsProviderType) -> Result<Vec<String>, String> {
+    let core_provider = dns_provider_to_core(provider);
+    tokio::task::spawn_blocking(move || netok_core::build_dns_commands(core_provider))
+        .await
+        .map_err(|e| format!("Failed to build DNS commands: {}", e))?
+}
+
+// Set DNS provider (async wrapper — runs netsh directly, needs admin rights)
 pub async fn set_dns_provider(provider: DnsProviderType) -> Result<(), String> {
     eprintln!("[DNS] Setting provider: {:?}", provider);
     let core_provider = dns_provider_to_core(provider.clone());

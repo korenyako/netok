@@ -106,12 +106,78 @@ mod win_elevation {
         }
     }
 
+    /// Run a command elevated (UAC prompt), wait for it to finish, and return the result.
+    pub fn run_elevated_wait(exe_path: &Path, args: &str) -> Result<(), String> {
+        use std::ffi::OsStr;
+        use std::mem;
+        use std::os::windows::ffi::OsStrExt;
+
+        use windows::core::PCWSTR;
+        use windows::Win32::Foundation::CloseHandle;
+        use windows::Win32::System::Threading::{GetExitCodeProcess, WaitForSingleObject};
+        use windows::Win32::UI::Shell::{
+            ShellExecuteExW, SEE_MASK_NOCLOSEPROCESS, SHELLEXECUTEINFOW,
+        };
+
+        fn to_wide_null(s: &str) -> Vec<u16> {
+            OsStr::new(s)
+                .encode_wide()
+                .chain(std::iter::once(0))
+                .collect()
+        }
+
+        let verb = to_wide_null("runas");
+        let file = to_wide_null(&exe_path.to_string_lossy());
+        let params = to_wide_null(args);
+
+        let mut sei: SHELLEXECUTEINFOW = unsafe { mem::zeroed() };
+        sei.cbSize = mem::size_of::<SHELLEXECUTEINFOW>() as u32;
+        sei.fMask = SEE_MASK_NOCLOSEPROCESS;
+        sei.lpVerb = PCWSTR(verb.as_ptr());
+        sei.lpFile = PCWSTR(file.as_ptr());
+        sei.lpParameters = PCWSTR(params.as_ptr());
+        sei.nShow = 0; // SW_HIDE
+
+        unsafe { ShellExecuteExW(&mut sei) }.map_err(|e| {
+            // ERROR_CANCELLED (1223) = user clicked No on UAC
+            let msg = e.to_string();
+            if msg.contains("1223") || msg.contains("cancelled") {
+                "elevation_denied".to_string()
+            } else {
+                format!("elevation_failed: {}", msg)
+            }
+        })?;
+
+        let hprocess = sei.hProcess;
+        if hprocess.is_invalid() {
+            return Err("Process handle is invalid".to_string());
+        }
+
+        // Wait up to 60 seconds for the process to finish
+        let _wait = unsafe { WaitForSingleObject(hprocess, 60_000) };
+
+        let mut exit_code: u32 = 1;
+        let _ = unsafe { GetExitCodeProcess(hprocess, &mut exit_code) };
+        let _ = unsafe { CloseHandle(hprocess) };
+
+        if exit_code != 0 {
+            return Err(format!(
+                "dns_config_failed: netsh exited with code {}",
+                exit_code
+            ));
+        }
+
+        Ok(())
+    }
+
     /// Kill a process by PID using taskkill.
     pub fn kill_process(pid: u32) -> Result<(), String> {
+        use std::os::windows::process::CommandExt;
         use std::process::Command;
 
         let output = Command::new("taskkill")
             .args(["/F", "/PID", &pid.to_string()])
+            .creation_flags(0x08000000) // CREATE_NO_WINDOW
             .output()
             .map_err(|e| format!("Failed to execute taskkill: {}", e))?;
 
@@ -152,9 +218,38 @@ async fn run_diagnostics() -> Result<netok_bridge::Snapshot, String> {
 
 #[tauri::command]
 async fn set_dns(provider: DnsProviderType) -> Result<(), String> {
-    netok_bridge::set_dns_provider(provider)
-        .await
-        .map_err(|e| e.to_string())
+    // Build netsh commands (no elevation needed — only reads adapter name)
+    let commands = netok_bridge::build_dns_commands(provider).await?;
+
+    // Write commands to a temp .bat file
+    let bat_path = std::env::temp_dir().join("netok_dns.bat");
+    let bat_content = format!(
+        "@echo off\r\n{}",
+        commands
+            .iter()
+            .map(|c| format!("{} || exit /b 1", c))
+            .collect::<Vec<_>>()
+            .join("\r\n")
+    );
+    std::fs::write(&bat_path, &bat_content)
+        .map_err(|e| format!("Failed to write DNS script: {}", e))?;
+
+    // Run elevated (UAC prompt) and wait for completion
+    #[cfg(target_os = "windows")]
+    let result = {
+        let bat = bat_path.clone();
+        tokio::task::spawn_blocking(move || win_elevation::run_elevated_wait(&bat, ""))
+            .await
+            .map_err(|e| format!("Task error: {}", e))?
+    };
+
+    #[cfg(not(target_os = "windows"))]
+    let result = Err::<(), String>("DNS configuration requires Windows".to_string());
+
+    // Clean up temp file
+    let _ = std::fs::remove_file(&bat_path);
+
+    result
 }
 
 #[tauri::command]
@@ -594,9 +689,11 @@ fn update_tray_language(app: tauri::AppHandle, lang: String) -> Result<(), Strin
 fn kill_orphaned_singbox() {
     #[cfg(target_os = "windows")]
     {
+        use std::os::windows::process::CommandExt;
         use std::process::Command;
         let output = Command::new("taskkill")
             .args(["/F", "/IM", "sing-box-x86_64-pc-windows-msvc.exe"])
+            .creation_flags(0x08000000) // CREATE_NO_WINDOW
             .output();
         if let Ok(out) = output {
             if out.status.success() {

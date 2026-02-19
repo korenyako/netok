@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import { ArrowLeft, Loader2 } from '../components/icons/UIIcons';
 import { setDns, type DnsProvider as ApiDnsProvider } from '../api/tauri';
 import { useDnsStore } from '../stores/useDnsStore';
@@ -95,8 +96,14 @@ export function DnsProvidersScreen({ onBack, onCustomIp }: DnsProvidersScreenPro
       setApplyingId(id);
       await setDns(provider);
       dnsStore.setProvider(provider);
+      toast.success(t('dns_providers.applied'));
     } catch (err) {
-      console.error('Failed to set DNS:', err);
+      const msg = String(err);
+      if (msg.includes('elevation_denied')) {
+        toast.error(t('dns_providers.error_elevation_denied'));
+      } else {
+        toast.error(t('dns_providers.error_set_failed'));
+      }
     } finally {
       setApplyingId(null);
     }

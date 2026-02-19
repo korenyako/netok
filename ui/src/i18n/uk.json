@@ -37,7 +37,10 @@
     "cache_cleared": "Кеш DNS очищено",
     "system": "Стандартний DNS",
     "system_desc": "Без захисту",
-    "custom_ip_edit": "Змінити"
+    "custom_ip_edit": "Змінити",
+    "error_elevation_denied": "Для зміни DNS потрібні права адміністратора",
+    "error_set_failed": "Не вдалося застосувати налаштування DNS",
+    "applied": "DNS застосовано"
   },
   "dns_detail": {
     "ip_copied": "Скопійовано"

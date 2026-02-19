@@ -37,7 +37,10 @@
     "cache_cleared": "DNS önbelleği temizlendi",
     "system": "Standart DNS",
     "system_desc": "Koruma yok",
-    "custom_ip_edit": "Düzenle"
+    "custom_ip_edit": "Düzenle",
+    "error_elevation_denied": "DNS değiştirmek için yönetici hakları gerekli",
+    "error_set_failed": "DNS ayarları uygulanamadı",
+    "applied": "DNS uygulandı"
   },
   "dns_detail": {
     "ip_copied": "Kopyalandı"

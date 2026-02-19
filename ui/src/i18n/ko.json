@@ -37,7 +37,10 @@
     "cache_cleared": "DNS 캐시 삭제됨",
     "system": "표준 DNS",
     "system_desc": "보호 없음",
-    "custom_ip_edit": "편집"
+    "custom_ip_edit": "편집",
+    "error_elevation_denied": "DNS를 변경하려면 관리자 권한이 필요합니다",
+    "error_set_failed": "DNS 설정 적용에 실패했습니다",
+    "applied": "DNS 적용됨"
   },
   "dns_detail": {
     "ip_copied": "복사됨"

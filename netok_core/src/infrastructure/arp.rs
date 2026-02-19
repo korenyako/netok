@@ -3,7 +3,7 @@
 /// Get router MAC address via ARP lookup.
 #[cfg(target_os = "windows")]
 pub fn get_router_mac(gateway_ip: &str) -> Option<String> {
-    use std::process::Command;
+    use super::hidden_cmd;
 
     // Use PowerShell Get-NetNeighbor for reliable ARP lookup
     // LOCALE-INDEPENDENT: MAC addresses and IP addresses are not localized
@@ -14,7 +14,7 @@ pub fn get_router_mac(gateway_ip: &str) -> Option<String> {
         gateway_ip
     );
 
-    let output = Command::new("powershell")
+    let output = hidden_cmd("powershell")
         .args(["-NoProfile", "-Command", &command])
         .output()
         .ok()?;
@@ -121,7 +121,7 @@ fn subnet_prefix(gateway_ip: &str) -> Option<String> {
 /// Total time: ~3-5 seconds for a /24 subnet.
 #[cfg(target_os = "windows")]
 pub fn ping_sweep(gateway_ip: &str) {
-    use std::process::Command;
+    use super::hidden_cmd;
 
     let prefix = match subnet_prefix(gateway_ip) {
         Some(p) => p,
@@ -137,18 +137,9 @@ pub fn ping_sweep(gateway_ip: &str) {
                 .map(|i| {
                     let ip = format!("{}.{}", prefix, i);
                     s.spawn(move || {
-                        // -n 1: single ping, -w 200: 200ms timeout
-                        #[cfg(target_os = "windows")]
-                        use std::os::windows::process::CommandExt;
-
-                        let mut cmd = Command::new("ping");
-                        cmd.args(["-n", "1", "-w", "200", &ip]);
-
-                        // Hide console windows for ping processes
-                        #[cfg(target_os = "windows")]
-                        cmd.creation_flags(0x08000000); // CREATE_NO_WINDOW
-
-                        let _ = cmd.output();
+                        let _ = hidden_cmd("ping")
+                            .args(["-n", "1", "-w", "200", &ip])
+                            .output();
                     })
                 })
                 .collect();
@@ -170,7 +161,7 @@ pub fn ping_sweep(_gateway_ip: &str) {
 /// Get all reachable entries from the ARP table (IPv4 only).
 #[cfg(target_os = "windows")]
 pub fn get_all_arp_entries() -> Vec<ArpEntry> {
-    use std::process::Command;
+    use super::hidden_cmd;
 
     // Get-NetNeighbor returns all ARP entries.
     // Filter: IPv4, Reachable or Stale (exclude Unreachable and Incomplete).
@@ -181,7 +172,7 @@ pub fn get_all_arp_entries() -> Vec<ArpEntry> {
          Where-Object { $_.State -ne 'Unreachable' -and $_.State -ne 'Incomplete' -and $_.LinkLayerAddress -ne '00-00-00-00-00-00' -and $_.LinkLayerAddress -ne 'FF-FF-FF-FF-FF-FF' } | \
          ForEach-Object { $_.IPAddress + '|' + $_.LinkLayerAddress }";
 
-    let output = match Command::new("powershell")
+    let output = match hidden_cmd("powershell")
         .args(["-NoProfile", "-Command", command])
         .output()
     {

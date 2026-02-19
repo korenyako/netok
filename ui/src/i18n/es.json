@@ -37,7 +37,10 @@
     "cache_cleared": "Caché DNS borrada",
     "system": "DNS estándar",
     "system_desc": "Sin protección",
-    "custom_ip_edit": "Editar"
+    "custom_ip_edit": "Editar",
+    "error_elevation_denied": "Se requieren permisos de administrador para cambiar DNS",
+    "error_set_failed": "No se pudieron aplicar los ajustes DNS",
+    "applied": "DNS aplicado"
   },
   "dns_detail": {
     "ip_copied": "Copiado"

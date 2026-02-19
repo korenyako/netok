@@ -37,7 +37,10 @@
     "cache_cleared": "DNSキャッシュをクリアしました",
     "system": "標準 DNS",
     "system_desc": "保護なし",
-    "custom_ip_edit": "編集"
+    "custom_ip_edit": "編集",
+    "error_elevation_denied": "DNSを変更するには管理者権限が必要です",
+    "error_set_failed": "DNS設定の適用に失敗しました",
+    "applied": "DNSを適用しました"
   },
   "dns_detail": {
     "ip_copied": "コピーしました"

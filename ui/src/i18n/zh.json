@@ -37,7 +37,10 @@
     "cache_cleared": "DNS 缓存已清除",
     "system": "标准 DNS",
     "system_desc": "无保护",
-    "custom_ip_edit": "编辑"
+    "custom_ip_edit": "编辑",
+    "error_elevation_denied": "更改 DNS 需要管理员权限",
+    "error_set_failed": "无法应用 DNS 设置",
+    "applied": "DNS 已应用"
   },
   "dns_detail": {
     "ip_copied": "已复制"

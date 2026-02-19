@@ -37,7 +37,7 @@ pub use diagnostics::{
 };
 
 // Re-export infrastructure functions used by bridge
-pub use infrastructure::{check_wifi_security, get_current_dns, set_dns};
+pub use infrastructure::{build_dns_commands, check_wifi_security, get_current_dns, set_dns};
 
 // Re-export security types
 pub use infrastructure::security::{
