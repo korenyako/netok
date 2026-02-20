@@ -399,7 +399,7 @@ Generated: 2026-02-20
 
   "plugins": {
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEMzNjhCNUFCODkwMjg3RkIKUldUN2h3S0pxN1ZvdzVnUTE4aXU3RnNYY01KYWFCUHhVeWZOSWJ1eFhWSlA5bnZiMURpMC83aXMK",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDE3RDE1RDlEQjg3M0YxOUIKUldTYjhYTzRuVjNSRjJyVVZCbkpTMXlyZHE0ZzczNXVWclNodEY4SWVjL2JBc2Y3V1dkT2MralgK",
       "endpoints": [
         "https://github.com/korenyako/netok/releases/latest/download/latest.json"
       ]
