@@ -242,6 +242,32 @@ export function Copy({ size = defaultSize, color = 'currentColor' }: IconProps) 
   );
 }
 
+export function ArrowDown({ size = defaultSize, color = 'currentColor' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={defaultStrokeWidth} strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M12 5v14" />
+      <Path d="m19 12-7 7-7-7" />
+    </Svg>
+  );
+}
+
+export function ArrowUp({ size = defaultSize, color = 'currentColor' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={defaultStrokeWidth} strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M12 19V5" />
+      <Path d="m5 12 7-7 7 7" />
+    </Svg>
+  );
+}
+
+export function InfoCircleFilled({ size = defaultSize, color = 'currentColor' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill={color} stroke="none">
+      <Path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+    </Svg>
+  );
+}
+
 export function ArrowUpRight({ size = defaultSize, color = 'currentColor' }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={defaultStrokeWidth} strokeLinecap="round" strokeLinejoin="round">
