@@ -234,11 +234,13 @@ async fn set_dns(provider: DnsProviderType) -> Result<(), String> {
     std::fs::write(&bat_path, &bat_content)
         .map_err(|e| format!("Failed to write DNS script: {}", e))?;
 
-    // Run elevated (UAC prompt) and wait for completion
+    // Run elevated (UAC prompt) via cmd.exe /c and wait for completion
     #[cfg(target_os = "windows")]
     let result = {
-        let bat = bat_path.clone();
-        tokio::task::spawn_blocking(move || win_elevation::run_elevated_wait(&bat, ""))
+        let bat_str = bat_path.to_string_lossy().to_string();
+        let cmd_exe = std::path::PathBuf::from("cmd.exe");
+        let args = format!(r#"/c "{}""#, bat_str);
+        tokio::task::spawn_blocking(move || win_elevation::run_elevated_wait(&cmd_exe, &args))
             .await
             .map_err(|e| format!("Task error: {}", e))?
     };
