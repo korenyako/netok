@@ -218,21 +218,37 @@ async fn run_diagnostics() -> Result<netok_bridge::Snapshot, String> {
 
 #[tauri::command]
 async fn set_dns(provider: DnsProviderType) -> Result<(), String> {
-    // Build netsh commands (no elevation needed — only reads adapter name)
-    let commands = netok_bridge::build_dns_commands(provider).await?;
+    let log_path = std::env::temp_dir().join("netok_dns.log");
 
-    // Write commands to a temp .bat file
+    // Build netsh commands (no elevation needed — only reads adapter name)
+    let commands = netok_bridge::build_dns_commands(provider).await.map_err(|e| {
+        let _ = std::fs::write(&log_path, format!("[DNS] build_dns_commands failed: {}\n", e));
+        e
+    })?;
+
+    let mut log = String::new();
+    log.push_str("[DNS] Commands to execute:\n");
+    for cmd in &commands {
+        log.push_str(&format!("  {}\n", cmd));
+    }
+
+    // Write commands to a temp .bat file with UTF-8 BOM + chcp 65001 for Unicode adapter names
     let bat_path = std::env::temp_dir().join("netok_dns.bat");
-    let bat_content = format!(
-        "@echo off\r\n{}",
-        commands
-            .iter()
-            .map(|c| format!("{} || exit /b 1", c))
-            .collect::<Vec<_>>()
-            .join("\r\n")
-    );
-    std::fs::write(&bat_path, &bat_content)
+    let bat_body = commands
+        .iter()
+        .map(|c| format!("{} || exit /b 1", c))
+        .collect::<Vec<_>>()
+        .join("\r\n");
+    let bat_content = format!("@echo off\r\nchcp 65001 >nul\r\n{}", bat_body);
+
+    // Write with UTF-8 BOM for cmd.exe compatibility
+    let mut bat_bytes = vec![0xEF, 0xBB, 0xBF]; // UTF-8 BOM
+    bat_bytes.extend_from_slice(bat_content.as_bytes());
+    std::fs::write(&bat_path, &bat_bytes)
         .map_err(|e| format!("Failed to write DNS script: {}", e))?;
+
+    log.push_str(&format!("[DNS] Bat written to: {}\n", bat_path.display()));
+    log.push_str(&format!("[DNS] Bat content:\n{}\n", bat_content));
 
     // Run elevated (UAC prompt) via cmd.exe /c and wait for completion
     #[cfg(target_os = "windows")]
@@ -240,15 +256,24 @@ async fn set_dns(provider: DnsProviderType) -> Result<(), String> {
         let bat_str = bat_path.to_string_lossy().to_string();
         let cmd_exe = std::path::PathBuf::from("cmd.exe");
         let args = format!(r#"/c "{}""#, bat_str);
-        tokio::task::spawn_blocking(move || win_elevation::run_elevated_wait(&cmd_exe, &args))
+        log.push_str(&format!("[DNS] Running elevated: cmd.exe {}\n", args));
+        let res = tokio::task::spawn_blocking(move || win_elevation::run_elevated_wait(&cmd_exe, &args))
             .await
-            .map_err(|e| format!("Task error: {}", e))?
+            .map_err(|e| format!("Task error: {}", e))?;
+        match &res {
+            Ok(()) => log.push_str("[DNS] SUCCESS\n"),
+            Err(e) => log.push_str(&format!("[DNS] FAILED: {}\n", e)),
+        }
+        res
     };
 
     #[cfg(not(target_os = "windows"))]
     let result = Err::<(), String>("DNS configuration requires Windows".to_string());
 
-    // Clean up temp file
+    // Write log file (always, for debugging)
+    let _ = std::fs::write(&log_path, &log);
+
+    // Clean up bat file (keep log file for debugging)
     let _ = std::fs::remove_file(&bat_path);
 
     result
@@ -351,7 +376,7 @@ async fn validate_vpn_key(raw_uri: String) -> Result<netok_bridge::VpnKeyValidat
 }
 
 /// Resolve the sing-box sidecar binary path.
-/// Checks resource dir (production), then src-tauri/binaries/ (dev mode).
+/// Checks multiple locations: resource dir (production), next to exe, dev mode fallback.
 fn get_singbox_path(app: &tauri::AppHandle) -> Result<PathBuf, String> {
     let exe_name = if cfg!(target_os = "windows") {
         "sing-box-x86_64-pc-windows-msvc.exe"
@@ -361,25 +386,54 @@ fn get_singbox_path(app: &tauri::AppHandle) -> Result<PathBuf, String> {
         "sing-box-x86_64-unknown-linux-gnu"
     };
 
-    // 1. Resource dir (production bundle)
+    let mut checked_paths = Vec::new();
+
+    // 1. Resource dir with binaries/ subdirectory (Tauri v2 sidecar layout)
     if let Ok(resource_dir) = app.path().resource_dir() {
         let path = resource_dir.join("binaries").join(exe_name);
         if path.exists() {
             return Ok(path);
         }
+        checked_paths.push(path.to_string_lossy().to_string());
+
+        // 2. Resource dir directly (flat layout)
+        let path = resource_dir.join(exe_name);
+        if path.exists() {
+            return Ok(path);
+        }
+        checked_paths.push(path.to_string_lossy().to_string());
     }
 
-    // 2. src-tauri/binaries/ (dev mode — CARGO_MANIFEST_DIR set at compile time)
+    // 3. Next to the main executable
+    if let Ok(exe_path) = std::env::current_exe() {
+        if let Some(exe_dir) = exe_path.parent() {
+            let path = exe_dir.join(exe_name);
+            if path.exists() {
+                return Ok(path);
+            }
+            checked_paths.push(path.to_string_lossy().to_string());
+
+            // Also check binaries/ subdirectory next to exe
+            let path = exe_dir.join("binaries").join(exe_name);
+            if path.exists() {
+                return Ok(path);
+            }
+            checked_paths.push(path.to_string_lossy().to_string());
+        }
+    }
+
+    // 4. src-tauri/binaries/ (dev mode — CARGO_MANIFEST_DIR set at compile time)
     let dev_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("binaries")
         .join(exe_name);
     if dev_path.exists() {
         return Ok(dev_path);
     }
+    checked_paths.push(dev_path.to_string_lossy().to_string());
 
     Err(format!(
-        "sing-box binary not found. Place {} in src-tauri/binaries/",
-        exe_name
+        "sing-box binary not found. Checked paths:\n{}",
+        checked_paths.join("\n")
     ))
 }
 

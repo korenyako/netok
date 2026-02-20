@@ -102,7 +102,10 @@ export function DnsProvidersScreen({ onBack, onCustomIp }: DnsProvidersScreenPro
       if (msg.includes('elevation_denied')) {
         toast.error(t('dns_providers.error_elevation_denied'));
       } else {
-        toast.error(t('dns_providers.error_set_failed'));
+        console.error('[DNS] set_dns error:', msg);
+        toast.error(t('dns_providers.error_set_failed'), {
+          description: msg.length > 100 ? msg.slice(0, 100) + '…' : msg,
+        });
       }
     } finally {
       setApplyingId(null);
