@@ -1,51 +1,71 @@
-# Netok MVP (Desktop)
+# Netok
 
-## Project Docs
+**Network diagnostics that speak human language.**
 
-- **Architecture:** [docs/SoT-ARCH.md](docs/SoT-ARCH.md) — Desktop = **Tauri (WebView)**, Core = **Rust**
-- **UI/UX:** [docs/UI-SPEC.md](docs/UI-SPEC.md) — UI specifications and design guidelines
-- **i18n:** [i18n/README.md](i18n/README.md) — Internationalization guidelines
-- **AI Assistants:** [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md) — Universal guide for all AI assistants
+Netok shows you the full path from your computer to the internet — and explains
+what's wrong in plain terms, not error codes.
 
-Mono-repo с двумя крейтами: `core` (Apache-2.0) и `desktop` (Tauri WebView).
+![Netok screenshot](docs/screenshot.png)
 
-## Сборка
+---
 
-Требуется Rust stable.
+## Features
 
-```bash
-cargo build --release -p netok-desktop
-```
+- **Connection diagnostics** — Computer → Wi-Fi → Router → Internet, step by step
+- **Plain language explanations** — no technical jargon, just clear answers
+- **DNS protection** — Cloudflare, AdGuard, CleanBrowsing, or custom servers
+- **VPN support** — VLESS, VMess, Shadowsocks, Trojan, WireGuard via sing-box
+- **Device discovery** — scan your local network, identify devices by brand
+- **Speed test** — real-world ratings, not just raw numbers
+- **Wi-Fi security check** — encryption vulnerabilities and threats
+- **15 languages** — full localization including RTL scripts
+- **Light and dark theme**
 
-## Запуск
+---
 
-```bash
-cargo run -p desktop
-```
+## Download
 
-## Project Map
+→ [Latest release for Windows](https://github.com/korenyako/netok/releases/latest)
 
-Автоматическая генерация карты проекта:
+> **Note:** Windows may show a SmartScreen warning on first launch — this is normal
+> for unsigned applications. Click "Run anyway" to proceed.
 
-```bash
-npm run map
-```
+---
 
-### Pre-commit Hook
+## Why Netok
 
-При каждом коммите автоматически обновляется `PROJECT_MAP.md` через husky pre-commit hook.
+Most network tools are built for engineers. Netok is built for everyone else.
 
-### Скрипт генерации
+When your internet stops working, you shouldn't need to know what
+`DNS_PROBE_FINISHED_NXDOMAIN` means. Netok translates that into something useful:
+what's broken, where, and what to do about it.
 
-- **Файл**: `scripts/generate_project_map.mjs`
-- **Игнорируемые папки**: `node_modules`, `.git`, `target`, `dist`, `.next`, `.turbo`, `.pnpm-store`, `.cache`
-- **Проверка**: `npm run map:check` — сравнивает с текущим PROJECT_MAP.md
+---
 
-### VS Code Task
+## Platform support
 
-Доступна задача "Update Project Map" для ручного обновления карты проекта.
+| Platform | Status |
+|----------|--------|
+| Windows | Ready |
+| macOS | Planned |
+| Android | In progress |
+| iOS | Planned |
 
-## Лицензии
+---
 
-- core: Apache-2.0 (см. LICENSE.Apache-2.0)
-- desktop: OSS, но бинарные релизы могут распространяться по проприетарной лицензии (см. LICENSE.Proprietary)
+## Built with
+
+- [Rust](https://www.rust-lang.org/) — core diagnostics engine
+- [Tauri](https://tauri.app/) — desktop framework
+- [React](https://react.dev/) + TypeScript — UI
+- [sing-box](https://sing-box.sagernet.org/) — VPN tunneling
+
+---
+
+## License
+
+GPL-3.0. See [LICENSE](LICENSE) and [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).
+
+---
+
+*Made by [Anton Korenyako](https://github.com/korenyako)*
