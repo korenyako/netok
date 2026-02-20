@@ -46,7 +46,7 @@ jobs:
           unzip -j sing-box.zip "sing-box-1.12.21-windows-amd64/sing-box.exe" -d netok_desktop/src-tauri/binaries/
           mv netok_desktop/src-tauri/binaries/sing-box.exe netok_desktop/src-tauri/binaries/sing-box-x86_64-pc-windows-msvc.exe
 
-      - uses: tauri-apps/tauri-action@v0
+      - uses: tauri-apps/tauri-action@v0.5.16
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
