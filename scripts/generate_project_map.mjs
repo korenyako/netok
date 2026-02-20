@@ -10,8 +10,9 @@ const projectRoot = join(__dirname, '..');
 
 // Configuration
 const IGNORE_DIRS = new Set([
-  'node_modules', '.git', 'target', 'dist', '.next', '.turbo', 
-  '.pnpm-store', '.cache', 'build', 'out', '.vscode', '.idea'
+  'node_modules', '.git', 'target', 'dist', '.next', '.turbo',
+  '.pnpm-store', '.cache', 'build', 'out', '.vscode', '.idea',
+  '~', 'deprecated', '.claude'
 ]);
 
 const MAX_TREE_DEPTH = 5;

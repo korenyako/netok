@@ -5,8 +5,6 @@ Generated: 2026-02-20
 ## TREE (ASCII)
 
 ```text
-├── .claude
-│   └── settings.local.json
 ├── .github
 │   ├── ISSUE_TEMPLATE
 │   │   └── feature_request.md
@@ -21,10 +19,6 @@ Generated: 2026-02-20
 │   │   └── husky.sh
 │   └── pre-commit
 ├── docs
-│   ├── deprecated
-│   │   ├── CODING_RULES.md
-│   │   ├── SoT.md
-│   │   └── TASK_TEMPLATE.md
 │   ├── ACTION_PLAN.md
 │   ├── CODE_ANALYSIS.md
 │   ├── IMPLEMENTATION-PLAN.md
@@ -100,7 +94,8 @@ Generated: 2026-02-20
 │   │   │   └── colors.ts
 │   │   └── utils
 │   │       ├── deriveScenario.ts
-│   │       └── ndt7Client.ts
+│   │       ├── ndt7Client.ts
+│   │       └── speedTestClient.ts
 │   ├── .gitignore
 │   ├── app.json
 │   ├── App.tsx
@@ -144,10 +139,6 @@ Generated: 2026-02-20
 │   │   └── oui_database.rs
 │   └── Cargo.toml
 ├── netok_desktop
-│   ├── ~
-│   │   └── .tauri
-│   │       ├── netok.key
-│   │       └── netok.key.pub
 │   ├── public
 │   │   ├── tauri.svg
 │   │   └── vite.svg

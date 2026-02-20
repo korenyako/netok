@@ -13,6 +13,10 @@ Cargo.lock
 .idea/
 .vscode/
 *.swp
+.cursorrules
+
+# AI assistant configs
+.claude/settings.local.json
 
 # OS-specific files
 .DS_Store
@@ -34,5 +38,19 @@ nul
 netok_desktop/src-tauri/binaries/*.exe
 netok_desktop/src-tauri/binaries/sing-box-*
 
-# Environment overrides
-.env.development
+# Signing keys and secrets
+*.key
+*.key.pub
+*.pem
+*.p12
+*.pfx
+*.keystore
+netok_desktop/~/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Generated data files
+manuf.txt
