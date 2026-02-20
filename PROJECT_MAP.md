@@ -337,8 +337,7 @@ Generated: 2026-02-20
 ├── CONTRIBUTING.md
 ├── DNS_PROVIDERS.md
 ├── etsy-hover-effects-fixed.html
-├── LICENSE.Apache-2.0
-├── LICENSE.Proprietary
+├── LICENSE
 ├── manuf.txt
 ├── netok-protection-hub.jsx
 ├── netok-status.jsx
