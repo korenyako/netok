@@ -409,6 +409,7 @@ Generated: 2026-02-20
   "bundle": {
     "active": true,
     "targets": ["nsis"],
+    "createUpdaterArtifacts": true,
     "icon": [
       "icons/32x32.png",
       "icons/icon.ico"
@@ -418,8 +419,7 @@ Generated: 2026-02-20
     ],
     "windows": {
       "nsis": {
-        "installMode": "currentUser"
-      }}}}
+        "installMode": "currentUser"}}}}
 ```
 
 ### ui/package.json
