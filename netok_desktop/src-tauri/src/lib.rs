@@ -376,63 +376,69 @@ async fn validate_vpn_key(raw_uri: String) -> Result<netok_bridge::VpnKeyValidat
 }
 
 /// Resolve the sing-box sidecar binary path.
-/// Checks multiple locations: resource dir (production), next to exe, dev mode fallback.
+///
+/// Tauri v2 NSIS strips the target triple and flattens the directory, so:
+/// - Build time: `binaries/sing-box-x86_64-pc-windows-msvc.exe`
+/// - Installed:  `sing-box.exe` (in install root)
 fn get_singbox_path(app: &tauri::AppHandle) -> Result<PathBuf, String> {
-    let exe_name = if cfg!(target_os = "windows") {
-        "sing-box-x86_64-pc-windows-msvc.exe"
+    // Names to check: NSIS-installed name first (most common), then dev name with triple
+    let names: &[&str] = if cfg!(target_os = "windows") {
+        &["sing-box.exe", "sing-box-x86_64-pc-windows-msvc.exe"]
     } else if cfg!(target_os = "macos") {
-        "sing-box-aarch64-apple-darwin"
+        &["sing-box", "sing-box-aarch64-apple-darwin"]
     } else {
-        "sing-box-x86_64-unknown-linux-gnu"
+        &["sing-box", "sing-box-x86_64-unknown-linux-gnu"]
     };
 
     let mut checked_paths = Vec::new();
 
-    // 1. Resource dir with binaries/ subdirectory (Tauri v2 sidecar layout)
-    if let Ok(resource_dir) = app.path().resource_dir() {
-        let path = resource_dir.join("binaries").join(exe_name);
-        if path.exists() {
-            return Ok(path);
-        }
-        checked_paths.push(path.to_string_lossy().to_string());
-
-        // 2. Resource dir directly (flat layout)
-        let path = resource_dir.join(exe_name);
-        if path.exists() {
-            return Ok(path);
-        }
-        checked_paths.push(path.to_string_lossy().to_string());
-    }
-
-    // 3. Next to the main executable
+    // 1. Next to the main executable (NSIS installs sing-box.exe here)
     if let Ok(exe_path) = std::env::current_exe() {
         if let Some(exe_dir) = exe_path.parent() {
-            let path = exe_dir.join(exe_name);
-            if path.exists() {
-                return Ok(path);
+            for name in names {
+                let path = exe_dir.join(name);
+                if path.exists() {
+                    return Ok(path);
+                }
+                checked_paths.push(path.to_string_lossy().to_string());
             }
-            checked_paths.push(path.to_string_lossy().to_string());
-
-            // Also check binaries/ subdirectory next to exe
-            let path = exe_dir.join("binaries").join(exe_name);
-            if path.exists() {
-                return Ok(path);
-            }
-            checked_paths.push(path.to_string_lossy().to_string());
         }
     }
 
-    // 4. src-tauri/binaries/ (dev mode — CARGO_MANIFEST_DIR set at compile time)
-    let dev_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .join("binaries")
-        .join(exe_name);
-    if dev_path.exists() {
-        return Ok(dev_path);
+    // 2. Resource dir (may differ from exe dir on some platforms)
+    if let Ok(resource_dir) = app.path().resource_dir() {
+        for name in names {
+            for sub in &["", "binaries"] {
+                let path = if sub.is_empty() {
+                    resource_dir.join(name)
+                } else {
+                    resource_dir.join(sub).join(name)
+                };
+                if path.exists() {
+                    return Ok(path);
+                }
+                // Avoid duplicate entries
+                let s = path.to_string_lossy().to_string();
+                if !checked_paths.contains(&s) {
+                    checked_paths.push(s);
+                }
+            }
+        }
     }
-    checked_paths.push(dev_path.to_string_lossy().to_string());
+
+    // 3. src-tauri/binaries/ (dev mode — CARGO_MANIFEST_DIR set at compile time)
+    for name in names {
+        let dev_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("binaries")
+            .join(name);
+        if dev_path.exists() {
+            return Ok(dev_path);
+        }
+        checked_paths.push(dev_path.to_string_lossy().to_string());
+    }
 
     Err(format!(
-        "sing-box binary not found. Checked paths:\n{}",
+        "sing-box binary not found. Checked:\n{}",
         checked_paths.join("\n")
     ))
 }
@@ -747,13 +753,16 @@ fn kill_orphaned_singbox() {
     {
         use std::os::windows::process::CommandExt;
         use std::process::Command;
-        let output = Command::new("taskkill")
-            .args(["/F", "/IM", "sing-box-x86_64-pc-windows-msvc.exe"])
-            .creation_flags(0x08000000) // CREATE_NO_WINDOW
-            .output();
-        if let Ok(out) = output {
-            if out.status.success() {
-                eprintln!("[VPN] Killed orphaned sing-box process");
+        // Kill both possible names: NSIS-installed and dev-mode
+        for name in &["sing-box.exe", "sing-box-x86_64-pc-windows-msvc.exe"] {
+            let output = Command::new("taskkill")
+                .args(["/F", "/IM", name])
+                .creation_flags(0x08000000) // CREATE_NO_WINDOW
+                .output();
+            if let Ok(out) = output {
+                if out.status.success() {
+                    eprintln!("[VPN] Killed orphaned sing-box process ({})", name);
+                }
             }
         }
     }

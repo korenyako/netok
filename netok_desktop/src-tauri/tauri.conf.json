@@ -45,6 +45,9 @@
     "externalBin": [
       "binaries/sing-box"
     ],
+    "resources": {
+      "binaries/wintun.dll": "./"
+    },
     "windows": {
       "nsis": {
         "installMode": "currentUser"

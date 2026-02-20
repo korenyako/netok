@@ -408,9 +408,10 @@ Generated: 2026-02-20
     "externalBin": [
       "binaries/sing-box"
     ],
-    "windows": {
-      "nsis": {
-        "installMode": "currentUser"}}}}
+    "resources": {
+      "binaries/wintun.dll": "./"
+    },
+// ... (truncated due to syntax error)
 ```
 
 ### ui/package.json
