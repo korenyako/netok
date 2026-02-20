@@ -62,9 +62,21 @@ Generated: 2026-02-20
 │   │   ├── hooks
 │   │   │   └── useTheme.ts
 │   │   ├── i18n
+│   │   │   ├── de.json
 │   │   │   ├── en.json
+│   │   │   ├── es.json
+│   │   │   ├── fa.json
+│   │   │   ├── fr.json
 │   │   │   ├── index.ts
-│   │   │   └── ru.json
+│   │   │   ├── it.json
+│   │   │   ├── ja.json
+│   │   │   ├── ko.json
+│   │   │   ├── pl.json
+│   │   │   ├── pt.json
+│   │   │   ├── ru.json
+│   │   │   ├── tr.json
+│   │   │   ├── uk.json
+│   │   │   └── zh.json
 │   │   ├── navigation
 │   │   │   └── RootNavigator.tsx
 │   │   ├── screens
