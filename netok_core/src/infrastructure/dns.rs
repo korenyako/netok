@@ -229,33 +229,19 @@ pub fn build_dns_commands(_provider: DnsProvider) -> Result<Vec<String>, String>
 #[cfg(target_os = "windows")]
 pub fn get_current_dns() -> Result<Vec<String>, String> {
     use super::adapter::get_active_adapter_name;
-    use super::hidden_cmd;
+    use super::run_powershell;
 
     let adapter_name = get_active_adapter_name()
         .ok_or_else(|| "Failed to find active network adapter".to_string())?;
 
-    // Force English culture for locale-independent output
-    let culture_prefix = "[System.Threading.Thread]::CurrentThread.CurrentUICulture = 'en-US'; ";
     let command = format!(
-        "{}Get-DnsClientServerAddress -InterfaceAlias '{}' -AddressFamily IPv4 | Select-Object -ExpandProperty ServerAddresses",
-        culture_prefix,
+        "Get-DnsClientServerAddress -InterfaceAlias '{}' -AddressFamily IPv4 | Select-Object -ExpandProperty ServerAddresses",
         adapter_name.replace('\'', "''")
     );
 
-    // Use PowerShell to get DNS server addresses
-    let output = hidden_cmd("powershell")
-        .args(["-NoProfile", "-Command", &command])
-        .output()
-        .map_err(|e| format!("Failed to execute PowerShell: {}", e))?;
+    let text = run_powershell(&command)
+        .ok_or_else(|| "Failed to get DNS servers".to_string())?;
 
-    if !output.status.success() {
-        return Err(format!(
-            "Failed to get DNS servers: {}",
-            String::from_utf8_lossy(&output.stderr)
-        ));
-    }
-
-    let text = String::from_utf8_lossy(&output.stdout);
     let dns_servers: Vec<String> = text
         .lines()
         .map(|line| line.trim().to_string())

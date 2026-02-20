@@ -30,6 +30,30 @@ pub fn hidden_cmd(program: &str) -> std::process::Command {
     cmd
 }
 
+/// Run a PowerShell command and return trimmed stdout as a String.
+///
+/// Forces UTF-8 output encoding (critical for GUI apps without a console,
+/// where PowerShell defaults to UTF-16 LE) and English culture for
+/// locale-independent output.
+#[cfg(target_os = "windows")]
+pub fn run_powershell(command: &str) -> Option<String> {
+    let prefix = "[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; \
+                  [System.Threading.Thread]::CurrentThread.CurrentUICulture = 'en-US'; ";
+    let full_command = format!("{}{}", prefix, command);
+
+    let output = hidden_cmd("powershell")
+        .args(["-NoProfile", "-Command", &full_command])
+        .output()
+        .ok()?;
+
+    if !output.status.success() {
+        return None;
+    }
+
+    let text = String::from_utf8_lossy(&output.stdout).trim().to_string();
+    if text.is_empty() { None } else { Some(text) }
+}
+
 // Re-export commonly used functions
 pub use arp::{get_router_mac, ping_sweep};
 pub use connection::detect_connection_type;

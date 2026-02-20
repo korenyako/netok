@@ -3,31 +3,8 @@
 /// Get active network adapter alias for Windows.
 #[cfg(target_os = "windows")]
 pub fn get_active_adapter_name() -> Option<String> {
+    use super::run_powershell;
     use super::wifi::get_wifi_info;
-
-    fn run_powershell(command: &str) -> Option<String> {
-        // Force English culture to ensure locale-independent output
-        // This prevents localized enum values like "Connected"/"Подключено"
-        let culture_prefix =
-            "[System.Threading.Thread]::CurrentThread.CurrentUICulture = 'en-US'; ";
-        let full_command = format!("{}{}", culture_prefix, command);
-
-        let output = super::hidden_cmd("powershell")
-            .args(["-NoProfile", "-Command", &full_command])
-            .output()
-            .ok()?;
-
-        if !output.status.success() {
-            return None;
-        }
-
-        let name = String::from_utf8_lossy(&output.stdout).trim().to_string();
-        if name.is_empty() {
-            None
-        } else {
-            Some(name)
-        }
-    }
 
     // Try to map the currently connected Wi-Fi adapter description to a friendly alias.
     if let (_, _, Some(wifi_desc)) = get_wifi_info() {

@@ -3,27 +3,15 @@
 /// Get router MAC address via ARP lookup.
 #[cfg(target_os = "windows")]
 pub fn get_router_mac(gateway_ip: &str) -> Option<String> {
-    use super::hidden_cmd;
+    use super::run_powershell;
 
-    // Use PowerShell Get-NetNeighbor for reliable ARP lookup
-    // LOCALE-INDEPENDENT: MAC addresses and IP addresses are not localized
     let command = format!(
-        "[System.Threading.Thread]::CurrentThread.CurrentUICulture = 'en-US'; \
-         Get-NetNeighbor -IPAddress {} -ErrorAction SilentlyContinue | \
+        "Get-NetNeighbor -IPAddress {} -ErrorAction SilentlyContinue | \
          Select-Object -ExpandProperty LinkLayerAddress",
         gateway_ip
     );
 
-    let output = hidden_cmd("powershell")
-        .args(["-NoProfile", "-Command", &command])
-        .output()
-        .ok()?;
-
-    if !output.status.success() {
-        return None;
-    }
-
-    let mac = String::from_utf8_lossy(&output.stdout).trim().to_string();
+    let mac = run_powershell(&command)?;
 
     // Validate and format MAC address
     // PowerShell returns format like: "AA-BB-CC-DD-EE-FF"
@@ -161,26 +149,17 @@ pub fn ping_sweep(_gateway_ip: &str) {
 /// Get all reachable entries from the ARP table (IPv4 only).
 #[cfg(target_os = "windows")]
 pub fn get_all_arp_entries() -> Vec<ArpEntry> {
-    use super::hidden_cmd;
+    use super::run_powershell;
 
-    // Get-NetNeighbor returns all ARP entries.
-    // Filter: IPv4, Reachable or Stale (exclude Unreachable and Incomplete).
-    // Output: "IPAddress|LinkLayerAddress" per line for easy parsing.
     let command =
-        "[System.Threading.Thread]::CurrentThread.CurrentUICulture = 'en-US'; \
-         Get-NetNeighbor -AddressFamily IPv4 -ErrorAction SilentlyContinue | \
+        "Get-NetNeighbor -AddressFamily IPv4 -ErrorAction SilentlyContinue | \
          Where-Object { $_.State -ne 'Unreachable' -and $_.State -ne 'Incomplete' -and $_.LinkLayerAddress -ne '00-00-00-00-00-00' -and $_.LinkLayerAddress -ne 'FF-FF-FF-FF-FF-FF' } | \
          ForEach-Object { $_.IPAddress + '|' + $_.LinkLayerAddress }";
 
-    let output = match hidden_cmd("powershell")
-        .args(["-NoProfile", "-Command", command])
-        .output()
-    {
-        Ok(o) if o.status.success() => o,
-        _ => return vec![],
+    let stdout = match run_powershell(command) {
+        Some(s) => s,
+        None => return vec![],
     };
-
-    let stdout = String::from_utf8_lossy(&output.stdout);
 
     stdout
         .lines()
