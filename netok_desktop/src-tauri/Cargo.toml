@@ -1,9 +1,10 @@
 [package]
 name = "netok_desktop"
 version = "0.3.2"
-description = "A Tauri App"
-authors = ["you"]
-edition = "2021"
+description = "Network diagnostics that speak human language"
+authors = ["Anton Korenyako"]
+edition.workspace = true
+license.workspace = true
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

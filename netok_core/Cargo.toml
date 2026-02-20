@@ -1,7 +1,8 @@
 [package]
 name = "netok_core"
 version = "0.1.0"
-edition = "2021"
+edition.workspace = true
+license.workspace = true
 
 [dependencies]
 serde = { workspace = true, features = ["derive"] }

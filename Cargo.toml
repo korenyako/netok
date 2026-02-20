@@ -4,6 +4,7 @@ resolver = "2"
 
 [workspace.package]
 edition = "2021"
+license = "GPL-3.0-or-later"
 
 [workspace.dependencies]
 serde = { version = "1", features = ["derive"] }
