@@ -103,10 +103,6 @@ Generated: 2026-02-21
 │   ├── package-lock.json
 │   ├── package.json
 │   └── tsconfig.json
-├── i18n
-│   ├── en.json
-│   ├── README.md
-│   └── ru.json
 ├── netok_bridge
 │   ├── src
 │   │   ├── lib.rs

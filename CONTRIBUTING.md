@@ -50,7 +50,6 @@ netok/
 ├── netok_desktop/    # Tauri desktop app shell (Rust + Tauri config)
 ├── ui/               # React + TypeScript frontend (Vite, Tailwind, ESLint)
 ├── expo-app/         # Mobile app (experimental)
-├── i18n/             # Legacy translation files (active ones in ui/src/i18n/)
 ├── scripts/          # Utility scripts (project map generator, OUI database)
 └── docs/             # Documentation
 ```
