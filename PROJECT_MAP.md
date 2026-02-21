@@ -178,6 +178,8 @@ Generated: 2026-02-21
 │   │   │   └── main.rs
 │   │   ├── tests
 │   │   │   └── integration_tests.rs
+│   │   ├── windows
+│   │   │   └── hooks.nsh
 │   │   ├── .gitignore
 │   │   ├── build.rs
 │   │   ├── Cargo.toml

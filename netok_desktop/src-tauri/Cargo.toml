@@ -1,6 +1,6 @@
 [package]
 name = "netok_desktop"
-version = "0.3.6"
+version = "0.3.7"
 description = "Network diagnostics that speak human language"
 authors = ["Anton Korenyako"]
 edition.workspace = true
