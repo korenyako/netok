@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { check, type Update } from '@tauri-apps/plugin-updater';
 import { relaunch } from '@tauri-apps/plugin-process';
+import { invoke } from '@tauri-apps/api/core';
 
 export type UpdateStatus = 'idle' | 'checking' | 'available' | 'downloading' | 'up-to-date' | 'error';
 
@@ -59,6 +60,9 @@ export const useUpdateChecker = create<UpdateStore>((set, get) => ({
 
     set({ status: 'downloading', progress: 0 });
     try {
+      // Stop VPN before update — NSIS can't overwrite sing-box.exe while it's running
+      await invoke('disconnect_vpn').catch(() => {});
+
       let totalLength = 0;
       let downloaded = 0;
 
