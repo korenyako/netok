@@ -39,14 +39,12 @@ jobs:
         run: npm ci
         working-directory: netok_desktop
 
-      - name: Download sing-box and wintun
+      - name: Download sing-box binary
         shell: bash
         run: |
           curl -sL "https://github.com/SagerNet/sing-box/releases/download/v1.12.21/sing-box-1.12.21-windows-amd64.zip" -o sing-box.zip
           unzip -j sing-box.zip "sing-box-1.12.21-windows-amd64/sing-box.exe" -d netok_desktop/src-tauri/binaries/
           mv netok_desktop/src-tauri/binaries/sing-box.exe netok_desktop/src-tauri/binaries/sing-box-x86_64-pc-windows-msvc.exe
-          curl -sL "https://www.wintun.net/builds/wintun-0.14.1.zip" -o wintun.zip
-          unzip -j wintun.zip "wintun/bin/amd64/wintun.dll" -d netok_desktop/src-tauri/binaries/
 
       - uses: tauri-apps/tauri-action@v0.5.16
         env:
