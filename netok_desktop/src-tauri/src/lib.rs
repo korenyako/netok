@@ -175,14 +175,24 @@ mod win_elevation {
     }
 
     /// Terminate a process using its raw HANDLE (works for elevated processes).
+    /// Waits up to 5 seconds for the process to fully exit so file locks are released.
     pub fn terminate_process(raw_handle: isize) -> Result<(), String> {
-        use windows::Win32::Foundation::{CloseHandle, HANDLE};
-        use windows::Win32::System::Threading::TerminateProcess;
+        use windows::Win32::Foundation::{CloseHandle, HANDLE, WAIT_OBJECT_0};
+        use windows::Win32::System::Threading::{TerminateProcess, WaitForSingleObject};
 
         let handle = HANDLE(raw_handle as *mut std::ffi::c_void);
-        let result = unsafe { TerminateProcess(handle, 1) };
+        unsafe { TerminateProcess(handle, 1) }
+            .map_err(|e| format!("TerminateProcess failed: {}", e))?;
+
+        // Wait for process to fully exit so OS releases file locks (e.g. sing-box.exe)
+        let wait_result = unsafe { WaitForSingleObject(handle, 5000) };
         let _ = unsafe { CloseHandle(handle) };
-        result.map_err(|e| format!("TerminateProcess failed: {}", e))
+
+        if wait_result != WAIT_OBJECT_0 {
+            eprintln!("[VPN] Warning: process did not exit within 5s (wait_result={:?})", wait_result);
+        }
+
+        Ok(())
     }
 
     /// Close a raw HANDLE without terminating.
