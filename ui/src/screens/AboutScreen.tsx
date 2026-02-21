@@ -95,11 +95,10 @@ export function AboutScreen({ onBack }: AboutScreenProps) {
             disabled={isChecking || isDownloading}
             onClick={handleUpdateClick}
           >
-            {(isChecking || isDownloading) && <Spinner className="w-4 h-4 me-2" />}
-            {isAvailable
-              ? t('settings.about.update_to', { version: updateVersion })
-              : isDownloading
-                ? t('settings.about.update_downloading', { progress: String(progress) })
+            {(isChecking || isDownloading)
+              ? <Spinner className="w-4 h-4" />
+              : isAvailable
+                ? t('settings.about.update_to', { version: updateVersion })
                 : t('settings.about.check_updates')}
           </Button>
           {statusText && (

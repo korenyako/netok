@@ -14,6 +14,9 @@ pub use netok_bridge::{DnsProviderType, IpInfoResponse, SingleNodeResult, Snapsh
 
 struct VpnProcessState {
     elevated_pid: Option<u32>,
+    /// Raw HANDLE value from ShellExecuteExW — needed for TerminateProcess
+    /// (taskkill can't kill elevated processes from non-elevated context)
+    elevated_handle: Option<isize>,
     state: netok_bridge::VpnConnectionState,
     config_path: Option<PathBuf>,
 }
@@ -22,6 +25,7 @@ impl Default for VpnProcessState {
     fn default() -> Self {
         Self {
             elevated_pid: None,
+            elevated_handle: None,
             state: netok_bridge::VpnConnectionState::Disconnected,
             config_path: None,
         }
@@ -34,8 +38,9 @@ impl Default for VpnProcessState {
 mod win_elevation {
     use std::path::Path;
 
-    /// Spawn a process elevated (with UAC prompt) and return its PID.
-    pub fn spawn_elevated(exe_path: &Path, args: &str, working_dir: &Path) -> Result<u32, String> {
+    /// Spawn a process elevated (with UAC prompt) and return (PID, raw HANDLE).
+    /// The caller MUST close the handle via `close_handle()` or `terminate_process()`.
+    pub fn spawn_elevated(exe_path: &Path, args: &str, working_dir: &Path) -> Result<(u32, isize), String> {
         use std::ffi::OsStr;
         use std::mem;
         use std::os::windows::ffi::OsStrExt;
@@ -81,14 +86,13 @@ mod win_elevation {
         }
 
         let pid = unsafe { GetProcessId(hprocess) };
-        // Close the handle — we track by PID
-        let _ = unsafe { CloseHandle(hprocess) };
-
         if pid == 0 {
+            let _ = unsafe { CloseHandle(hprocess) };
             return Err("Failed to get process ID".to_string());
         }
 
-        Ok(pid)
+        // Return raw handle value as isize — caller owns it
+        Ok((pid, hprocess.0 as isize))
     }
 
     /// Check if a process with the given PID is still running.
@@ -170,28 +174,21 @@ mod win_elevation {
         Ok(())
     }
 
-    /// Kill a process by PID using taskkill.
-    pub fn kill_process(pid: u32) -> Result<(), String> {
-        use std::os::windows::process::CommandExt;
-        use std::process::Command;
+    /// Terminate a process using its raw HANDLE (works for elevated processes).
+    pub fn terminate_process(raw_handle: isize) -> Result<(), String> {
+        use windows::Win32::Foundation::{CloseHandle, HANDLE};
+        use windows::Win32::System::Threading::TerminateProcess;
 
-        let output = Command::new("taskkill")
-            .args(["/F", "/PID", &pid.to_string()])
-            .creation_flags(0x08000000) // CREATE_NO_WINDOW
-            .output()
-            .map_err(|e| format!("Failed to execute taskkill: {}", e))?;
+        let handle = HANDLE(raw_handle as *mut std::ffi::c_void);
+        let result = unsafe { TerminateProcess(handle, 1) };
+        let _ = unsafe { CloseHandle(handle) };
+        result.map_err(|e| format!("TerminateProcess failed: {}", e))
+    }
 
-        if output.status.success() {
-            Ok(())
-        } else {
-            let stderr = String::from_utf8_lossy(&output.stderr);
-            // Process already exited — not an error
-            if stderr.contains("not found") {
-                Ok(())
-            } else {
-                Err(format!("taskkill failed: {}", stderr))
-            }
-        }
+    /// Close a raw HANDLE without terminating.
+    pub fn close_handle(raw_handle: isize) {
+        use windows::Win32::Foundation::{CloseHandle, HANDLE};
+        let _ = unsafe { CloseHandle(HANDLE(raw_handle as *mut std::ffi::c_void)) };
     }
 }
 
@@ -494,20 +491,21 @@ async fn connect_vpn(
         let working_dir = singbox_path.parent().unwrap().to_path_buf();
         let singbox_path_clone = singbox_path;
 
-        let pid_result = tokio::task::spawn_blocking(move || {
+        let spawn_result = tokio::task::spawn_blocking(move || {
             win_elevation::spawn_elevated(&singbox_path_clone, &args, &working_dir)
         })
         .await
         .map_err(|e| format!("Task error: {}", e))?;
 
-        match pid_result {
-            Ok(pid) => {
+        match spawn_result {
+            Ok((pid, handle)) => {
                 eprintln!("[VPN] sing-box started with PID: {}", pid);
 
-                // Store PID
+                // Store PID and handle
                 {
                     let mut state = vpn_state.lock().map_err(|e| e.to_string())?;
                     state.elevated_pid = Some(pid);
+                    state.elevated_handle = Some(handle);
                 }
 
                 // Step 6: Wait for sing-box to initialize TUN interface
@@ -525,6 +523,10 @@ async fn connect_vpn(
                         message: "sing-box process exited immediately after start".to_string(),
                     };
                     state.elevated_pid = None;
+                    // Close handle if process already exited
+                    if let Some(h) = state.elevated_handle.take() {
+                        win_elevation::close_handle(h);
+                    }
                     return Err("sing-box process exited immediately".to_string());
                 }
 
@@ -557,6 +559,7 @@ async fn connect_vpn(
                     state.state = netok_bridge::VpnConnectionState::Error { message: e.clone() };
                 }
                 state.elevated_pid = None;
+                state.elevated_handle = None;
                 Err(e)
             }
         }
@@ -576,17 +579,17 @@ async fn connect_vpn(
 async fn disconnect_vpn(
     vpn_state: tauri::State<'_, Arc<Mutex<VpnProcessState>>>,
 ) -> Result<(), String> {
-    let (pid, config_path) = {
+    let (pid, handle, config_path) = {
         let mut state = vpn_state.lock().map_err(|e| e.to_string())?;
         state.state = netok_bridge::VpnConnectionState::Disconnecting;
-        (state.elevated_pid, state.config_path.clone())
+        (state.elevated_pid, state.elevated_handle.take(), state.config_path.clone())
     };
 
-    // Kill the process
+    // Terminate the elevated process using its handle
     #[cfg(target_os = "windows")]
-    if let Some(pid) = pid {
-        eprintln!("[VPN] Killing sing-box PID: {}", pid);
-        tokio::task::spawn_blocking(move || win_elevation::kill_process(pid))
+    if let Some(h) = handle {
+        eprintln!("[VPN] Terminating sing-box PID: {:?}", pid);
+        tokio::task::spawn_blocking(move || win_elevation::terminate_process(h))
             .await
             .map_err(|e| format!("Task error: {}", e))??;
     }
@@ -601,6 +604,7 @@ async fn disconnect_vpn(
         let mut state = vpn_state.lock().map_err(|e| e.to_string())?;
         state.state = netok_bridge::VpnConnectionState::Disconnected;
         state.elevated_pid = None;
+        state.elevated_handle = None;
         state.config_path = None;
     }
 
@@ -649,6 +653,9 @@ async fn monitor_vpn_process(pid: u32, state: Arc<Mutex<VpnProcessState>>, app: 
                             message: "VPN process stopped unexpectedly".to_string(),
                         };
                         s.elevated_pid = None;
+                        if let Some(h) = s.elevated_handle.take() {
+                            win_elevation::close_handle(h);
+                        }
 
                         // Clean up config
                         if let Some(ref path) = s.config_path {
@@ -770,11 +777,11 @@ fn kill_orphaned_singbox() {
 
 /// Kill VPN process if running (cleanup helper).
 fn cleanup_vpn(vpn_state: &Mutex<VpnProcessState>) {
-    if let Ok(state) = vpn_state.lock() {
+    if let Ok(mut state) = vpn_state.lock() {
         #[cfg(target_os = "windows")]
-        if let Some(pid) = state.elevated_pid {
-            eprintln!("[VPN] Cleaning up: killing PID {}", pid);
-            let _ = win_elevation::kill_process(pid);
+        if let Some(h) = state.elevated_handle.take() {
+            eprintln!("[VPN] Cleaning up: terminating PID {:?}", state.elevated_pid);
+            let _ = win_elevation::terminate_process(h);
         }
 
         if let Some(ref path) = state.config_path {
