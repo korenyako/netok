@@ -1,11 +1,22 @@
 // NDT7 WebSocket client for M-Lab speed testing (React Native)
 // Protocol: https://github.com/m-lab/ndt-server/blob/main/spec/ndt7-protocol.md
+//
+// IMPORTANT: React Native WebSocket bridge can't handle the binary data flood
+// from NDT7 download test (thousands of messages/sec freeze the JS thread).
+// Solution: ignore binary messages entirely, rely only on server-side JSON
+// measurement reports (~4/sec), and close the connection from the client side
+// before the server's 10-second test completes.
 
 const LOCATE_URL = 'https://locate.measurementlab.net/v2/nearest/ndt/ndt7';
 const NDT7_SUBPROTOCOL = 'net.measurementlab.ndt.v7';
-const TEST_DURATION_MS = 10_000;
 const UPLOAD_CHUNK_SIZE = 8192; // 8KB per WebSocket message
 const WS_CONNECT_TIMEOUT_MS = 5_000;
+
+// Download: close from client side after 8s (server runs for ~10s).
+// 8 seconds gives accurate results while avoiding the RN bridge freeze.
+const DOWNLOAD_DURATION_MS = 8_000;
+// Upload: client controls timing, so full 10s is fine.
+const UPLOAD_DURATION_MS = 10_000;
 
 // --- Types ---
 
@@ -28,6 +39,8 @@ interface NDT7Measurement {
 
 export interface SpeedTestCallbacks {
   onProgress: (phase: 'ping' | 'download' | 'upload', progress: number, currentValue: number) => void;
+  onDataPoint: (phase: 'download' | 'upload', mbps: number) => void;
+  onLatencySample: (rttMs: number) => void;
   onPhaseComplete: (phase: 'ping' | 'download' | 'upload', value: number) => void;
 }
 
@@ -211,6 +224,16 @@ function wsPing(wsUrl: string): Promise<number> {
   });
 }
 
+// ── Download Test ──────────────────────────────────────────
+//
+// React Native WebSocket bridge delivers EVERY binary message through the
+// native→JS bridge. NDT7 servers send thousands of binary chunks per second,
+// which completely saturates the JS thread and freezes the app.
+//
+// Fix: only process string (JSON) measurement messages (~4/sec).
+// Binary messages → immediate return (minimal JS work).
+// Close the WebSocket from the client side after DOWNLOAD_DURATION_MS.
+
 async function runDownloadTest(
   wsUrl: string,
   callbacks: SpeedTestCallbacks,
@@ -219,14 +242,30 @@ async function runDownloadTest(
     if (cancelled) { reject(new Error('Aborted')); return; }
 
     const ws = new WebSocket(wsUrl, NDT7_SUBPROTOCOL);
-
-    let totalBytes = 0;
+    let settled = false;
     let startTime = 0;
     let lastMbps = 0;
+    let lastDataPointTime = 0;
+    let jsonMessageCount = 0;
     const latencySamples: number[] = [];
 
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      clearInterval(checkCancel);
+      resolve({ throughputMbps: lastMbps, latencySamples });
+    };
+
+    const fail = (msg: string) => {
+      if (settled) return;
+      settled = true;
+      clearInterval(checkCancel);
+      try { ws.close(); } catch {}
+      reject(new Error(msg));
+    };
+
     const checkCancel = setInterval(() => {
-      if (cancelled) { ws.close(); reject(new Error('Aborted')); }
+      if (cancelled) fail('Aborted');
     }, 500);
 
     ws.onopen = () => {
@@ -234,56 +273,72 @@ async function runDownloadTest(
     };
 
     ws.onmessage = (event: WebSocketMessageEvent) => {
+      // ── CRITICAL: ignore binary messages completely ──
+      // Binary data floods the RN bridge. We don't need client-side byte
+      // counting because server-side AppInfo gives accurate throughput.
+      if (typeof event.data !== 'string') return;
+      if (settled) return;
+
       const now = performance.now();
       const elapsed = now - startTime;
 
-      if (typeof event.data === 'string') {
-        try {
-          const msg: NDT7Measurement = JSON.parse(event.data);
-          if (msg.TCPInfo?.SmoothedRTT) {
-            const rttMs = msg.TCPInfo.SmoothedRTT / 1000;
-            latencySamples.push(rttMs);
-          }
-          if (msg.AppInfo?.NumBytes) {
-            const serverMbps = (msg.AppInfo.NumBytes * 8) /
-              ((msg.AppInfo.ElapsedTime || 1) / 1_000_000) / 1_000_000;
-            lastMbps = serverMbps;
-          }
-        } catch {
-          totalBytes += event.data.length;
-        }
-      } else if (event.data instanceof ArrayBuffer) {
-        totalBytes += event.data.byteLength;
-      } else if (typeof event.data === 'object' && event.data !== null) {
-        // React Native may deliver binary as Blob or base64
-        const size = (event.data as { size?: number }).size;
-        totalBytes += size ?? 0;
+      // Close from client side before server's 10s is up.
+      // This runs inside onmessage so it can't be starved by the message flood.
+      if (elapsed >= DOWNLOAD_DURATION_MS) {
+        try { ws.close(); } catch {}
+        finish();
+        return;
       }
 
-      if (elapsed > 0) {
-        const clientMbps = (totalBytes * 8) / (elapsed / 1000) / 1_000_000;
-        const reportMbps = lastMbps > 0 ? lastMbps : clientMbps;
-        const progress = Math.min((elapsed / TEST_DURATION_MS) * 100, 100);
-        callbacks.onProgress('download', progress, Math.round(reportMbps * 10) / 10);
+      // Process JSON measurement message
+      try {
+        const msg: NDT7Measurement = JSON.parse(event.data);
+
+        if (msg.TCPInfo?.SmoothedRTT) {
+          const rttMs = msg.TCPInfo.SmoothedRTT / 1000;
+          latencySamples.push(rttMs);
+          callbacks.onLatencySample(rttMs);
+        }
+
+        if (msg.AppInfo?.NumBytes && msg.AppInfo?.ElapsedTime) {
+          const serverMbps = (msg.AppInfo.NumBytes * 8) /
+            (msg.AppInfo.ElapsedTime / 1_000_000) / 1_000_000;
+          lastMbps = serverMbps;
+          jsonMessageCount++;
+
+          // Report progress based on our client-side duration
+          const progress = Math.min((elapsed / DOWNLOAD_DURATION_MS) * 100, 100);
+          callbacks.onProgress('download', progress, Math.round(serverMbps * 10) / 10);
+
+          // Emit data points for graph
+          if (jsonMessageCount > 2 && now - lastDataPointTime >= 200) {
+            lastDataPointTime = now;
+            callbacks.onDataPoint('download', serverMbps);
+          }
+        }
+      } catch {
+        // Not valid JSON — ignore
       }
     };
 
     ws.onclose = () => {
-      clearInterval(checkCancel);
-      const elapsed = performance.now() - startTime;
-      const clientMbps = elapsed > 0
-        ? (totalBytes * 8) / (elapsed / 1000) / 1_000_000
-        : 0;
-      const throughputMbps = lastMbps > 0 ? lastMbps : clientMbps;
-      resolve({ throughputMbps, latencySamples });
+      finish();
     };
 
     ws.onerror = () => {
-      clearInterval(checkCancel);
-      reject(new Error('Download test WebSocket error'));
+      if (lastMbps > 0) {
+        finish(); // Have data — resolve
+      } else {
+        fail('Download test WebSocket error');
+      }
     };
   });
 }
+
+// ── Upload Test ────────────────────────────────────────────
+//
+// Upload is client-driven (we send data), so the JS thread is not flooded.
+// Server sends back periodic JSON measurements. No bridge bottleneck.
 
 async function runUploadTest(
   wsUrl: string,
@@ -293,15 +348,37 @@ async function runUploadTest(
     if (cancelled) { reject(new Error('Aborted')); return; }
 
     const ws = new WebSocket(wsUrl, NDT7_SUBPROTOCOL);
-
+    let settled = false;
     let startTime = 0;
     let totalBytesSent = 0;
     let lastServerMbps = 0;
     let sending = false;
+    let lastDataPointTime = 0;
     const uploadData = new ArrayBuffer(UPLOAD_CHUNK_SIZE);
 
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      sending = false;
+      clearInterval(checkCancel);
+      const elapsed = performance.now() - startTime;
+      const clientMbps = elapsed > 0
+        ? (totalBytesSent * 8) / (elapsed / 1000) / 1_000_000
+        : 0;
+      resolve(lastServerMbps > 0 ? lastServerMbps : clientMbps);
+    };
+
+    const fail = (msg: string) => {
+      if (settled) return;
+      settled = true;
+      sending = false;
+      clearInterval(checkCancel);
+      try { ws.close(); } catch {}
+      reject(new Error(msg));
+    };
+
     const checkCancel = setInterval(() => {
-      if (cancelled) { sending = false; ws.close(); reject(new Error('Aborted')); }
+      if (cancelled) fail('Aborted');
     }, 500);
 
     ws.onopen = () => {
@@ -311,35 +388,39 @@ async function runUploadTest(
     };
 
     function sendData() {
-      if (!sending) return;
+      if (!sending || settled) return;
       const elapsed = performance.now() - startTime;
 
-      if (elapsed >= TEST_DURATION_MS) {
+      if (elapsed >= UPLOAD_DURATION_MS) {
         sending = false;
-        ws.close();
+        try { ws.close(); } catch {}
+        // Force finish in case onclose doesn't fire
+        setTimeout(() => finish(), 500);
         return;
       }
 
-      // Send a batch of data
-      // React Native WebSocket may not support bufferedAmount reliably,
-      // so we send a fixed batch per tick
       const batchCount = 10;
       for (let i = 0; i < batchCount && sending; i++) {
         try {
           ws.send(uploadData);
           totalBytesSent += UPLOAD_CHUNK_SIZE;
         } catch {
-          // Socket may be closing
           break;
         }
       }
 
+      const now = performance.now();
       const clientMbps = elapsed > 0
         ? (totalBytesSent * 8) / (elapsed / 1000) / 1_000_000
         : 0;
       const reportMbps = lastServerMbps > 0 ? lastServerMbps : clientMbps;
-      const progress = Math.min((elapsed / TEST_DURATION_MS) * 100, 100);
+      const progress = Math.min((elapsed / UPLOAD_DURATION_MS) * 100, 100);
       callbacks.onProgress('upload', progress, Math.round(reportMbps * 10) / 10);
+
+      if (elapsed > 1000 && now - lastDataPointTime >= 200) {
+        lastDataPointTime = now;
+        callbacks.onDataPoint('upload', reportMbps);
+      }
 
       setTimeout(sendData, 25);
     }
@@ -359,19 +440,15 @@ async function runUploadTest(
     };
 
     ws.onclose = () => {
-      clearInterval(checkCancel);
-      sending = false;
-      const elapsed = performance.now() - startTime;
-      const clientMbps = elapsed > 0
-        ? (totalBytesSent * 8) / (elapsed / 1000) / 1_000_000
-        : 0;
-      resolve(lastServerMbps > 0 ? lastServerMbps : clientMbps);
+      finish();
     };
 
     ws.onerror = () => {
-      clearInterval(checkCancel);
-      sending = false;
-      reject(new Error('Upload test WebSocket error'));
+      if (startTime > 0 && (totalBytesSent > 0 || lastServerMbps > 0)) {
+        finish();
+      } else {
+        fail('Upload test WebSocket error');
+      }
     };
   });
 }

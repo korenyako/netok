@@ -15,8 +15,21 @@ Cargo.lock
 *.swp
 .cursorrules
 
-# AI assistant configs
+# AI assistant configs and planning docs
 .claude/settings.local.json
+CLAUDE.md
+PROJECT_CONTEXT.md
+netok-wifi-security-plan.md
+docs/ACTION_PLAN.md
+docs/CODE_ANALYSIS.md
+docs/MOBILE-PLAN.md
+docs/PROGRESS.md
+docs/RECOMMENDATIONS.md
+docs/REFACTORING-PLAN-SOLID.md
+docs/REVISED_PRIORITIES.md
+docs/SECURITY_AUDIT.md
+docs/TESTING_PLAN.md
+docs/deprecated/
 
 # OS-specific files
 .DS_Store
@@ -31,6 +44,7 @@ netok_desktop/dist
 
 # Prototypes and scratch files
 *.jsx
+*.html
 speedtest-prototype*.html
 nul
 
