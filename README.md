@@ -1,9 +1,17 @@
+**English** | [Русский](README.ru.md) | [فارسی](README.fa.md) | [Español](README.es.md)
+
 # Netok
 
 **Network diagnostics that speak human language.**
 
 Netok shows you the full path from your computer to the internet — and explains
 what's wrong in plain terms, not error codes.
+
+[![Download for Windows](https://img.shields.io/github/v/release/korenyako/netok?label=Download%20for%20Windows&style=for-the-badge&logo=windows&logoColor=white)](https://github.com/korenyako/netok/releases/latest)
+
+[![GitHub Stars](https://img.shields.io/github/stars/korenyako/netok?style=flat-square)](https://github.com/korenyako/netok)
+[![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue?style=flat-square)](LICENSE)
+[![Platform: Windows](https://img.shields.io/badge/Platform-Windows-0078D4?style=flat-square&logo=windows)](https://github.com/korenyako/netok/releases/latest)
 
 ![Netok screenshot](docs/screenshot.png)
 

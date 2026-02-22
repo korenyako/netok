@@ -1,6 +1,6 @@
 # Project Map - Netok
 
-Generated: 2026-02-21
+Generated: 2026-02-22
 
 ## TREE (ASCII)
 
@@ -19,18 +19,13 @@ Generated: 2026-02-21
 │   │   └── husky.sh
 │   └── pre-commit
 ├── docs
-│   ├── ACTION_PLAN.md
-│   ├── CODE_ANALYSIS.md
+│   ├── screenshots
+│   │   └── netok-farsi.gif
 │   ├── IMPLEMENTATION-PLAN.md
 │   ├── MOBILE-PLAN.md
-│   ├── PROGRESS.md
 │   ├── README.md
-│   ├── RECOMMENDATIONS.md
-│   ├── REFACTORING-PLAN-SOLID.md
-│   ├── REVISED_PRIORITIES.md
-│   ├── SECURITY_AUDIT.md
 │   ├── SoT-ARCH.md
-│   ├── TESTING_PLAN.md
+│   ├── TESTING.md
 │   └── UI-SPEC.md
 ├── expo-app
 │   ├── .expo
@@ -333,7 +328,6 @@ Generated: 2026-02-21
 ├── Cargo.toml
 ├── CLAUDE.md
 ├── CONTRIBUTING.md
-├── DNS_PROVIDERS.md
 ├── etsy-hover-effects-fixed.html
 ├── LICENSE
 ├── manuf.txt
@@ -345,11 +339,11 @@ Generated: 2026-02-21
 ├── package.json
 ├── PROJECT_CONTEXT.md
 ├── PROJECT_MAP.md
-├── README_DEV.md
+├── README.es.md
+├── README.fa.md
 ├── README.md
-├── SETUP-PRECOMMIT.md
+├── README.ru.md
 ├── speedtest-prototype-v2.html
-├── TESTING.md
 └── THIRD_PARTY_LICENSES.md
 
 ```

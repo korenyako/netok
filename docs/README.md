@@ -6,16 +6,9 @@ This directory contains the official documentation for the Netok project.
 
 - **[SoT-ARCH.md](SoT-ARCH.md)** - Architecture Source of Truth: Desktop = Tauri, Core = Rust, Mobile = Native
 
-## Current Documentation
+## Documentation
 
 - **[UI-SPEC.md](UI-SPEC.md)** - UI/UX specifications and design guidelines
 - **[IMPLEMENTATION-PLAN.md](IMPLEMENTATION-PLAN.md)** - Network diagnostics implementation plan and roadmap
+- **[TESTING.md](TESTING.md)** - Manual testing checklist
 - **[i18n/README.md](../i18n/README.md)** - Internationalization guidelines
-
-## Deprecated Documentation
-
-The following files are deprecated but kept for reference:
-
-- **[deprecated/SoT.md](deprecated/SoT.md)** - Legacy Source of Truth (deprecated)
-- **[deprecated/CODING_RULES.md](deprecated/CODING_RULES.md)** - Legacy coding rules (deprecated)
-- **[deprecated/TASK_TEMPLATE.md](deprecated/TASK_TEMPLATE.md)** - Legacy task template (deprecated)
