@@ -51,7 +51,7 @@
 <p>VLESS, VMess, Shadowsocks, Trojan, WireGuard via sing-box</p>
 </td>
 <td align="center">
-<h3>📡 Device Discovery</h3>
+<h3>💻 Device Discovery</h3>
 <p>Scan your local network and identify devices by brand</p>
 </td>
 <td align="center">
@@ -61,7 +61,7 @@
 </tr>
 <tr>
 <td align="center">
-<h3>🔒 Wi-Fi Security</h3>
+<h3>🛜 Wi-Fi Security</h3>
 <p>Detect encryption vulnerabilities and network threats</p>
 </td>
 <td align="center">
@@ -69,7 +69,7 @@
 <p>Full localization including RTL scripts</p>
 </td>
 <td align="center">
-<h3>🎨 Themes</h3>
+<h3>🌒 Themes</h3>
 <p>Light and dark mode with system preference support</p>
 </td>
 </tr>
