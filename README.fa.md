@@ -1,17 +1,28 @@
-[English](README.md) | [Русский](README.ru.md) | **فارسی** | [Español](README.es.md)
+<p align="center">
+  <img src="logo.svg" width="120" alt="لوگو Netok">
+</p>
 
-# Netok
+<p align="center">
+  <a href="README.md">English</a> | <a href="README.ru.md">Русский</a> | <b>فارسی</b> | <a href="README.es.md">Español</a>
+</p>
 
-**عیب‌یابی شبکه به زبان ساده.**
+<h1 align="center">Netok</h1>
 
-Netok مسیر کامل از رایانه شما تا اینترنت را نشان می‌دهد — و به زبان ساده
-توضیح می‌دهد که مشکل چیست، نه با کدهای خطا.
+<p align="center">
+  <b>عیب‌یابی شبکه به زبان ساده.</b><br>
+  Netok مسیر کامل از رایانه شما تا اینترنت را نشان می‌دهد — و به زبان ساده<br>
+  توضیح می‌دهد که مشکل چیست، نه با کدهای خطا.
+</p>
 
-[![دانلود برای ویندوز](https://img.shields.io/github/v/release/korenyako/netok?label=Download%20for%20Windows&style=for-the-badge&logo=windows&logoColor=white)](https://github.com/korenyako/netok/releases/latest)
+<p align="center">
+  <a href="https://github.com/korenyako/netok/releases/latest"><img src="https://img.shields.io/github/v/release/korenyako/netok?label=Download%20for%20Windows&style=for-the-badge&logo=windows&logoColor=white" alt="دانلود برای ویندوز"></a>
+</p>
 
-[![GitHub Stars](https://img.shields.io/github/stars/korenyako/netok?style=flat-square)](https://github.com/korenyako/netok)
-[![مجوز: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue?style=flat-square)](LICENSE)
-[![پلتفرم: ویندوز](https://img.shields.io/badge/Platform-Windows-0078D4?style=flat-square&logo=windows)](https://github.com/korenyako/netok/releases/latest)
+<p align="center">
+  <a href="https://github.com/korenyako/netok"><img src="https://img.shields.io/github/stars/korenyako/netok?style=flat-square" alt="GitHub Stars"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-blue?style=flat-square" alt="مجوز: GPL-3.0"></a>
+  <a href="https://github.com/korenyako/netok/releases/latest"><img src="https://img.shields.io/badge/Platform-Windows-0078D4?style=flat-square&logo=windows" alt="پلتفرم: ویندوز"></a>
+</p>
 
 ![اسکرین‌شات Netok](docs/screenshot.png)
 

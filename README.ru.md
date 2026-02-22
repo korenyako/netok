@@ -1,17 +1,28 @@
-[English](README.md) | **Русский** | [فارسی](README.fa.md) | [Español](README.es.md)
+<p align="center">
+  <img src="logo.svg" width="120" alt="Логотип Netok">
+</p>
 
-# Netok
+<p align="center">
+  <a href="README.md">English</a> | <b>Русский</b> | <a href="README.fa.md">فارسی</a> | <a href="README.es.md">Español</a>
+</p>
 
-**Диагностика сети на понятном языке.**
+<h1 align="center">Netok</h1>
 
-Netok показывает полный путь от вашего компьютера до интернета — и объясняет,
-что не так, простыми словами, а не кодами ошибок.
+<p align="center">
+  <b>Диагностика сети на понятном языке.</b><br>
+  Netok показывает полный путь от вашего компьютера до интернета — и объясняет,<br>
+  что не так, простыми словами, а не кодами ошибок.
+</p>
 
-[![Скачать для Windows](https://img.shields.io/github/v/release/korenyako/netok?label=%D0%A1%D0%BA%D0%B0%D1%87%D0%B0%D1%82%D1%8C%20%D0%B4%D0%BB%D1%8F%20Windows&style=for-the-badge&logo=windows&logoColor=white)](https://github.com/korenyako/netok/releases/latest)
+<p align="center">
+  <a href="https://github.com/korenyako/netok/releases/latest"><img src="https://img.shields.io/github/v/release/korenyako/netok?label=%D0%A1%D0%BA%D0%B0%D1%87%D0%B0%D1%82%D1%8C%20%D0%B4%D0%BB%D1%8F%20Windows&style=for-the-badge&logo=windows&logoColor=white" alt="Скачать для Windows"></a>
+</p>
 
-[![GitHub Stars](https://img.shields.io/github/stars/korenyako/netok?style=flat-square)](https://github.com/korenyako/netok)
-[![Лицензия: GPL-3.0](https://img.shields.io/badge/%D0%9B%D0%B8%D1%86%D0%B5%D0%BD%D0%B7%D0%B8%D1%8F-GPL--3.0-blue?style=flat-square)](LICENSE)
-[![Платформа: Windows](https://img.shields.io/badge/%D0%9F%D0%BB%D0%B0%D1%82%D1%84%D0%BE%D1%80%D0%BC%D0%B0-Windows-0078D4?style=flat-square&logo=windows)](https://github.com/korenyako/netok/releases/latest)
+<p align="center">
+  <a href="https://github.com/korenyako/netok"><img src="https://img.shields.io/github/stars/korenyako/netok?style=flat-square" alt="GitHub Stars"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/%D0%9B%D0%B8%D1%86%D0%B5%D0%BD%D0%B7%D0%B8%D1%8F-GPL--3.0-blue?style=flat-square" alt="Лицензия: GPL-3.0"></a>
+  <a href="https://github.com/korenyako/netok/releases/latest"><img src="https://img.shields.io/badge/%D0%9F%D0%BB%D0%B0%D1%82%D1%84%D0%BE%D1%80%D0%BC%D0%B0-Windows-0078D4?style=flat-square&logo=windows" alt="Платформа: Windows"></a>
+</p>
 
 ![Скриншот Netok](docs/screenshot.png)
 

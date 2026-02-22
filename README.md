@@ -1,17 +1,28 @@
-**English** | [Русский](README.ru.md) | [فارسی](README.fa.md) | [Español](README.es.md)
+<p align="center">
+  <img src="logo.svg" width="120" alt="Netok logo">
+</p>
 
-# Netok
+<p align="center">
+  <b>English</b> | <a href="README.ru.md">Русский</a> | <a href="README.fa.md">فارسی</a> | <a href="README.es.md">Español</a>
+</p>
 
-**Network diagnostics that speak human language.**
+<h1 align="center">Netok</h1>
 
-Netok shows you the full path from your computer to the internet — and explains
-what's wrong in plain terms, not error codes.
+<p align="center">
+  <b>Network diagnostics that speak human language.</b><br>
+  Netok shows you the full path from your computer to the internet — and explains<br>
+  what's wrong in plain terms, not error codes.
+</p>
 
-[![Download for Windows](https://img.shields.io/github/v/release/korenyako/netok?label=Download%20for%20Windows&style=for-the-badge&logo=windows&logoColor=white)](https://github.com/korenyako/netok/releases/latest)
+<p align="center">
+  <a href="https://github.com/korenyako/netok/releases/latest"><img src="https://img.shields.io/github/v/release/korenyako/netok?label=Download%20for%20Windows&style=for-the-badge&logo=windows&logoColor=white" alt="Download for Windows"></a>
+</p>
 
-[![GitHub Stars](https://img.shields.io/github/stars/korenyako/netok?style=flat-square)](https://github.com/korenyako/netok)
-[![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue?style=flat-square)](LICENSE)
-[![Platform: Windows](https://img.shields.io/badge/Platform-Windows-0078D4?style=flat-square&logo=windows)](https://github.com/korenyako/netok/releases/latest)
+<p align="center">
+  <a href="https://github.com/korenyako/netok"><img src="https://img.shields.io/github/stars/korenyako/netok?style=flat-square" alt="GitHub Stars"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-blue?style=flat-square" alt="License: GPL-3.0"></a>
+  <a href="https://github.com/korenyako/netok/releases/latest"><img src="https://img.shields.io/badge/Platform-Windows-0078D4?style=flat-square&logo=windows" alt="Platform: Windows"></a>
+</p>
 
 ![Netok screenshot](docs/screenshot.png)
 

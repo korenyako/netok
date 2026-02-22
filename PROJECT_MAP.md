@@ -330,6 +330,7 @@ Generated: 2026-02-22
 ├── CONTRIBUTING.md
 ├── etsy-hover-effects-fixed.html
 ├── LICENSE
+├── logo.svg
 ├── manuf.txt
 ├── netok-protection-hub.jsx
 ├── netok-status.jsx
