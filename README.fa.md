@@ -98,12 +98,12 @@
 
 ## پشتیبانی از پلتفرم‌ها
 
-| پلتفرم | وضعیت |
-|---------|--------|
-| ویندوز | آماده |
-| مک | برنامه‌ریزی شده |
-| اندروید | در حال توسعه |
-| iOS | برنامه‌ریزی شده |
+<p>
+  <img src="https://img.shields.io/badge/Windows-Ready-brightgreen?style=for-the-badge&logo=windows&logoColor=white" alt="Windows: Ready">
+  <img src="https://img.shields.io/badge/macOS-Planned-lightgrey?style=for-the-badge&logo=apple&logoColor=white" alt="macOS: Planned">
+  <img src="https://img.shields.io/badge/Android-In%20progress-orange?style=for-the-badge&logo=android&logoColor=white" alt="Android: In progress">
+  <img src="https://img.shields.io/badge/iOS-Planned-lightgrey?style=for-the-badge&logo=apple&logoColor=white" alt="iOS: Planned">
+</p>
 
 ---
 

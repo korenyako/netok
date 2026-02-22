@@ -98,12 +98,12 @@ qué está roto, dónde, y qué hacer al respecto.
 
 ## Soporte de plataformas
 
-| Plataforma | Estado |
-|------------|--------|
-| Windows | Listo |
-| macOS | Planeado |
-| Android | En desarrollo |
-| iOS | Planeado |
+<p>
+  <img src="https://img.shields.io/badge/Windows-Listo-brightgreen?style=for-the-badge&logo=windows&logoColor=white" alt="Windows: Listo">
+  <img src="https://img.shields.io/badge/macOS-Planeado-lightgrey?style=for-the-badge&logo=apple&logoColor=white" alt="macOS: Planeado">
+  <img src="https://img.shields.io/badge/Android-En%20desarrollo-orange?style=for-the-badge&logo=android&logoColor=white" alt="Android: En desarrollo">
+  <img src="https://img.shields.io/badge/iOS-Planeado-lightgrey?style=for-the-badge&logo=apple&logoColor=white" alt="iOS: Planeado">
+</p>
 
 ---
 

@@ -98,12 +98,12 @@
 
 ## Поддержка платформ
 
-| Платформа | Статус |
-|-----------|--------|
-| Windows | Готово |
-| macOS | Планируется |
-| Android | В разработке |
-| iOS | Планируется |
+<p>
+  <img src="https://img.shields.io/badge/Windows-%D0%93%D0%BE%D1%82%D0%BE%D0%B2%D0%BE-brightgreen?style=for-the-badge&logo=windows&logoColor=white" alt="Windows: Готово">
+  <img src="https://img.shields.io/badge/macOS-%D0%9F%D0%BB%D0%B0%D0%BD%D0%B8%D1%80%D1%83%D0%B5%D1%82%D1%81%D1%8F-lightgrey?style=for-the-badge&logo=apple&logoColor=white" alt="macOS: Планируется">
+  <img src="https://img.shields.io/badge/Android-%D0%92%20%D1%80%D0%B0%D0%B7%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%BA%D0%B5-orange?style=for-the-badge&logo=android&logoColor=white" alt="Android: В разработке">
+  <img src="https://img.shields.io/badge/iOS-%D0%9F%D0%BB%D0%B0%D0%BD%D0%B8%D1%80%D1%83%D0%B5%D1%82%D1%81%D1%8F-lightgrey?style=for-the-badge&logo=apple&logoColor=white" alt="iOS: Планируется">
+</p>
 
 ---
 
