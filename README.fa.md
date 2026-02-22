@@ -9,22 +9,29 @@
 <h1 align="center">Netok</h1>
 
 <p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-blue?style=flat-square" alt="مجوز: GPL-3.0"></a>
+</p>
+
+<p align="center">
   <b>عیب‌یابی شبکه به زبان ساده.</b><br>
   Netok مسیر کامل از رایانه شما تا اینترنت را نشان می‌دهد — و به زبان ساده<br>
   توضیح می‌دهد که مشکل چیست، نه با کدهای خطا.
 </p>
 
 <p align="center">
-  <a href="https://github.com/korenyako/netok/releases/latest"><img src="https://img.shields.io/github/v/release/korenyako/netok?label=Download%20for%20Windows&style=for-the-badge&logo=windows&logoColor=white" alt="دانلود برای ویندوز"></a>
+  <a href="https://github.com/korenyako/netok/releases/latest"><img src="https://img.shields.io/badge/Windows-Ready-brightgreen?style=for-the-badge&logo=windows&logoColor=white" alt="Windows: Ready"></a>
+  <img src="https://img.shields.io/badge/Android-In%20progress-orange?style=for-the-badge&logo=android&logoColor=white" alt="Android: In progress">
+  <img src="https://img.shields.io/badge/macOS-Planned-lightgrey?style=for-the-badge&logo=apple&logoColor=white" alt="macOS: Planned">
+  <img src="https://img.shields.io/badge/iOS-Planned-lightgrey?style=for-the-badge&logo=apple&logoColor=white" alt="iOS: Planned">
 </p>
 
-<p align="center">
-  <a href="https://github.com/korenyako/netok"><img src="https://img.shields.io/github/stars/korenyako/netok?style=flat-square" alt="GitHub Stars"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-blue?style=flat-square" alt="مجوز: GPL-3.0"></a>
-  <a href="https://github.com/korenyako/netok/releases/latest"><img src="https://img.shields.io/badge/Platform-Windows-0078D4?style=flat-square&logo=windows" alt="پلتفرم: ویندوز"></a>
-</p>
+## چرا Netok
 
-![اسکرین‌شات Netok](docs/screenshot.png)
+بیشتر ابزارهای شبکه برای مهندسان ساخته شده‌اند. Netok برای بقیه افراد ساخته شده.
+
+وقتی اینترنت شما قطع می‌شود، نباید لازم باشد بدانید
+`DNS_PROBE_FINISHED_NXDOMAIN` یعنی چه. Netok آن را به زبان قابل فهم ترجمه می‌کند:
+چه چیزی خراب شده، کجا، و چه باید کرد.
 
 ---
 
@@ -51,7 +58,7 @@
 <p>VLESS، VMess، Shadowsocks، Trojan، WireGuard از طریق sing-box</p>
 </td>
 <td align="center">
-<h3>📡 شناسایی دستگاه‌ها</h3>
+<h3>💻 شناسایی دستگاه‌ها</h3>
 <p>اسکن شبکه محلی و شناسایی دستگاه‌ها بر اساس برند</p>
 </td>
 <td align="center">
@@ -61,7 +68,7 @@
 </tr>
 <tr>
 <td align="center">
-<h3>🔒 امنیت Wi-Fi</h3>
+<h3>🛜 امنیت Wi-Fi</h3>
 <p>شناسایی آسیب‌پذیری‌های رمزنگاری و تهدیدهای شبکه</p>
 </td>
 <td align="center">
@@ -69,7 +76,7 @@
 <p>بومی‌سازی کامل شامل اسکریپت‌های راست‌به‌چپ</p>
 </td>
 <td align="center">
-<h3>🎨 تم‌ها</h3>
+<h3>🌒 تم‌ها</h3>
 <p>تم روشن و تاریک با پشتیبانی از تنظیمات سیستم</p>
 </td>
 </tr>
@@ -79,31 +86,12 @@
 
 ## دانلود
 
-> [آخرین نسخه برای ویندوز](https://github.com/korenyako/netok/releases/latest)
+<p>
+  <a href="https://github.com/korenyako/netok/releases/latest"><img src="https://img.shields.io/github/v/release/korenyako/netok?label=Download%20for%20Windows&style=for-the-badge&logo=windows&logoColor=white" alt="دانلود برای ویندوز"></a>
+</p>
 
 > **توجه:** ویندوز ممکن است هنگام اولین اجرا هشدار SmartScreen نشان دهد —
 > این برای برنامه‌های بدون امضا طبیعی است. روی «Run anyway» کلیک کنید.
-
----
-
-## چرا Netok
-
-بیشتر ابزارهای شبکه برای مهندسان ساخته شده‌اند. Netok برای بقیه افراد ساخته شده.
-
-وقتی اینترنت شما قطع می‌شود، نباید لازم باشد بدانید
-`DNS_PROBE_FINISHED_NXDOMAIN` یعنی چه. Netok آن را به زبان قابل فهم ترجمه می‌کند:
-چه چیزی خراب شده، کجا، و چه باید کرد.
-
----
-
-## پشتیبانی از پلتفرم‌ها
-
-<p>
-  <img src="https://img.shields.io/badge/Windows-Ready-brightgreen?style=for-the-badge&logo=windows&logoColor=white" alt="Windows: Ready">
-  <img src="https://img.shields.io/badge/macOS-Planned-lightgrey?style=for-the-badge&logo=apple&logoColor=white" alt="macOS: Planned">
-  <img src="https://img.shields.io/badge/Android-In%20progress-orange?style=for-the-badge&logo=android&logoColor=white" alt="Android: In progress">
-  <img src="https://img.shields.io/badge/iOS-Planned-lightgrey?style=for-the-badge&logo=apple&logoColor=white" alt="iOS: Planned">
-</p>
 
 ---
 

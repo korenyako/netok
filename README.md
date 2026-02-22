@@ -9,22 +9,29 @@
 <h1 align="center">Netok</h1>
 
 <p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-blue?style=flat-square" alt="License: GPL-3.0"></a>
+</p>
+
+<p align="center">
   <b>Network diagnostics that speak human language.</b><br>
   Netok shows you the full path from your computer to the internet — and explains<br>
   what's wrong in plain terms, not error codes.
 </p>
 
 <p align="center">
-  <a href="https://github.com/korenyako/netok/releases/latest"><img src="https://img.shields.io/github/v/release/korenyako/netok?label=Download%20for%20Windows&style=for-the-badge&logo=windows&logoColor=white" alt="Download for Windows"></a>
+  <a href="https://github.com/korenyako/netok/releases/latest"><img src="https://img.shields.io/badge/Windows-Ready-brightgreen?style=for-the-badge&logo=windows&logoColor=white" alt="Windows: Ready"></a>
+  <img src="https://img.shields.io/badge/Android-In%20progress-orange?style=for-the-badge&logo=android&logoColor=white" alt="Android: In progress">
+  <img src="https://img.shields.io/badge/macOS-Planned-lightgrey?style=for-the-badge&logo=apple&logoColor=white" alt="macOS: Planned">
+  <img src="https://img.shields.io/badge/iOS-Planned-lightgrey?style=for-the-badge&logo=apple&logoColor=white" alt="iOS: Planned">
 </p>
 
-<p align="center">
-  <a href="https://github.com/korenyako/netok"><img src="https://img.shields.io/github/stars/korenyako/netok?style=flat-square" alt="GitHub Stars"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-blue?style=flat-square" alt="License: GPL-3.0"></a>
-  <a href="https://github.com/korenyako/netok/releases/latest"><img src="https://img.shields.io/badge/Platform-Windows-0078D4?style=flat-square&logo=windows" alt="Platform: Windows"></a>
-</p>
+## Why Netok
 
-![Netok screenshot](docs/screenshot.png)
+Most network tools are built for engineers. Netok is built for everyone else.
+
+When your internet stops working, you shouldn't need to know what
+`DNS_PROBE_FINISHED_NXDOMAIN` means. Netok translates that into something useful:
+what's broken, where, and what to do about it.
 
 ---
 
@@ -79,31 +86,12 @@
 
 ## Download
 
-→ [Latest release for Windows](https://github.com/korenyako/netok/releases/latest)
+<p>
+  <a href="https://github.com/korenyako/netok/releases/latest"><img src="https://img.shields.io/github/v/release/korenyako/netok?label=Download%20for%20Windows&style=for-the-badge&logo=windows&logoColor=white" alt="Download for Windows"></a>
+</p>
 
 > **Note:** Windows may show a SmartScreen warning on first launch — this is normal
 > for unsigned applications. Click "Run anyway" to proceed.
-
----
-
-## Why Netok
-
-Most network tools are built for engineers. Netok is built for everyone else.
-
-When your internet stops working, you shouldn't need to know what
-`DNS_PROBE_FINISHED_NXDOMAIN` means. Netok translates that into something useful:
-what's broken, where, and what to do about it.
-
----
-
-## Platform support
-
-<p>
-  <img src="https://img.shields.io/badge/Windows-Ready-brightgreen?style=for-the-badge&logo=windows&logoColor=white" alt="Windows: Ready">
-  <img src="https://img.shields.io/badge/macOS-Planned-lightgrey?style=for-the-badge&logo=apple&logoColor=white" alt="macOS: Planned">
-  <img src="https://img.shields.io/badge/Android-In%20progress-orange?style=for-the-badge&logo=android&logoColor=white" alt="Android: In progress">
-  <img src="https://img.shields.io/badge/iOS-Planned-lightgrey?style=for-the-badge&logo=apple&logoColor=white" alt="iOS: Planned">
-</p>
 
 ---
 

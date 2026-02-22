@@ -9,22 +9,29 @@
 <h1 align="center">Netok</h1>
 
 <p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/Licencia-GPL--3.0-blue?style=flat-square" alt="Licencia: GPL-3.0"></a>
+</p>
+
+<p align="center">
   <b>Diagnóstico de red en lenguaje humano.</b><br>
   Netok te muestra el camino completo desde tu computadora hasta internet — y explica<br>
   qué está mal en términos simples, no en códigos de error.
 </p>
 
 <p align="center">
-  <a href="https://github.com/korenyako/netok/releases/latest"><img src="https://img.shields.io/github/v/release/korenyako/netok?label=Descargar%20para%20Windows&style=for-the-badge&logo=windows&logoColor=white" alt="Descargar para Windows"></a>
+  <a href="https://github.com/korenyako/netok/releases/latest"><img src="https://img.shields.io/badge/Windows-Listo-brightgreen?style=for-the-badge&logo=windows&logoColor=white" alt="Windows: Listo"></a>
+  <img src="https://img.shields.io/badge/Android-En%20desarrollo-orange?style=for-the-badge&logo=android&logoColor=white" alt="Android: En desarrollo">
+  <img src="https://img.shields.io/badge/macOS-Planeado-lightgrey?style=for-the-badge&logo=apple&logoColor=white" alt="macOS: Planeado">
+  <img src="https://img.shields.io/badge/iOS-Planeado-lightgrey?style=for-the-badge&logo=apple&logoColor=white" alt="iOS: Planeado">
 </p>
 
-<p align="center">
-  <a href="https://github.com/korenyako/netok"><img src="https://img.shields.io/github/stars/korenyako/netok?style=flat-square" alt="GitHub Stars"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/Licencia-GPL--3.0-blue?style=flat-square" alt="Licencia: GPL-3.0"></a>
-  <a href="https://github.com/korenyako/netok/releases/latest"><img src="https://img.shields.io/badge/Plataforma-Windows-0078D4?style=flat-square&logo=windows" alt="Plataforma: Windows"></a>
-</p>
+## Por qué Netok
 
-![Captura de pantalla de Netok](docs/screenshot.png)
+La mayoría de las herramientas de red están diseñadas para ingenieros. Netok está diseñado para todos los demás.
+
+Cuando tu internet deja de funcionar, no deberías necesitar saber qué significa
+`DNS_PROBE_FINISHED_NXDOMAIN`. Netok lo traduce a algo útil:
+qué está roto, dónde, y qué hacer al respecto.
 
 ---
 
@@ -51,7 +58,7 @@
 <p>VLESS, VMess, Shadowsocks, Trojan, WireGuard a través de sing-box</p>
 </td>
 <td align="center">
-<h3>📡 Dispositivos</h3>
+<h3>💻 Dispositivos</h3>
 <p>Escanea tu red local e identifica dispositivos por marca</p>
 </td>
 <td align="center">
@@ -61,7 +68,7 @@
 </tr>
 <tr>
 <td align="center">
-<h3>🔒 Seguridad Wi-Fi</h3>
+<h3>🛜 Seguridad Wi-Fi</h3>
 <p>Detecta vulnerabilidades de cifrado y amenazas de red</p>
 </td>
 <td align="center">
@@ -69,7 +76,7 @@
 <p>Localización completa incluyendo scripts RTL</p>
 </td>
 <td align="center">
-<h3>🎨 Temas</h3>
+<h3>🌒 Temas</h3>
 <p>Modo claro y oscuro con soporte de preferencias del sistema</p>
 </td>
 </tr>
@@ -79,31 +86,12 @@
 
 ## Descargar
 
-> [Última versión para Windows](https://github.com/korenyako/netok/releases/latest)
+<p>
+  <a href="https://github.com/korenyako/netok/releases/latest"><img src="https://img.shields.io/github/v/release/korenyako/netok?label=Descargar%20para%20Windows&style=for-the-badge&logo=windows&logoColor=white" alt="Descargar para Windows"></a>
+</p>
 
 > **Nota:** Windows puede mostrar una advertencia de SmartScreen en el primer inicio —
 > esto es normal para aplicaciones sin firma. Haz clic en "Ejecutar de todas formas" para continuar.
-
----
-
-## Por qué Netok
-
-La mayoría de las herramientas de red están diseñadas para ingenieros. Netok está diseñado para todos los demás.
-
-Cuando tu internet deja de funcionar, no deberías necesitar saber qué significa
-`DNS_PROBE_FINISHED_NXDOMAIN`. Netok lo traduce a algo útil:
-qué está roto, dónde, y qué hacer al respecto.
-
----
-
-## Soporte de plataformas
-
-<p>
-  <img src="https://img.shields.io/badge/Windows-Listo-brightgreen?style=for-the-badge&logo=windows&logoColor=white" alt="Windows: Listo">
-  <img src="https://img.shields.io/badge/macOS-Planeado-lightgrey?style=for-the-badge&logo=apple&logoColor=white" alt="macOS: Planeado">
-  <img src="https://img.shields.io/badge/Android-En%20desarrollo-orange?style=for-the-badge&logo=android&logoColor=white" alt="Android: En desarrollo">
-  <img src="https://img.shields.io/badge/iOS-Planeado-lightgrey?style=for-the-badge&logo=apple&logoColor=white" alt="iOS: Planeado">
-</p>
 
 ---
 
