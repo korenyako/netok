@@ -30,15 +30,50 @@
 
 ## Características
 
-- **Diagnóstico de conexión** — Computadora → Wi-Fi → Router → Internet, paso a paso
-- **Explicaciones en lenguaje simple** — sin jerga técnica, solo respuestas claras
-- **Protección DNS** — Cloudflare, AdGuard, CleanBrowsing o servidores personalizados
-- **Soporte VPN** — VLESS, VMess, Shadowsocks, Trojan, WireGuard a través de sing-box
-- **Descubrimiento de dispositivos** — escanea tu red local, identifica dispositivos por marca
-- **Test de velocidad** — calificaciones reales, no solo números crudos
-- **Verificación de seguridad Wi-Fi** — vulnerabilidades de cifrado y amenazas
-- **15 idiomas** — localización completa incluyendo scripts RTL
-- **Tema claro y oscuro**
+<table>
+<tr>
+<td align="center" width="33%">
+<h3>🩺 Diagnóstico</h3>
+<p>Computadora → Wi-Fi → Router → Internet — verificación paso a paso</p>
+</td>
+<td align="center" width="33%">
+<h3>💬 Lenguaje Simple</h3>
+<p>Sin jerga técnica — respuestas claras sobre qué falla y cómo solucionarlo</p>
+</td>
+<td align="center" width="33%">
+<h3>🛡️ Protección DNS</h3>
+<p>Cloudflare, AdGuard, CleanBrowsing o tus propios servidores</p>
+</td>
+</tr>
+<tr>
+<td align="center">
+<h3>🔐 VPN</h3>
+<p>VLESS, VMess, Shadowsocks, Trojan, WireGuard a través de sing-box</p>
+</td>
+<td align="center">
+<h3>📡 Dispositivos</h3>
+<p>Escanea tu red local e identifica dispositivos por marca</p>
+</td>
+<td align="center">
+<h3>⚡ Test de Velocidad</h3>
+<p>Calificaciones reales, no solo números crudos</p>
+</td>
+</tr>
+<tr>
+<td align="center">
+<h3>🔒 Seguridad Wi-Fi</h3>
+<p>Detecta vulnerabilidades de cifrado y amenazas de red</p>
+</td>
+<td align="center">
+<h3>🌍 15 Idiomas</h3>
+<p>Localización completa incluyendo scripts RTL</p>
+</td>
+<td align="center">
+<h3>🎨 Temas</h3>
+<p>Modo claro y oscuro con soporte de preferencias del sistema</p>
+</td>
+</tr>
+</table>
 
 ---
 

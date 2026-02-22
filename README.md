@@ -30,15 +30,50 @@
 
 ## Features
 
-- **Connection diagnostics** — Computer → Wi-Fi → Router → Internet, step by step
-- **Plain language explanations** — no technical jargon, just clear answers
-- **DNS protection** — Cloudflare, AdGuard, CleanBrowsing, or custom servers
-- **VPN support** — VLESS, VMess, Shadowsocks, Trojan, WireGuard via sing-box
-- **Device discovery** — scan your local network, identify devices by brand
-- **Speed test** — real-world ratings, not just raw numbers
-- **Wi-Fi security check** — encryption vulnerabilities and threats
-- **15 languages** — full localization including RTL scripts
-- **Light and dark theme**
+<table>
+<tr>
+<td align="center" width="33%">
+<h3>🩺 Diagnostics</h3>
+<p>Computer → Wi-Fi → Router → Internet — step-by-step connection check</p>
+</td>
+<td align="center" width="33%">
+<h3>💬 Plain Language</h3>
+<p>No technical jargon — clear answers about what's wrong and how to fix it</p>
+</td>
+<td align="center" width="33%">
+<h3>🛡️ DNS Protection</h3>
+<p>Cloudflare, AdGuard, CleanBrowsing, or your own custom servers</p>
+</td>
+</tr>
+<tr>
+<td align="center">
+<h3>🔐 VPN</h3>
+<p>VLESS, VMess, Shadowsocks, Trojan, WireGuard via sing-box</p>
+</td>
+<td align="center">
+<h3>📡 Device Discovery</h3>
+<p>Scan your local network and identify devices by brand</p>
+</td>
+<td align="center">
+<h3>⚡ Speed Test</h3>
+<p>Real-world ratings, not just raw numbers</p>
+</td>
+</tr>
+<tr>
+<td align="center">
+<h3>🔒 Wi-Fi Security</h3>
+<p>Detect encryption vulnerabilities and network threats</p>
+</td>
+<td align="center">
+<h3>🌍 15 Languages</h3>
+<p>Full localization including RTL scripts</p>
+</td>
+<td align="center">
+<h3>🎨 Themes</h3>
+<p>Light and dark mode with system preference support</p>
+</td>
+</tr>
+</table>
 
 ---
 
