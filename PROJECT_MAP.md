@@ -264,6 +264,7 @@ Generated: 2026-02-23
 │   │   │   ├── AddVpnScreen.tsx
 │   │   │   ├── CloseBehaviorSettingsScreen.tsx
 │   │   │   ├── CustomIpScreen.tsx
+│   │   │   ├── DebugScenariosScreen.tsx
 │   │   │   ├── DeviceScanScreen.tsx
 │   │   │   ├── DiagnosticsScreen.tsx
 │   │   │   ├── DnsProvidersScreen.tsx

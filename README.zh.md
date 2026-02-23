@@ -15,8 +15,10 @@
 
 <p align="center">
   <b>用人话说的网络诊断。</b><br>
-  Netok 展示从您的电脑到互联网的完整路径——<br>
-  用简单易懂的语言解释问题，而不是错误代码。
+  网络诊断、DNS 防护和 VPN 桌面应用。<br>
+  查看从电脑到互联网的完整连接路径，一键切换 DNS 提供商，<br>
+  通过 VPN 连接 — 一切用简单易懂的语言说明，而非错误代码。<br>
+  Built with Rust + Tauri + React.
 </p>
 
 <p align="center">

@@ -15,8 +15,10 @@
 
 <p align="center">
   <b>Network diagnostics that speak human language.</b><br>
-  Netok shows you the full path from your computer to the internet — and explains<br>
-  what's wrong in plain terms, not error codes.
+  Desktop app for network diagnostics, DNS protection, and VPN.<br>
+  See your full connection path from computer to internet, switch DNS providers in one click,<br>
+  and connect through VPN — all explained in plain language, not error codes.<br>
+  Built with Rust + Tauri + React.
 </p>
 
 <p align="center">

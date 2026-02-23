@@ -15,8 +15,11 @@
 
 <p align="center">
   <b>Netzwerkdiagnose in verständlicher Sprache.</b><br>
-  Netok zeigt den vollständigen Weg von Ihrem Computer zum Internet — und erklärt<br>
-  verständlich, was nicht funktioniert, statt Fehlercodes anzuzeigen.
+  Desktop-App für Netzwerkdiagnose, DNS-Schutz und VPN.<br>
+  Sehen Sie den vollständigen Verbindungspfad vom Computer zum Internet,<br>
+  wechseln Sie DNS-Anbieter mit einem Klick und verbinden Sie sich über VPN —<br>
+  alles in verständlicher Sprache erklärt, nicht in Fehlercodes.<br>
+  Built with Rust + Tauri + React.
 </p>
 
 <p align="center">

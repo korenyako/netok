@@ -15,8 +15,11 @@
 
 <p align="center">
   <b>Diagnostica di rete in linguaggio umano.</b><br>
-  Netok mostra il percorso completo dal tuo computer a Internet — e spiega<br>
-  cosa non funziona in termini semplici, non con codici di errore.
+  App desktop per diagnostica di rete, protezione DNS e VPN.<br>
+  Visualizza il percorso completo di connessione dal computer a Internet,<br>
+  cambia provider DNS con un clic e connettiti tramite VPN —<br>
+  il tutto spiegato in linguaggio semplice, non in codici di errore.<br>
+  Built with Rust + Tauri + React.
 </p>
 
 <p align="center">

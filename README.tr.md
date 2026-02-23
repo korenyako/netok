@@ -15,8 +15,11 @@
 
 <p align="center">
   <b>Anlasilir dilde ag tanilama.</b><br>
-  Netok bilgisayarinizdan Internete kadar olan tam yolu gosterir — ve neyin<br>
-  yanlis oldugunu hata kodlariyla degil, anlasilir bir dille aciklar.
+  Ag tanilama, DNS korumasi ve VPN icin masaustu uygulamasi.<br>
+  Bilgisayardan internete kadar tam baglanti yolunu gorun,<br>
+  DNS saglayicisini tek tikla degistirin ve VPN uzerinden baglanin —<br>
+  hepsi hata kodlariyla degil, anlasilir bir dille aciklaniyor.<br>
+  Built with Rust + Tauri + React.
 </p>
 
 <p align="center">
