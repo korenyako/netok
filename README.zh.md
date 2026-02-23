@@ -110,4 +110,4 @@ GPL-3.0。参见 [LICENSE](LICENSE) 和 [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LI
 
 ---
 
-*由 [Anton Korenyako](https://github.com/korenyako) 创建*
+*由 [Anton Korenyako](https://korenyako.github.io) 创建*

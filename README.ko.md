@@ -111,4 +111,4 @@ GPL-3.0. [LICENSE](LICENSE) 및 [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.m
 
 ---
 
-*[Anton Korenyako](https://github.com/korenyako) 제작*
+*[Anton Korenyako](https://korenyako.github.io) 제작*

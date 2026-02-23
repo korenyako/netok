@@ -111,4 +111,4 @@ GPL-3.0. Veja [LICENSE](LICENSE) e [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSE
 
 ---
 
-*Criado por [Anton Korenyako](https://github.com/korenyako)*
+*Criado por [Anton Korenyako](https://korenyako.github.io)*

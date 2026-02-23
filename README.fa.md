@@ -111,4 +111,4 @@ GPL-3.0. مراجعه کنید به [LICENSE](LICENSE) و [THIRD_PARTY_LICENSES.
 
 ---
 
-*ساخته شده توسط [آنتون کورنیاکو](https://github.com/korenyako)*
+*ساخته شده توسط [Anton Korenyako](https://korenyako.github.io)*
