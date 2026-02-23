@@ -308,6 +308,11 @@ async fn test_dns_server(server_ip: String) -> Result<bool, String> {
 }
 
 #[tauri::command]
+async fn ping_dns_server(server_ip: String) -> Result<Option<u64>, String> {
+    netok_bridge::ping_dns_server(server_ip).await
+}
+
+#[tauri::command]
 fn run_all() -> Result<serde_json::Value, String> {
     let data = serde_json::json!({
         "hostname": "test-hostname",
@@ -356,6 +361,13 @@ async fn check_internet() -> Result<SingleNodeResult, String> {
     netok_bridge::check_internet_node()
         .await
         .map_err(|e| e.to_string())
+}
+
+// ==================== Flush DNS ====================
+
+#[tauri::command]
+async fn flush_dns() -> Result<(), String> {
+    netok_bridge::flush_dns().await
 }
 
 // ==================== Device Scan ====================
@@ -816,6 +828,7 @@ pub fn run() {
             get_dns_provider,
             get_dns_servers,
             test_dns_server,
+            ping_dns_server,
             run_all,
             check_computer,
             check_network,
@@ -823,6 +836,7 @@ pub fn run() {
             check_internet,
             lookup_ip_location,
             update_tray_language,
+            flush_dns,
             scan_network_devices,
             check_wifi_security,
             validate_vpn_key,

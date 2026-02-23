@@ -2,13 +2,14 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { ArrowLeft, Loader2, XThick } from '../components/icons/UIIcons';
-import { setDns, testDnsServer, type DnsProvider as ApiDnsProvider } from '../api/tauri';
+import { setDns, testDnsServer, pingDnsServer, type DnsProvider as ApiDnsProvider } from '../api/tauri';
 import { dnsStore } from '../stores/dnsStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { CloseButton } from '../components/WindowControls';
+import { PingBadge } from '@/components/PingBadge';
 import { saveCustomDnsConfig, loadCustomDnsConfig, clearCustomDnsConfig } from '../utils/customDnsStorage';
 
 interface CustomIpScreenProps {
@@ -56,6 +57,8 @@ export function CustomIpScreen({ onBack, onApplied }: CustomIpScreenProps) {
   const [secondaryIpv6Error, setSecondaryIpv6Error] = useState(false);
   const [isApplying, setIsApplying] = useState(false);
   const [serverUnreachable, setServerUnreachable] = useState(false);
+  const [pingResult, setPingResult] = useState<number | null | undefined>(undefined);
+  const [showPing, setShowPing] = useState(false);
 
   // Load existing Custom DNS addresses on mount
   useEffect(() => {
@@ -155,6 +158,10 @@ export function CustomIpScreen({ onBack, onApplied }: CustomIpScreenProps) {
           setIsApplying(false);
           return;
         }
+        // Measure latency after successful reachability test
+        pingDnsServer(primary)
+          .then((ms) => { setPingResult(ms); setShowPing(true); })
+          .catch(() => { setPingResult(null); setShowPing(true); });
       }
 
       const provider = {
@@ -221,7 +228,7 @@ export function CustomIpScreen({ onBack, onApplied }: CustomIpScreenProps) {
               <Input
                 placeholder={t('dns_providers.custom_ip_primary')}
                 value={primaryDns}
-                onChange={(e) => { setPrimaryDns(e.target.value); setPrimaryError(false); setServerUnreachable(false); }}
+                onChange={(e) => { setPrimaryDns(e.target.value); setPrimaryError(false); setServerUnreachable(false); setShowPing(false); }}
                 onBlur={handlePrimaryBlur}
                 className={cn('font-mono pr-8 placeholder:font-sans placeholder:font-normal placeholder:text-xs placeholder:tracking-normal placeholder:text-muted-foreground/35', primaryError && 'ring-1 ring-destructive')}
               />
@@ -239,6 +246,12 @@ export function CustomIpScreen({ onBack, onApplied }: CustomIpScreenProps) {
               <div className="mt-1.5">
                 <p className="text-xs text-destructive">{t('dns_providers.custom_ip_typo')}</p>
                 <p className="text-[10px] text-muted-foreground mt-0.5">{t('dns_providers.custom_ip_hint_ipv4')}</p>
+              </div>
+            )}
+            {showPing && !primaryError && (
+              <div className="mt-1.5 flex items-center gap-1.5">
+                <span className="text-xs text-muted-foreground">Ping:</span>
+                <PingBadge value={pingResult} />
               </div>
             )}
           </div>

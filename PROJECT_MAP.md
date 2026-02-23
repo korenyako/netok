@@ -223,6 +223,7 @@ Generated: 2026-02-23
 │   │   │   ├── HeaderStatus.tsx
 │   │   │   ├── MenuCard.tsx
 │   │   │   ├── NodeCard.tsx
+│   │   │   ├── PingBadge.tsx
 │   │   │   ├── ScanProgressRing.tsx
 │   │   │   ├── SecurityRouter.tsx
 │   │   │   ├── SettingsRouter.tsx

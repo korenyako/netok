@@ -57,7 +57,7 @@ pub fn run_powershell(command: &str) -> Option<String> {
 // Re-export commonly used functions
 pub use arp::{get_router_mac, ping_sweep};
 pub use connection::detect_connection_type;
-pub use dns::{build_dns_commands, get_current_dns, reverse_dns_lookup, set_dns};
+pub use dns::{build_dns_commands, flush_dns, get_current_dns, reverse_dns_lookup, set_dns};
 pub use gateway::get_default_gateway;
 pub use mdns::mdns_discover;
 pub use security::check_wifi_security;

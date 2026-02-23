@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { ArrowLeft, Loader2 } from '../components/icons/UIIcons';
-import { setDns, type DnsProvider as ApiDnsProvider } from '../api/tauri';
+import { setDns, pingDnsServer, type DnsProvider as ApiDnsProvider } from '../api/tauri';
 import { useDnsStore } from '../stores/useDnsStore';
 import { dnsStore } from '../stores/dnsStore';
 import { Button } from '@/components/ui/button';
 import { MenuCard } from '@/components/MenuCard';
+import { PingBadge } from '@/components/PingBadge';
 import { cn } from '@/lib/utils';
 import { CloseButton } from '../components/WindowControls';
 import { loadCustomDnsConfig } from '../utils/customDnsStorage';
@@ -24,6 +25,7 @@ interface ProviderCard {
   dnsPayload: ApiDnsProvider;
   matchType: string;
   badgeKey?: string;
+  pingIp: string;
 }
 
 const PROVIDER_CARDS: ProviderCard[] = [
@@ -33,6 +35,7 @@ const PROVIDER_CARDS: ProviderCard[] = [
     descKey: 'dns_providers.goal_fast_desc',
     dnsPayload: { type: 'Cloudflare', variant: 'Standard' },
     matchType: 'Cloudflare',
+    pingIp: '1.1.1.1',
   },
   {
     id: 'adguard',
@@ -40,6 +43,7 @@ const PROVIDER_CARDS: ProviderCard[] = [
     descKey: 'dns_providers.goal_adblock_desc',
     dnsPayload: { type: 'AdGuard', variant: 'Standard' },
     matchType: 'AdGuard',
+    pingIp: '94.140.14.14',
   },
   {
     id: 'quad9',
@@ -47,6 +51,7 @@ const PROVIDER_CARDS: ProviderCard[] = [
     descKey: 'dns_providers.goal_secure_desc',
     dnsPayload: { type: 'Quad9', variant: 'Recommended' },
     matchType: 'Quad9',
+    pingIp: '9.9.9.9',
   },
 ];
 
@@ -73,22 +78,54 @@ export function DnsProvidersScreen({ onBack, onCustomIp }: DnsProvidersScreenPro
   const [applyingId, setApplyingId] = useState<string | null>(null);
   const isApplying = applyingId !== null;
 
+  // Ping latency state: id → ms | null (unreachable) | undefined (loading)
+  const [pings, setPings] = useState<Record<string, number | null | undefined>>({});
+
+  const runPings = useCallback(() => {
+    // Mark all as loading
+    const loading: Record<string, undefined> = {};
+    for (const card of PROVIDER_CARDS) loading[card.id] = undefined;
+
+    // Also ping custom DNS if saved
+    const config = loadCustomDnsConfig();
+    const customIp = config?.primary || config?.primaryIpv6;
+    if (customIp) loading['custom'] = undefined;
+
+    setPings(loading);
+
+    // Ping each provider in parallel
+    for (const card of PROVIDER_CARDS) {
+      pingDnsServer(card.pingIp)
+        .then((ms) => setPings((prev) => ({ ...prev, [card.id]: ms })))
+        .catch(() => setPings((prev) => ({ ...prev, [card.id]: null })));
+    }
+
+    if (customIp) {
+      pingDnsServer(customIp)
+        .then((ms) => setPings((prev) => ({ ...prev, custom: ms })))
+        .catch(() => setPings((prev) => ({ ...prev, custom: null })));
+    }
+  }, []);
+
+  useEffect(() => {
+    runPings();
+  }, [runPings]);
+
   const protectionEnabled = isProtected(apiProvider);
 
   // Custom is active only when the current provider doesn't match any predefined card
   const matchesPredefined = PROVIDER_CARDS.some(c => c.matchType === apiProvider?.type);
   const isCustomActive = protectionEnabled && !matchesPredefined;
 
+  // Resolve custom DNS IP for ping display and subtitle
+  const customConfig = loadCustomDnsConfig();
+  const customIp = customConfig?.primary || customConfig?.primaryIpv6 || null;
+
   // Build subtitle for Custom card: show saved IPv4 or IPv6 address
   const customSubtitle = (): string | undefined => {
-    const config = loadCustomDnsConfig();
-    if (!config) return undefined;
-    const ip = config.primary || config.primaryIpv6;
-    if (ip) {
-      const providerName = lookupDnsProvider(ip);
-      return providerName ? `${ip} (${providerName})` : ip;
-    }
-    return undefined;
+    if (!customIp) return undefined;
+    const providerName = lookupDnsProvider(customIp);
+    return providerName ? `${customIp} (${providerName})` : customIp;
   };
 
   const applyProvider = async (id: string, provider: ApiDnsProvider) => {
@@ -186,6 +223,7 @@ export function DnsProvidersScreen({ onBack, onCustomIp }: DnsProvidersScreenPro
                   title={t(card.nameKey)}
                   badge={card.badgeKey ? t(card.badgeKey) : undefined}
                   subtitle={t(card.descKey)}
+                  trailing={<PingBadge value={pings[card.id]} />}
                   onClick={() => handleCardSelect(card)}
                 />
               </div>
@@ -204,15 +242,22 @@ export function DnsProvidersScreen({ onBack, onCustomIp }: DnsProvidersScreenPro
                   title={t('dns_providers.custom')}
                   subtitle={customSubtitle() || t('dns_providers.custom_ip_desc')}
                   trailing={
-                    <button
-                      className="ghost-action px-4 py-1.5 rounded-full text-[10px] font-medium uppercase tracking-wider text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all shrink-0 opacity-0 group-hover:opacity-100"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onCustomIp();
-                      }}
-                    >
-                      {t('dns_providers.custom_ip_edit')}
-                    </button>
+                    <div className="shrink-0 self-start">
+                      {customIp && (
+                        <span className="group-hover:hidden">
+                          <PingBadge value={pings['custom']} />
+                        </span>
+                      )}
+                      <button
+                        className="ghost-action px-4 py-1.5 rounded-full text-[10px] font-medium uppercase tracking-wider text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all shrink-0 hidden group-hover:inline-flex"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onCustomIp();
+                        }}
+                      >
+                        {t('dns_providers.custom_ip_edit')}
+                      </button>
+                    </div>
                   }
                   onClick={handleCustomSelect}
                 />

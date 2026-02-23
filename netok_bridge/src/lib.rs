@@ -401,6 +401,15 @@ pub async fn test_dns_server_reachable(server_ip: String) -> Result<bool, String
     .map_err(|e| format!("Failed to run DNS server test task: {}", e))?
 }
 
+// Ping a DNS server and measure latency in ms (async wrapper)
+pub async fn ping_dns_server(server_ip: String) -> Result<Option<u64>, String> {
+    tokio::task::spawn_blocking(move || {
+        netok_core::ping_dns_server(&server_ip, 3) // 3 second timeout
+    })
+    .await
+    .map_err(|e| format!("Failed to run DNS ping task: {}", e))?
+}
+
 // ==================== VPN Validation ====================
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
@@ -541,6 +550,13 @@ pub async fn verify_vpn_ip() -> Result<Option<String>, String> {
     })
     .await
     .map_err(|e| format!("Task join error: {}", e))?
+}
+
+// Flush DNS cache (async wrapper)
+pub async fn flush_dns() -> Result<(), String> {
+    tokio::task::spawn_blocking(netok_core::flush_dns)
+        .await
+        .map_err(|e| format!("Failed to run DNS flush task: {}", e))?
 }
 
 // Re-export device scan types

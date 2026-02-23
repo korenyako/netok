@@ -280,3 +280,28 @@ pub fn reverse_dns_lookup(ip: &str, timeout_ms: u64) -> Option<String> {
         s.trim_end_matches('.').to_string()
     })
 }
+
+/// Flush the OS DNS resolver cache.
+#[cfg(target_os = "windows")]
+pub fn flush_dns() -> Result<(), String> {
+    use super::hidden_cmd;
+
+    let output = hidden_cmd("ipconfig")
+        .args(["/flushdns"])
+        .output()
+        .map_err(|e| format!("Failed to execute ipconfig: {}", e))?;
+
+    if !output.status.success() {
+        return Err(format!(
+            "ipconfig /flushdns failed: {}",
+            String::from_utf8_lossy(&output.stderr).trim()
+        ));
+    }
+
+    Ok(())
+}
+
+#[cfg(not(target_os = "windows"))]
+pub fn flush_dns() -> Result<(), String> {
+    Err("DNS cache flush is only supported on Windows".to_string())
+}

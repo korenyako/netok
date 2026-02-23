@@ -95,9 +95,14 @@ export function SettingsScreen({ onNavigateToTheme, onNavigateToLanguage, onNavi
         <Button
           variant="outline"
           className="w-full text-sm font-medium"
-          onClick={() => {
-            // TODO: Implement actual DNS cache flush
-            toast.success(t('dns_providers.cache_cleared'));
+          onClick={async () => {
+            try {
+              const { flushDns } = await import('../api/tauri');
+              await flushDns();
+              toast.success(t('dns_providers.cache_cleared'));
+            } catch (e) {
+              toast.error(String(e));
+            }
           }}
         >
           <BrushCleaning className="w-4 h-4" />

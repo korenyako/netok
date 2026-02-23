@@ -107,6 +107,10 @@ export async function testDnsServer(serverIp: string): Promise<boolean> {
   return await invoke<boolean>('test_dns_server', { serverIp });
 }
 
+export async function pingDnsServer(serverIp: string): Promise<number | null> {
+  return await invoke<number | null>('ping_dns_server', { serverIp });
+}
+
 // IP geolocation lookup
 export interface IpLocationInfo {
   ip: string | null;
@@ -200,6 +204,11 @@ export async function disconnectVpn(): Promise<void> {
 
 export async function getVpnStatus(): Promise<VpnStatus> {
   return await invoke<VpnStatus>('get_vpn_status');
+}
+
+// Flush DNS cache
+export async function flushDns(): Promise<void> {
+  return await invoke('flush_dns');
 }
 
 // Device scan types

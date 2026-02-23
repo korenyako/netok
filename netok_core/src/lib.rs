@@ -32,12 +32,13 @@ pub use domain::{
 pub use diagnostics::{
     check_computer, check_internet, check_network, check_router, detect_dns_provider,
     get_computer_info, get_internet_info, get_network_info, get_router_info, lookup_ip_location,
-    run_diagnostics, scan_network_devices, scan_network_devices_with_progress, test_dns_server,
+    ping_dns_server, run_diagnostics, scan_network_devices, scan_network_devices_with_progress,
+    test_dns_server,
     IpInfoResponse,
 };
 
 // Re-export infrastructure functions used by bridge
-pub use infrastructure::{build_dns_commands, check_wifi_security, get_current_dns, set_dns};
+pub use infrastructure::{build_dns_commands, check_wifi_security, flush_dns, get_current_dns, set_dns};
 
 // Re-export security types
 pub use infrastructure::security::{

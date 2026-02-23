@@ -89,6 +89,54 @@ pub fn test_dns_server(server_ip: &str, timeout_secs: u64) -> Result<bool, Strin
     Ok(resolver.lookup_ip("google.com").is_ok())
 }
 
+/// Measure DNS server latency by resolving a domain and timing the query.
+/// Returns Ok(Some(ms)) on success, Ok(None) if server is unreachable, Err on invalid IP.
+pub fn ping_dns_server(server_ip: &str, timeout_secs: u64) -> Result<Option<u64>, String> {
+    use std::net::IpAddr;
+    use trust_dns_resolver::config::*;
+    use trust_dns_resolver::Resolver;
+
+    use std::net::{Ipv4Addr, Ipv6Addr};
+
+    let ip: IpAddr = server_ip
+        .parse()
+        .map_err(|_| format!("Invalid IP address: {}", server_ip))?;
+
+    let mut opts = ResolverOpts::default();
+    opts.timeout = Duration::from_secs(timeout_secs);
+    opts.attempts = 1;
+
+    let bind_addr = match ip {
+        IpAddr::V4(_) => Some(std::net::SocketAddr::new(
+            IpAddr::V4(Ipv4Addr::UNSPECIFIED),
+            0,
+        )),
+        IpAddr::V6(_) => Some(std::net::SocketAddr::new(
+            IpAddr::V6(Ipv6Addr::UNSPECIFIED),
+            0,
+        )),
+    };
+
+    let name_server = NameServerConfig {
+        socket_addr: std::net::SocketAddr::new(ip, 53),
+        protocol: Protocol::Udp,
+        tls_dns_name: None,
+        trust_negative_responses: true,
+        bind_addr,
+    };
+
+    let config = ResolverConfig::from_parts(None, vec![], vec![name_server]);
+
+    let resolver =
+        Resolver::new(config, opts).map_err(|e| format!("Failed to create resolver: {}", e))?;
+
+    let start = Instant::now();
+    match resolver.lookup_ip("google.com") {
+        Ok(_) => Ok(Some(start.elapsed().as_millis() as u64)),
+        Err(_) => Ok(None),
+    }
+}
+
 /// HTTP Test: try to fetch from known endpoints.
 fn test_http() -> bool {
     let client = match reqwest::blocking::Client::builder()
