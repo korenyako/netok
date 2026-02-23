@@ -341,10 +341,20 @@ Generated: 2026-02-23
 ├── package.json
 ├── PROJECT_CONTEXT.md
 ├── PROJECT_MAP.md
+├── README.de.md
 ├── README.es.md
 ├── README.fa.md
+├── README.fr.md
+├── README.it.md
+├── README.ja.md
+├── README.ko.md
 ├── README.md
+├── README.pl.md
+├── README.pt.md
 ├── README.ru.md
+├── README.tr.md
+├── README.uk.md
+├── README.zh.md
 ├── speedtest-prototype-v2.html
 └── THIRD_PARTY_LICENSES.md
 
