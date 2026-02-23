@@ -270,12 +270,14 @@
       "wifi_disabled": {
         "title": "Wi-Fi deaktiviert",
         "message": "Der Wi-Fi-Adapter ist auf Ihrem Computer deaktiviert.",
-        "action": "Schalten Sie Wi-Fi in den Windows-Einstellungen ein oder drücken Sie den Wi-Fi-Schalter an Ihrem Laptop."
+        "action": "Schalten Sie Wi-Fi in den Windows-Einstellungen ein oder drücken Sie den Wi-Fi-Schalter an Ihrem Laptop.",
+        "button": "WLAN-Einstellungen"
       },
       "wifi_not_connected": {
         "title": "Nicht verbunden",
         "message": "Ihr Computer ist nicht mit einem Wi-Fi-Netzwerk verbunden.",
-        "action": "Öffnen Sie die Netzwerkliste, wählen Sie Ihr Netzwerk aus und verbinden Sie sich."
+        "action": "Öffnen Sie die Netzwerkliste, wählen Sie Ihr Netzwerk aus und verbinden Sie sich.",
+        "button": "WLAN-Einstellungen"
       },
       "router_unreachable": {
         "title": "Router nicht erreichbar",
@@ -290,12 +292,14 @@
       "dns_failure": {
         "title": "DNS-Problem",
         "message": "Webseitenadressen können nicht aufgelöst werden.",
-        "action": "Versuchen Sie, den DNS-Schutz in den Netok-Einstellungen zu aktivieren — das könnte das Problem lösen."
+        "action": "Versuchen Sie, den DNS-Schutz in den Netok-Einstellungen zu aktivieren — das könnte das Problem lösen.",
+        "button": "DNS einrichten"
       },
       "http_blocked": {
         "title": "Webseiten nicht erreichbar",
         "message": "Es besteht eine Verbindung, aber Webseiten öffnen sich nicht.",
-        "action": "Wenn Sie ein VPN verwenden, versuchen Sie es zu deaktivieren. Überprüfen Sie auch Ihre Antivireneinstellungen."
+        "action": "Wenn Sie ein VPN verwenden, versuchen Sie es zu deaktivieren. Überprüfen Sie auch Ihre Antivireneinstellungen.",
+        "button": "VPN prüfen"
       },
       "weak_signal": {
         "title": "Schwaches Signal",

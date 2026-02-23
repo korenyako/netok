@@ -50,6 +50,10 @@ pub enum ConnectionType {
     Ethernet,
     Usb,
     Mobile,
+    /// Wi-Fi adapter is disabled or absent
+    Disabled,
+    /// Wi-Fi adapter is present but not connected to any network
+    Disconnected,
     #[default]
     Unknown,
 }

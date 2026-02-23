@@ -4,8 +4,12 @@ import {
   checkNetwork,
   checkRouter,
   checkInternet,
+  lookupIpLocation,
   type SingleNodeResult,
   type NetworkInfo,
+  type DiagnosticScenario,
+  type NodeStatus,
+  type ConnectionType,
 } from '../api/tauri';
 
 // Node detail for display
@@ -36,6 +40,9 @@ interface DiagnosticsState {
 
   // Network info for StatusScreen
   networkInfo: NetworkInfo | null;
+
+  // Debug scenario override (null = real diagnostics)
+  scenarioOverride: DiagnosticScenario | null;
 }
 
 // Store actions
@@ -44,6 +51,8 @@ interface DiagnosticsActions {
   updateNode: (node: NetworkNode) => void;
   reset: () => void;
   getRawResult: (nodeId: string) => SingleNodeResult | undefined;
+  overrideScenario: (scenario: DiagnosticScenario, t: (key: string) => string) => void;
+  clearOverride: (t: (key: string) => string) => void;
 }
 
 export type DiagnosticsStore = DiagnosticsState & DiagnosticsActions;
@@ -57,6 +66,7 @@ const initialState: DiagnosticsState = {
   error: null,
   rawResults: new Map(),
   networkInfo: null,
+  scenarioOverride: null,
 };
 
 // Remove AS number prefix from ISP string
@@ -144,6 +154,80 @@ function upsertNode(nodes: NetworkNode[], node: NetworkNode): NetworkNode[] {
   return [...nodes, node];
 }
 
+// Node status map per scenario for synthetic data generation
+const SCENARIO_NODE_STATUSES: Record<DiagnosticScenario, Record<string, NodeStatus>> = {
+  all_good:           { computer: 'ok', network: 'ok', dns: 'ok', internet: 'ok' },
+  wifi_disabled:      { computer: 'ok', network: 'down', dns: 'down', internet: 'down' },
+  wifi_not_connected: { computer: 'ok', network: 'down', dns: 'down', internet: 'down' },
+  weak_signal:        { computer: 'ok', network: 'partial', dns: 'ok', internet: 'ok' },
+  router_unreachable: { computer: 'ok', network: 'ok', dns: 'down', internet: 'down' },
+  no_internet:        { computer: 'ok', network: 'ok', dns: 'ok', internet: 'down' },
+  dns_failure:        { computer: 'ok', network: 'ok', dns: 'ok', internet: 'partial' },
+  http_blocked:       { computer: 'ok', network: 'ok', dns: 'ok', internet: 'partial' },
+};
+
+// Connection type for network node per scenario
+const SCENARIO_CONNECTION_TYPE: Partial<Record<DiagnosticScenario, ConnectionType>> = {
+  wifi_disabled: 'Disabled',
+  wifi_not_connected: 'Disconnected',
+};
+
+// Build synthetic diagnostics data for a given scenario
+function buildSyntheticResults(
+  scenario: DiagnosticScenario,
+  t: (key: string) => string,
+): { nodes: NetworkNode[]; rawResults: Map<string, SingleNodeResult>; networkInfo: NetworkInfo | null } {
+  const statuses = SCENARIO_NODE_STATUSES[scenario];
+  const connectionType = SCENARIO_CONNECTION_TYPE[scenario] ?? 'Wifi';
+
+  const nodeIds: Array<{ id: 'computer' | 'network' | 'dns' | 'internet'; labelKey: string }> = [
+    { id: 'computer', labelKey: 'diagnostics.computer' },
+    { id: 'network', labelKey: 'diagnostics.wifi' },
+    { id: 'dns', labelKey: 'diagnostics.router' },
+    { id: 'internet', labelKey: 'diagnostics.internet' },
+  ];
+
+  const nodes: NetworkNode[] = [];
+  const rawResults = new Map<string, SingleNodeResult>();
+
+  for (const { id, labelKey } of nodeIds) {
+    const status = statuses[id];
+    const label = t(labelKey);
+
+    const node: NetworkNode = { id, title: label, status, details: [] };
+
+    // Build minimal SingleNodeResult for ScenarioContext
+    const raw: SingleNodeResult = {
+      node: { id, label, status, latency_ms: status === 'ok' ? 12 : null, details: null },
+      computer: id === 'computer' ? { hostname: 'Debug', model: null, adapter: 'Debug Adapter', local_ip: '192.168.1.100' } : null,
+      network: id === 'network' ? {
+        connection_type: connectionType,
+        ssid: connectionType === 'Wifi' ? 'DebugNetwork' : null,
+        rssi: status === 'partial' ? -78 : status === 'ok' ? -45 : null,
+        signal_quality: null,
+        channel: null,
+        frequency: null,
+      } : null,
+      router: id === 'dns' ? { gateway_ip: '192.168.1.1', gateway_mac: null, vendor: null, model: null } : null,
+      internet: id === 'internet' ? {
+        public_ip: null, isp: null, country: null, city: null,
+        dns_ok: scenario === 'http_blocked' ? true : status === 'ok',
+        http_ok: status === 'ok',
+        latency_ms: status === 'ok' ? 25 : null,
+        speed_down_mbps: null,
+        speed_up_mbps: null,
+      } : null,
+    };
+
+    // Re-transform to pick up details (signal labels, etc.)
+    nodes.push(transformSingleNode(raw, t));
+    rawResults.set(id, raw);
+  }
+
+  const networkInfo: NetworkInfo | null = rawResults.get('network')?.network ?? null;
+  return { nodes, rawResults, networkInfo };
+}
+
 // Run ID for cancellation
 let runIdCounter = 0;
 
@@ -164,7 +248,7 @@ export const useDiagnosticsStore = create<DiagnosticsStore>((set, get) => ({
     });
 
     try {
-      // Step 0: Computer
+      // Step 0: Computer (must run first — adapter needed by Network)
       const computerResult = await checkComputer();
       if (stale()) return;
 
@@ -179,39 +263,31 @@ export const useDiagnosticsStore = create<DiagnosticsStore>((set, get) => ({
         };
       });
 
-      // Step 1: Network (depends on computer's adapter)
+      // Step 1+2: Network and Router in parallel (both depend only on adapter)
       const adapter = computerResult.computer?.adapter ?? null;
-      const networkResult = await checkNetwork(adapter);
+      const [networkResult, routerResult] = await Promise.all([
+        checkNetwork(adapter),
+        checkRouter(),
+      ]);
       if (stale()) return;
 
       const networkNode = transformSingleNode(networkResult, t);
+      const routerNode = transformSingleNode(routerResult, t);
       set((state) => {
         const newRawResults = new Map(state.rawResults);
         newRawResults.set(networkResult.node.id, networkResult);
+        newRawResults.set(routerResult.node.id, routerResult);
+        let nodes = upsertNode(state.nodes, networkNode);
+        nodes = upsertNode(nodes, routerNode);
         return {
-          nodes: upsertNode(state.nodes, networkNode),
+          nodes,
           rawResults: newRawResults,
-          currentCheckIndex: 2,
+          currentCheckIndex: 3,
           networkInfo: networkResult.network,
         };
       });
 
-      // Step 2: Router
-      const routerResult = await checkRouter();
-      if (stale()) return;
-
-      const routerNode = transformSingleNode(routerResult, t);
-      set((state) => {
-        const newRawResults = new Map(state.rawResults);
-        newRawResults.set(routerResult.node.id, routerResult);
-        return {
-          nodes: upsertNode(state.nodes, routerNode),
-          rawResults: newRawResults,
-          currentCheckIndex: 3,
-        };
-      });
-
-      // Step 3: Internet
+      // Step 3: Internet (DNS + HTTP, no geo — fast)
       const internetResult = await checkInternet();
       if (stale()) return;
 
@@ -227,6 +303,37 @@ export const useDiagnosticsStore = create<DiagnosticsStore>((set, get) => ({
           lastUpdated: Date.now(),
         };
       });
+
+      // Background: fetch geo-info (ISP, city, public IP) without blocking status
+      if (internetResult.internet?.http_ok) {
+        // Fire-and-forget — enriches the internet node card when data arrives
+        lookupIpLocation('').then((geo) => {
+          if (stale()) return;
+          set((state) => {
+            const raw = state.rawResults.get('internet');
+            if (!raw?.internet) return state;
+            // Enrich the raw result with geo data
+            const enrichedInternet = {
+              ...raw.internet,
+              public_ip: geo.ip ?? raw.internet.public_ip,
+              isp: geo.org ?? raw.internet.isp,
+              country: geo.country ?? raw.internet.country,
+              city: geo.city ?? raw.internet.city,
+            };
+            const enrichedResult: SingleNodeResult = {
+              ...raw,
+              internet: enrichedInternet,
+            };
+            const enrichedNode = transformSingleNode(enrichedResult, t);
+            const newRawResults = new Map(state.rawResults);
+            newRawResults.set('internet', enrichedResult);
+            return {
+              nodes: upsertNode(state.nodes, enrichedNode),
+              rawResults: newRawResults,
+            };
+          });
+        }).catch(() => { /* geo-lookup failure is non-critical */ });
+      }
     } catch (err) {
       if (stale()) return;
       console.error('Failed to run diagnostics:', err);
@@ -258,6 +365,25 @@ export const useDiagnosticsStore = create<DiagnosticsStore>((set, get) => ({
   getRawResult: (nodeId: string) => {
     return get().rawResults.get(nodeId);
   },
+
+  overrideScenario: (scenario: DiagnosticScenario, t: (key: string) => string) => {
+    const { nodes, rawResults, networkInfo } = buildSyntheticResults(scenario, t);
+    set({
+      scenarioOverride: scenario,
+      nodes,
+      rawResults,
+      networkInfo,
+      isRunning: false,
+      currentCheckIndex: 4,
+      lastUpdated: Date.now(),
+      error: null,
+    });
+  },
+
+  clearOverride: (t: (key: string) => string) => {
+    set({ scenarioOverride: null });
+    get().runDiagnostics(t);
+  },
 }));
 
 // Selector for checking if diagnostics should auto-refresh
@@ -266,3 +392,22 @@ export const shouldRefreshDiagnostics = (lastUpdated: number | null): boolean =>
   const thirtySecondsAgo = Date.now() - 30_000;
   return lastUpdated < thirtySecondsAgo;
 };
+
+// Derive network availability level from current diagnostic nodes
+export type NetworkAvailability = 'full' | 'local_only' | 'no_network';
+
+export function getNetworkAvailability(nodes: NetworkNode[]): NetworkAvailability {
+  if (nodes.length === 0) return 'full'; // Not yet diagnosed — don't block
+
+  const network = nodes.find(n => n.id === 'network');
+  const router = nodes.find(n => n.id === 'dns');
+  const internet = nodes.find(n => n.id === 'internet');
+
+  if (network?.status === 'down' || router?.status === 'down') {
+    return 'no_network';
+  }
+  if (internet?.status === 'down' || internet?.status === 'partial') {
+    return 'local_only';
+  }
+  return 'full';
+}

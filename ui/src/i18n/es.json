@@ -270,12 +270,14 @@
       "wifi_disabled": {
         "title": "Wi-Fi desactivado",
         "message": "El adaptador Wi-Fi está desactivado en tu ordenador.",
-        "action": "Activa el Wi-Fi en la configuración de Windows o pulsa el interruptor Wi-Fi de tu portátil."
+        "action": "Activa el Wi-Fi en la configuración de Windows o pulsa el interruptor Wi-Fi de tu portátil.",
+        "button": "Ajustes de Wi-Fi"
       },
       "wifi_not_connected": {
         "title": "No conectado",
         "message": "Tu ordenador no está conectado a una red Wi-Fi.",
-        "action": "Abre la lista de redes, selecciona la tuya y conéctate."
+        "action": "Abre la lista de redes, selecciona la tuya y conéctate.",
+        "button": "Ajustes de Wi-Fi"
       },
       "router_unreachable": {
         "title": "Router inaccesible",
@@ -290,12 +292,14 @@
       "dns_failure": {
         "title": "Problema de DNS",
         "message": "No se pueden resolver las direcciones de los sitios web.",
-        "action": "Prueba a activar la protección DNS en la configuración de Netok — esto podría resolver el problema."
+        "action": "Prueba a activar la protección DNS en la configuración de Netok — esto podría resolver el problema.",
+        "button": "Configurar DNS"
       },
       "http_blocked": {
         "title": "Sitios web no disponibles",
         "message": "Hay conexión, pero los sitios web no se abren.",
-        "action": "Si usas una VPN, prueba a desactivarla. También revisa la configuración de tu antivirus."
+        "action": "Si usas una VPN, prueba a desactivarla. También revisa la configuración de tu antivirus.",
+        "button": "Comprobar VPN"
       },
       "weak_signal": {
         "title": "Señal débil",

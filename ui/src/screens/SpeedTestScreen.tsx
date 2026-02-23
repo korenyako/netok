@@ -10,6 +10,7 @@ import {
   type ExperienceRating,
   type GraphPoint,
 } from '../stores/speedTestStore';
+import { useDiagnosticsStore, getNetworkAvailability, type NetworkAvailability } from '../stores/diagnosticsStore';
 
 interface SpeedTestScreenProps {
   onBack: () => void;
@@ -20,6 +21,9 @@ interface SpeedTestScreenProps {
 export function SpeedTestScreen({ onBack }: SpeedTestScreenProps) {
   const { t } = useTranslation();
   const { phase, cooldownSecondsLeft, startTest, reset, cancelTest } = useSpeedTestStore();
+  const nodes = useDiagnosticsStore(s => s.nodes);
+  const availability = getNetworkAvailability(nodes);
+  const internetBlocked = availability !== 'full';
 
   const isRunning = phase === 'ping' || phase === 'download' || phase === 'upload';
   const isCoolingDown = cooldownSecondsLeft > 0;
@@ -41,7 +45,7 @@ export function SpeedTestScreen({ onBack }: SpeedTestScreenProps) {
           <h1 className="flex-1 text-lg font-semibold text-foreground">
             {t('speed_test.title')}
           </h1>
-          <Button variant="ghost" size="icon" onClick={handleRestart} disabled={phase === 'idle' || isCoolingDown}>
+          <Button variant="ghost" size="icon" onClick={handleRestart} disabled={phase === 'idle' || isCoolingDown || internetBlocked}>
             <RotateCw className="w-5 h-5 text-muted-foreground" />
           </Button>
           <CloseButton />
@@ -51,7 +55,7 @@ export function SpeedTestScreen({ onBack }: SpeedTestScreenProps) {
       <ScrollArea className="flex-1">
         <div className="px-4 pb-6">
           {/* Circle progress (hidden when done) */}
-          {phase !== 'done' && <CircleProgress />}
+          {phase !== 'done' && <CircleProgress internetBlocked={internetBlocked} availability={availability} />}
 
           {/* Speed metrics */}
           <SpeedMetrics />
@@ -81,7 +85,7 @@ export function SpeedTestScreen({ onBack }: SpeedTestScreenProps) {
 const CIRCLE_R = 90;
 const CIRCUMFERENCE = 2 * Math.PI * CIRCLE_R;
 
-function CircleProgress() {
+function CircleProgress({ internetBlocked, availability }: { internetBlocked: boolean; availability: NetworkAvailability }) {
   const { t } = useTranslation();
   const { phase, progress, currentValue, currentUnit, cooldownSecondsLeft, startTest } = useSpeedTestStore();
 
@@ -124,12 +128,22 @@ function CircleProgress() {
             </div>
           )}
 
-          {phase === 'idle' && cooldownSecondsLeft === 0 && (
+          {phase === 'idle' && cooldownSecondsLeft === 0 && !internetBlocked && (
             <button onClick={() => startTest()} className="text-center">
               <span className="text-lg font-medium text-primary">
                 {t('speed_test.start')}
               </span>
             </button>
+          )}
+
+          {phase === 'idle' && cooldownSecondsLeft === 0 && internetBlocked && (
+            <div className="text-center px-6">
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {availability === 'no_network'
+                  ? t('network.scan_unavailable_no_network')
+                  : t('network.scan_unavailable_no_internet')}
+              </p>
+            </div>
           )}
 
           {(phase === 'ping' || phase === 'download' || phase === 'upload') && (
@@ -163,12 +177,22 @@ function CircleProgress() {
             </div>
           )}
 
-          {phase === 'error' && cooldownSecondsLeft === 0 && (
+          {phase === 'error' && cooldownSecondsLeft === 0 && !internetBlocked && (
             <button onClick={() => startTest()} className="text-center">
               <span className="text-lg font-medium text-primary">
                 {t('speed_test.start')}
               </span>
             </button>
+          )}
+
+          {phase === 'error' && cooldownSecondsLeft === 0 && internetBlocked && (
+            <div className="text-center px-6">
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {availability === 'no_network'
+                  ? t('network.scan_unavailable_no_network')
+                  : t('network.scan_unavailable_no_internet')}
+              </p>
+            </div>
           )}
         </div>
       </div>

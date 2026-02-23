@@ -753,7 +753,7 @@ fn parse_dns_response(data: &[u8]) -> Vec<String> {
 
 /// Get the SSID of the currently connected Wi-Fi network.
 fn get_current_ssid() -> Option<String> {
-    let (ssid, _, _) = super::wifi::get_wifi_info();
+    let (ssid, _, _, _) = super::wifi::get_wifi_info();
     ssid
 }
 

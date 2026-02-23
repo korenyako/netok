@@ -270,12 +270,14 @@
       "wifi_disabled": {
         "title": "Wi-Fi Devre Dışı",
         "message": "Bilgisayarınızda Wi-Fi adaptörü kapalı.",
-        "action": "Windows ayarlarından Wi-Fi'yi açın veya dizüstü bilgisayarınızdaki Wi-Fi düğmesine basın."
+        "action": "Windows ayarlarından Wi-Fi'yi açın veya dizüstü bilgisayarınızdaki Wi-Fi düğmesine basın.",
+        "button": "Wi-Fi Ayarları"
       },
       "wifi_not_connected": {
         "title": "Bağlı Değil",
         "message": "Bilgisayarınız bir Wi-Fi ağına bağlı değil.",
-        "action": "Ağ listesini açın, ağınızı seçin ve bağlanın."
+        "action": "Ağ listesini açın, ağınızı seçin ve bağlanın.",
+        "button": "Wi-Fi Ayarları"
       },
       "router_unreachable": {
         "title": "Yönlendirici Ulaşılamaz",
@@ -290,12 +292,14 @@
       "dns_failure": {
         "title": "DNS Sorunu",
         "message": "Web sitesi adresleri çözümlenemiyor.",
-        "action": "Netok ayarlarında DNS korumasını etkinleştirmeyi deneyin — bu sorunu çözebilir."
+        "action": "Netok ayarlarında DNS korumasını etkinleştirmeyi deneyin — bu sorunu çözebilir.",
+        "button": "DNS Ayarla"
       },
       "http_blocked": {
         "title": "Web Siteleri Kullanılamıyor",
         "message": "Bağlantı var, ancak web siteleri açılmıyor.",
-        "action": "VPN kullanıyorsanız, devre dışı bırakmayı deneyin. Ayrıca antivirüs ayarlarınızı kontrol edin."
+        "action": "VPN kullanıyorsanız, devre dışı bırakmayı deneyin. Ayrıca antivirüs ayarlarınızı kontrol edin.",
+        "button": "VPN Kontrol Et"
       },
       "weak_signal": {
         "title": "Zayıf Sinyal",

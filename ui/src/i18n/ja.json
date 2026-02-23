@@ -270,12 +270,14 @@
       "wifi_disabled": {
         "title": "Wi-Fiが無効",
         "message": "お使いのコンピュータでWi-Fiアダプターがオフになっています。",
-        "action": "Windowsの設定でWi-Fiをオンにするか、ノートパソコンのWi-Fiスイッチを押してください。"
+        "action": "Windowsの設定でWi-Fiをオンにするか、ノートパソコンのWi-Fiスイッチを押してください。",
+        "button": "Wi-Fi 設定"
       },
       "wifi_not_connected": {
         "title": "未接続",
         "message": "お使いのコンピュータはWi-Fiネットワークに接続されていません。",
-        "action": "ネットワークリストを開き、お使いのネットワークを選択して接続してください。"
+        "action": "ネットワークリストを開き、お使いのネットワークを選択して接続してください。",
+        "button": "Wi-Fi 設定"
       },
       "router_unreachable": {
         "title": "ルーターに到達不能",
@@ -290,12 +292,14 @@
       "dns_failure": {
         "title": "DNSの問題",
         "message": "ウェブサイトのアドレスを解決できません。",
-        "action": "NetokでDNS保護を有効にしてみてください — これで問題が解決する可能性があります。"
+        "action": "NetokでDNS保護を有効にしてみてください — これで問題が解決する可能性があります。",
+        "button": "DNS を設定"
       },
       "http_blocked": {
         "title": "ウェブサイトが利用不可",
         "message": "接続はありますが、ウェブサイトが開きません。",
-        "action": "VPNを使用している場合は、無効にしてみてください。また、ウイルス対策ソフトの設定も確認してください。"
+        "action": "VPNを使用している場合は、無効にしてみてください。また、ウイルス対策ソフトの設定も確認してください。",
+        "button": "VPN を確認"
       },
       "weak_signal": {
         "title": "信号が弱い",

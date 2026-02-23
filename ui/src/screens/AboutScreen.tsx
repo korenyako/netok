@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ArrowUpRight } from '../components/icons/UIIcons';
 import Spinner from '../components/Spinner';
@@ -11,9 +11,10 @@ import { useUpdateChecker } from '../hooks/useUpdateChecker';
 
 interface AboutScreenProps {
   onBack: () => void;
+  onNavigateToDebugScenarios?: () => void;
 }
 
-export function AboutScreen({ onBack }: AboutScreenProps) {
+export function AboutScreen({ onBack, onNavigateToDebugScenarios }: AboutScreenProps) {
   const { t } = useTranslation();
   const [appVersion, setAppVersion] = useState('...');
   const { status, updateVersion, updateDate, progress, checkForUpdates, downloadAndInstall } = useUpdateChecker();
@@ -21,6 +22,20 @@ export function AboutScreen({ onBack }: AboutScreenProps) {
   useEffect(() => {
     getVersion().then(setAppVersion).catch(() => setAppVersion('0.1.0'));
   }, []);
+
+  // Hidden 5-tap gesture to open debug scenarios
+  const tapCountRef = useRef(0);
+  const tapTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const handleVersionTap = useCallback(() => {
+    tapCountRef.current++;
+    clearTimeout(tapTimerRef.current);
+    if (tapCountRef.current >= 5) {
+      tapCountRef.current = 0;
+      onNavigateToDebugScenarios?.();
+    } else {
+      tapTimerRef.current = setTimeout(() => { tapCountRef.current = 0; }, 2000);
+    }
+  }, [onNavigateToDebugScenarios]);
 
   const isChecking = status === 'checking';
   const isAvailable = status === 'available';
@@ -69,7 +84,7 @@ export function AboutScreen({ onBack }: AboutScreenProps) {
         <Card className="bg-transparent">
           <CardContent className="px-4 py-3">
             <div className="space-y-4">
-              <div>
+              <div onClick={handleVersionTap} className="cursor-default select-none">
                 <p className="text-sm text-muted-foreground">{t('settings.about.version')}</p>
                 <p className="text-sm text-foreground">{appVersion}</p>
               </div>

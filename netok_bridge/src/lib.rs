@@ -387,7 +387,7 @@ pub async fn get_dns_provider() -> Result<DnsProviderType, String> {
 
 // Get raw DNS server IPs currently configured on the system
 pub async fn get_dns_servers() -> Result<Vec<String>, String> {
-    tokio::task::spawn_blocking(|| netok_core::get_current_dns())
+    tokio::task::spawn_blocking(netok_core::get_current_dns)
         .await
         .map_err(|e| format!("Failed to run DNS servers task: {}", e))?
 }

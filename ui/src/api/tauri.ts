@@ -22,7 +22,7 @@ export interface ComputerInfo {
   local_ip: string | null;
 }
 
-export type ConnectionType = 'Wifi' | 'Ethernet' | 'Usb' | 'Mobile' | 'Unknown';
+export type ConnectionType = 'Wifi' | 'Ethernet' | 'Usb' | 'Mobile' | 'Disabled' | 'Disconnected' | 'Unknown';
 
 export interface NetworkInfo {
   connection_type: ConnectionType;

@@ -1,6 +1,9 @@
 {
   "network": {
-    "unknown": "Unknown"
+    "unknown": "Unknown",
+    "unavailable": "Unavailable",
+    "scan_unavailable_no_network": "Unavailable \u2014 no network connection",
+    "scan_unavailable_no_internet": "Unavailable \u2014 no internet connection"
   },
   "dns_providers": {
     "title": "DNS",
@@ -272,12 +275,14 @@
       "wifi_disabled": {
         "title": "Wi-Fi Disabled",
         "message": "The Wi-Fi adapter is turned off on your computer.",
-        "action": "Turn on Wi-Fi in Windows settings or press the Wi-Fi toggle on your laptop."
+        "action": "Turn on Wi-Fi in Windows settings or press the Wi-Fi toggle on your laptop.",
+        "button": "Wi-Fi settings"
       },
       "wifi_not_connected": {
         "title": "Not Connected",
         "message": "Your computer is not connected to a Wi-Fi network.",
-        "action": "Open the network list, select your network, and connect."
+        "action": "Open the network list, select your network, and connect.",
+        "button": "Wi-Fi settings"
       },
       "router_unreachable": {
         "title": "Router Unreachable",
@@ -292,12 +297,14 @@
       "dns_failure": {
         "title": "DNS Problem",
         "message": "Unable to resolve website addresses.",
-        "action": "Try enabling DNS protection in Netok settings — this may fix the issue."
+        "action": "Try enabling DNS protection in Netok settings — this may fix the issue.",
+        "button": "Set up DNS"
       },
       "http_blocked": {
         "title": "Websites Unavailable",
         "message": "There is a connection, but websites won't open.",
-        "action": "If you're using a VPN, try disabling it. Also check your antivirus settings."
+        "action": "If you're using a VPN, try disabling it. Also check your antivirus settings.",
+        "button": "Check VPN"
       },
       "weak_signal": {
         "title": "Weak Signal",

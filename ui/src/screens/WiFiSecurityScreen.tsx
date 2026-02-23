@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { MenuCard } from '@/components/MenuCard';
 import { CloseButton } from '../components/WindowControls';
 import { useWifiSecurityStore } from '../stores/wifiSecurityStore';
+import { useDiagnosticsStore, getNetworkAvailability } from '../stores/diagnosticsStore';
 import type { SecurityCheck, SecurityStatus } from '../api/tauri';
 
 interface WiFiSecurityScreenProps {
@@ -71,6 +72,9 @@ export function WiFiSecurityScreen({ onBack, onNavigateToDns, onNavigateToVpn }:
     runScan,
     resetReveal,
   } = useWifiSecurityStore();
+  const nodes = useDiagnosticsStore(s => s.nodes);
+  const availability = getNetworkAvailability(nodes);
+  const networkBlocked = availability === 'no_network';
 
   const revealTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const revealStartedRef = useRef(false);
@@ -119,9 +123,9 @@ export function WiFiSecurityScreen({ onBack, onNavigateToDns, onNavigateToVpn }:
     }
   }, [report, isRunning, startReveal]);
 
-  // On mount: if no report, start scan; if report exists, show all instantly
+  // On mount: if no report, start scan (skip when no network); if report exists, show all instantly
   useEffect(() => {
-    if (!report && !isRunning) {
+    if (!networkBlocked && !report && !isRunning) {
       runScan();
     } else if (report && !isRunning) {
       resetReveal();
@@ -165,15 +169,24 @@ export function WiFiSecurityScreen({ onBack, onNavigateToDns, onNavigateToVpn }:
           <h1 className="flex-1 text-lg font-semibold text-foreground">
             {t('wifi_security.title')}
           </h1>
-          <Button variant="ghost" size="icon" onClick={doRefresh} disabled={isRunning}>
+          <Button variant="ghost" size="icon" onClick={doRefresh} disabled={isRunning || networkBlocked}>
             <RotateCw className="w-5 h-5 text-muted-foreground" />
           </Button>
           <CloseButton />
         </div>
       </div>
 
+      {/* Network unavailable state */}
+      {networkBlocked && !isRunning && visibleChecks.length === 0 && (
+        <div className="flex-1 flex items-center justify-center px-4">
+          <p className="text-sm text-muted-foreground text-center">
+            {t('network.scan_unavailable_no_network')}
+          </p>
+        </div>
+      )}
+
       {/* Error State — matches DiagnosticsScreen */}
-      {error && visibleChecks.length === 0 && (
+      {error && !networkBlocked && visibleChecks.length === 0 && (
         <div className="flex-1 flex items-center justify-center px-4">
           <div className="text-center">
             <p className="text-foreground mb-4">{t('wifi_security.scanning')}</p>

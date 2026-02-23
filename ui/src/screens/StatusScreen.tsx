@@ -1,13 +1,16 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDiagnosticsStore, shouldRefreshDiagnostics } from '../stores/diagnosticsStore';
+import { useDiagnosticsStore, shouldRefreshDiagnostics, getNetworkAvailability } from '../stores/diagnosticsStore';
 import { useDnsStore } from '../stores/useDnsStore';
 import { useVpnStore } from '../stores/vpnStore';
-import { deriveScenario } from '../utils/deriveScenario';
+import { deriveScenario, type ScenarioContext } from '../utils/deriveScenario';
 import { CloseButton } from '../components/WindowControls';
 import { Globe, Lock, LockOpen, Wifi } from '../components/icons/UIIcons';
+import { Button } from '@/components/ui/button';
 import { useWifiSecurityStore } from '../stores/wifiSecurityStore';
+import { openUrl } from '@tauri-apps/plugin-opener';
 import { cn } from '@/lib/utils';
+import type { DiagnosticScenario } from '../api/tauri';
 
 // DNS logging helper
 const logDns = (message: string, data?: unknown) => {
@@ -94,7 +97,7 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, onNa
   const mountedRef = useRef(false);
 
   // Get diagnostics data from store
-  const { nodes, isRunning, lastUpdated, networkInfo, runDiagnostics } = useDiagnosticsStore();
+  const { nodes, isRunning, lastUpdated, networkInfo, runDiagnostics, getRawResult, scenarioOverride } = useDiagnosticsStore();
 
   // Log on mount
   useEffect(() => {
@@ -119,16 +122,19 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, onNa
     });
   }, [dnsProvider, isDnsLoading]);
 
-  // Auto-refresh diagnostics on mount if stale or never run
+  // Auto-refresh diagnostics on mount if stale or never run (skip when debug override is active)
   useEffect(() => {
-    if (shouldRefreshDiagnostics(lastUpdated) && !isRunning) {
+    if (!scenarioOverride && shouldRefreshDiagnostics(lastUpdated) && !isRunning) {
       runDiagnostics(t);
     }
-  }, [lastUpdated, isRunning, runDiagnostics, t]);
+  }, [lastUpdated, isRunning, runDiagnostics, t, scenarioOverride]);
 
-  // Auto-run WiFi security check on mount if never run
+  // Derived network availability from diagnostic nodes
+  const availability = getNetworkAvailability(nodes);
+
+  // Auto-run WiFi security check on mount if never run (skip when no network)
   useEffect(() => {
-    if (!wifiReport && !wifiIsRunning) {
+    if (availability !== 'no_network' && !wifiReport && !wifiIsRunning) {
       runQuietWifiScan();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -149,7 +155,19 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, onNa
   // Derive diagnostic scenario from nodes
   // Only show loading spinner when we have NO previous data at all
   const isLoading = isRunning && nodes.length === 0;
-  const scenarioResult = nodes.length > 0 ? deriveScenario(nodes) : null;
+
+  // Build context for more precise scenario derivation
+  const scenarioContext: ScenarioContext | undefined = (() => {
+    const networkRaw = getRawResult('network');
+    const internetRaw = getRawResult('internet');
+    if (!networkRaw && !internetRaw) return undefined;
+    return {
+      connectionType: networkRaw?.network?.connection_type,
+      internetInfo: internetRaw?.internet ?? undefined,
+    };
+  })();
+
+  const scenarioResult = nodes.length > 0 ? deriveScenario(nodes, scenarioContext) : null;
   const visualState: VisualState = isLoading
     ? 'loading'
     : (scenarioResult?.severity ?? 'success') as VisualState;
@@ -162,14 +180,37 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, onNa
     ? t(`diagnostic.scenario.${scenarioResult.scenario}.title`)
     : t('status.waiting');
 
-  // Message below circle (only for non-all_good scenarios)
-  const showMessage = scenarioResult && scenarioResult.scenario !== 'all_good';
-  const messageText = showMessage
-    ? t(`diagnostic.scenario.${scenarioResult.scenario}.message`)
+  // Action hint below circle (only for non-all_good scenarios)
+  const showAction = scenarioResult && scenarioResult.scenario !== 'all_good';
+  const actionText = showAction
+    ? t(`diagnostic.scenario.${scenarioResult.scenario}.action`)
     : null;
 
   // Network info shown only for success or warning
   const showNetworkInfo = !isLoading && (visualState === 'success' || visualState === 'warning');
+
+  // Hide widgets when there are problems (error/warning) — only show on success
+  const showWidgets = visualState === 'success';
+
+  // Scenario action button — only for scenarios where the app can help
+  const SCENARIO_ACTIONS: Partial<Record<DiagnosticScenario, 'dns' | 'vpn' | 'wifi_settings'>> = {
+    dns_failure: 'dns',
+    http_blocked: 'vpn',
+    wifi_disabled: 'wifi_settings',
+    wifi_not_connected: 'wifi_settings',
+  };
+
+  const scenarioAction = scenarioResult ? SCENARIO_ACTIONS[scenarioResult.scenario] : undefined;
+  const actionButtonText = scenarioAction && scenarioResult
+    ? t(`diagnostic.scenario.${scenarioResult.scenario}.button`)
+    : null;
+
+  const handleScenarioAction = useCallback(() => {
+    if (!scenarioAction) return;
+    if (scenarioAction === 'dns') onNavigateToDnsProviders();
+    else if (scenarioAction === 'vpn') onNavigateToVpn();
+    else if (scenarioAction === 'wifi_settings') openUrl('ms-settings:network-wifi');
+  }, [scenarioAction, onNavigateToDnsProviders, onNavigateToVpn]);
 
   return (
     <div className="flex flex-col h-full bg-background">
@@ -184,11 +225,11 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, onNa
       <div
         className="flex-1 flex flex-col items-center px-4"
       >
-        <div className="flex-1" />
+        <div className="h-4 shrink-0" />
         {/* Status Circle - Clickable */}
         <button
           onClick={onOpenDiagnostics}
-          className="relative w-60 h-60 mb-4 rounded-full focus:outline-none cursor-pointer"
+          className="relative w-60 h-60 shrink-0 rounded-full focus:outline-none cursor-pointer"
         >
           <svg
             className="w-full h-full overflow-visible"
@@ -234,24 +275,28 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, onNa
           </div>
         </button>
 
-        {/* Info area below circle */}
-        <div className="flex flex-col items-center gap-1.5">
-          {/* Scenario message */}
-          {messageText && (
-            <p className={cn(
-              "text-sm text-center leading-relaxed max-w-[240px]",
-              visualState === 'error' && "text-destructive/75",
-              visualState === 'warning' && "text-warning/75",
-            )}>
-              {messageText}
+        {/* Action block — centered in remaining bottom space */}
+        <div className="flex-[3] flex flex-col items-center justify-center">
+          {actionText && (
+            <p className="text-sm text-center leading-normal max-w-[240px] text-muted-foreground">
+              {actionText}
             </p>
           )}
+          {actionButtonText && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-3"
+              onClick={handleScenarioAction}
+            >
+              {actionButtonText}
+            </Button>
+          )}
         </div>
-        <div className="flex-1" />
       </div>
 
-      {/* Status Indicators */}
-      <div className="shrink-0 flex flex-col items-center gap-0.5 pb-4">
+      {/* Status Indicators — hidden during error/warning */}
+      {showWidgets && <div className="shrink-0 flex flex-col items-center gap-0.5 pb-4">
         <button
           onClick={onNavigateToDnsProviders}
           className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
@@ -274,22 +319,24 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, onNa
           className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
         >
           <Wifi className={cn("w-4 h-4",
-            wifiReport && wifiReport.overall_status === 'safe' && "text-primary",
-            wifiReport && wifiReport.overall_status === 'warning' && "text-warning",
-            wifiReport && wifiReport.overall_status === 'danger' && "text-destructive",
+            availability !== 'no_network' && wifiReport && wifiReport.overall_status === 'safe' && "text-primary",
+            availability !== 'no_network' && wifiReport && wifiReport.overall_status === 'warning' && "text-warning",
+            availability !== 'no_network' && wifiReport && wifiReport.overall_status === 'danger' && "text-destructive",
           )} />
           <span>
-            {wifiIsRunning
-              ? t('wifi_security.checking')
-              : wifiReport
-                ? wifiReport.overall_status === 'safe'
-                  ? t('protection.no_threats')
-                  : t('protection.threats_detected')
-                : t('protection.check_security')
+            {availability === 'no_network'
+              ? t('network.unavailable')
+              : wifiIsRunning
+                ? t('wifi_security.checking')
+                : wifiReport
+                  ? wifiReport.overall_status === 'safe'
+                    ? t('protection.no_threats')
+                    : t('protection.threats_detected')
+                  : t('protection.check_security')
             }
           </span>
         </button>
-      </div>
+      </div>}
     </div>
   );
 }

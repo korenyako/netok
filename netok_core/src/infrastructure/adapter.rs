@@ -7,7 +7,7 @@ pub fn get_active_adapter_name() -> Option<String> {
     use super::wifi::get_wifi_info;
 
     // Try to map the currently connected Wi-Fi adapter description to a friendly alias.
-    if let (_, _, Some(wifi_desc)) = get_wifi_info() {
+    if let (_, _, Some(wifi_desc), _) = get_wifi_info() {
         let escaped = wifi_desc.replace('\'', "''");
         let command = format!(
             "Get-NetAdapter | Where-Object {{ $_.InterfaceDescription -eq '{}' -and $_.Status -eq 'Up' }} | Select-Object -First 1 -ExpandProperty Name",

@@ -132,6 +132,7 @@ function App() {
               subScreen={settingsSubScreen}
               onSetSubScreen={navigateToSettingsSubScreen}
               onBack={goBack}
+              onNavigateToHome={navigateToHome}
             />
           )}
         </div>

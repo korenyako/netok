@@ -270,12 +270,14 @@
       "wifi_disabled": {
         "title": "Wi-Fi wyłączone",
         "message": "Adapter Wi-Fi jest wyłączony na Twoim komputerze.",
-        "action": "Włącz Wi-Fi w ustawieniach systemu Windows lub naciśnij przełącznik Wi-Fi na laptopie."
+        "action": "Włącz Wi-Fi w ustawieniach systemu Windows lub naciśnij przełącznik Wi-Fi na laptopie.",
+        "button": "Ustawienia Wi-Fi"
       },
       "wifi_not_connected": {
         "title": "Brak połączenia",
         "message": "Twój komputer nie jest połączony z siecią Wi-Fi.",
-        "action": "Otwórz listę sieci, wybierz swoją sieć i połącz się."
+        "action": "Otwórz listę sieci, wybierz swoją sieć i połącz się.",
+        "button": "Ustawienia Wi-Fi"
       },
       "router_unreachable": {
         "title": "Router nieosiągalny",
@@ -290,12 +292,14 @@
       "dns_failure": {
         "title": "Problem z DNS",
         "message": "Nie można rozwiązać adresów stron internetowych.",
-        "action": "Spróbuj włączyć ochronę DNS w ustawieniach Netok — to może rozwiązać problem."
+        "action": "Spróbuj włączyć ochronę DNS w ustawieniach Netok — to może rozwiązać problem.",
+        "button": "Skonfiguruj DNS"
       },
       "http_blocked": {
         "title": "Strony niedostępne",
         "message": "Jest połączenie, ale strony się nie otwierają.",
-        "action": "Jeśli używasz VPN, spróbuj go wyłączyć. Sprawdź też ustawienia programu antywirusowego."
+        "action": "Jeśli używasz VPN, spróbuj go wyłączyć. Sprawdź też ustawienia programu antywirusowego.",
+        "button": "Sprawdź VPN"
       },
       "weak_signal": {
         "title": "Słaby sygnał",

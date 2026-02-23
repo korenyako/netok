@@ -270,12 +270,14 @@
       "wifi_disabled": {
         "title": "Wi-Fi 已关闭",
         "message": "您的电脑上 Wi-Fi 适配器已关闭。",
-        "action": "请在 Windows 设置中开启 Wi-Fi，或按笔记本电脑上的 Wi-Fi 开关。"
+        "action": "请在 Windows 设置中开启 Wi-Fi，或按笔记本电脑上的 Wi-Fi 开关。",
+        "button": "Wi-Fi 设置"
       },
       "wifi_not_connected": {
         "title": "未连接",
         "message": "您的电脑未连接到 Wi-Fi 网络。",
-        "action": "打开网络列表，选择您的网络并连接。"
+        "action": "打开网络列表，选择您的网络并连接。",
+        "button": "Wi-Fi 设置"
       },
       "router_unreachable": {
         "title": "路由器无响应",
@@ -290,12 +292,14 @@
       "dns_failure": {
         "title": "DNS 问题",
         "message": "无法解析网站地址。",
-        "action": "尝试在 Netok 设置中启用 DNS 防护——这可能会解决问题。"
+        "action": "尝试在 Netok 设置中启用 DNS 防护——这可能会解决问题。",
+        "button": "设置 DNS"
       },
       "http_blocked": {
         "title": "网站不可用",
         "message": "有网络连接，但网站无法打开。",
-        "action": "如果您正在使用 VPN，请尝试关闭它。同时检查您的杀毒软件设置。"
+        "action": "如果您正在使用 VPN，请尝试关闭它。同时检查您的杀毒软件设置。",
+        "button": "检查 VPN"
       },
       "weak_signal": {
         "title": "信号较弱",

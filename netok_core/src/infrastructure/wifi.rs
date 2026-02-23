@@ -1,19 +1,36 @@
 //! Wi-Fi information retrieval.
 
+/// State of the Wi-Fi adapter as reported by the WLAN API.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WifiAdapterState {
+    /// No wireless interface found on the system
+    Absent,
+    /// Adapter exists but is disabled / not ready
+    Disabled,
+    /// Adapter is enabled but not connected to any network
+    Disconnected,
+    /// Adapter is connected to a network
+    Connected,
+}
+
 /// Get Wi-Fi information on Windows using WLAN API.
 ///
-/// Returns a tuple of (SSID, RSSI in dBm, interface description) for the currently
-/// connected Wi-Fi network, or (None, None, None) if not connected or on error.
+/// Returns a tuple of (SSID, RSSI in dBm, interface description, adapter state)
+/// for the currently connected Wi-Fi network.
+///
+/// When not connected:
+/// - SSID and RSSI are None
+/// - adapter state distinguishes Absent / Disabled / Disconnected
 ///
 /// # Platform Support
 /// - **Windows**: Full support via Windows WLAN API
-/// - **macOS/Linux**: Returns (None, None, None) - TODO
+/// - **macOS/Linux**: Returns (None, None, None, Absent) - TODO
 ///
 /// # Safety
 /// This function uses the Windows WLAN API which requires careful resource management.
 /// All safety invariants are documented inline within the unsafe block.
 #[cfg(target_os = "windows")]
-pub fn get_wifi_info() -> (Option<String>, Option<i32>, Option<String>) {
+pub fn get_wifi_info() -> (Option<String>, Option<i32>, Option<String>, WifiAdapterState) {
     use std::ptr;
     use windows::Win32::Foundation::*;
     use windows::Win32::NetworkManagement::WiFi::*;
@@ -73,7 +90,7 @@ pub fn get_wifi_info() -> (Option<String>, Option<i32>, Option<String>) {
         );
 
         if result != 0 || client_handle.is_invalid() {
-            return (None, None, None);
+            return (None, None, None, WifiAdapterState::Absent);
         }
 
         // Wrap handle in RAII guard to ensure cleanup on all code paths
@@ -88,12 +105,13 @@ pub fn get_wifi_info() -> (Option<String>, Option<i32>, Option<String>) {
         let result = WlanEnumInterfaces(client_handle, None, &mut interface_list);
 
         if result != 0 || interface_list.is_null() {
-            return (None, None, None); // _handle_guard ensures WlanCloseHandle is called
+            return (None, None, None, WifiAdapterState::Absent);
         }
 
         let mut ssid = None;
         let mut rssi = None;
         let mut interface_desc = None;
+        let mut adapter_state = WifiAdapterState::Absent;
 
         // SAFETY: Dereferencing interface_list pointer.
         // - Pointer is non-null (checked above)
@@ -120,7 +138,22 @@ pub fn get_wifi_info() -> (Option<String>, Option<i32>, Option<String>) {
                 interface_desc = String::from_utf16(&desc_bytes[..desc_len]).ok();
             }
 
+            // Track the best adapter state across all interfaces
+            // (prefer Connected > Disconnected > Disabled > Absent)
+            if interface.isState == wlan_interface_state_not_ready {
+                if adapter_state == WifiAdapterState::Absent {
+                    adapter_state = WifiAdapterState::Disabled;
+                }
+            } else if interface.isState != wlan_interface_state_connected {
+                // Any state other than not_ready and connected means the adapter
+                // is enabled (disconnected, scanning, associating, etc.)
+                if adapter_state != WifiAdapterState::Connected {
+                    adapter_state = WifiAdapterState::Disconnected;
+                }
+            }
+
             if interface.isState == wlan_interface_state_connected {
+                adapter_state = WifiAdapterState::Connected;
                 // Query current connection
                 let mut data_size: u32 = 0;
                 let mut connection_attrs: *mut WLAN_CONNECTION_ATTRIBUTES = ptr::null_mut();
@@ -180,12 +213,12 @@ pub fn get_wifi_info() -> (Option<String>, Option<i32>, Option<String>) {
 
         // Note: WlanCloseHandle is called automatically by _handle_guard destructor
 
-        (ssid, rssi, interface_desc)
+        (ssid, rssi, interface_desc, adapter_state)
     }
 }
 
 #[cfg(not(target_os = "windows"))]
-pub fn get_wifi_info() -> (Option<String>, Option<i32>, Option<String>) {
+pub fn get_wifi_info() -> (Option<String>, Option<i32>, Option<String>, WifiAdapterState) {
     // TODO: Implement for Linux and macOS
-    (None, None, None)
+    (None, None, None, WifiAdapterState::Absent)
 }

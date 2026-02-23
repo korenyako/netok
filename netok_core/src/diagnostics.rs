@@ -25,7 +25,7 @@ fn test_dns() -> bool {
 
     // Configure resolver with timeout
     let mut opts = ResolverOpts::default();
-    opts.timeout = Duration::from_secs(2); // 2 second timeout
+    opts.timeout = Duration::from_secs(1); // 1 second timeout (fast check)
 
     let resolver = match Resolver::new(ResolverConfig::default(), opts) {
         Ok(r) => r,
@@ -140,7 +140,7 @@ pub fn ping_dns_server(server_ip: &str, timeout_secs: u64) -> Result<Option<u64>
 /// HTTP Test: try to fetch from known endpoints.
 fn test_http() -> bool {
     let client = match reqwest::blocking::Client::builder()
-        .timeout(Duration::from_secs(3))
+        .timeout(Duration::from_secs(2))
         .build()
     {
         Ok(c) => c,
@@ -170,13 +170,18 @@ pub struct IpInfoResponse {
 }
 
 /// Lookup geolocation info for a given IP address via ipinfo.io.
+/// Pass an empty string to look up the caller's own public IP.
 pub fn lookup_ip_location(ip: &str) -> Result<IpInfoResponse, String> {
     let client = reqwest::blocking::Client::builder()
         .timeout(Duration::from_secs(3))
         .build()
         .map_err(|e| format!("Failed to create HTTP client: {}", e))?;
 
-    let url = format!("https://ipinfo.io/{}/json", ip);
+    let url = if ip.is_empty() {
+        "https://ipinfo.io/json".to_string()
+    } else {
+        format!("https://ipinfo.io/{}/json", ip)
+    };
 
     let resp = client
         .get(&url)
@@ -254,7 +259,7 @@ pub fn get_computer_info() -> ComputerInfo {
     let hostname = hostname::get().ok().and_then(|s| s.into_string().ok());
 
     // Try to get Wi-Fi info first to determine active adapter
-    let (_ssid, _rssi, wifi_adapter_desc) = get_wifi_info();
+    let (_ssid, _rssi, wifi_adapter_desc, _wifi_state) = get_wifi_info();
 
     // Collect all non-loopback interfaces with private IPv4
     let interfaces: Vec<(String, String)> = match get_if_addrs() {
@@ -307,19 +312,34 @@ pub fn get_computer_info() -> ComputerInfo {
 
 /// Get network connection information.
 pub fn get_network_info(adapter_name: Option<&str>) -> NetworkInfo {
+    use crate::infrastructure::wifi::WifiAdapterState;
+
     let connection_type = adapter_name
         .map(detect_connection_type)
         .unwrap_or(ConnectionType::Unknown);
 
     // Try to get Wi-Fi info from system API
-    let (ssid, rssi, _wifi_adapter_desc) = get_wifi_info();
+    let (ssid, rssi, _wifi_adapter_desc, wifi_state) = get_wifi_info();
 
-    // Determine final connection type:
-    // If we got Wi-Fi info AND (adapter matches or adapter is unknown), it's Wi-Fi
-    let final_connection_type = if ssid.is_some() {
-        ConnectionType::Wifi
-    } else {
-        connection_type
+    // Determine final connection type using Wi-Fi adapter state
+    let final_connection_type = match wifi_state {
+        WifiAdapterState::Connected => ConnectionType::Wifi,
+        WifiAdapterState::Disabled | WifiAdapterState::Absent => {
+            // Wi-Fi adapter disabled/absent — check if we have Ethernet
+            if connection_type == ConnectionType::Ethernet {
+                ConnectionType::Ethernet
+            } else {
+                ConnectionType::Disabled
+            }
+        }
+        WifiAdapterState::Disconnected => {
+            // Wi-Fi adapter enabled but not connected to any network
+            if connection_type == ConnectionType::Ethernet {
+                ConnectionType::Ethernet
+            } else {
+                ConnectionType::Disconnected
+            }
+        }
     };
 
     NetworkInfo {
@@ -354,35 +374,26 @@ pub fn get_router_info() -> RouterInfo {
 }
 
 /// Get internet connectivity information.
+///
+/// DNS and HTTP checks run in parallel for speed.
+/// Geo-lookup (ipinfo.io) is NOT included here — use `lookup_ip_location()`
+/// separately so the Internet node status appears immediately.
 pub fn get_internet_info() -> InternetInfo {
-    let dns_ok = test_dns();
-    let http_ok = test_http();
-
-    // Try to fetch geo info if HTTP works (with shorter timeout)
-    let (public_ip, isp, country, city) = if http_ok {
-        match reqwest::blocking::Client::builder()
-            .timeout(Duration::from_secs(3))
-            .build()
-            .ok()
-            .and_then(|client| {
-                client
-                    .get("https://ipinfo.io/json")
-                    .send()
-                    .ok()
-                    .and_then(|resp| resp.json::<IpInfoResponse>().ok())
-            }) {
-            Some(info) => (info.ip, info.org, info.country, info.city),
-            None => (None, None, None, None),
-        }
-    } else {
-        (None, None, None, None)
-    };
+    // Run DNS and HTTP checks in parallel — they are independent
+    let (dns_ok, http_ok) = std::thread::scope(|s| {
+        let dns_handle = s.spawn(test_dns);
+        let http_handle = s.spawn(test_http);
+        (
+            dns_handle.join().unwrap_or(false),
+            http_handle.join().unwrap_or(false),
+        )
+    });
 
     InternetInfo {
-        public_ip,
-        isp,
-        country,
-        city,
+        public_ip: None,
+        isp: None,
+        country: None,
+        city: None,
         dns_ok,
         http_ok,
         latency_ms: None,
@@ -417,6 +428,8 @@ pub fn check_network(adapter_name: Option<&str>) -> (NodeInfo, NetworkInfo) {
     let network = get_network_info(adapter_name);
     let latency = start.elapsed().as_millis() as u32;
     let status = match network.connection_type {
+        ConnectionType::Disabled => Status::Fail,        // adapter off → down
+        ConnectionType::Disconnected => Status::Fail,    // not connected → down
         ConnectionType::Unknown => Status::Warn,
         _ => Status::Ok,
     };

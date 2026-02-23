@@ -270,12 +270,14 @@
       "wifi_disabled": {
         "title": "Wi-Fi désactivé",
         "message": "L'adaptateur Wi-Fi est désactivé sur votre ordinateur.",
-        "action": "Activez le Wi-Fi dans les paramètres Windows ou appuyez sur l'interrupteur Wi-Fi de votre ordinateur portable."
+        "action": "Activez le Wi-Fi dans les paramètres Windows ou appuyez sur l'interrupteur Wi-Fi de votre ordinateur portable.",
+        "button": "Paramètres Wi-Fi"
       },
       "wifi_not_connected": {
         "title": "Non connecté",
         "message": "Votre ordinateur n'est pas connecté à un réseau Wi-Fi.",
-        "action": "Ouvrez la liste des réseaux, sélectionnez le vôtre et connectez-vous."
+        "action": "Ouvrez la liste des réseaux, sélectionnez le vôtre et connectez-vous.",
+        "button": "Paramètres Wi-Fi"
       },
       "router_unreachable": {
         "title": "Routeur inaccessible",
@@ -290,12 +292,14 @@
       "dns_failure": {
         "title": "Problème DNS",
         "message": "Impossible de résoudre les adresses de sites web.",
-        "action": "Essayez d'activer la protection DNS dans les paramètres de Netok — cela pourrait résoudre le problème."
+        "action": "Essayez d'activer la protection DNS dans les paramètres de Netok — cela pourrait résoudre le problème.",
+        "button": "Configurer le DNS"
       },
       "http_blocked": {
         "title": "Sites web indisponibles",
         "message": "Il y a une connexion, mais les sites web ne s'ouvrent pas.",
-        "action": "Si vous utilisez un VPN, essayez de le désactiver. Vérifiez également les paramètres de votre antivirus."
+        "action": "Si vous utilisez un VPN, essayez de le désactiver. Vérifiez également les paramètres de votre antivirus.",
+        "button": "Vérifier le VPN"
       },
       "weak_signal": {
         "title": "Signal faible",

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { MenuCard } from '@/components/MenuCard';
 import { NodeDetailScreen } from './NodeDetailScreen';
 import { DiagnosticMessage } from '../components/DiagnosticMessage';
-import { deriveScenario } from '../utils/deriveScenario';
+import { deriveScenario, type ScenarioContext } from '../utils/deriveScenario';
 import { CloseButton } from '../components/WindowControls';
 import { useDiagnosticsStore, type NetworkNode } from '../stores/diagnosticsStore';
 import { useVpnStore } from '../stores/vpnStore';
@@ -38,16 +38,24 @@ export function DiagnosticsScreen({ onBack, onNavigateToSecurity, onNavigateToTo
     error,
     runDiagnostics,
     getRawResult,
+    scenarioOverride,
   } = useDiagnosticsStore();
 
   const { connectionState } = useVpnStore();
 
+  // Auto-run diagnostics on mount (skip when debug override is active)
   useEffect(() => {
-    runDiagnostics(t);
-  }, [runDiagnostics, t]);
+    if (!scenarioOverride) {
+      runDiagnostics(t);
+    }
+  }, [runDiagnostics, t, scenarioOverride]);
 
   const handleRefresh = () => {
-    runDiagnostics(t);
+    if (scenarioOverride) {
+      useDiagnosticsStore.getState().clearOverride(t);
+    } else {
+      runDiagnostics(t);
+    }
   };
 
   const getStatusIcon = (status: NetworkNode['status']) => {
@@ -64,7 +72,19 @@ export function DiagnosticsScreen({ onBack, onNavigateToSecurity, onNavigateToTo
   };
 
   const isActive = currentCheckIndex >= 0 && currentCheckIndex < 4;
-  const scenarioResult = !isRunning && nodes.length > 0 ? deriveScenario(nodes) : null;
+
+  // Build context for more precise scenario derivation
+  const scenarioContext: ScenarioContext | undefined = (() => {
+    const networkRaw = getRawResult('network');
+    const internetRaw = getRawResult('internet');
+    if (!networkRaw && !internetRaw) return undefined;
+    return {
+      connectionType: networkRaw?.network?.connection_type,
+      internetInfo: internetRaw?.internet ?? undefined,
+    };
+  })();
+
+  const scenarioResult = !isRunning && nodes.length > 0 ? deriveScenario(nodes, scenarioContext) : null;
   const showScenarioCard = scenarioResult !== null && scenarioResult.scenario !== 'all_good';
 
   const hasLoadingPlaceholder = isActive && currentCheckIndex >= nodes.length;
@@ -135,21 +155,24 @@ export function DiagnosticsScreen({ onBack, onNavigateToSecurity, onNavigateToTo
           <div>
             <div className="space-y-2">
               {/* Completed nodes */}
-              {nodes.map((node) => (
-                <MenuCard
-                  key={node.id}
-                  variant="ghost"
-                  icon={getStatusIcon(node.status)}
-                  title={t(node.title)}
-                  badge={node.id === 'internet' && vpnConnected ? t('diagnostics.via_vpn') : undefined}
-                  subtitle={node.details.map((detail) => (
-                    <p key={detail.text}>{detail.text}</p>
-                  ))}
-                  trailing="chevron"
-                  onClick={() => setSelectedNode(node.id)}
-                  className="animate-in fade-in slide-in-from-bottom-2 duration-300"
-                />
-              ))}
+              {nodes.map((node) => {
+                const isDown = node.status === 'down';
+                return (
+                  <MenuCard
+                    key={node.id}
+                    variant={isDown ? 'static' : 'ghost'}
+                    icon={getStatusIcon(node.status)}
+                    title={t(node.title)}
+                    badge={node.id === 'internet' && vpnConnected ? t('diagnostics.via_vpn') : undefined}
+                    subtitle={node.details.map((detail) => (
+                      <p key={detail.text}>{detail.text}</p>
+                    ))}
+                    trailing={isDown ? undefined : 'chevron'}
+                    onClick={isDown ? undefined : () => setSelectedNode(node.id)}
+                    className="animate-in fade-in slide-in-from-bottom-2 duration-300"
+                  />
+                );
+              })}
 
               {/* Loading placeholder for current check */}
               {hasLoadingPlaceholder && (

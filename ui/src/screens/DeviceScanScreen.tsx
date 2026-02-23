@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { CloseButton } from '../components/WindowControls';
 import { useDeviceScanStore, formatTimeAgo } from '../stores/deviceScanStore';
+import { useDiagnosticsStore, getNetworkAvailability } from '../stores/diagnosticsStore';
 import type { DeviceType, NetworkDevice } from '../api/tauri';
 
 interface DeviceScanScreenProps {
@@ -57,6 +58,9 @@ function getDeviceVisual(device: NetworkDevice) {
 export function DeviceScanScreen({ onBack }: DeviceScanScreenProps) {
   const { t } = useTranslation();
   const { devices, lastUpdated, isScanning, scanStage, scanProgress, error, runScan } = useDeviceScanStore();
+  const nodes = useDiagnosticsStore(s => s.nodes);
+  const availability = getNetworkAvailability(nodes);
+  const networkBlocked = availability === 'no_network';
 
   // Tick every 30s to refresh the "updated X min ago" label
   const [, setTick] = useState(0);
@@ -66,9 +70,9 @@ export function DeviceScanScreen({ onBack }: DeviceScanScreenProps) {
     return () => clearInterval(id);
   }, [lastUpdated]);
 
-  // Auto-scan on first visit (no cached data)
+  // Auto-scan on first visit (no cached data, skip when no network)
   useEffect(() => {
-    if (devices.length === 0 && !lastUpdated && !isScanning) {
+    if (!networkBlocked && devices.length === 0 && !lastUpdated && !isScanning) {
       runScan();
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -87,7 +91,7 @@ export function DeviceScanScreen({ onBack }: DeviceScanScreenProps) {
             {t('device_scan.title')}
           </h1>
           {!showLoading && (
-            <Button variant="ghost" size="icon" onClick={runScan} disabled={isScanning}>
+            <Button variant="ghost" size="icon" onClick={runScan} disabled={isScanning || networkBlocked}>
               {isScanning
                 ? <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
                 : <RotateCw className="w-5 h-5 text-muted-foreground" />
@@ -100,6 +104,12 @@ export function DeviceScanScreen({ onBack }: DeviceScanScreenProps) {
 
       {/* Content */}
       <div className="flex-1 px-4 pb-4 overflow-y-auto">
+        {networkBlocked && !isScanning && devices.length === 0 && (
+          <div className="text-sm text-muted-foreground text-center py-16">
+            {t('network.scan_unavailable_no_network')}
+          </div>
+        )}
+
         {showLoading && (
           <ScanProgressRing
             percent={scanProgress}
