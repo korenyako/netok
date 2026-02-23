@@ -10,6 +10,7 @@
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-blue?style=flat-square" alt="مجوز: GPL-3.0"></a>
+  <a href="https://github.com/korenyako/netok/releases"><img src="https://img.shields.io/github/downloads/korenyako/netok/total?style=flat-square&label=%D8%AF%D8%A7%D9%86%D9%84%D9%88%D8%AF%D9%87%D8%A7" alt="کل دانلودها"></a>
 </p>
 
 <p align="center">
