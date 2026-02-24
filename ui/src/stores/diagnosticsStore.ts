@@ -194,8 +194,6 @@ function buildSyntheticResults(
     const status = statuses[id];
     const label = t(labelKey);
 
-    const node: NetworkNode = { id, title: label, status, details: [] };
-
     // Build minimal SingleNodeResult for ScenarioContext
     const raw: SingleNodeResult = {
       node: { id, label, status, latency_ms: status === 'ok' ? 12 : null, details: null },

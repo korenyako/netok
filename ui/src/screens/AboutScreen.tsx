@@ -25,7 +25,7 @@ export function AboutScreen({ onBack, onNavigateToDebugScenarios }: AboutScreenP
 
   // Hidden 5-tap gesture to open debug scenarios
   const tapCountRef = useRef(0);
-  const tapTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const tapTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const handleVersionTap = useCallback(() => {
     tapCountRef.current++;
     clearTimeout(tapTimerRef.current);
