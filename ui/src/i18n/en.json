@@ -19,7 +19,7 @@
     "custom_ip": "Custom IP",
     "custom_ip_desc": "Enter DNS addresses manually",
     "set_custom_dns": "Edit custom DNS",
-    "custom_ip_hint": "Enter the DNS server addresses from your provider or another DNS service.",
+    "custom_ip_hint": "Enter the DNS addresses you want to use.",
     "custom_ip_invalid": "Invalid IP address",
     "custom_ipv6_invalid": "Invalid IPv6 address",
     "custom_ip_typo": "Check the address — looks like there's a typo",
@@ -73,13 +73,21 @@
     "vpn_disabled_desc": "Traffic is not encrypted"
   },
   "node_detail": {
-    "adapter": "Adapter",
+    "adapter": "Network adapter",
     "ip_address": "IP address",
     "network_name": "Network",
     "signal": "Signal",
     "manufacturer": "Manufacturer",
     "isp": "ISP",
     "location": "Location",
+    "dns_lookup": "Site lookup",
+    "web_loading": "Loading sites",
+    "status_fail": "not working",
+    "response_time": "Response time",
+    "response_time_excellent": "Excellent",
+    "response_time_good": "Good",
+    "response_time_fair": "Normal",
+    "response_time_slow": "Slow",
     "open_router": "Open settings"
   },
   "nodes": {
@@ -106,6 +114,17 @@
       "signal_label_good": "Good signal",
       "signal_label_fair": "Fair signal",
       "signal_label_weak": "Weak signal",
+      "signal_very_weak": "Very weak",
+      "signal_label_very_weak": "Very weak signal",
+      "signal_desc_excellent": "Stable connection",
+      "signal_desc_good": "Strong enough for any tasks",
+      "signal_desc_fair": "Video calls may drop",
+      "signal_desc_weak": "Move closer to your router or remove obstacles",
+      "signal_desc_very_weak": "Frequent disconnects possible, try moving closer to your router",
+      "security_protected": "Protected network",
+      "security_weak_wep": "Weak protection — WEP is outdated",
+      "security_weak_wpa": "Weak protection — WPA is outdated",
+      "security_open": "Open network — your data is not encrypted",
       "link_field": "Link",
       "link_yes": "Connected",
       "link_no": "Disconnected"
@@ -227,6 +246,7 @@
   },
   "speed_test": {
     "title": "Speed test",
+    "details": "More details",
     "start": "Start",
     "cooldown_wait": "Wait",
     "repeat": "Repeat test",
@@ -275,7 +295,7 @@
       "wifi_disabled": {
         "title": "Wi-Fi Disabled",
         "message": "The Wi-Fi adapter is turned off on your computer.",
-        "action": "Turn on Wi-Fi in Windows settings or press the Wi-Fi toggle on your laptop.",
+        "action": "Turn on Wi-Fi in your system settings.",
         "button": "Wi-Fi settings"
       },
       "wifi_not_connected": {
@@ -297,13 +317,13 @@
       "dns_failure": {
         "title": "DNS Problem",
         "message": "Unable to resolve website addresses.",
-        "action": "Try enabling DNS protection in Netok settings — this may fix the issue.",
+        "action": "Try switching your DNS — this may fix the issue.",
         "button": "Set up DNS"
       },
       "http_blocked": {
         "title": "Websites Unavailable",
-        "message": "There is a connection, but websites won't open.",
-        "action": "If you're using a VPN, try disabling it. Also check your antivirus settings.",
+        "message": "Internet is working, but websites won't open.",
+        "action": "Check your VPN, antivirus, or firewall — they may be blocking access.",
         "button": "Check VPN"
       },
       "weak_signal": {

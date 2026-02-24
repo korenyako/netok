@@ -67,6 +67,8 @@ pub struct NetworkInfo {
     pub signal_quality: Option<String>,
     pub channel: Option<u8>,
     pub frequency: Option<String>,
+    /// Wi-Fi encryption type: "WPA2", "WPA3", "WEP", "WPA", "Open", or None if unknown
+    pub encryption: Option<String>,
 }
 
 /// Information about the router/gateway.

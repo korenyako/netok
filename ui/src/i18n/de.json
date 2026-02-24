@@ -16,7 +16,7 @@
     "custom_ip": "Benutzerdefinierte IP",
     "custom_ip_desc": "DNS-Adressen manuell eingeben",
     "set_custom_dns": "Eigenen DNS einrichten",
-    "custom_ip_hint": "Geben Sie die DNS-Serveradressen Ihres Anbieters oder eines anderen DNS-Dienstes ein.",
+    "custom_ip_hint": "Geben Sie die DNS-Adressen ein, die Sie verwenden möchten.",
     "custom_ip_invalid": "Ungültige IP-Adresse",
     "custom_ipv6_invalid": "Ungültige IPv6-Adresse",
     "custom_ip_typo": "Überprüfen Sie die Adresse — es scheint ein Tippfehler vorzuliegen",
@@ -70,13 +70,21 @@
     "vpn_disabled_desc": "Datenverkehr ist nicht verschlüsselt"
   },
   "node_detail": {
-    "adapter": "Adapter",
+    "adapter": "Netzwerkadapter",
     "ip_address": "IP-Adresse",
     "network_name": "Netzwerk",
     "signal": "Signal",
     "manufacturer": "Hersteller",
     "isp": "Internetanbieter",
     "location": "Standort",
+    "dns_lookup": "Seitensuche",
+    "web_loading": "Seitenladen",
+    "status_fail": "funktioniert nicht",
+    "response_time": "Antwortzeit",
+    "response_time_excellent": "Ausgezeichnet",
+    "response_time_good": "Gut",
+    "response_time_fair": "Normal",
+    "response_time_slow": "Langsam",
     "open_router": "Einstellungen öffnen"
   },
   "nodes": {
@@ -103,6 +111,17 @@
       "signal_label_good": "Gutes Signal",
       "signal_label_fair": "Mittelmäßiges Signal",
       "signal_label_weak": "Schwaches Signal",
+      "signal_very_weak": "Sehr schwach",
+      "signal_label_very_weak": "Sehr schwaches Signal",
+      "signal_desc_excellent": "Stabile Verbindung",
+      "signal_desc_good": "Stark genug für alle Aufgaben",
+      "signal_desc_fair": "Videoanrufe können unterbrochen werden",
+      "signal_desc_weak": "Gehen Sie näher zum Router oder entfernen Sie Hindernisse",
+      "signal_desc_very_weak": "Häufige Verbindungsabbrüche möglich, versuchen Sie näher zum Router zu gehen",
+      "security_protected": "Geschütztes Netzwerk",
+      "security_weak_wep": "Schwacher Schutz — WEP ist veraltet",
+      "security_weak_wpa": "Schwacher Schutz — WPA ist veraltet",
+      "security_open": "Offenes Netzwerk — Ihre Daten werden nicht verschlüsselt",
       "link_field": "Verbindung",
       "link_yes": "Verbunden",
       "link_no": "Getrennt"
@@ -222,6 +241,7 @@
   },
   "speed_test": {
     "title": "Geschwindigkeitstest",
+    "details": "Mehr Details",
     "start": "Starten",
     "cooldown_wait": "Warten",
     "repeat": "Test wiederholen",
@@ -270,7 +290,7 @@
       "wifi_disabled": {
         "title": "Wi-Fi deaktiviert",
         "message": "Der Wi-Fi-Adapter ist auf Ihrem Computer deaktiviert.",
-        "action": "Schalten Sie Wi-Fi in den Windows-Einstellungen ein oder drücken Sie den Wi-Fi-Schalter an Ihrem Laptop.",
+        "action": "Aktivieren Sie WLAN in Ihren Systemeinstellungen.",
         "button": "WLAN-Einstellungen"
       },
       "wifi_not_connected": {
@@ -292,13 +312,13 @@
       "dns_failure": {
         "title": "DNS-Problem",
         "message": "Webseitenadressen können nicht aufgelöst werden.",
-        "action": "Versuchen Sie, den DNS-Schutz in den Netok-Einstellungen zu aktivieren — das könnte das Problem lösen.",
+        "action": "Versuchen Sie, Ihren DNS zu wechseln — das könnte das Problem lösen.",
         "button": "DNS einrichten"
       },
       "http_blocked": {
         "title": "Webseiten nicht erreichbar",
-        "message": "Es besteht eine Verbindung, aber Webseiten öffnen sich nicht.",
-        "action": "Wenn Sie ein VPN verwenden, versuchen Sie es zu deaktivieren. Überprüfen Sie auch Ihre Antivireneinstellungen.",
+        "message": "Internet funktioniert, aber Webseiten öffnen sich nicht.",
+        "action": "Prüfen Sie Ihr VPN, Antivirenprogramm oder Ihre Firewall — diese könnten den Zugang blockieren.",
         "button": "VPN prüfen"
       },
       "weak_signal": {

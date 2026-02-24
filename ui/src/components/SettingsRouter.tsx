@@ -11,9 +11,10 @@ interface SettingsRouterProps {
   onSetSubScreen: (screen: SettingsSubScreen) => void;
   onBack: () => void;
   onNavigateToHome?: () => void;
+  onNavigateToSpeedTest?: () => void;
 }
 
-export function SettingsRouter({ subScreen, onSetSubScreen, onBack, onNavigateToHome }: SettingsRouterProps) {
+export function SettingsRouter({ subScreen, onSetSubScreen, onBack, onNavigateToHome, onNavigateToSpeedTest }: SettingsRouterProps) {
   switch (subScreen) {
     case 'theme':
       return <ThemeSettingsScreen onBack={onBack} />;
@@ -37,6 +38,7 @@ export function SettingsRouter({ subScreen, onSetSubScreen, onBack, onNavigateTo
         <DebugScenariosScreen
           onBack={onBack}
           onNavigateToHome={onNavigateToHome ?? onBack}
+          onNavigateToSpeedTest={onNavigateToSpeedTest ?? onBack}
         />
       );
 

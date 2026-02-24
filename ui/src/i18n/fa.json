@@ -16,7 +16,7 @@
     "custom_ip": "IP سفارشی",
     "custom_ip_desc": "آدرس‌های DNS را به صورت دستی وارد کنید",
     "set_custom_dns": "ویرایش DNS سفارشی",
-    "custom_ip_hint": "آدرس‌های سرور DNS ارائه‌دهنده خود یا سرویس DNS دیگری را وارد کنید.",
+    "custom_ip_hint": "آدرس‌های DNS موردنظر خود را وارد کنید.",
     "custom_ip_invalid": "آدرس IP نامعتبر",
     "custom_ipv6_invalid": "آدرس IPv6 نامعتبر",
     "custom_ip_typo": "آدرس را بررسی کنید — به نظر اشتباه تایپی دارد",
@@ -70,13 +70,21 @@
     "vpn_disabled_desc": "ترافیک رمزگذاری نشده است"
   },
   "node_detail": {
-    "adapter": "آداپتور",
+    "adapter": "آداپتور شبکه",
     "ip_address": "آدرس IP",
     "network_name": "شبکه",
     "signal": "سیگنال",
     "manufacturer": "سازنده",
     "isp": "ارائه‌دهنده اینترنت",
     "location": "موقعیت",
+    "dns_lookup": "جستجوی سایت",
+    "web_loading": "بارگذاری سایت",
+    "status_fail": "کار نمی‌کند",
+    "response_time": "زمان پاسخ",
+    "response_time_excellent": "عالی",
+    "response_time_good": "خوب",
+    "response_time_fair": "معمولی",
+    "response_time_slow": "کند",
     "open_router": "باز کردن تنظیمات"
   },
   "nodes": {
@@ -103,6 +111,17 @@
       "signal_label_good": "سیگنال خوب",
       "signal_label_fair": "سیگنال متوسط",
       "signal_label_weak": "سیگنال ضعیف",
+      "signal_very_weak": "بسیار ضعیف",
+      "signal_label_very_weak": "سیگنال بسیار ضعیف",
+      "signal_desc_excellent": "اتصال پایدار",
+      "signal_desc_good": "برای هر کاری کافی است",
+      "signal_desc_fair": "تماس‌های تصویری ممکن است قطع شوند",
+      "signal_desc_weak": "به روتر نزدیک‌تر شوید یا موانع را بردارید",
+      "signal_desc_very_weak": "قطعی‌های مکرر محتمل است، سعی کنید به روتر نزدیک‌تر شوید",
+      "security_protected": "شبکه محافظت‌شده",
+      "security_weak_wep": "محافظت ضعیف — WEP منسوخ شده است",
+      "security_weak_wpa": "محافظت ضعیف — WPA منسوخ شده است",
+      "security_open": "شبکه باز — داده‌های شما رمزنگاری نمی‌شوند",
       "link_field": "اتصال",
       "link_yes": "متصل",
       "link_no": "قطع شده"
@@ -222,6 +241,7 @@
   },
   "speed_test": {
     "title": "تست سرعت",
+    "details": "جزئیات بیشتر",
     "start": "شروع",
     "cooldown_wait": "صبر کنید",
     "repeat": "تکرار تست",
@@ -257,8 +277,8 @@
     "error_test_failed": "تست سرعت ناموفق بود. لطفاً دوباره تلاش کنید.",
     "error_rate_limited": "تست‌های زیادی پشت سر هم انجام شده. لطفاً چند دقیقه صبر کنید.",
     "error_connection": "اتصال به سرور ممکن نیست. اتصال خود را بررسی کنید.",
-    "unit_mbps": "مگابیت/ثانیه",
-    "unit_ms": "میلی‌ثانیه"
+    "unit_mbps": "Mbps",
+    "unit_ms": "ms"
   },
   "diagnostic": {
     "scenario": {
@@ -270,7 +290,7 @@
       "wifi_disabled": {
         "title": "Wi-Fi غیرفعال است",
         "message": "آداپتور Wi-Fi در رایانه شما خاموش است.",
-        "action": "Wi-Fi را در تنظیمات ویندوز روشن کنید یا دکمه Wi-Fi روی لپ‌تاپ خود را فشار دهید.",
+        "action": "Wi-Fi را در تنظیمات سیستم روشن کنید.",
         "button": "تنظیمات Wi-Fi"
       },
       "wifi_not_connected": {
@@ -292,13 +312,13 @@
       "dns_failure": {
         "title": "مشکل DNS",
         "message": "آدرس وب‌سایت‌ها قابل شناسایی نیست.",
-        "action": "سعی کنید حفاظت DNS را در تنظیمات Netok فعال کنید — این ممکن است مشکل را حل کند.",
+        "action": "DNS خود را تغییر دهید — این ممکن است مشکل را حل کند.",
         "button": "تنظیم DNS"
       },
       "http_blocked": {
         "title": "وب‌سایت‌ها در دسترس نیستند",
-        "message": "اتصال وجود دارد، اما وب‌سایت‌ها باز نمی‌شوند.",
-        "action": "اگر از VPN استفاده می‌کنید، سعی کنید آن را غیرفعال کنید. همچنین تنظیمات آنتی‌ویروس خود را بررسی کنید.",
+        "message": "اینترنت کار می‌کند، اما وب‌سایت‌ها باز نمی‌شوند.",
+        "action": "VPN، آنتی‌ویروس یا فایروال خود را بررسی کنید — ممکن است دسترسی را مسدود کرده باشند.",
         "button": "بررسی VPN"
       },
       "weak_signal": {

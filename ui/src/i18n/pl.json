@@ -16,7 +16,7 @@
     "custom_ip": "Własny DNS",
     "custom_ip_desc": "Wprowadź adresy DNS ręcznie",
     "set_custom_dns": "Edytuj własny DNS",
-    "custom_ip_hint": "Wprowadź adresy serwerów DNS swojego dostawcy lub innej usługi DNS.",
+    "custom_ip_hint": "Wprowadź adresy DNS, których chcesz używać.",
     "custom_ip_invalid": "Nieprawidłowy adres IP",
     "custom_ipv6_invalid": "Nieprawidłowy adres IPv6",
     "custom_ip_typo": "Sprawdź adres — wygląda na literówkę",
@@ -70,13 +70,21 @@
     "vpn_disabled_desc": "Ruch nie jest szyfrowany"
   },
   "node_detail": {
-    "adapter": "Adapter",
+    "adapter": "Adapter sieciowy",
     "ip_address": "Adres IP",
     "network_name": "Sieć",
     "signal": "Sygnał",
     "manufacturer": "Producent",
     "isp": "Dostawca",
     "location": "Lokalizacja",
+    "dns_lookup": "Wyszukiwanie stron",
+    "web_loading": "Ładowanie stron",
+    "status_fail": "nie działa",
+    "response_time": "Czas odpowiedzi",
+    "response_time_excellent": "Doskonały",
+    "response_time_good": "Dobry",
+    "response_time_fair": "Normalny",
+    "response_time_slow": "Wolny",
     "open_router": "Otwórz ustawienia"
   },
   "nodes": {
@@ -103,6 +111,17 @@
       "signal_label_good": "Dobry sygnał",
       "signal_label_fair": "Umiarkowany sygnał",
       "signal_label_weak": "Słaby sygnał",
+      "signal_very_weak": "Bardzo słaby",
+      "signal_label_very_weak": "Bardzo słaby sygnał",
+      "signal_desc_excellent": "Stabilne połączenie",
+      "signal_desc_good": "Wystarczający do każdego zadania",
+      "signal_desc_fair": "Rozmowy wideo mogą być przerywane",
+      "signal_desc_weak": "Podejdź bliżej routera lub usuń przeszkody",
+      "signal_desc_very_weak": "Możliwe częste rozłączenia, spróbuj podejść bliżej routera",
+      "security_protected": "Chroniona sieć",
+      "security_weak_wep": "Słabe zabezpieczenie — WEP jest przestarzały",
+      "security_weak_wpa": "Słabe zabezpieczenie — WPA jest przestarzały",
+      "security_open": "Otwarta sieć — dane nie są szyfrowane",
       "link_field": "Łącze",
       "link_yes": "Połączono",
       "link_no": "Rozłączono"
@@ -222,6 +241,7 @@
   },
   "speed_test": {
     "title": "Test prędkości",
+    "details": "Więcej szczegółów",
     "start": "Start",
     "cooldown_wait": "Czekaj",
     "repeat": "Powtórz test",
@@ -270,7 +290,7 @@
       "wifi_disabled": {
         "title": "Wi-Fi wyłączone",
         "message": "Adapter Wi-Fi jest wyłączony na Twoim komputerze.",
-        "action": "Włącz Wi-Fi w ustawieniach systemu Windows lub naciśnij przełącznik Wi-Fi na laptopie.",
+        "action": "Włącz Wi-Fi w ustawieniach systemu.",
         "button": "Ustawienia Wi-Fi"
       },
       "wifi_not_connected": {
@@ -292,13 +312,13 @@
       "dns_failure": {
         "title": "Problem z DNS",
         "message": "Nie można rozwiązać adresów stron internetowych.",
-        "action": "Spróbuj włączyć ochronę DNS w ustawieniach Netok — to może rozwiązać problem.",
+        "action": "Spróbuj zmienić DNS — to może rozwiązać problem.",
         "button": "Skonfiguruj DNS"
       },
       "http_blocked": {
         "title": "Strony niedostępne",
-        "message": "Jest połączenie, ale strony się nie otwierają.",
-        "action": "Jeśli używasz VPN, spróbuj go wyłączyć. Sprawdź też ustawienia programu antywirusowego.",
+        "message": "Internet działa, ale strony się nie otwierają.",
+        "action": "Sprawdź VPN, antywirus lub zaporę sieciową — mogą blokować dostęp.",
         "button": "Sprawdź VPN"
       },
       "weak_signal": {

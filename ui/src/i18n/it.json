@@ -16,7 +16,7 @@
     "custom_ip": "IP personalizzato",
     "custom_ip_desc": "Inserisci gli indirizzi DNS manualmente",
     "set_custom_dns": "Modifica DNS personalizzato",
-    "custom_ip_hint": "Inserisci gli indirizzi del server DNS del tuo provider o di un altro servizio DNS.",
+    "custom_ip_hint": "Inserisci gli indirizzi DNS che vuoi utilizzare.",
     "custom_ip_invalid": "Indirizzo IP non valido",
     "custom_ipv6_invalid": "Indirizzo IPv6 non valido",
     "custom_ip_typo": "Controlla l'indirizzo — sembra che ci sia un errore di battitura",
@@ -70,13 +70,21 @@
     "vpn_disabled_desc": "Il traffico non è crittografato"
   },
   "node_detail": {
-    "adapter": "Adattatore",
+    "adapter": "Adattatore di rete",
     "ip_address": "Indirizzo IP",
     "network_name": "Rete",
     "signal": "Segnale",
     "manufacturer": "Produttore",
     "isp": "ISP",
     "location": "Posizione",
+    "dns_lookup": "Ricerca siti",
+    "web_loading": "Caricamento siti",
+    "status_fail": "non funziona",
+    "response_time": "Tempo di risposta",
+    "response_time_excellent": "Eccellente",
+    "response_time_good": "Buono",
+    "response_time_fair": "Normale",
+    "response_time_slow": "Lento",
     "open_router": "Apri impostazioni"
   },
   "nodes": {
@@ -103,6 +111,17 @@
       "signal_label_good": "Buon segnale",
       "signal_label_fair": "Segnale discreto",
       "signal_label_weak": "Segnale debole",
+      "signal_very_weak": "Molto debole",
+      "signal_label_very_weak": "Segnale molto debole",
+      "signal_desc_excellent": "Connessione stabile",
+      "signal_desc_good": "Sufficiente per qualsiasi attività",
+      "signal_desc_fair": "Le videochiamate potrebbero interrompersi",
+      "signal_desc_weak": "Avvicinati al router o rimuovi gli ostacoli",
+      "signal_desc_very_weak": "Possibili disconnessioni frequenti, prova ad avvicinarti al router",
+      "security_protected": "Rete protetta",
+      "security_weak_wep": "Protezione debole — il WEP è obsoleto",
+      "security_weak_wpa": "Protezione debole — il WPA è obsoleto",
+      "security_open": "Rete aperta — i tuoi dati non sono crittografati",
       "link_field": "Collegamento",
       "link_yes": "Connesso",
       "link_no": "Disconnesso"
@@ -222,6 +241,7 @@
   },
   "speed_test": {
     "title": "Test di velocità",
+    "details": "Più dettagli",
     "start": "Avvia",
     "cooldown_wait": "Attendi",
     "repeat": "Ripeti test",
@@ -270,7 +290,7 @@
       "wifi_disabled": {
         "title": "Wi-Fi disattivato",
         "message": "L'adattatore Wi-Fi è disattivato sul tuo computer.",
-        "action": "Attiva il Wi-Fi nelle impostazioni di Windows o premi l'interruttore Wi-Fi sul tuo laptop.",
+        "action": "Attiva il Wi-Fi nelle impostazioni di sistema.",
         "button": "Impostazioni Wi-Fi"
       },
       "wifi_not_connected": {
@@ -292,13 +312,13 @@
       "dns_failure": {
         "title": "Problema DNS",
         "message": "Impossibile risolvere gli indirizzi dei siti web.",
-        "action": "Prova ad attivare la protezione DNS nelle impostazioni di Netok — potrebbe risolvere il problema.",
+        "action": "Prova a cambiare il DNS — potrebbe risolvere il problema.",
         "button": "Configura DNS"
       },
       "http_blocked": {
         "title": "Siti web non disponibili",
-        "message": "C'è connessione, ma i siti web non si aprono.",
-        "action": "Se usi una VPN, prova a disattivarla. Controlla anche le impostazioni del tuo antivirus.",
+        "message": "Internet funziona, ma i siti web non si aprono.",
+        "action": "Controlla la tua VPN, antivirus o firewall — potrebbero bloccare l'accesso.",
         "button": "Controlla VPN"
       },
       "weak_signal": {

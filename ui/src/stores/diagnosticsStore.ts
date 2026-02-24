@@ -205,6 +205,7 @@ function buildSyntheticResults(
         signal_quality: null,
         channel: null,
         frequency: null,
+        encryption: connectionType === 'Wifi' ? 'WPA2' : null,
       } : null,
       router: id === 'dns' ? { gateway_ip: '192.168.1.1', gateway_mac: null, vendor: null, model: null } : null,
       internet: id === 'internet' ? {

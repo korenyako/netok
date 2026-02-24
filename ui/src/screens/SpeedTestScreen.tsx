@@ -1,8 +1,8 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, ArrowDown, ArrowUp, RotateCw, InfoCircleFilled } from '../components/icons/UIIcons';
+import { ArrowLeft, ArrowDown, ArrowUp, RotateCw, ChevronRight, Video, TvMinimalPlay, Gamepad2, HouseWifi } from '../components/icons/UIIcons';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { Card, CardContent } from '@/components/ui/card';
 import { CloseButton } from '../components/WindowControls';
 import {
   useSpeedTestStore,
@@ -24,6 +24,7 @@ export function SpeedTestScreen({ onBack }: SpeedTestScreenProps) {
   const nodes = useDiagnosticsStore(s => s.nodes);
   const availability = getNetworkAvailability(nodes);
   const internetBlocked = availability !== 'full';
+  const [showDetails, setShowDetails] = useState(false);
 
   const isRunning = phase === 'ping' || phase === 'download' || phase === 'upload';
   const isCoolingDown = cooldownSecondsLeft > 0;
@@ -33,6 +34,10 @@ export function SpeedTestScreen({ onBack }: SpeedTestScreenProps) {
     reset();
     startTest();
   }, [isRunning, cancelTest, reset, startTest]);
+
+  if (showDetails) {
+    return <LatencyDetailsView onBack={() => setShowDetails(false)} />;
+  }
 
   return (
     <div className="flex flex-col flex-1 min-h-0 bg-background">
@@ -52,62 +57,73 @@ export function SpeedTestScreen({ onBack }: SpeedTestScreenProps) {
         </div>
       </div>
 
-      <ScrollArea className="flex-1">
-        <div className="px-4 pb-6">
+      <div className="flex-1 px-4 pb-6 overflow-y-auto">
           {/* Circle progress (hidden when done) */}
           {phase !== 'done' && <CircleProgress internetBlocked={internetBlocked} availability={availability} />}
 
-          {/* Speed metrics */}
-          <SpeedMetrics />
+          {phase === 'done' ? (
+            <>
+              {/* 1 — Download / Upload */}
+              <SpeedMetrics />
 
-          {/* Graph */}
-          <SpeedGraph />
+              {/* 2 — Experience ratings */}
+              <ExperienceRatingsSection />
 
-          {/* Latency metrics */}
-          <LatencyMetrics />
+              {/* 3 — Ping / Latency / Jitter */}
+              <div className="mt-3">
+                <LatencySummary onClick={() => setShowDetails(true)} />
+              </div>
 
-          {/* Error state */}
-          {phase === 'error' && <ErrorCard />}
+              {/* 4,5,6 — Warning messages */}
+              <WarningCards />
+            </>
+          ) : (
+            <>
+              {/* Speed metrics */}
+              <SpeedMetrics />
 
-          {/* Warning cards (on result) */}
-          {phase === 'done' && <WarningCards />}
+              {/* Graph */}
+              <SpeedGraph />
 
-          {/* Experience ratings (on result) */}
-          {phase === 'done' && <ExperienceRatingsSection />}
-        </div>
-      </ScrollArea>
+              {/* Error state */}
+              {phase === 'error' && <ErrorCard />}
+            </>
+          )}
+      </div>
     </div>
   );
 }
 
 // ── Circle Progress ────────────────────────────────────────
 
-const CIRCLE_R = 90;
+const CIRCLE_SIZE = 240;
+const STROKE_WIDTH = 2;
+const CIRCLE_R = (CIRCLE_SIZE - STROKE_WIDTH * 2) / 2;
 const CIRCUMFERENCE = 2 * Math.PI * CIRCLE_R;
 
 function CircleProgress({ internetBlocked, availability }: { internetBlocked: boolean; availability: NetworkAvailability }) {
   const { t } = useTranslation();
-  const { phase, progress, currentValue, currentUnit, cooldownSecondsLeft, startTest } = useSpeedTestStore();
+  const { phase, progress, currentValue, currentUnit, cooldownSecondsLeft, startTest, metrics } = useSpeedTestStore();
 
   const offset = CIRCUMFERENCE - (progress / 100) * CIRCUMFERENCE;
 
   const strokeColor = phase === 'upload' ? '#a855f7' : 'hsl(var(--primary))';
 
-  const phaseLabel = phase === 'ping' ? t('speed_test.phase_ping') : '';
+  const showPingInCircle = metrics.ping !== null && (phase === 'download' || phase === 'upload');
 
   return (
     <div className="flex flex-col items-center mb-6">
-      <div className="relative w-[220px] h-[220px]">
-        <svg className="-rotate-90" width="220" height="220">
+      <div className="relative w-60 h-60">
+        <svg className="-rotate-90" viewBox={`0 0 ${CIRCLE_SIZE} ${CIRCLE_SIZE}`} fill="none" style={{ width: '100%', height: '100%' }}>
           <circle
             className="fill-none stroke-accent"
-            cx="110" cy="110" r={CIRCLE_R}
-            strokeWidth="2"
+            cx={CIRCLE_SIZE / 2} cy={CIRCLE_SIZE / 2} r={CIRCLE_R}
+            strokeWidth={STROKE_WIDTH}
           />
           <circle
             className="fill-none"
-            cx="110" cy="110" r={CIRCLE_R}
-            strokeWidth="2"
+            cx={CIRCLE_SIZE / 2} cy={CIRCLE_SIZE / 2} r={CIRCLE_R}
+            strokeWidth={STROKE_WIDTH}
             strokeLinecap="round"
             stroke={strokeColor}
             strokeDasharray={CIRCUMFERENCE}
@@ -116,7 +132,7 @@ function CircleProgress({ internetBlocked, availability }: { internetBlocked: bo
           />
         </svg>
 
-        <div className="absolute inset-0 flex items-center justify-center">
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
           {phase === 'idle' && cooldownSecondsLeft > 0 && (
             <div className="text-center">
               <div className="text-4xl font-semibold text-muted-foreground font-mono">
@@ -146,22 +162,25 @@ function CircleProgress({ internetBlocked, availability }: { internetBlocked: bo
             </div>
           )}
 
-          {(phase === 'ping' || phase === 'download' || phase === 'upload') && (
+          {phase === 'ping' && (
+            <div className="text-center">
+              <div className="text-4xl font-semibold text-foreground font-mono">
+                {currentValue}
+              </div>
+              <div className="text-sm text-muted-foreground font-mono">{t(currentUnit)}</div>
+              <span className="text-xs mt-1" style={{ color: strokeColor }}>{t('speed_test.phase_ping')}</span>
+            </div>
+          )}
+
+          {(phase === 'download' || phase === 'upload') && (
             <div className="text-center">
               <div className="text-4xl font-semibold text-foreground font-mono">
                 {currentValue}
               </div>
               <div className="text-sm text-muted-foreground font-mono">{t(currentUnit)}</div>
               <div className="flex justify-center mt-1">
-                {phase === 'ping' && (
-                  <span className="text-xs" style={{ color: strokeColor }}>{phaseLabel}</span>
-                )}
-                {phase === 'download' && (
-                  <ArrowDown className="w-4 h-4 text-primary" />
-                )}
-                {phase === 'upload' && (
-                  <ArrowUp className="w-4 h-4 text-purple-500" />
-                )}
+                {phase === 'download' && <ArrowDown className="w-4 h-4 text-primary" />}
+                {phase === 'upload' && <ArrowUp className="w-4 h-4 text-purple-500" />}
               </div>
             </div>
           )}
@@ -195,6 +214,16 @@ function CircleProgress({ internetBlocked, availability }: { internetBlocked: bo
             </div>
           )}
         </div>
+
+        {/* Ping result at the bottom of the circle */}
+        {showPingInCircle && (
+          <div className="absolute bottom-10 inset-x-0 flex flex-col items-center animate-in fade-in duration-300">
+            <p className="text-[10px] font-mono uppercase text-muted-foreground">{t('speed_test.ping')}</p>
+            <span className="text-xs font-mono text-muted-foreground">
+              {Math.round(metrics.ping!)} {t('speed_test.unit_ms')}
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -207,7 +236,7 @@ function SpeedMetrics() {
   const { metrics } = useSpeedTestStore();
 
   return (
-    <div className="flex justify-around mb-3">
+    <div className="flex justify-around mt-3 mb-3">
       <div className="flex items-center justify-center gap-2">
         <ArrowDown className="w-5 h-5 text-primary" />
         <div className="text-center">
@@ -373,80 +402,108 @@ function drawLine(
   ctx.stroke();
 }
 
-// ── Latency Metrics ────────────────────────────────────────
+// ── Latency Summary (clickable row) ───────────────────────
 
-function LatencyMetrics() {
+function LatencySummary({ onClick }: { onClick: () => void }) {
   const { t } = useTranslation();
   const { metrics } = useSpeedTestStore();
-  const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
+
+  const items = [
+    { label: t('speed_test.ping'), value: metrics.ping, getLevel: getPingLevel },
+    { label: t('speed_test.latency'), value: metrics.latency, getLevel: getPingLevel },
+    { label: t('speed_test.jitter'), value: metrics.jitter, getLevel: getJitterLevel },
+  ];
 
   return (
-    <div className="mb-6 relative">
-      <div className="flex justify-center gap-8 pl-4">
-        <LatencyItem
-          label={t('speed_test.ping')}
-          value={metrics.ping}
-          tooltipKey="ping"
-          onShow={setActiveTooltip}
-          onHide={() => setActiveTooltip(null)}
-        />
-        <LatencyItem
-          label={t('speed_test.latency')}
-          value={metrics.latency}
-          tooltipKey="latency"
-          onShow={setActiveTooltip}
-          onHide={() => setActiveTooltip(null)}
-        />
-        <LatencyItem
-          label={t('speed_test.jitter')}
-          value={metrics.jitter}
-          tooltipKey="jitter"
-          onShow={setActiveTooltip}
-          onHide={() => setActiveTooltip(null)}
-        />
-      </div>
+    <Card className="bg-transparent hover:bg-accent transition-colors cursor-pointer" onClick={onClick}>
+      <CardContent className="flex items-center py-3 px-4 gap-3">
+        <div className="flex-1 flex gap-6">
+          {items.map((item) => {
+            const level = item.value !== null ? item.getLevel(item.value) : null;
+            const colorClass = level ? LATENCY_COLOR[level] : '';
 
-      {/* Tooltip popover */}
-      {activeTooltip && (
-        <div className="absolute left-2 right-2 top-full mt-2 bg-tooltip text-tooltip-foreground rounded-lg p-3 text-sm leading-relaxed z-50 shadow-lg animate-tooltip-in">
-          {t(`speed_test.tooltip_${activeTooltip}`)}
+            return (
+              <div key={item.label}>
+                <p className="text-[10px] font-mono uppercase text-muted-foreground mb-0.5">{item.label}</p>
+                <span className={`text-xs font-mono ${colorClass}`}>
+                  {item.value !== null ? `${Math.round(item.value)} ${t('speed_test.unit_ms')}` : '—'}
+                </span>
+              </div>
+            );
+          })}
         </div>
-      )}
-    </div>
+        <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0 self-center rtl-flip" />
+      </CardContent>
+    </Card>
   );
 }
 
-interface LatencyItemProps {
-  label: string;
-  value: number | null;
-  tooltipKey: string;
-  onShow: (key: string) => void;
-  onHide: () => void;
+// ── Latency Details View ──────────────────────────────────
+
+type LatencyLevel = 'excellent' | 'good' | 'fair' | 'slow';
+
+function getPingLevel(ms: number): LatencyLevel {
+  if (ms < 20) return 'excellent';
+  if (ms <= 50) return 'good';
+  if (ms <= 100) return 'fair';
+  return 'slow';
 }
 
-function LatencyItem({ label, value, tooltipKey, onShow, onHide }: LatencyItemProps) {
+function getJitterLevel(ms: number): LatencyLevel {
+  if (ms < 5) return 'excellent';
+  if (ms <= 15) return 'good';
+  if (ms <= 30) return 'fair';
+  return 'slow';
+}
+
+const LATENCY_COLOR: Record<LatencyLevel, string> = {
+  excellent: 'text-success', good: 'text-success',
+  fair: 'text-warning', slow: 'text-destructive',
+};
+
+function LatencyDetailsView({ onBack }: { onBack: () => void }) {
   const { t } = useTranslation();
+  const { metrics } = useSpeedTestStore();
+
+  const items = [
+    { label: t('speed_test.ping'), value: metrics.ping, desc: t('speed_test.tooltip_ping'), getLevel: getPingLevel },
+    { label: t('speed_test.latency'), value: metrics.latency, desc: t('speed_test.tooltip_latency'), getLevel: getPingLevel },
+    { label: t('speed_test.jitter'), value: metrics.jitter, desc: t('speed_test.tooltip_jitter'), getLevel: getJitterLevel },
+  ];
+
   return (
-    <div className="flex-1">
-      <div
-        className="flex items-center gap-1 mb-1 text-muted-foreground hover:text-foreground hover:opacity-100 opacity-70 transition-all cursor-default"
-        onMouseEnter={() => onShow(tooltipKey)}
-        onMouseLeave={onHide}
-      >
-        <span className="text-sm">{label}</span>
-        <InfoCircleFilled className="w-3.5 h-3.5 opacity-50" />
+    <div className="flex flex-col flex-1 min-h-0 bg-background">
+      <div data-tauri-drag-region className="px-4 pt-4 pb-3">
+        <div className="flex items-center gap-2 pointer-events-auto">
+          <Button variant="ghost" size="icon" onClick={onBack}>
+            <ArrowLeft className="w-5 h-5 text-muted-foreground rtl-flip" />
+          </Button>
+          <h1 className="flex-1 text-lg font-semibold text-foreground">
+            {t('speed_test.title')}
+          </h1>
+          <CloseButton />
+        </div>
       </div>
-      <div className="flex items-baseline gap-0.5">
-        {value !== null ? (
-          <>
-            <span className="text-xl font-semibold text-foreground font-mono">
-              {Math.round(value)}
-            </span>
-            <span className="text-sm text-muted-foreground font-mono">{t('speed_test.unit_ms')}</span>
-          </>
-        ) : (
-          <span className="text-xl font-semibold text-foreground font-mono">—</span>
-        )}
+
+      <div className="flex-1 px-4 pb-4 overflow-y-auto space-y-3">
+          {items.map((item) => {
+            const level = item.value !== null ? item.getLevel(item.value) : null;
+            const colorClass = level ? LATENCY_COLOR[level] : '';
+
+            return (
+              <div key={item.label} className="bg-accent/50 rounded-xl p-4">
+                <div className="flex items-baseline gap-2">
+                  <span className={`text-xs font-mono uppercase tracking-wider ${colorClass || 'text-foreground'}`}>{item.label}</span>
+                  <span className={`text-xs font-mono ${colorClass}`}>
+                    {item.value !== null ? <>{Math.round(item.value)}<span className="ml-0.5 text-[10px]">{t('speed_test.unit_ms')}</span></> : '—'}
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground leading-relaxed mt-2">
+                  {item.desc}
+                </p>
+              </div>
+            );
+          })}
       </div>
     </div>
   );
@@ -474,7 +531,7 @@ function WarningCards() {
   if (warnings.length === 0) return null;
 
   return (
-    <div className="space-y-3 mb-4 px-1">
+    <div className="space-y-2 mt-3">
       {warnings.map((w) => (
         <WarningCard key={w.titleKey} warning={w} t={t} />
       ))}
@@ -484,15 +541,20 @@ function WarningCards() {
 
 function WarningCard({ warning, t }: { warning: SpeedTestWarning; t: (key: string, params?: Record<string, string>) => string }) {
   return (
-    <div className="rounded-xl p-4 bg-amber-50 dark:bg-amber-900/15">
-      <div className="flex items-center gap-2 mb-2">
-        <span className="text-amber-600 dark:text-amber-300/70 text-sm font-medium">
-          {t(warning.titleKey)}
+    <div className="rounded-lg bg-accent p-4">
+      <div className="flex items-start gap-3">
+        <span className="flex items-center justify-center w-4 h-4 shrink-0 mt-1">
+          <span className="w-2 h-2 rounded-full bg-warning" />
         </span>
+        <div className="flex-1">
+          <p className="text-base font-medium leading-normal mb-1 text-warning">
+            {t(warning.titleKey)}
+          </p>
+          <p className="text-sm text-muted-foreground leading-normal">
+            {t(warning.descKey, warning.descParams)}
+          </p>
+        </div>
       </div>
-      <p className="text-sm text-amber-600 dark:text-amber-300/70 leading-relaxed">
-        {t(warning.descKey, warning.descParams)}
-      </p>
     </div>
   );
 }
@@ -506,7 +568,7 @@ function ExperienceRatingsSection() {
   if (experienceRatings.length === 0) return null;
 
   return (
-    <div className="grid grid-cols-2 gap-3 mt-5 px-1">
+    <div className="space-y-2 mt-3">
       {experienceRatings.map((rating) => (
         <RatingBar key={rating.nameKey} rating={rating} t={t} />
       ))}
@@ -514,22 +576,24 @@ function ExperienceRatingsSection() {
   );
 }
 
+const RATING_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  'speed_test.rating_video_calls': Video,
+  'speed_test.rating_streaming': TvMinimalPlay,
+  'speed_test.rating_gaming': Gamepad2,
+  'speed_test.rating_work_from_home': HouseWifi,
+};
+
 function RatingBar({ rating, t }: { rating: ExperienceRating; t: (key: string) => string }) {
+  const Icon = RATING_ICONS[rating.nameKey];
   return (
-    <div className="bg-accent/50 rounded-xl p-3">
-      <span className="text-sm text-foreground">{t(rating.nameKey)}</span>
-      <span className="block text-xs font-medium mt-0.5 mb-2" style={{ color: rating.color }}>
+    <div className="flex items-center py-1.5">
+      <span className="flex items-center gap-2 flex-1 text-sm text-muted-foreground">
+        {Icon && <Icon className="w-4 h-4" />}
+        {t(rating.nameKey)}
+      </span>
+      <span className="text-sm font-medium" style={{ color: rating.color }}>
         {t(`speed_test.rating_${rating.level}`)}
       </span>
-      <div className="h-1 bg-black/10 dark:bg-white/15 rounded-full overflow-hidden">
-        <div
-          className="h-full rounded-full transition-all duration-500"
-          style={{
-            width: `${rating.fillPercent}%`,
-            backgroundColor: rating.color,
-          }}
-        />
-      </div>
     </div>
   );
 }

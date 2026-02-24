@@ -121,14 +121,7 @@ export function AboutScreen({ onBack, onNavigateToDebugScenarios }: AboutScreenP
           )}
         </div>
 
-        {/* Website button */}
-        <Button
-          onClick={() => openUrl('https://netok.app/')}
-          className="w-full text-sm font-medium"
-        >
-          {t('settings.about.website_button')}
-          <ArrowUpRight className="w-4 h-4 ms-2" />
-        </Button>
+        {/* Website button — temporarily hidden */}
       </div>
     </div>
   );

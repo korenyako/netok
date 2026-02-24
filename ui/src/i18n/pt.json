@@ -16,7 +16,7 @@
     "custom_ip": "IP personalizado",
     "custom_ip_desc": "Inserir endereços DNS manualmente",
     "set_custom_dns": "Editar DNS personalizado",
-    "custom_ip_hint": "Insira os endereços do servidor DNS do seu provedor ou de outro serviço DNS.",
+    "custom_ip_hint": "Insira os endereços DNS que deseja usar.",
     "custom_ip_invalid": "Endereço IP inválido",
     "custom_ipv6_invalid": "Endereço IPv6 inválido",
     "custom_ip_typo": "Verifique o endereço — parece haver um erro de digitação",
@@ -70,13 +70,21 @@
     "vpn_disabled_desc": "O tráfego não está criptografado"
   },
   "node_detail": {
-    "adapter": "Adaptador",
+    "adapter": "Adaptador de rede",
     "ip_address": "Endereço IP",
     "network_name": "Rede",
     "signal": "Sinal",
     "manufacturer": "Fabricante",
     "isp": "Provedor",
     "location": "Localização",
+    "dns_lookup": "Busca de sites",
+    "web_loading": "Carregamento de sites",
+    "status_fail": "não funciona",
+    "response_time": "Tempo de resposta",
+    "response_time_excellent": "Excelente",
+    "response_time_good": "Bom",
+    "response_time_fair": "Normal",
+    "response_time_slow": "Lento",
     "open_router": "Abrir configurações"
   },
   "nodes": {
@@ -103,6 +111,17 @@
       "signal_label_good": "Bom sinal",
       "signal_label_fair": "Sinal razoável",
       "signal_label_weak": "Sinal fraco",
+      "signal_very_weak": "Muito fraco",
+      "signal_label_very_weak": "Sinal muito fraco",
+      "signal_desc_excellent": "Conexão estável",
+      "signal_desc_good": "Suficiente para qualquer tarefa",
+      "signal_desc_fair": "Videochamadas podem ser interrompidas",
+      "signal_desc_weak": "Aproxime-se do roteador ou remova obstáculos",
+      "signal_desc_very_weak": "Possíveis desconexões frequentes, tente se aproximar do roteador",
+      "security_protected": "Rede protegida",
+      "security_weak_wep": "Proteção fraca — WEP está obsoleto",
+      "security_weak_wpa": "Proteção fraca — WPA está obsoleto",
+      "security_open": "Rede aberta — seus dados não estão criptografados",
       "link_field": "Link",
       "link_yes": "Conectado",
       "link_no": "Desconectado"
@@ -222,6 +241,7 @@
   },
   "speed_test": {
     "title": "Teste de velocidade",
+    "details": "Mais detalhes",
     "start": "Iniciar",
     "cooldown_wait": "Aguarde",
     "repeat": "Repetir teste",
@@ -270,7 +290,7 @@
       "wifi_disabled": {
         "title": "Wi-Fi Desativado",
         "message": "O adaptador Wi-Fi está desativado no seu computador.",
-        "action": "Ative o Wi-Fi nas configurações do Windows ou pressione o botão Wi-Fi no seu notebook.",
+        "action": "Ative o Wi-Fi nas configurações do sistema.",
         "button": "Configurações de Wi-Fi"
       },
       "wifi_not_connected": {
@@ -292,13 +312,13 @@
       "dns_failure": {
         "title": "Problema de DNS",
         "message": "Não é possível resolver endereços de sites.",
-        "action": "Tente ativar a proteção DNS nas configurações do Netok — isso pode resolver o problema.",
+        "action": "Tente trocar seu DNS — isso pode resolver o problema.",
         "button": "Configurar DNS"
       },
       "http_blocked": {
         "title": "Sites Indisponíveis",
-        "message": "Há conexão, mas os sites não abrem.",
-        "action": "Se você está usando VPN, tente desativá-la. Verifique também as configurações do seu antivírus.",
+        "message": "A internet funciona, mas os sites não abrem.",
+        "action": "Verifique sua VPN, antivírus ou firewall — eles podem estar bloqueando o acesso.",
         "button": "Verificar VPN"
       },
       "weak_signal": {

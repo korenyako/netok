@@ -51,7 +51,10 @@ interface SpeedTestActions {
   startTest: () => Promise<void>;
   cancelTest: () => void;
   reset: () => void;
+  overrideScenario: (scenario: SpeedTestScenario) => void;
 }
+
+export type SpeedTestScenario = 'fast' | 'slow' | 'high_latency' | 'error';
 
 export type SpeedTestStore = SpeedTestState & SpeedTestActions;
 
@@ -221,8 +224,71 @@ export const useSpeedTestStore = create<SpeedTestStore>((set) => {
     clearCooldown();
     set({ ...initialState });
   },
+
+  overrideScenario: (scenario: SpeedTestScenario) => {
+    clearCooldown();
+    runIdCounter++;
+
+    const data = SPEED_SCENARIOS[scenario];
+    if (scenario === 'error') {
+      set({
+        ...initialState,
+        phase: 'error',
+        error: data.errorKey ?? 'speed_test.error_test_failed',
+      });
+      return;
+    }
+
+    const metrics: SpeedTestMetrics = {
+      download: data.download!,
+      upload: data.upload!,
+      ping: data.ping!,
+      latency: data.latency!,
+      jitter: data.jitter!,
+    };
+
+    set({
+      ...initialState,
+      phase: 'done',
+      progress: 100,
+      metrics,
+      downloadData: generateSyntheticGraph(data.download!, 30),
+      uploadData: generateSyntheticGraph(data.upload!, 30),
+      warnings: analyzeWarnings(metrics),
+      experienceRatings: calculateRatings(metrics),
+      serverName: 'debug-server.example.com',
+    });
+  },
 };
 });
+
+// --- Speed test debug scenarios ---
+
+interface SpeedScenarioData {
+  download?: number;
+  upload?: number;
+  ping?: number;
+  latency?: number;
+  jitter?: number;
+  errorKey?: string;
+}
+
+const SPEED_SCENARIOS: Record<SpeedTestScenario, SpeedScenarioData> = {
+  fast: { download: 150, upload: 80, ping: 8, latency: 12, jitter: 2 },
+  slow: { download: 5, upload: 1.5, ping: 85, latency: 200, jitter: 25 },
+  high_latency: { download: 50, upload: 25, ping: 12, latency: 180, jitter: 35 },
+  error: { errorKey: 'speed_test.error_test_failed' },
+};
+
+function generateSyntheticGraph(target: number, count: number): GraphPoint[] {
+  const points: GraphPoint[] = [];
+  for (let i = 0; i < count; i++) {
+    const ramp = Math.min(i / 5, 1);
+    const noise = (Math.random() - 0.5) * target * 0.15;
+    points.push({ value: Math.max(0, target * ramp + noise) });
+  }
+  return points;
+}
 
 // --- Analysis helpers ---
 

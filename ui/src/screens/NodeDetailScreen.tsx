@@ -1,12 +1,14 @@
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Copy, ArrowUpRight } from '../components/icons/UIIcons';
+import { ArrowLeft, Copy, ArrowUpRight, Lock, LockOpen, Wifi } from '../components/icons/UIIcons';
 import { NetokLogoIcon, ShieldIcon, ToolsIcon, SettingsIcon } from '../components/icons/NavigationIcons';
 import { openUrl } from '@tauri-apps/plugin-opener';
 import { Button } from '@/components/ui/button';
+import { DiagnosticMessage } from '../components/DiagnosticMessage';
 
-import type { SingleNodeResult } from '../api/tauri';
+import type { SingleNodeResult, DiagnosticScenario } from '../api/tauri';
 import { notifications } from '../utils/notifications';
 import { CloseButton } from '../components/WindowControls';
+import { useVpnStore } from '../stores/vpnStore';
 
 interface NodeDetailScreenProps {
   nodeId: string;
@@ -16,6 +18,8 @@ interface NodeDetailScreenProps {
   onNavigateToSecurity?: () => void;
   onNavigateToTools?: () => void;
   onNavigateToSettings?: () => void;
+  onNavigateToDnsProviders?: () => void;
+  onNavigateToVpn?: () => void;
 }
 
 /** Remove AS number prefix from ISP string */
@@ -33,21 +37,85 @@ function getNodeTitleKey(nodeId: string): string {
   }
 }
 
-function getSignalQualityKey(rssi: number): string {
-  if (rssi >= -50) return 'nodes.network.signal_excellent';
-  if (rssi >= -60) return 'nodes.network.signal_good';
-  if (rssi >= -70) return 'nodes.network.signal_fair';
-  return 'nodes.network.signal_weak';
+type SignalLevel = 'excellent' | 'good' | 'fair' | 'weak' | 'very_weak';
+
+function getSignalLevel(rssi: number): SignalLevel {
+  if (rssi >= -50) return 'excellent';
+  if (rssi >= -60) return 'good';
+  if (rssi >= -70) return 'fair';
+  if (rssi >= -80) return 'weak';
+  return 'very_weak';
 }
+
+const SIGNAL_TEXT_COLOR: Record<SignalLevel, string> = {
+  excellent: 'text-success', good: 'text-success',
+  fair: 'text-warning',
+  weak: 'text-destructive', very_weak: 'text-destructive',
+};
+
+type EncryptionLevel = 'safe' | 'warning' | 'danger';
+
+function getEncryptionLevel(encryption: string): EncryptionLevel {
+  switch (encryption) {
+    case 'WPA2':
+    case 'WPA3':
+      return 'safe';
+    case 'WEP':
+    case 'WPA':
+      return 'warning';
+    case 'Open':
+      return 'danger';
+    default:
+      return 'safe'; // Unknown encryption types — assume safe
+  }
+}
+
+function getEncryptionI18nKey(encryption: string): string {
+  switch (encryption) {
+    case 'WPA2':
+    case 'WPA3':
+      return 'nodes.network.security_protected';
+    case 'WEP':
+      return 'nodes.network.security_weak_wep';
+    case 'WPA':
+      return 'nodes.network.security_weak_wpa';
+    case 'Open':
+      return 'nodes.network.security_open';
+    default:
+      return 'nodes.network.security_protected';
+  }
+}
+
+const ENCRYPTION_TEXT_COLOR: Record<EncryptionLevel, string> = {
+  safe: 'text-success',
+  warning: 'text-warning',
+  danger: 'text-destructive',
+};
+
+type LatencyLevel = 'excellent' | 'good' | 'fair' | 'slow';
+
+function getLatencyLevel(ms: number): LatencyLevel {
+  if (ms < 20) return 'excellent';
+  if (ms <= 50) return 'good';
+  if (ms <= 100) return 'fair';
+  return 'slow';
+}
+
+const LATENCY_TEXT_COLOR: Record<LatencyLevel, string> = {
+  excellent: 'text-success', good: 'text-success',
+  fair: 'text-warning', slow: 'text-destructive',
+};
 
 interface InfoRow {
   label: string;
   value: string;
   copyable?: boolean;
+  valueClass?: string;
 }
 
-export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToHome, onNavigateToSecurity, onNavigateToTools, onNavigateToSettings }: NodeDetailScreenProps) {
+export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToHome, onNavigateToSecurity, onNavigateToTools, onNavigateToSettings, onNavigateToDnsProviders, onNavigateToVpn }: NodeDetailScreenProps) {
   const { t } = useTranslation();
+  const vpnConfigured = useVpnStore(s => s.configs.length > 0);
 
   const handleCopyIp = (ip: string) => {
     navigator.clipboard.writeText(ip);
@@ -74,14 +142,7 @@ export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToHome, onN
   }
 
   if (nodeId === 'network' && result.network) {
-    if (result.network.ssid) {
-      rows.push({ label: t('node_detail.network_name'), value: result.network.ssid });
-    }
-    if (result.network.rssi !== null) {
-      const qualityText = t(getSignalQualityKey(result.network.rssi));
-      const signalValue = `${qualityText} (${result.network.rssi} dBm)`;
-      rows.push({ label: t('node_detail.signal'), value: signalValue });
-    }
+    // ssid shown directly without label — the network name is self-explanatory
   }
 
   if (nodeId === 'dns' && result.router) {
@@ -93,19 +154,50 @@ export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToHome, onN
     }
   }
 
-  if (nodeId === 'internet' && result.internet) {
-    if (result.internet.isp) {
-      rows.push({ label: t('node_detail.isp'), value: cleanIspName(result.internet.isp) });
+  // Internet node data
+  const inet = nodeId === 'internet' ? result.internet : null;
+  const inetBothOk = inet ? (inet.dns_ok === true && inet.http_ok === true) : true;
+
+  // Derive internet failure scenario
+  let inetScenario: DiagnosticScenario | null = null;
+  let inetSeverity: 'error' | 'warning' = 'error';
+  let inetActionHandler: (() => void) | undefined;
+  let inetActionLabel: string | undefined;
+
+  if (inet && !inetBothOk) {
+    if (inet.dns_ok && !inet.http_ok) {
+      inetScenario = 'http_blocked';
+      inetSeverity = 'warning';
+      if (vpnConfigured) {
+        inetActionHandler = () => onNavigateToVpn?.();
+        inetActionLabel = t('diagnostic.scenario.http_blocked.button');
+      }
+    } else if (!inet.dns_ok && inet.http_ok) {
+      inetScenario = 'dns_failure';
+      inetSeverity = 'warning';
+      inetActionHandler = () => onNavigateToDnsProviders?.();
+      inetActionLabel = t('diagnostic.scenario.dns_failure.button');
+    } else {
+      // Both failed
+      inetScenario = 'no_internet';
+      inetSeverity = 'error';
     }
-    if (result.internet.city && result.internet.country) {
-      rows.push({ label: t('node_detail.location'), value: `${result.internet.city}, ${result.internet.country}` });
-    } else if (result.internet.country) {
-      rows.push({ label: t('node_detail.location'), value: result.internet.country });
-    } else if (result.internet.city) {
-      rows.push({ label: t('node_detail.location'), value: result.internet.city });
-    }
-    if (result.internet.public_ip) {
-      rows.push({ label: t('node_detail.ip_address'), value: result.internet.public_ip, copyable: true });
+  }
+
+  // ISP, location, IP rows for internet node (always shown when inet exists)
+  if (inet) {
+    const dash = '—';
+    rows.push({ label: t('node_detail.isp'), value: inet.isp ? cleanIspName(inet.isp) : dash });
+
+    const location = inet.city && inet.country
+      ? `${inet.city}, ${inet.country}`
+      : inet.country ?? inet.city ?? dash;
+    rows.push({ label: t('node_detail.location'), value: location });
+
+    if (inet.public_ip) {
+      rows.push({ label: t('node_detail.ip_address'), value: inet.public_ip, copyable: true });
+    } else {
+      rows.push({ label: t('node_detail.ip_address'), value: dash });
     }
   }
 
@@ -126,13 +218,29 @@ export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToHome, onN
 
       {/* Content — ps-12 inside px-4 aligns text under the title (16+48 = 64px) */}
       <div className="flex-1 px-4 pb-4 flex flex-col min-h-0 overflow-y-auto">
+        {/* Internet failure scenario card */}
+        {inetScenario && (
+          <div className="pb-3">
+            <DiagnosticMessage
+              scenario={inetScenario}
+              severity={inetSeverity}
+              onAction={inetActionHandler}
+              actionLabel={inetActionLabel}
+            />
+          </div>
+        )}
+
         <div className="ps-12 space-y-4">
+          {/* Network SSID as prominent text (no label) */}
+          {nodeId === 'network' && result.network?.ssid && (
+            <p className="text-base font-medium text-foreground">{result.network.ssid}</p>
+          )}
           {rows.map((row) => (
             <div key={row.label}>
               <p className="text-sm text-muted-foreground">{row.label}</p>
               {row.copyable ? (
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-cyan-600 dark:text-cyan-400 font-mono">{row.value}</span>
+                  <span className="text-sm text-cyan-600 dark:text-cyan-400 font-mono" dir="ltr">{row.value}</span>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -143,10 +251,73 @@ export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToHome, onN
                   </Button>
                 </div>
               ) : (
-                <p className="text-sm text-foreground">{row.value}</p>
+                <div className="flex">
+                  <span className={`text-sm min-w-0 ${row.valueClass ?? 'text-foreground'}`} dir="ltr">{row.value}</span>
+                </div>
               )}
             </div>
           ))}
+
+          {/* Response time indicator for Internet node */}
+          {inet?.latency_ms != null && (() => {
+            const ms = inet.latency_ms!;
+            const level = getLatencyLevel(ms);
+            const textColor = LATENCY_TEXT_COLOR[level];
+
+            return (
+              <div>
+                <p className="text-sm text-muted-foreground">{t('node_detail.response_time')}</p>
+                <p className={`text-base font-medium ${textColor}`}>
+                  {t(`node_detail.response_time_${level}`)}
+                </p>
+                <p className="text-xs text-muted-foreground/50 mt-1">
+                  {ms} ms
+                </p>
+              </div>
+            );
+          })()}
+
+          {/* Network security for Wi-Fi node */}
+          {nodeId === 'network' && result.network?.encryption && (() => {
+            const encryption = result.network!.encryption!;
+            const level = getEncryptionLevel(encryption);
+            const textColor = ENCRYPTION_TEXT_COLOR[level];
+            const IconComponent = level === 'danger' ? LockOpen : Lock;
+
+            return (
+              <div>
+                <div className={`flex items-center gap-1.5 ${textColor}`}>
+                  <IconComponent className="w-3.5 h-3.5" />
+                  <span className="text-xs font-mono">{encryption}</span>
+                </div>
+                <p className="text-sm font-medium text-foreground mt-0.5">
+                  {t(getEncryptionI18nKey(encryption))}
+                </p>
+              </div>
+            );
+          })()}
+
+          {/* Signal strength for Wi-Fi node */}
+          {nodeId === 'network' && result.network?.rssi != null && (() => {
+            const rssi = result.network!.rssi!;
+            const level = getSignalLevel(rssi);
+            const textColor = SIGNAL_TEXT_COLOR[level];
+
+            return (
+              <div>
+                <div className={`flex items-center gap-1.5 ${textColor}`}>
+                  <Wifi className="w-3.5 h-3.5" />
+                  <span className="text-xs font-mono">{rssi} dBm</span>
+                </div>
+                <p className="text-sm font-medium text-foreground mt-0.5">
+                  {t(`nodes.network.signal_label_${level}`)}
+                </p>
+                <p className="text-sm text-muted-foreground mt-0.5">
+                  {t(`nodes.network.signal_desc_${level}`)}
+                </p>
+              </div>
+            );
+          })()}
         </div>
 
         <div className="flex-1" />

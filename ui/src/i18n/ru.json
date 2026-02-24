@@ -19,7 +19,7 @@
     "custom_ip": "Свой DNS",
     "custom_ip_desc": "Указать адреса DNS вручную",
     "set_custom_dns": "Настроить свой DNS",
-    "custom_ip_hint": "Введите адреса DNS-серверов вашего провайдера или другого сервиса.",
+    "custom_ip_hint": "Укажите адреса DNS, которые хотите использовать.",
     "custom_ip_invalid": "Неверный формат IP",
     "custom_ipv6_invalid": "Неверный формат IPv6",
     "custom_ip_typo": "Проверьте адрес — похоже, в нём опечатка",
@@ -73,13 +73,21 @@
     "vpn_disabled_desc": "Трафик не зашифрован"
   },
   "node_detail": {
-    "adapter": "Адаптер",
+    "adapter": "Сетевой адаптер",
     "ip_address": "IP-адрес",
     "network_name": "Сеть",
     "signal": "Сигнал",
     "manufacturer": "Производитель",
     "isp": "Провайдер",
     "location": "Расположение",
+    "dns_lookup": "Поиск сайтов",
+    "web_loading": "Загрузка сайтов",
+    "status_fail": "не работает",
+    "response_time": "Время отклика",
+    "response_time_excellent": "Отлично",
+    "response_time_good": "Хорошо",
+    "response_time_fair": "Нормально",
+    "response_time_slow": "Медленно",
     "open_router": "Открыть настройки"
   },
   "nodes": {
@@ -106,6 +114,17 @@
       "signal_label_good": "Хороший сигнал",
       "signal_label_fair": "Средний сигнал",
       "signal_label_weak": "Слабый сигнал",
+      "signal_very_weak": "очень слабый",
+      "signal_label_very_weak": "Очень слабый сигнал",
+      "signal_desc_excellent": "Стабильное соединение",
+      "signal_desc_good": "Достаточно сильный для любых задач",
+      "signal_desc_fair": "Видеозвонки могут прерываться",
+      "signal_desc_weak": "Подойдите ближе к роутеру или уберите препятствия",
+      "signal_desc_very_weak": "Возможны частые обрывы, попробуйте переместиться ближе к роутеру",
+      "security_protected": "Защищённая сеть",
+      "security_weak_wep": "Слабая защита — WEP устарел",
+      "security_weak_wpa": "Слабая защита — WPA устарел",
+      "security_open": "Открытая сеть — данные не шифруются",
       "link_field": "Линк",
       "link_yes": "Подключено",
       "link_no": "Отключено"
@@ -227,6 +246,7 @@
   },
   "speed_test": {
     "title": "Тест скорости",
+    "details": "Подробнее",
     "start": "Начать",
     "cooldown_wait": "Ждите",
     "repeat": "Повторить тест",
@@ -275,7 +295,7 @@
       "wifi_disabled": {
         "title": "Wi-Fi выключен",
         "message": "Адаптер Wi-Fi отключён на компьютере.",
-        "action": "Включите Wi-Fi в настройках Windows или нажмите переключатель на ноутбуке.",
+        "action": "Включите Wi-Fi в настройках системы.",
         "button": "Настройки Wi-Fi"
       },
       "wifi_not_connected": {
@@ -297,13 +317,13 @@
       "dns_failure": {
         "title": "Проблема с DNS",
         "message": "Не удаётся найти адреса сайтов.",
-        "action": "Попробуйте включить DNS-защиту в настройках Netok — это может решить проблему.",
+        "action": "Попробуйте сменить DNS — это может решить проблему.",
         "button": "Настроить DNS"
       },
       "http_blocked": {
         "title": "Сайты недоступны",
-        "message": "Соединение есть, но сайты не открываются.",
-        "action": "Если используете VPN — попробуйте отключить его. Также проверьте настройки антивируса.",
+        "message": "Интернет есть, но сайты не открываются.",
+        "action": "Проверьте VPN, антивирус или файрвол — они могут блокировать доступ.",
         "button": "Проверить VPN"
       },
       "weak_signal": {

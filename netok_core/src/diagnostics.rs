@@ -14,6 +14,7 @@ use crate::domain::{
 use crate::infrastructure::{
     arp::get_all_arp_entries, detect_connection_type, get_default_gateway, get_router_mac,
     get_wifi_info, mdns_discover,
+    security::check_encryption,
 };
 use crate::infrastructure::mdns::infer_device_type_from_services;
 use crate::oui_database::OUI_DATABASE;
@@ -342,6 +343,13 @@ pub fn get_network_info(adapter_name: Option<&str>) -> NetworkInfo {
         }
     };
 
+    // Get encryption type from existing security module (only for Wi-Fi)
+    let encryption = if final_connection_type == ConnectionType::Wifi {
+        check_encryption().details
+    } else {
+        None
+    };
+
     NetworkInfo {
         connection_type: final_connection_type,
         ssid,
@@ -349,6 +357,7 @@ pub fn get_network_info(adapter_name: Option<&str>) -> NetworkInfo {
         signal_quality: None,
         channel: None,
         frequency: None,
+        encryption,
     }
 }
 

@@ -16,7 +16,7 @@
     "custom_ip": "カスタムIP",
     "custom_ip_desc": "DNSアドレスを手動で入力",
     "set_custom_dns": "カスタムDNSを編集",
-    "custom_ip_hint": "プロバイダーまたは他のDNSサービスのDNSサーバーアドレスを入力してください。",
+    "custom_ip_hint": "使用したいDNSアドレスを入力してください。",
     "custom_ip_invalid": "無効なIPアドレス",
     "custom_ipv6_invalid": "無効なIPv6アドレス",
     "custom_ip_typo": "アドレスを確認してください — 入力ミスがあるようです",
@@ -70,13 +70,21 @@
     "vpn_disabled_desc": "通信は暗号化されていません"
   },
   "node_detail": {
-    "adapter": "アダプター",
+    "adapter": "ネットワークアダプター",
     "ip_address": "IPアドレス",
     "network_name": "ネットワーク",
     "signal": "信号",
     "manufacturer": "メーカー",
     "isp": "ISP",
     "location": "所在地",
+    "dns_lookup": "サイト検索",
+    "web_loading": "サイト読み込み",
+    "status_fail": "動作していません",
+    "response_time": "応答時間",
+    "response_time_excellent": "優秀",
+    "response_time_good": "良好",
+    "response_time_fair": "普通",
+    "response_time_slow": "遅い",
     "open_router": "設定を開く"
   },
   "nodes": {
@@ -103,6 +111,17 @@
       "signal_label_good": "信号: 良好",
       "signal_label_fair": "信号: 普通",
       "signal_label_weak": "信号: 弱い",
+      "signal_very_weak": "非常に弱い",
+      "signal_label_very_weak": "信号: 非常に弱い",
+      "signal_desc_excellent": "安定した接続",
+      "signal_desc_good": "あらゆる作業に十分な強度",
+      "signal_desc_fair": "ビデオ通話が途切れる可能性があります",
+      "signal_desc_weak": "ルーターに近づくか障害物を取り除いてください",
+      "signal_desc_very_weak": "頻繁に切断される可能性があります。ルーターに近づいてみてください",
+      "security_protected": "保護されたネットワーク",
+      "security_weak_wep": "保護が弱い — WEPは時代遅れです",
+      "security_weak_wpa": "保護が弱い — WPAは時代遅れです",
+      "security_open": "オープンネットワーク — データは暗号化されていません",
       "link_field": "リンク",
       "link_yes": "接続済み",
       "link_no": "切断"
@@ -222,6 +241,7 @@
   },
   "speed_test": {
     "title": "スピードテスト",
+    "details": "詳細を見る",
     "start": "開始",
     "cooldown_wait": "お待ちください",
     "repeat": "再テスト",
@@ -270,7 +290,7 @@
       "wifi_disabled": {
         "title": "Wi-Fiが無効",
         "message": "お使いのコンピュータでWi-Fiアダプターがオフになっています。",
-        "action": "Windowsの設定でWi-Fiをオンにするか、ノートパソコンのWi-Fiスイッチを押してください。",
+        "action": "システム設定で Wi-Fi をオンにしてください。",
         "button": "Wi-Fi 設定"
       },
       "wifi_not_connected": {
@@ -292,13 +312,13 @@
       "dns_failure": {
         "title": "DNSの問題",
         "message": "ウェブサイトのアドレスを解決できません。",
-        "action": "NetokでDNS保護を有効にしてみてください — これで問題が解決する可能性があります。",
+        "action": "DNS を切り替えてみてください — 問題が解決する可能性があります。",
         "button": "DNS を設定"
       },
       "http_blocked": {
         "title": "ウェブサイトが利用不可",
-        "message": "接続はありますが、ウェブサイトが開きません。",
-        "action": "VPNを使用している場合は、無効にしてみてください。また、ウイルス対策ソフトの設定も確認してください。",
+        "message": "インターネットは接続されていますが、ウェブサイトが開きません。",
+        "action": "VPN、ウイルス対策ソフト、ファイアウォールを確認してください。アクセスをブロックしている可能性があります。",
         "button": "VPN を確認"
       },
       "weak_signal": {

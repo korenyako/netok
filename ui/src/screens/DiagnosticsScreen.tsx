@@ -11,13 +11,17 @@ import { deriveScenario, type ScenarioContext } from '../utils/deriveScenario';
 import { CloseButton } from '../components/WindowControls';
 import { useDiagnosticsStore, type NetworkNode } from '../stores/diagnosticsStore';
 import { useVpnStore } from '../stores/vpnStore';
-import { useState } from 'react';
+import { openUrl } from '@tauri-apps/plugin-opener';
+import { useState, useCallback } from 'react';
+import type { DiagnosticScenario } from '../api/tauri';
 
 interface DiagnosticsScreenProps {
   onBack: () => void;
   onNavigateToSecurity?: () => void;
   onNavigateToTools?: () => void;
   onNavigateToSettings?: () => void;
+  onNavigateToDnsProviders?: () => void;
+  onNavigateToVpn?: () => void;
 }
 
 const LOADING_LABELS = [
@@ -27,7 +31,13 @@ const LOADING_LABELS = [
   'diagnostics.internet',
 ];
 
-export function DiagnosticsScreen({ onBack, onNavigateToSecurity, onNavigateToTools, onNavigateToSettings }: DiagnosticsScreenProps) {
+const BASE_SCENARIO_ACTIONS: Partial<Record<DiagnosticScenario, 'dns' | 'vpn' | 'wifi_settings'>> = {
+  dns_failure: 'dns',
+  wifi_disabled: 'wifi_settings',
+  wifi_not_connected: 'wifi_settings',
+};
+
+export function DiagnosticsScreen({ onBack, onNavigateToSecurity, onNavigateToTools, onNavigateToSettings, onNavigateToDnsProviders, onNavigateToVpn }: DiagnosticsScreenProps) {
   const { t } = useTranslation();
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
 
@@ -41,7 +51,7 @@ export function DiagnosticsScreen({ onBack, onNavigateToSecurity, onNavigateToTo
     scenarioOverride,
   } = useDiagnosticsStore();
 
-  const { connectionState } = useVpnStore();
+  const { configs: vpnConfigs, connectionState } = useVpnStore();
 
   // Auto-run diagnostics on mount (skip when debug override is active)
   useEffect(() => {
@@ -90,6 +100,22 @@ export function DiagnosticsScreen({ onBack, onNavigateToSecurity, onNavigateToTo
   const hasLoadingPlaceholder = isActive && currentCheckIndex >= nodes.length;
   const vpnConnected = connectionState.type === 'connected';
 
+  const SCENARIO_ACTIONS: Partial<Record<DiagnosticScenario, 'dns' | 'vpn' | 'wifi_settings'>> = {
+    ...BASE_SCENARIO_ACTIONS,
+    ...(vpnConfigs.length > 0 ? { http_blocked: 'vpn' as const } : {}),
+  };
+  const scenarioAction = scenarioResult ? SCENARIO_ACTIONS[scenarioResult.scenario] : undefined;
+  const actionButtonText = scenarioAction && scenarioResult
+    ? t(`diagnostic.scenario.${scenarioResult.scenario}.button`)
+    : undefined;
+
+  const handleScenarioAction = useCallback(() => {
+    if (!scenarioAction) return;
+    if (scenarioAction === 'dns') onNavigateToDnsProviders?.();
+    else if (scenarioAction === 'vpn') onNavigateToVpn?.();
+    else if (scenarioAction === 'wifi_settings') openUrl('ms-settings:network-wifi');
+  }, [scenarioAction, onNavigateToDnsProviders, onNavigateToVpn]);
+
   const selectedResult = selectedNode ? getRawResult(selectedNode) : undefined;
   if (selectedNode && selectedResult) {
     return (
@@ -101,6 +127,8 @@ export function DiagnosticsScreen({ onBack, onNavigateToSecurity, onNavigateToTo
         onNavigateToSecurity={onNavigateToSecurity}
         onNavigateToTools={onNavigateToTools}
         onNavigateToSettings={onNavigateToSettings}
+        onNavigateToDnsProviders={onNavigateToDnsProviders}
+        onNavigateToVpn={onNavigateToVpn}
       />
     );
   }
@@ -140,6 +168,8 @@ export function DiagnosticsScreen({ onBack, onNavigateToSecurity, onNavigateToTo
               <DiagnosticMessage
                 scenario={scenarioResult.scenario}
                 severity={scenarioResult.severity}
+                onAction={scenarioAction ? handleScenarioAction : undefined}
+                actionLabel={actionButtonText}
               />
             </div>
           )}
@@ -165,7 +195,7 @@ export function DiagnosticsScreen({ onBack, onNavigateToSecurity, onNavigateToTo
                     title={t(node.title)}
                     badge={node.id === 'internet' && vpnConnected ? t('diagnostics.via_vpn') : undefined}
                     subtitle={node.details.map((detail) => (
-                      <p key={detail.text}>{detail.text}</p>
+                      <div key={detail.text} className="flex"><span className="min-w-0 truncate" dir="ltr">{detail.text}</span></div>
                     ))}
                     trailing={isDown ? undefined : 'chevron'}
                     onClick={isDown ? undefined : () => setSelectedNode(node.id)}

@@ -219,10 +219,7 @@ export function CustomIpScreen({ onBack, onApplied }: CustomIpScreenProps) {
         </p>
         {/* IPv4 Section */}
         <div className="space-y-3">
-          <div className="flex justify-between items-baseline">
-            <span className="text-xs font-medium text-muted-foreground tracking-wider">IPv4</span>
-            <span className="text-xs text-muted-foreground/60">{t('dns_providers.custom_ip_ipv4_example')}</span>
-          </div>
+          <span className="text-xs font-medium text-muted-foreground tracking-wider">IPv4</span>
           <div>
             <div className="relative">
               <Input
@@ -285,10 +282,7 @@ export function CustomIpScreen({ onBack, onApplied }: CustomIpScreenProps) {
 
         {/* IPv6 Section */}
         <div className="space-y-3">
-          <div className="flex justify-between items-baseline">
-            <span className="text-xs font-medium text-muted-foreground tracking-wider">IPv6</span>
-            <span className="text-xs text-muted-foreground/60">{t('dns_providers.custom_ip_ipv6_example')}</span>
-          </div>
+          <span className="text-xs font-medium text-muted-foreground tracking-wider">IPv6</span>
           <div>
             <div className="relative">
               <Input

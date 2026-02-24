@@ -3,12 +3,14 @@ import { ArrowLeft, RotateCw } from '../components/icons/UIIcons';
 import { Button } from '@/components/ui/button';
 import { CloseButton } from '../components/WindowControls';
 import { useDiagnosticsStore } from '../stores/diagnosticsStore';
+import { useSpeedTestStore, type SpeedTestScenario } from '../stores/speedTestStore';
 import type { DiagnosticScenario, DiagnosticSeverity } from '../api/tauri';
 import { cn } from '@/lib/utils';
 
 interface DebugScenariosScreenProps {
   onBack: () => void;
   onNavigateToHome: () => void;
+  onNavigateToSpeedTest: () => void;
 }
 
 const SCENARIOS: Array<{ scenario: DiagnosticScenario; label: string; severity: DiagnosticSeverity }> = [
@@ -22,23 +24,37 @@ const SCENARIOS: Array<{ scenario: DiagnosticScenario; label: string; severity: 
   { scenario: 'http_blocked', label: 'HTTP Blocked', severity: 'warning' },
 ];
 
+const SPEED_SCENARIOS: Array<{ scenario: SpeedTestScenario; label: string; severity: DiagnosticSeverity }> = [
+  { scenario: 'fast', label: 'Fast Connection', severity: 'success' },
+  { scenario: 'slow', label: 'Slow Connection', severity: 'warning' },
+  { scenario: 'high_latency', label: 'High Latency', severity: 'warning' },
+  { scenario: 'error', label: 'Test Error', severity: 'error' },
+];
+
 const SEVERITY_DOT: Record<DiagnosticSeverity, string> = {
   success: 'bg-primary',
   warning: 'bg-warning',
   error: 'bg-destructive',
 };
 
-export function DebugScenariosScreen({ onBack, onNavigateToHome }: DebugScenariosScreenProps) {
+export function DebugScenariosScreen({ onBack, onNavigateToHome, onNavigateToSpeedTest }: DebugScenariosScreenProps) {
   const { t } = useTranslation();
   const { overrideScenario, clearOverride, scenarioOverride } = useDiagnosticsStore();
+  const speedTestStore = useSpeedTestStore();
 
   const handleSelect = (scenario: DiagnosticScenario) => {
     overrideScenario(scenario, t);
     onNavigateToHome();
   };
 
+  const handleSpeedSelect = (scenario: SpeedTestScenario) => {
+    speedTestStore.overrideScenario(scenario);
+    onNavigateToSpeedTest();
+  };
+
   const handleReset = () => {
     clearOverride(t);
+    speedTestStore.reset();
     onNavigateToHome();
   };
 
@@ -57,6 +73,8 @@ export function DebugScenariosScreen({ onBack, onNavigateToHome }: DebugScenario
 
       {/* Scenario list */}
       <div className="flex-1 px-4 pb-4 flex flex-col min-h-0 overflow-y-auto">
+        {/* Diagnostics section */}
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Diagnostics</p>
         <div className="space-y-1.5">
           {SCENARIOS.map(({ scenario, label, severity }) => (
             <button
@@ -66,6 +84,25 @@ export function DebugScenariosScreen({ onBack, onNavigateToHome }: DebugScenario
                 'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-left transition-colors',
                 'hover:bg-accent/50',
                 scenarioOverride === scenario && 'bg-accent',
+              )}
+            >
+              <span className={cn('w-2 h-2 rounded-full shrink-0', SEVERITY_DOT[severity])} />
+              <span className="flex-1 text-foreground">{label}</span>
+              <span className="text-xs text-muted-foreground font-mono">{scenario}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Speed test section */}
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mt-5 mb-2">Speed Test</p>
+        <div className="space-y-1.5">
+          {SPEED_SCENARIOS.map(({ scenario, label, severity }) => (
+            <button
+              key={scenario}
+              onClick={() => handleSpeedSelect(scenario)}
+              className={cn(
+                'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-left transition-colors',
+                'hover:bg-accent/50',
               )}
             >
               <span className={cn('w-2 h-2 rounded-full shrink-0', SEVERITY_DOT[severity])} />

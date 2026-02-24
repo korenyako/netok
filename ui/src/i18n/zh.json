@@ -16,7 +16,7 @@
     "custom_ip": "自定义 IP",
     "custom_ip_desc": "手动输入 DNS 地址",
     "set_custom_dns": "编辑自定义 DNS",
-    "custom_ip_hint": "请输入您的运营商或其他 DNS 服务的服务器地址。",
+    "custom_ip_hint": "输入您要使用的 DNS 地址。",
     "custom_ip_invalid": "IP 地址格式无效",
     "custom_ipv6_invalid": "IPv6 地址格式无效",
     "custom_ip_typo": "请检查地址 — 似乎有拼写错误",
@@ -77,6 +77,14 @@
     "manufacturer": "制造商",
     "isp": "运营商",
     "location": "位置",
+    "dns_lookup": "站点查找",
+    "web_loading": "站点加载",
+    "status_fail": "无法使用",
+    "response_time": "响应时间",
+    "response_time_excellent": "优秀",
+    "response_time_good": "良好",
+    "response_time_fair": "一般",
+    "response_time_slow": "缓慢",
     "open_router": "打开设置"
   },
   "nodes": {
@@ -103,6 +111,17 @@
       "signal_label_good": "信号良好",
       "signal_label_fair": "信号一般",
       "signal_label_weak": "信号较弱",
+      "signal_very_weak": "极弱",
+      "signal_label_very_weak": "信号极弱",
+      "signal_desc_excellent": "连接稳定",
+      "signal_desc_good": "足以应对任何任务",
+      "signal_desc_fair": "视频通话可能会中断",
+      "signal_desc_weak": "请靠近路由器或移除障碍物",
+      "signal_desc_very_weak": "可能频繁断连，请尝试靠近路由器",
+      "security_protected": "受保护的网络",
+      "security_weak_wep": "保护较弱 — WEP 已过时",
+      "security_weak_wpa": "保护较弱 — WPA 已过时",
+      "security_open": "开放网络 — 您的数据未加密",
       "link_field": "链路",
       "link_yes": "已连接",
       "link_no": "已断开"
@@ -222,6 +241,7 @@
   },
   "speed_test": {
     "title": "测速",
+    "details": "更多详情",
     "start": "开始",
     "cooldown_wait": "请稍候",
     "repeat": "重新测试",
@@ -270,7 +290,7 @@
       "wifi_disabled": {
         "title": "Wi-Fi 已关闭",
         "message": "您的电脑上 Wi-Fi 适配器已关闭。",
-        "action": "请在 Windows 设置中开启 Wi-Fi，或按笔记本电脑上的 Wi-Fi 开关。",
+        "action": "在系统设置中开启 Wi-Fi。",
         "button": "Wi-Fi 设置"
       },
       "wifi_not_connected": {
@@ -292,13 +312,13 @@
       "dns_failure": {
         "title": "DNS 问题",
         "message": "无法解析网站地址。",
-        "action": "尝试在 Netok 设置中启用 DNS 防护——这可能会解决问题。",
+        "action": "尝试更换 DNS — 这可能会解决问题。",
         "button": "设置 DNS"
       },
       "http_blocked": {
         "title": "网站不可用",
-        "message": "有网络连接，但网站无法打开。",
-        "action": "如果您正在使用 VPN，请尝试关闭它。同时检查您的杀毒软件设置。",
+        "message": "网络正常，但网站无法打开。",
+        "action": "检查您的 VPN、杀毒软件或防火墙——它们可能阻止了访问。",
         "button": "检查 VPN"
       },
       "weak_signal": {

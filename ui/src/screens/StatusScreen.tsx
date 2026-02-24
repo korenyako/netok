@@ -180,8 +180,11 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, onNa
     ? t(`diagnostic.scenario.${scenarioResult.scenario}.title`)
     : t('status.waiting');
 
-  // Action hint below circle (only for non-all_good scenarios)
+  // Message & action below circle (only for non-all_good scenarios)
   const showAction = scenarioResult && scenarioResult.scenario !== 'all_good';
+  const messageText = showAction
+    ? t(`diagnostic.scenario.${scenarioResult.scenario}.message`)
+    : null;
   const actionText = showAction
     ? t(`diagnostic.scenario.${scenarioResult.scenario}.action`)
     : null;
@@ -195,7 +198,7 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, onNa
   // Scenario action button — only for scenarios where the app can help
   const SCENARIO_ACTIONS: Partial<Record<DiagnosticScenario, 'dns' | 'vpn' | 'wifi_settings'>> = {
     dns_failure: 'dns',
-    http_blocked: 'vpn',
+    ...(configs.length > 0 ? { http_blocked: 'vpn' as const } : {}),
     wifi_disabled: 'wifi_settings',
     wifi_not_connected: 'wifi_settings',
   };
@@ -275,8 +278,13 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, onNa
           </div>
         </button>
 
-        {/* Action block — centered in remaining bottom space */}
-        <div className="flex-[3] flex flex-col items-center justify-center">
+        {/* Message + action block — centered in remaining bottom space */}
+        <div className="flex-[3] flex flex-col items-center justify-center gap-2">
+          {messageText && (
+            <p className="text-sm text-center leading-normal max-w-[240px] text-foreground font-medium">
+              {messageText}
+            </p>
+          )}
           {actionText && (
             <p className="text-sm text-center leading-normal max-w-[240px] text-muted-foreground">
               {actionText}

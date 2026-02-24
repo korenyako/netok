@@ -1,11 +1,14 @@
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 import type { DiagnosticScenario, DiagnosticSeverity } from '../api/tauri';
 
 interface DiagnosticMessageProps {
   scenario: DiagnosticScenario;
   severity: DiagnosticSeverity;
   className?: string;
+  onAction?: () => void;
+  actionLabel?: string;
 }
 
 const severityStyles: Record<DiagnosticSeverity, { bead: string; title: string }> = {
@@ -14,7 +17,7 @@ const severityStyles: Record<DiagnosticSeverity, { bead: string; title: string }
   error: { bead: 'bg-destructive', title: 'text-destructive' },
 };
 
-export function DiagnosticMessage({ scenario, severity, className }: DiagnosticMessageProps) {
+export function DiagnosticMessage({ scenario, severity, className, onAction, actionLabel }: DiagnosticMessageProps) {
   const { t } = useTranslation();
   const styles = severityStyles[severity];
   const action = t(`diagnostic.scenario.${scenario}.action`);
@@ -27,15 +30,22 @@ export function DiagnosticMessage({ scenario, severity, className }: DiagnosticM
         </span>
         <div className="flex-1">
           <p className={cn('text-base font-medium leading-normal mb-1', styles.title)}>
-            {t(`diagnostic.scenario.${scenario}.title`)}
-          </p>
-          <p className="text-sm text-muted-foreground leading-normal">
             {t(`diagnostic.scenario.${scenario}.message`)}
           </p>
           {action && (
-            <p className="text-sm text-muted-foreground/75 leading-normal mt-1.5">
+            <p className="text-sm text-muted-foreground leading-normal">
               {action}
             </p>
+          )}
+          {onAction && actionLabel && (
+            <Button
+              variant="outline-card"
+              size="sm"
+              className="mt-3"
+              onClick={onAction}
+            >
+              {actionLabel}
+            </Button>
           )}
         </div>
       </div>

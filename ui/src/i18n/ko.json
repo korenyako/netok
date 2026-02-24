@@ -16,7 +16,7 @@
     "custom_ip": "사용자 지정 IP",
     "custom_ip_desc": "DNS 주소를 직접 입력하세요",
     "set_custom_dns": "사용자 지정 DNS 편집",
-    "custom_ip_hint": "제공업체 또는 다른 DNS 서비스의 DNS 서버 주소를 입력하세요.",
+    "custom_ip_hint": "사용할 DNS 주소를 입력하세요.",
     "custom_ip_invalid": "잘못된 IP 주소",
     "custom_ipv6_invalid": "잘못된 IPv6 주소",
     "custom_ip_typo": "주소를 확인하세요 — 오타가 있는 것 같습니다",
@@ -70,13 +70,21 @@
     "vpn_disabled_desc": "트래픽이 암호화되지 않음"
   },
   "node_detail": {
-    "adapter": "어댑터",
+    "adapter": "네트워크 어댑터",
     "ip_address": "IP 주소",
     "network_name": "네트워크",
     "signal": "신호",
     "manufacturer": "제조사",
     "isp": "ISP",
     "location": "위치",
+    "dns_lookup": "사이트 검색",
+    "web_loading": "사이트 로딩",
+    "status_fail": "작동하지 않음",
+    "response_time": "응답 시간",
+    "response_time_excellent": "우수",
+    "response_time_good": "양호",
+    "response_time_fair": "보통",
+    "response_time_slow": "느림",
     "open_router": "설정 열기"
   },
   "nodes": {
@@ -103,6 +111,17 @@
       "signal_label_good": "신호 좋음",
       "signal_label_fair": "신호 보통",
       "signal_label_weak": "신호 약함",
+      "signal_very_weak": "매우 약함",
+      "signal_label_very_weak": "신호 매우 약함",
+      "signal_desc_excellent": "안정적인 연결",
+      "signal_desc_good": "모든 작업에 충분한 강도",
+      "signal_desc_fair": "영상 통화가 끊길 수 있습니다",
+      "signal_desc_weak": "라우터에 가까이 가거나 장애물을 제거하세요",
+      "signal_desc_very_weak": "자주 끊길 수 있습니다. 라우터에 가까이 이동해 보세요",
+      "security_protected": "보호된 네트워크",
+      "security_weak_wep": "약한 보호 — WEP는 더 이상 사용되지 않습니다",
+      "security_weak_wpa": "약한 보호 — WPA는 더 이상 사용되지 않습니다",
+      "security_open": "개방형 네트워크 — 데이터가 암호화되지 않습니다",
       "link_field": "링크",
       "link_yes": "연결됨",
       "link_no": "연결 끊김"
@@ -222,6 +241,7 @@
   },
   "speed_test": {
     "title": "속도 테스트",
+    "details": "자세히 보기",
     "start": "시작",
     "cooldown_wait": "대기",
     "repeat": "다시 테스트",
@@ -270,7 +290,7 @@
       "wifi_disabled": {
         "title": "Wi-Fi 비활성화됨",
         "message": "컴퓨터에서 Wi-Fi 어댑터가 꺼져 있습니다.",
-        "action": "Windows 설정에서 Wi-Fi를 켜거나 노트북의 Wi-Fi 스위치를 누르세요.",
+        "action": "시스템 설정에서 Wi-Fi를 켜세요.",
         "button": "Wi-Fi 설정"
       },
       "wifi_not_connected": {
@@ -292,13 +312,13 @@
       "dns_failure": {
         "title": "DNS 문제",
         "message": "웹사이트 주소를 확인할 수 없습니다.",
-        "action": "Netok 설정에서 DNS 보호를 활성화해 보세요 — 문제가 해결될 수 있습니다.",
+        "action": "DNS를 변경해 보세요 — 문제가 해결될 수 있습니다.",
         "button": "DNS 설정"
       },
       "http_blocked": {
         "title": "웹사이트 접속 불가",
-        "message": "연결은 있지만 웹사이트가 열리지 않습니다.",
-        "action": "VPN을 사용 중이라면 비활성화해 보세요. 백신 소프트웨어 설정도 확인하세요.",
+        "message": "인터넷은 연결되어 있지만 웹사이트가 열리지 않습니다.",
+        "action": "VPN, 백신 소프트웨어 또는 방화벽을 확인하세요 — 접속을 차단하고 있을 수 있습니다.",
         "button": "VPN 확인"
       },
       "weak_signal": {

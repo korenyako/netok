@@ -102,21 +102,27 @@ export function DeviceScanScreen({ onBack }: DeviceScanScreenProps) {
         </div>
       </div>
 
-      {/* Content */}
+      {/* Content — loading state uses StatusScreen-style centered layout */}
+      {showLoading ? (
+        <div className="flex-1 flex flex-col items-center px-4">
+          <div className="h-4 shrink-0" />
+          <ScanProgressRing
+            percent={scanProgress}
+          />
+          <div className="flex-[3] flex flex-col items-center justify-center">
+            <p className="text-sm text-muted-foreground">
+              {scanStage === 'identifying'
+                ? t('device_scan.stage_identifying')
+                : t('device_scan.stage_scanning')}
+            </p>
+          </div>
+        </div>
+      ) : (
       <div className="flex-1 px-4 pb-4 overflow-y-auto">
         {networkBlocked && !isScanning && devices.length === 0 && (
           <div className="text-sm text-muted-foreground text-center py-16">
             {t('network.scan_unavailable_no_network')}
           </div>
-        )}
-
-        {showLoading && (
-          <ScanProgressRing
-            percent={scanProgress}
-            stageLabel={scanStage === 'identifying'
-              ? t('device_scan.stage_identifying')
-              : t('device_scan.stage_scanning')}
-          />
         )}
 
         {error && (
@@ -158,7 +164,9 @@ export function DeviceScanScreen({ onBack }: DeviceScanScreenProps) {
                       {name ? (
                         <>
                           <div className="text-sm text-muted-foreground leading-normal">{typeLabel}</div>
-                          <div className="text-base font-medium leading-normal truncate">{name}</div>
+                          <div className="text-base font-medium leading-normal flex">
+                            <span className="min-w-0 truncate" dir="ltr">{name}</span>
+                          </div>
                         </>
                       ) : (
                         <div className="text-base font-medium leading-normal">{t('device_scan.unknown_device')}</div>
@@ -172,6 +180,7 @@ export function DeviceScanScreen({ onBack }: DeviceScanScreenProps) {
           </div>
         )}
       </div>
+      )}
     </div>
   );
 }

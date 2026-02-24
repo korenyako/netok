@@ -16,7 +16,7 @@
     "custom_ip": "Özel IP",
     "custom_ip_desc": "DNS adreslerini manuel olarak girin",
     "set_custom_dns": "Özel DNS'i düzenle",
-    "custom_ip_hint": "Sağlayıcınızdan veya başka bir DNS hizmetinden DNS sunucu adreslerini girin.",
+    "custom_ip_hint": "Kullanmak istediğiniz DNS adreslerini girin.",
     "custom_ip_invalid": "Geçersiz IP adresi",
     "custom_ipv6_invalid": "Geçersiz IPv6 adresi",
     "custom_ip_typo": "Adresi kontrol edin — bir yazım hatası var gibi görünüyor",
@@ -70,13 +70,21 @@
     "vpn_disabled_desc": "Trafik şifrelenmemiş"
   },
   "node_detail": {
-    "adapter": "Adaptör",
+    "adapter": "Ağ adaptörü",
     "ip_address": "IP adresi",
     "network_name": "Ağ",
     "signal": "Sinyal",
     "manufacturer": "Üretici",
     "isp": "İSS",
     "location": "Konum",
+    "dns_lookup": "Site arama",
+    "web_loading": "Site yükleme",
+    "status_fail": "çalışmıyor",
+    "response_time": "Yanıt süresi",
+    "response_time_excellent": "Mükemmel",
+    "response_time_good": "İyi",
+    "response_time_fair": "Normal",
+    "response_time_slow": "Yavaş",
     "open_router": "Ayarları aç"
   },
   "nodes": {
@@ -103,6 +111,17 @@
       "signal_label_good": "İyi sinyal",
       "signal_label_fair": "Orta sinyal",
       "signal_label_weak": "Zayıf sinyal",
+      "signal_very_weak": "Çok zayıf",
+      "signal_label_very_weak": "Çok zayıf sinyal",
+      "signal_desc_excellent": "Kararlı bağlantı",
+      "signal_desc_good": "Her türlü görev için yeterli",
+      "signal_desc_fair": "Görüntülü aramalar kesilebilir",
+      "signal_desc_weak": "Yönlendiriciye yaklaşın veya engelleri kaldırın",
+      "signal_desc_very_weak": "Sık kopma olasılığı var, yönlendiriciye yaklaşmayı deneyin",
+      "security_protected": "Korumalı ağ",
+      "security_weak_wep": "Zayıf koruma — WEP eskimiş",
+      "security_weak_wpa": "Zayıf koruma — WPA eskimiş",
+      "security_open": "Açık ağ — verileriniz şifrelenmemiş",
       "link_field": "Bağlantı",
       "link_yes": "Bağlı",
       "link_no": "Bağlantı kesildi"
@@ -222,6 +241,7 @@
   },
   "speed_test": {
     "title": "Hız testi",
+    "details": "Daha fazla bilgi",
     "start": "Başlat",
     "cooldown_wait": "Bekleyin",
     "repeat": "Testi tekrarla",
@@ -270,7 +290,7 @@
       "wifi_disabled": {
         "title": "Wi-Fi Devre Dışı",
         "message": "Bilgisayarınızda Wi-Fi adaptörü kapalı.",
-        "action": "Windows ayarlarından Wi-Fi'yi açın veya dizüstü bilgisayarınızdaki Wi-Fi düğmesine basın.",
+        "action": "Sistem ayarlarından Wi-Fi'yi açın.",
         "button": "Wi-Fi Ayarları"
       },
       "wifi_not_connected": {
@@ -292,13 +312,13 @@
       "dns_failure": {
         "title": "DNS Sorunu",
         "message": "Web sitesi adresleri çözümlenemiyor.",
-        "action": "Netok ayarlarında DNS korumasını etkinleştirmeyi deneyin — bu sorunu çözebilir.",
+        "action": "DNS'inizi değiştirmeyi deneyin — bu sorunu çözebilir.",
         "button": "DNS Ayarla"
       },
       "http_blocked": {
         "title": "Web Siteleri Kullanılamıyor",
-        "message": "Bağlantı var, ancak web siteleri açılmıyor.",
-        "action": "VPN kullanıyorsanız, devre dışı bırakmayı deneyin. Ayrıca antivirüs ayarlarınızı kontrol edin.",
+        "message": "İnternet çalışıyor, ancak web siteleri açılmıyor.",
+        "action": "VPN, antivirüs veya güvenlik duvarınızı kontrol edin — erişimi engelliyor olabilirler.",
         "button": "VPN Kontrol Et"
       },
       "weak_signal": {

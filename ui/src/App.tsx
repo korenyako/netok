@@ -97,6 +97,8 @@ function App() {
             onNavigateToSecurity={navigateToSecurity}
             onNavigateToTools={navigateToTools}
             onNavigateToSettings={navigateToSettings}
+            onNavigateToDnsProviders={() => navigateToSecuritySubScreen('dns-providers')}
+            onNavigateToVpn={() => navigateToSecuritySubScreen('vpn')}
           />
         </div>
       </ThemeProvider>
@@ -133,6 +135,7 @@ function App() {
               onSetSubScreen={navigateToSettingsSubScreen}
               onBack={goBack}
               onNavigateToHome={navigateToHome}
+              onNavigateToSpeedTest={openSpeedTest}
             />
           )}
         </div>
