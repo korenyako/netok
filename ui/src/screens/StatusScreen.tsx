@@ -307,14 +307,14 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, onNa
       {showWidgets && <div className="shrink-0 flex flex-col items-center gap-0.5 pb-4">
         <button
           onClick={onNavigateToDnsProviders}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
+          className="flex items-center gap-2 px-4 py-1.5 rounded-full text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
         >
           <Globe className={cn("w-4 h-4", isDnsProtectionEnabled && "text-primary")} />
           <span>{isDnsProtectionEnabled && dnsSubtitle ? `DNS ${dnsSubtitle}` : t('status.dns_protection_disabled')}</span>
         </button>
         <button
           onClick={onNavigateToVpn}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
+          className="flex items-center gap-2 px-4 py-1.5 rounded-full text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
         >
           {connectionState.type === 'connected'
             ? <Lock className="w-4 h-4 text-primary" />
@@ -324,7 +324,7 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, onNa
         </button>
         <button
           onClick={onNavigateToWifiSecurity}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
+          className="flex items-center gap-2 px-4 py-1.5 rounded-full text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
         >
           <Wifi className={cn("w-4 h-4",
             availability !== 'no_network' && wifiReport && wifiReport.overall_status === 'safe' && "text-primary",

@@ -58,7 +58,7 @@
 
     --success: 152 50% 47%;
     --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;
+    --warning: 28 97% 44%;
     --warning-foreground: 0 0% 100%;
     --tooltip: 270 3.6% 11%;
     --tooltip-foreground: 292.5 7.3% 78.4%;
@@ -94,7 +94,7 @@
 
     --success: 152 50% 47%;
     --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;
+    --warning: 28 97% 44%;
     --warning-foreground: 0 0% 100%;
     --tooltip: 0 0% 90.8%;
     --tooltip-foreground: 270 3.6% 11%;
@@ -296,4 +296,20 @@ html, body, #root {
 .status-glow-error {
   opacity: 0.2;
   stroke-width: 6;
+}
+
+/* Ping pulse dot (nextdns-style scaleout) */
+@keyframes ping-scaleout {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0); opacity: 0; }
+}
+
+.ping-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: currentColor;
+  animation: ping-scaleout 1s ease-in-out infinite;
 }
