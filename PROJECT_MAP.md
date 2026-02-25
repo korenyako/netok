@@ -26,7 +26,8 @@ Generated: 2026-02-25
 │   ├── README.md
 │   ├── SoT-ARCH.md
 │   ├── TESTING.md
-│   └── UI-SPEC.md
+│   ├── UI-SPEC.md
+│   └── user-stories.md
 ├── expo-app
 │   ├── .expo
 │   │   ├── devices.json
