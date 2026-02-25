@@ -17,8 +17,11 @@ describe('dnsStore', () => {
     vi.clearAllMocks();
     // Reset store state
     dnsStore['hasInitialized'] = false;
+    dnsStore['initializationStarted'] = false;
     dnsStore['currentProvider'] = null;
     dnsStore['isLoading'] = true;
+    // Mock getDnsServers to avoid unhandled rejection in Promise.all
+    vi.mocked(tauriApi.getDnsServers).mockResolvedValue([]);
   });
 
   describe('initialize', () => {

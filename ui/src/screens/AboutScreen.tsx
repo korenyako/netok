@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, ArrowUpRight } from '../components/icons/UIIcons';
+import { ArrowLeft } from '../components/icons/UIIcons';
 import Spinner from '../components/Spinner';
 import { getVersion } from '@tauri-apps/api/app';
 import { openUrl } from '@tauri-apps/plugin-opener';
