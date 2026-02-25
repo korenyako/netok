@@ -23,13 +23,11 @@ export interface SpeedTestWarning {
   descParams: Record<string, string>;
 }
 
-export type RatingLevel = 'excellent' | 'good' | 'fair' | 'poor';
-
-export interface ExperienceRating {
+export interface TaskCheckItem {
   nameKey: string;
-  fillPercent: number;
-  level: RatingLevel;
-  color: string;
+  pass: boolean;
+  descKey: string;
+  descParams: Record<string, string>;
 }
 
 interface SpeedTestState {
@@ -41,7 +39,7 @@ interface SpeedTestState {
   downloadData: GraphPoint[];
   uploadData: GraphPoint[];
   warnings: SpeedTestWarning[];
-  experienceRatings: ExperienceRating[];
+  taskChecklist: TaskCheckItem[];
   serverName: string | null;
   error: string | null;
   cooldownSecondsLeft: number;
@@ -62,13 +60,6 @@ export type SpeedTestStore = SpeedTestState & SpeedTestActions;
 
 const COOLDOWN_SECONDS = 60;
 
-const RATING_COLORS: Record<RatingLevel, string> = {
-  excellent: 'hsl(var(--primary))',
-  good: 'hsl(var(--primary))',
-  fair: '#eab308',
-  poor: '#ef4444',
-};
-
 const initialState: SpeedTestState = {
   phase: 'idle',
   progress: 0,
@@ -78,7 +69,7 @@ const initialState: SpeedTestState = {
   downloadData: [],
   uploadData: [],
   warnings: [],
-  experienceRatings: [],
+  taskChecklist: [],
   serverName: null,
   error: null,
   cooldownSecondsLeft: 0,
@@ -178,14 +169,14 @@ export const useSpeedTestStore = create<SpeedTestStore>((set) => {
       };
 
       const warnings = analyzeWarnings(metrics);
-      const experienceRatings = calculateRatings(metrics);
+      const taskChecklist = calculateTaskChecklist(metrics);
 
       set({
         phase: 'done',
         progress: 100,
         metrics,
         warnings,
-        experienceRatings,
+        taskChecklist,
         serverName: result.serverName,
         error: null,
       });
@@ -255,7 +246,7 @@ export const useSpeedTestStore = create<SpeedTestStore>((set) => {
       downloadData: generateSyntheticGraph(data.download!, 30),
       uploadData: generateSyntheticGraph(data.upload!, 30),
       warnings: analyzeWarnings(metrics),
-      experienceRatings: calculateRatings(metrics),
+      taskChecklist: calculateTaskChecklist(metrics),
       serverName: 'debug-server.example.com',
     });
   },
@@ -333,48 +324,36 @@ function analyzeWarnings(m: SpeedTestMetrics): SpeedTestWarning[] {
   return warnings;
 }
 
-function rateLevel(score: number): { level: RatingLevel; fillPercent: number } {
-  if (score >= 3) return { level: 'excellent', fillPercent: 100 };
-  if (score >= 2) return { level: 'good', fillPercent: 75 };
-  if (score >= 1) return { level: 'fair', fillPercent: 50 };
-  return { level: 'poor', fillPercent: 25 };
+function taskItem(nameKey: string, pass: boolean, params: Record<string, string>): TaskCheckItem {
+  const suffix = pass ? '_pass' : '_fail';
+  return { nameKey, pass, descKey: nameKey + suffix, descParams: params };
 }
 
-function calculateRatings(m: SpeedTestMetrics): ExperienceRating[] {
+function calculateTaskChecklist(m: SpeedTestMetrics): TaskCheckItem[] {
   const dl = m.download ?? 0;
   const ul = m.upload ?? 0;
   const ping = m.ping ?? 999;
   const jitter = m.jitter ?? 999;
 
-  // Video calls: needs dl≥5, ul≥3, ping≤50, jitter≤10 for excellent
-  const videoScore =
-    (dl >= 5 ? 1 : dl >= 3 ? 0.6 : dl >= 1.5 ? 0.3 : 0) +
-    (ul >= 3 ? 1 : ul >= 2 ? 0.6 : ul >= 1 ? 0.3 : 0) +
-    (ping <= 50 ? 1 : ping <= 100 ? 0.6 : ping <= 200 ? 0.3 : 0);
-  const video = rateLevel(videoScore);
+  const p = {
+    download: String(Math.round(dl)),
+    upload: String(Math.round(ul)),
+    ping: String(Math.round(ping)),
+    jitter: String(Math.round(jitter)),
+  };
 
-  // Streaming: mainly needs download bandwidth
-  const streamScore =
-    dl >= 25 ? 3 : dl >= 10 ? 2 : dl >= 5 ? 1 : 0;
-  const stream = rateLevel(streamScore);
-
-  // Gaming: needs low ping and low jitter
-  const gameScore =
-    (ping <= 30 ? 1.5 : ping <= 50 ? 1 : ping <= 100 ? 0.5 : 0) +
-    (jitter <= 5 ? 1.5 : jitter <= 15 ? 1 : jitter <= 30 ? 0.5 : 0);
-  const game = rateLevel(gameScore);
-
-  // Work from home: balanced needs
-  const wfhScore =
-    (dl >= 10 ? 1 : dl >= 5 ? 0.6 : dl >= 2 ? 0.3 : 0) +
-    (ul >= 5 ? 1 : ul >= 2 ? 0.6 : ul >= 1 ? 0.3 : 0) +
-    (ping <= 50 ? 1 : ping <= 100 ? 0.6 : ping <= 200 ? 0.3 : 0);
-  const wfh = rateLevel(wfhScore);
-
-  return [
-    { nameKey: 'speed_test.rating_video_calls', ...video, color: RATING_COLORS[video.level] },
-    { nameKey: 'speed_test.rating_streaming', ...stream, color: RATING_COLORS[stream.level] },
-    { nameKey: 'speed_test.rating_gaming', ...game, color: RATING_COLORS[game.level] },
-    { nameKey: 'speed_test.rating_work_from_home', ...wfh, color: RATING_COLORS[wfh.level] },
+  const tasks: TaskCheckItem[] = [
+    taskItem('speed_test.task_4k_video',        dl >= 25,                              p),
+    taskItem('speed_test.task_online_gaming',    ping <= 50 && jitter <= 30,            p),
+    taskItem('speed_test.task_video_calls',      dl >= 5 && ul >= 3 && ping <= 100,     p),
+    taskItem('speed_test.task_hd_video',         dl >= 10,                              p),
+    taskItem('speed_test.task_music_podcasts',   dl >= 1,                               p),
+    taskItem('speed_test.task_social_web',       dl >= 3,                               p),
+    taskItem('speed_test.task_email_messengers', dl >= 0.5,                             p),
   ];
+
+  // Sort: failed first, then passed
+  tasks.sort((a, b) => Number(a.pass) - Number(b.pass));
+
+  return tasks;
 }

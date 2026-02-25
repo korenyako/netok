@@ -1,13 +1,12 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, ArrowDown, ArrowUp, RotateCw, ChevronRight, Video, TvMinimalPlay, Gamepad2, HouseWifi } from '../components/icons/UIIcons';
+import { ArrowLeft, LongArrowDown, LongArrowUp, RotateCw, ChevronDown } from '../components/icons/UIIcons';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { CloseButton } from '../components/WindowControls';
 import {
   useSpeedTestStore,
-  type SpeedTestWarning,
-  type ExperienceRating,
+  type TaskCheckItem,
   type GraphPoint,
 } from '../stores/speedTestStore';
 import { useDiagnosticsStore, getNetworkAvailability, type NetworkAvailability } from '../stores/diagnosticsStore';
@@ -24,7 +23,6 @@ export function SpeedTestScreen({ onBack }: SpeedTestScreenProps) {
   const nodes = useDiagnosticsStore(s => s.nodes);
   const availability = getNetworkAvailability(nodes);
   const internetBlocked = availability !== 'full';
-  const [showDetails, setShowDetails] = useState(false);
 
   const isRunning = phase === 'ping' || phase === 'download' || phase === 'upload';
   const isCoolingDown = cooldownSecondsLeft > 0;
@@ -34,10 +32,6 @@ export function SpeedTestScreen({ onBack }: SpeedTestScreenProps) {
     reset();
     startTest();
   }, [isRunning, cancelTest, reset, startTest]);
-
-  if (showDetails) {
-    return <LatencyDetailsView onBack={() => setShowDetails(false)} />;
-  }
 
   return (
     <div className="flex flex-col flex-1 min-h-0 bg-background">
@@ -63,19 +57,11 @@ export function SpeedTestScreen({ onBack }: SpeedTestScreenProps) {
 
           {phase === 'done' ? (
             <>
-              {/* 1 — Download / Upload */}
+              {/* Results card: Download/Upload + Ping/Latency/Jitter */}
               <SpeedMetrics />
 
-              {/* 2 — Experience ratings */}
-              <ExperienceRatingsSection />
-
-              {/* 3 — Ping / Latency / Jitter */}
-              <div className="mt-3">
-                <LatencySummary onClick={() => setShowDetails(true)} />
-              </div>
-
-              {/* 4,5,6 — Warning messages */}
-              <WarningCards />
+              {/* Task checklist */}
+              <TaskChecklistSection />
             </>
           ) : (
             <>
@@ -174,14 +160,14 @@ function CircleProgress({ internetBlocked, availability }: { internetBlocked: bo
 
           {(phase === 'download' || phase === 'upload') && (
             <div className="text-center">
+              <div className="flex justify-center mb-2">
+                {phase === 'download' && <LongArrowDown className="w-8 h-8 text-primary" />}
+                {phase === 'upload' && <LongArrowUp className="w-8 h-8 text-purple-500" />}
+              </div>
               <div className="text-4xl font-semibold text-foreground font-mono">
                 {currentValue}
               </div>
-              <div className="text-sm text-muted-foreground font-mono">{t(currentUnit)}</div>
-              <div className="flex justify-center mt-1">
-                {phase === 'download' && <ArrowDown className="w-4 h-4 text-primary" />}
-                {phase === 'upload' && <ArrowUp className="w-4 h-4 text-purple-500" />}
-              </div>
+              <div className="text-xs text-muted-foreground font-mono">{t(currentUnit)}</div>
             </div>
           )}
 
@@ -218,9 +204,8 @@ function CircleProgress({ internetBlocked, availability }: { internetBlocked: bo
         {/* Ping result at the bottom of the circle */}
         {showPingInCircle && (
           <div className="absolute bottom-10 inset-x-0 flex flex-col items-center animate-in fade-in duration-300">
-            <p className="text-[10px] font-mono uppercase text-muted-foreground">{t('speed_test.ping')}</p>
             <span className="text-xs font-mono text-muted-foreground">
-              {Math.round(metrics.ping!)} {t('speed_test.unit_ms')}
+              {t('speed_test.ping')} {Math.round(metrics.ping!)}<span className="ml-0.5">{t('speed_test.unit_ms')}</span>
             </span>
           </div>
         )}
@@ -233,33 +218,67 @@ function CircleProgress({ internetBlocked, availability }: { internetBlocked: bo
 
 function SpeedMetrics() {
   const { t } = useTranslation();
-  const { metrics } = useSpeedTestStore();
+  const { metrics, phase } = useSpeedTestStore();
+
+  const isDone = phase === 'done';
+
+  const latencyItems = [
+    { label: t('speed_test.ping'), value: metrics.ping, tooltip: t('speed_test.tooltip_ping'), getLevel: getPingLevel },
+    { label: t('speed_test.latency'), value: metrics.latency, tooltip: t('speed_test.tooltip_latency'), getLevel: getPingLevel },
+    { label: t('speed_test.jitter'), value: metrics.jitter, tooltip: t('speed_test.tooltip_jitter'), getLevel: getJitterLevel },
+  ];
 
   return (
-    <div className="flex justify-around mt-3 mb-3">
-      <div className="flex items-center justify-center gap-2">
-        <ArrowDown className="w-5 h-5 text-primary" />
-        <div className="text-center">
-          <div className={`text-[28px] leading-tight font-semibold font-mono ${metrics.download !== null ? 'text-primary' : 'text-muted-foreground'}`}>
-            {metrics.download !== null ? Math.round(metrics.download) : '—'}
+    <>
+      <Card className="mt-1 mb-3 bg-transparent border-2 border-border">
+        <CardContent className="py-4 px-4">
+          <div className="flex">
+            <div className="flex-1">
+              <div className={`flex items-center gap-1.5 text-4xl leading-tight font-semibold font-mono ${metrics.download !== null ? 'text-primary' : 'text-muted-foreground'}`}>
+                <LongArrowDown className="w-5 h-5" />
+                {metrics.download !== null ? Math.round(metrics.download) : '—'}
+              </div>
+              {metrics.download !== null && (
+                <div className="text-xs text-muted-foreground font-mono pl-6">{t('speed_test.unit_mbps')}</div>
+              )}
+            </div>
+            <div className="flex-1">
+              <div className={`flex items-center gap-1.5 text-4xl leading-tight font-semibold font-mono ${metrics.upload !== null ? 'text-purple-500' : 'text-muted-foreground'}`}>
+                <LongArrowUp className="w-5 h-5" />
+                {metrics.upload !== null ? Math.round(metrics.upload) : '—'}
+              </div>
+              {metrics.upload !== null && (
+                <div className="text-xs text-muted-foreground font-mono pl-6">{t('speed_test.unit_mbps')}</div>
+              )}
+            </div>
           </div>
-          {metrics.download !== null && (
-            <div className="text-xs text-muted-foreground font-mono">{t('speed_test.unit_mbps')}</div>
-          )}
-        </div>
-      </div>
-      <div className="flex items-center justify-center gap-2">
-        <ArrowUp className="w-5 h-5 text-purple-500" />
-        <div className="text-center">
-          <div className={`text-[28px] leading-tight font-semibold font-mono ${metrics.upload !== null ? 'text-purple-500' : 'text-muted-foreground'}`}>
-            {metrics.upload !== null ? Math.round(metrics.upload) : '—'}
+        </CardContent>
+      </Card>
+
+      {isDone && (
+        <>
+          <div className="flex justify-between px-4 mb-3">
+            {latencyItems.map((item) => {
+              const level = item.value !== null ? item.getLevel(item.value) : null;
+              const dotColor = level ? LATENCY_DOT[level] : 'bg-muted-foreground';
+
+              return (
+                <div key={item.label} title={item.tooltip} className="cursor-default">
+                  <p className="text-sm text-muted-foreground mb-1.5">{item.label}</p>
+                  <div className="flex items-center gap-2">
+                    <span className={`w-2 h-2 rounded-full shrink-0 ${dotColor}`} />
+                    <span className="text-xs font-mono text-foreground">
+                      {item.value !== null ? <>{Math.round(item.value)}<span className="ml-0.5">{t('speed_test.unit_ms')}</span></> : '—'}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
-          {metrics.upload !== null && (
-            <div className="text-xs text-muted-foreground font-mono">{t('speed_test.unit_mbps')}</div>
-          )}
-        </div>
-      </div>
-    </div>
+          <div className="mx-4 border-b-2 border-border" />
+        </>
+      )}
+    </>
   );
 }
 
@@ -402,43 +421,7 @@ function drawLine(
   ctx.stroke();
 }
 
-// ── Latency Summary (clickable row) ───────────────────────
-
-function LatencySummary({ onClick }: { onClick: () => void }) {
-  const { t } = useTranslation();
-  const { metrics } = useSpeedTestStore();
-
-  const items = [
-    { label: t('speed_test.ping'), value: metrics.ping, getLevel: getPingLevel },
-    { label: t('speed_test.latency'), value: metrics.latency, getLevel: getPingLevel },
-    { label: t('speed_test.jitter'), value: metrics.jitter, getLevel: getJitterLevel },
-  ];
-
-  return (
-    <Card className="bg-transparent hover:bg-accent transition-colors cursor-pointer" onClick={onClick}>
-      <CardContent className="flex items-center py-3 px-4 gap-3">
-        <div className="flex-1 flex gap-6">
-          {items.map((item) => {
-            const level = item.value !== null ? item.getLevel(item.value) : null;
-            const colorClass = level ? LATENCY_COLOR[level] : '';
-
-            return (
-              <div key={item.label}>
-                <p className="text-[10px] font-mono uppercase text-muted-foreground mb-0.5">{item.label}</p>
-                <span className={`text-xs font-mono ${colorClass}`}>
-                  {item.value !== null ? `${Math.round(item.value)} ${t('speed_test.unit_ms')}` : '—'}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-        <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0 self-center rtl-flip" />
-      </CardContent>
-    </Card>
-  );
-}
-
-// ── Latency Details View ──────────────────────────────────
+// ── Latency helpers ──────────────────────────────────────
 
 type LatencyLevel = 'excellent' | 'good' | 'fair' | 'slow';
 
@@ -456,58 +439,10 @@ function getJitterLevel(ms: number): LatencyLevel {
   return 'slow';
 }
 
-const LATENCY_COLOR: Record<LatencyLevel, string> = {
-  excellent: 'text-success', good: 'text-success',
-  fair: 'text-warning', slow: 'text-destructive',
+const LATENCY_DOT: Record<LatencyLevel, string> = {
+  excellent: 'bg-success', good: 'bg-success',
+  fair: 'bg-warning', slow: 'bg-destructive',
 };
-
-function LatencyDetailsView({ onBack }: { onBack: () => void }) {
-  const { t } = useTranslation();
-  const { metrics } = useSpeedTestStore();
-
-  const items = [
-    { label: t('speed_test.ping'), value: metrics.ping, desc: t('speed_test.tooltip_ping'), getLevel: getPingLevel },
-    { label: t('speed_test.latency'), value: metrics.latency, desc: t('speed_test.tooltip_latency'), getLevel: getPingLevel },
-    { label: t('speed_test.jitter'), value: metrics.jitter, desc: t('speed_test.tooltip_jitter'), getLevel: getJitterLevel },
-  ];
-
-  return (
-    <div className="flex flex-col flex-1 min-h-0 bg-background">
-      <div data-tauri-drag-region className="px-4 pt-4 pb-3">
-        <div className="flex items-center gap-2 pointer-events-auto">
-          <Button variant="ghost" size="icon" onClick={onBack}>
-            <ArrowLeft className="w-5 h-5 text-muted-foreground rtl-flip" />
-          </Button>
-          <h1 className="flex-1 text-lg font-semibold text-foreground">
-            {t('speed_test.title')}
-          </h1>
-          <CloseButton />
-        </div>
-      </div>
-
-      <div className="flex-1 px-4 pb-4 overflow-y-auto space-y-3">
-          {items.map((item) => {
-            const level = item.value !== null ? item.getLevel(item.value) : null;
-            const colorClass = level ? LATENCY_COLOR[level] : '';
-
-            return (
-              <div key={item.label} className="bg-accent/50 rounded-xl p-4">
-                <div className="flex items-baseline gap-2">
-                  <span className={`text-xs font-mono uppercase tracking-wider ${colorClass || 'text-foreground'}`}>{item.label}</span>
-                  <span className={`text-xs font-mono ${colorClass}`}>
-                    {item.value !== null ? <>{Math.round(item.value)}<span className="ml-0.5 text-[10px]">{t('speed_test.unit_ms')}</span></> : '—'}
-                  </span>
-                </div>
-                <p className="text-xs text-muted-foreground leading-relaxed mt-2">
-                  {item.desc}
-                </p>
-              </div>
-            );
-          })}
-      </div>
-    </div>
-  );
-}
 
 // ── Error Card ─────────────────────────────────────────────
 
@@ -522,78 +457,52 @@ function ErrorCard() {
   );
 }
 
-// ── Warning Cards ──────────────────────────────────────────
+// ── Task Checklist ────────────────────────────────────────
 
-function WarningCards() {
+function TaskChecklistSection() {
   const { t } = useTranslation();
-  const { warnings } = useSpeedTestStore();
+  const { taskChecklist } = useSpeedTestStore();
+  const [openKey, setOpenKey] = useState<string | null>(null);
 
-  if (warnings.length === 0) return null;
+  if (taskChecklist.length === 0) return null;
+
+  const toggle = (key: string) => setOpenKey(prev => prev === key ? null : key);
 
   return (
-    <div className="space-y-2 mt-3">
-      {warnings.map((w) => (
-        <WarningCard key={w.titleKey} warning={w} t={t} />
+    <div className="mt-3 space-y-0.5">
+      {taskChecklist.map((item) => (
+        <TaskCheckRow
+          key={item.nameKey}
+          item={item}
+          isOpen={openKey === item.nameKey}
+          onToggle={() => toggle(item.nameKey)}
+          t={t}
+        />
       ))}
     </div>
   );
 }
 
-function WarningCard({ warning, t }: { warning: SpeedTestWarning; t: (key: string, params?: Record<string, string>) => string }) {
+function TaskCheckRow({ item, isOpen, onToggle, t }: {
+  item: TaskCheckItem;
+  isOpen: boolean;
+  onToggle: () => void;
+  t: (key: string, params?: Record<string, string>) => string;
+}) {
   return (
-    <div className="rounded-lg bg-accent p-4">
-      <div className="flex items-start gap-3">
-        <span className="flex items-center justify-center w-4 h-4 shrink-0 mt-1">
-          <span className="w-2 h-2 rounded-full bg-warning" />
+    <button onClick={onToggle} className={`flex flex-col w-full text-left rounded-lg px-4 py-3 transition-colors ${isOpen ? 'bg-accent' : 'hover:bg-accent'}`}>
+      <div className="flex items-center w-full gap-2">
+        <span className={`w-2 h-2 rounded-full shrink-0 ${item.pass ? 'bg-success' : 'bg-destructive'}`} />
+        <span className={`text-sm flex-1 min-w-0 truncate ${item.pass ? 'text-muted-foreground' : 'text-foreground'}`}>
+          {t(item.nameKey)}
         </span>
-        <div className="flex-1">
-          <p className="text-base font-medium leading-normal mb-1 text-warning">
-            {t(warning.titleKey)}
-          </p>
-          <p className="text-sm text-muted-foreground leading-normal">
-            {t(warning.descKey, warning.descParams)}
-          </p>
-        </div>
+        <ChevronDown className={`w-4 h-4 text-muted-foreground shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </div>
-    </div>
-  );
-}
-
-// ── Experience Ratings ─────────────────────────────────────
-
-function ExperienceRatingsSection() {
-  const { t } = useTranslation();
-  const { experienceRatings } = useSpeedTestStore();
-
-  if (experienceRatings.length === 0) return null;
-
-  return (
-    <div className="space-y-2 mt-3">
-      {experienceRatings.map((rating) => (
-        <RatingBar key={rating.nameKey} rating={rating} t={t} />
-      ))}
-    </div>
-  );
-}
-
-const RATING_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
-  'speed_test.rating_video_calls': Video,
-  'speed_test.rating_streaming': TvMinimalPlay,
-  'speed_test.rating_gaming': Gamepad2,
-  'speed_test.rating_work_from_home': HouseWifi,
-};
-
-function RatingBar({ rating, t }: { rating: ExperienceRating; t: (key: string) => string }) {
-  const Icon = RATING_ICONS[rating.nameKey];
-  return (
-    <div className="flex items-center py-1.5">
-      <span className="flex items-center gap-2 flex-1 text-sm text-muted-foreground">
-        {Icon && <Icon className="w-4 h-4" />}
-        {t(rating.nameKey)}
-      </span>
-      <span className="text-sm font-medium" style={{ color: rating.color }}>
-        {t(`speed_test.rating_${rating.level}`)}
-      </span>
-    </div>
+      {isOpen && (
+        <p className="text-xs text-muted-foreground leading-relaxed pl-4 pr-6 pt-1">
+          {t(item.descKey, item.descParams)}
+        </p>
+      )}
+    </button>
   );
 }

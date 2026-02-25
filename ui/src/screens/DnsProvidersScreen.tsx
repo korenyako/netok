@@ -109,6 +109,8 @@ export function DnsProvidersScreen({ onBack, onCustomIp }: DnsProvidersScreenPro
 
   useEffect(() => {
     runPings();
+    const id = setInterval(runPings, 10_000);
+    return () => clearInterval(id);
   }, [runPings]);
 
   const protectionEnabled = isProtected(apiProvider);

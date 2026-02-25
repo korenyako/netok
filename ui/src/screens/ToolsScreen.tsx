@@ -41,7 +41,7 @@ export function ToolsScreen({ onBack, onOpenDiagnostics, onOpenSpeedTest, onOpen
       id: 'device-scan',
       nameKey: 'settings.tools.device_scan',
       icon: <MonitorSmartphone className="w-6 h-6" />,
-      iconColorClass: 'text-amber-500',
+      iconColorClass: 'text-warning',
       onClick: onOpenDeviceScan,
     },
     {

@@ -14,8 +14,9 @@ export function PingBadge({ value }: { value: number | null | undefined }) {
     return <span className="text-xs font-mono text-muted-foreground shrink-0 self-start mt-0.5">&mdash;</span>;
   }
   return (
-    <span className={cn("text-xs font-mono shrink-0 self-start mt-0.5", pingColorClass(value))}>
-      {value} ms
+    <span className={cn("inline-flex items-center gap-1.5 text-xs font-mono shrink-0 self-start mt-0.5", pingColorClass(value))}>
+      <span className="ping-dot" />
+      {value}&thinsp;ms
     </span>
   );
 }

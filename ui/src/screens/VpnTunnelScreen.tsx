@@ -1,10 +1,13 @@
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, AlertTriangle, Loader2 } from '../components/icons/UIIcons';
 import { Button } from '@/components/ui/button';
 import { MenuCard } from '@/components/MenuCard';
 import { Card, CardContent } from '@/components/ui/card';
 import { CloseButton } from '../components/WindowControls';
+import { PingBadge } from '../components/PingBadge';
 import { useVpnStore } from '../stores/vpnStore';
+import { pingDnsServer } from '../api/tauri';
 import { cn } from '@/lib/utils';
 
 
@@ -37,6 +40,29 @@ export function VpnTunnelScreen({ onBack, onAddVpn }: VpnTunnelScreenProps) {
   } = useVpnStore();
 
   const isConnected = connectionState.type === 'connected';
+
+  // Ping latency for the active server (only when connected)
+  const [ping, setPing] = useState<number | null | undefined>(undefined);
+
+  const runPing = useCallback(() => {
+    if (activeIndex === null) return;
+    const host = configs[activeIndex]?.serverHost;
+    if (!host) return;
+    setPing(undefined);
+    pingDnsServer(host)
+      .then((ms) => setPing(ms))
+      .catch(() => setPing(null));
+  }, [configs, activeIndex]);
+
+  useEffect(() => {
+    if (!isConnected || activeIndex === null) {
+      setPing(undefined);
+      return;
+    }
+    runPing();
+    const id = setInterval(runPing, 10_000);
+    return () => clearInterval(id);
+  }, [runPing, isConnected, activeIndex]);
   const isConnecting = connectionState.type === 'connecting';
   const isDisconnecting = connectionState.type === 'disconnecting';
   const isError = connectionState.type === 'error';
@@ -179,15 +205,22 @@ export function VpnTunnelScreen({ onBack, onAddVpn }: VpnTunnelScreenProps) {
                   title={serverTitle}
                   subtitle={serverSubtitle}
                   trailing={
-                    <button
-                      className="ghost-action px-4 py-1.5 rounded-full text-[10px] font-medium uppercase tracking-wider text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all shrink-0 opacity-0 group-hover:opacity-100"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleEditServer(index);
-                      }}
-                    >
-                      {t('vpn.edit')}
-                    </button>
+                    <div className="shrink-0 self-start">
+                      {isThisActive && isConnected && (
+                        <span className="group-hover:hidden">
+                          <PingBadge value={ping} />
+                        </span>
+                      )}
+                      <button
+                        className="ghost-action px-4 py-1.5 rounded-full text-[10px] font-medium uppercase tracking-wider text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all shrink-0 hidden group-hover:inline-flex"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditServer(index);
+                        }}
+                      >
+                        {t('vpn.edit')}
+                      </button>
+                    </div>
                   }
                   onClick={() => handleSelectServer(index)}
                 />

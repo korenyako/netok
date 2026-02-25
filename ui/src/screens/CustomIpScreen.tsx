@@ -158,10 +158,6 @@ export function CustomIpScreen({ onBack, onApplied }: CustomIpScreenProps) {
           setIsApplying(false);
           return;
         }
-        // Measure latency after successful reachability test
-        pingDnsServer(primary)
-          .then((ms) => { setPingResult(ms); setShowPing(true); })
-          .catch(() => { setPingResult(null); setShowPing(true); });
       }
 
       const provider = {
@@ -182,17 +178,27 @@ export function CustomIpScreen({ onBack, onApplied }: CustomIpScreenProps) {
         secondaryIpv6: secondaryV6 || null,
       });
 
+      // Measure latency and show under button before navigating back
+      if (primary) {
+        try {
+          const ms = await pingDnsServer(primary);
+          setPingResult(ms);
+        } catch {
+          setPingResult(null);
+        }
+        setShowPing(true);
+      }
+
       toast.success(t('dns_providers.applied'));
-      onApplied();
+      setTimeout(() => onApplied(), 1500);
     } catch (err) {
+      setIsApplying(false);
       const msg = String(err);
       if (msg.includes('elevation_denied')) {
         toast.error(t('dns_providers.error_elevation_denied'));
       } else {
         toast.error(t('dns_providers.error_set_failed'));
       }
-    } finally {
-      setIsApplying(false);
     }
   };
 
@@ -214,7 +220,7 @@ export function CustomIpScreen({ onBack, onApplied }: CustomIpScreenProps) {
       {/* Content */}
       <ScrollArea className="flex-1">
       <div className="px-4 pb-4 flex flex-col min-h-0 space-y-6">
-        <p className="text-sm font-normal text-muted-foreground">
+        <p className="text-sm font-normal text-muted-foreground -mb-2">
           {t('dns_providers.custom_ip_hint')}
         </p>
         {/* IPv4 Section */}
@@ -243,12 +249,6 @@ export function CustomIpScreen({ onBack, onApplied }: CustomIpScreenProps) {
               <div className="mt-1.5">
                 <p className="text-xs text-destructive">{t('dns_providers.custom_ip_typo')}</p>
                 <p className="text-[10px] text-muted-foreground mt-0.5">{t('dns_providers.custom_ip_hint_ipv4')}</p>
-              </div>
-            )}
-            {showPing && !primaryError && (
-              <div className="mt-1.5 flex items-center gap-1.5">
-                <span className="text-xs text-muted-foreground">Ping:</span>
-                <PingBadge value={pingResult} />
               </div>
             )}
           </div>
@@ -339,35 +339,37 @@ export function CustomIpScreen({ onBack, onApplied }: CustomIpScreenProps) {
 
         {/* Warning: IPv6-only provides partial protection */}
         {!primaryDns.trim() && primaryIpv6.trim() && isValidIpv6(primaryIpv6.trim()) && !isApplying && (
-          <div className="px-3 py-2 rounded-md bg-yellow-500/10">
-            <p className="text-xs text-yellow-600 dark:text-yellow-500">{t('dns_providers.custom_ip_ipv6_only_warning')}</p>
+          <div className="px-3 py-2 rounded-md bg-warning/10">
+            <p className="text-xs text-warning">{t('dns_providers.custom_ip_ipv6_only_warning')}</p>
           </div>
         )}
 
-        {/* Checking state */}
-        {isApplying && (
-          <div className="px-3 py-2 rounded-md bg-muted/50 flex items-center gap-2">
-            <Loader2 className="w-3.5 h-3.5 animate-spin text-muted-foreground" />
-            <p className="text-xs text-muted-foreground">
+        <div>
+          <Button
+            className="w-full text-sm font-medium"
+            onClick={handleSave}
+            disabled={isApplying}
+          >
+            {isApplying
+              ? <Loader2 className="w-4 h-4 animate-spin" />
+              : t('dns_providers.custom_ip_save')}
+          </Button>
+          {showPing && (
+            <div className="flex items-center justify-center gap-1.5 mt-2">
+              <PingBadge value={pingResult} />
+            </div>
+          )}
+          {isApplying && !showPing && (
+            <p className="text-xs text-muted-foreground text-center mt-2">
               {t('dns_providers.custom_ip_checking')}
             </p>
-          </div>
-        )}
-
-        {/* Warning for unreachable server */}
-        {serverUnreachable && !isApplying && (
-          <div className="px-3 py-2 rounded-md bg-yellow-500/10">
-            <p className="text-xs text-yellow-600 dark:text-yellow-500">{t('dns_providers.custom_ip_unreachable')}</p>
-          </div>
-        )}
-
-        <Button
-          className="w-full text-sm font-medium"
-          onClick={handleSave}
-          disabled={isApplying}
-        >
-          {t('dns_providers.custom_ip_save')}
-        </Button>
+          )}
+          {serverUnreachable && !isApplying && (
+            <p className="text-xs text-warning text-center mt-2">
+              {t('dns_providers.custom_ip_unreachable')}
+            </p>
+          )}
+        </div>
       </div>
       </ScrollArea>
     </div>

@@ -82,6 +82,26 @@ export function ArrowUp(props: IconProps) {
   );
 }
 
+/** Long narrow arrow pointing down — thin tail with small head */
+export function LongArrowDown(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <path d="M12 3v18" />
+      <path d="m16 17-4 4-4-4" />
+    </SvgIcon>
+  );
+}
+
+/** Long narrow arrow pointing up — thin tail with small head */
+export function LongArrowUp(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <path d="M12 21V3" />
+      <path d="m8 7 4-4 4 4" />
+    </SvgIcon>
+  );
+}
+
 export function ChevronDown(props: IconProps) {
   return (
     <SvgIcon {...props}>
