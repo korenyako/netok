@@ -23,4 +23,27 @@ Background monitoring with notifications:
 
 ---
 
+## 2. "I just want to switch DNS without thinking"
+
+**Source:** [r/macapps](https://www.reddit.com/r/macapps/comments/1iwflbm/dns_easy_switcher/)
+**Problem:** User switches between home, office, and public Wi-Fi. Wants DNS to adapt automatically — custom DNS for privacy at home, network-provided DNS at work/public.
+**What they asked for:** One-click switching between DHCP-assigned and custom DNS, ideally automatic per network.
+**Context:** Comment on DNS Easy Switcher app — user appreciates simple DNS management but wants it smarter.
+
+### Why this is a Netok user
+- Wants DNS control without technical complexity
+- Already understands the value of custom DNS for privacy
+- Netok already has System DNS ↔ AdGuard/Cloudflare/Custom switching built in
+
+### Feature opportunity
+Auto-switching DNS profiles per network:
+> "Home Wi-Fi detected → AdGuard DNS enabled"
+> "Office network detected → System DNS restored"
+
+### Current Netok coverage
+✅ Manual switching between System DNS and protected providers
+❌ Automatic switching when network changes
+
+---
+
 *Add more stories below as you find them.*
