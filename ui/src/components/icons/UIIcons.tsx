@@ -82,23 +82,27 @@ export function ArrowUp(props: IconProps) {
   );
 }
 
-/** Long narrow arrow pointing down — thin tail with small head */
-export function LongArrowDown(props: IconProps) {
+/** Long narrow arrow pointing down — extra-tall viewBox for elongated look */
+export function LongArrowDown({ size, ...props }: IconProps) {
   return (
-    <SvgIcon {...props}>
-      <path d="M12 3v18" />
-      <path d="m16 17-4 4-4-4" />
-    </SvgIcon>
+    <svg xmlns="http://www.w3.org/2000/svg" width={size ?? 24} height={size ?? 24}
+      viewBox="0 0 24 36" fill="none" stroke="currentColor"
+      strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M12 1v34" />
+      <path d="m17 30-5 5-5-5" />
+    </svg>
   );
 }
 
-/** Long narrow arrow pointing up — thin tail with small head */
-export function LongArrowUp(props: IconProps) {
+/** Long narrow arrow pointing up — extra-tall viewBox for elongated look */
+export function LongArrowUp({ size, ...props }: IconProps) {
   return (
-    <SvgIcon {...props}>
-      <path d="M12 21V3" />
-      <path d="m8 7 4-4 4 4" />
-    </SvgIcon>
+    <svg xmlns="http://www.w3.org/2000/svg" width={size ?? 24} height={size ?? 24}
+      viewBox="0 0 24 36" fill="none" stroke="currentColor"
+      strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M12 35V1" />
+      <path d="m7 6 5-5 5 5" />
+    </svg>
   );
 }
 

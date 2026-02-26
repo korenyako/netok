@@ -1,9 +1,9 @@
 import { create } from 'zustand';
-import { runSpeedTest, abort as abortNdt7, type SpeedTestResult } from '../utils/ndt7Client';
+import { runSpeedTest, runScenarioTest, abort as abortNdt7, MOCK_ENABLED, type SpeedTestResult } from '../utils/ndt7Client';
 
 // --- Types ---
 
-export type TestPhase = 'idle' | 'ping' | 'download' | 'upload' | 'done' | 'error';
+export type TestPhase = 'idle' | 'download' | 'upload' | 'done' | 'error';
 
 export interface SpeedTestMetrics {
   download: number | null;
@@ -40,6 +40,7 @@ interface SpeedTestState {
   uploadData: GraphPoint[];
   warnings: SpeedTestWarning[];
   taskChecklist: TaskCheckItem[];
+  liveLatency: number | null;
   serverName: string | null;
   error: string | null;
   cooldownSecondsLeft: number;
@@ -49,7 +50,7 @@ interface SpeedTestActions {
   startTest: () => Promise<void>;
   cancelTest: () => void;
   reset: () => void;
-  overrideScenario: (scenario: SpeedTestScenario) => void;
+  overrideScenario: (scenario: SpeedTestScenario) => Promise<void>;
 }
 
 export type SpeedTestScenario = 'fast' | 'slow' | 'high_latency' | 'error';
@@ -70,6 +71,7 @@ const initialState: SpeedTestState = {
   uploadData: [],
   warnings: [],
   taskChecklist: [],
+  liveLatency: null,
   serverName: null,
   error: null,
   cooldownSecondsLeft: 0,
@@ -77,6 +79,10 @@ const initialState: SpeedTestState = {
 
 // --- Run ID for cancellation ---
 let runIdCounter = 0;
+
+// --- Latency throttle ---
+let lastLatencyUpdate = 0;
+const LATENCY_THROTTLE_MS = 200;
 
 // --- Cooldown timer ---
 let cooldownInterval: ReturnType<typeof setInterval> | null = null;
@@ -114,9 +120,9 @@ export const useSpeedTestStore = create<SpeedTestStore>((set) => {
 
     set({
       ...initialState,
-      phase: 'ping',
+      phase: 'download',
       progress: 0,
-      currentUnit: 'speed_test.unit_ms',
+      currentUnit: 'speed_test.unit_mbps',
     });
 
     try {
@@ -127,7 +133,7 @@ export const useSpeedTestStore = create<SpeedTestStore>((set) => {
             phase,
             progress,
             currentValue: Math.round(currentMbps),
-            currentUnit: phase === 'ping' ? 'speed_test.unit_ms' : 'speed_test.unit_mbps',
+            currentUnit: 'speed_test.unit_mbps',
           });
         },
         onDataPoint: (phase, mbps) => {
@@ -142,15 +148,25 @@ export const useSpeedTestStore = create<SpeedTestStore>((set) => {
             }));
           }
         },
-        onLatencySample: () => {
-          // Latency samples collected internally by ndt7Client
+        onLatencySample: (rttMs) => {
+          if (stale()) return;
+          const now = Date.now();
+          if (now - lastLatencyUpdate >= LATENCY_THROTTLE_MS) {
+            lastLatencyUpdate = now;
+            set({ liveLatency: Math.round(rttMs) });
+          }
+        },
+        onPingResult: (pingMs) => {
+          if (stale()) return;
+          set((s) => ({
+            metrics: { ...s.metrics, ping: Math.round(pingMs) },
+          }));
         },
         onPhaseComplete: (phase, value) => {
           if (stale()) return;
           set((s) => ({
             metrics: {
               ...s.metrics,
-              ...(phase === 'ping' ? { ping: Math.round(value) } : {}),
               ...(phase === 'download' ? { download: Math.round(value * 100) / 100 } : {}),
               ...(phase === 'upload' ? { upload: Math.round(value * 100) / 100 } : {}),
             },
@@ -180,7 +196,7 @@ export const useSpeedTestStore = create<SpeedTestStore>((set) => {
         serverName: result.serverName,
         error: null,
       });
-      startCooldown();
+      if (!MOCK_ENABLED) startCooldown();
     } catch (err) {
       if (stale()) return;
       const message = err instanceof Error ? err.message : 'Unknown error';
@@ -200,7 +216,7 @@ export const useSpeedTestStore = create<SpeedTestStore>((set) => {
         phase: 'error',
         error: errorKey,
       });
-      startCooldown();
+      if (!MOCK_ENABLED) startCooldown();
     }
   },
 
@@ -216,9 +232,10 @@ export const useSpeedTestStore = create<SpeedTestStore>((set) => {
     set({ ...initialState });
   },
 
-  overrideScenario: (scenario: SpeedTestScenario) => {
+  overrideScenario: async (scenario: SpeedTestScenario) => {
     clearCooldown();
-    runIdCounter++;
+    const thisRunId = ++runIdCounter;
+    const stale = () => runIdCounter !== thisRunId;
 
     const data = SPEED_SCENARIOS[scenario];
     if (scenario === 'error') {
@@ -230,25 +247,87 @@ export const useSpeedTestStore = create<SpeedTestStore>((set) => {
       return;
     }
 
-    const metrics: SpeedTestMetrics = {
-      download: data.download!,
-      upload: data.upload!,
-      ping: data.ping!,
-      latency: data.latency!,
-      jitter: data.jitter!,
-    };
-
     set({
       ...initialState,
-      phase: 'done',
-      progress: 100,
-      metrics,
-      downloadData: generateSyntheticGraph(data.download!, 30),
-      uploadData: generateSyntheticGraph(data.upload!, 30),
-      warnings: analyzeWarnings(metrics),
-      taskChecklist: calculateTaskChecklist(metrics),
-      serverName: 'debug-server.example.com',
+      phase: 'download',
+      progress: 0,
+      currentUnit: 'speed_test.unit_mbps',
     });
+
+    try {
+      const result = await runScenarioTest(
+        {
+          onProgress: (phase, progress, currentMbps) => {
+            if (stale()) return;
+            set({
+              phase,
+              progress,
+              currentValue: Math.round(currentMbps),
+              currentUnit: 'speed_test.unit_mbps',
+            });
+          },
+          onDataPoint: (phase, mbps) => {
+            if (stale()) return;
+            if (phase === 'download') {
+              set((s) => ({ downloadData: [...s.downloadData, { value: mbps }] }));
+            } else {
+              set((s) => ({ uploadData: [...s.uploadData, { value: mbps }] }));
+            }
+          },
+          onLatencySample: (rttMs) => {
+            if (stale()) return;
+            const now = Date.now();
+            if (now - lastLatencyUpdate >= LATENCY_THROTTLE_MS) {
+              lastLatencyUpdate = now;
+              set({ liveLatency: Math.round(rttMs) });
+            }
+          },
+          onPingResult: (pingMs) => {
+            if (stale()) return;
+            set((s) => ({
+              metrics: { ...s.metrics, ping: Math.round(pingMs) },
+            }));
+          },
+          onPhaseComplete: (phase, value) => {
+            if (stale()) return;
+            set((s) => ({
+              metrics: {
+                ...s.metrics,
+                ...(phase === 'download' ? { download: Math.round(value * 100) / 100 } : {}),
+                ...(phase === 'upload' ? { upload: Math.round(value * 100) / 100 } : {}),
+              },
+            }));
+          },
+        },
+        { download: data.download!, upload: data.upload!, ping: data.ping!, latency: data.latency!, jitter: data.jitter! },
+      );
+
+      if (stale()) return;
+
+      const metrics: SpeedTestMetrics = {
+        download: result.downloadMbps,
+        upload: result.uploadMbps,
+        ping: result.pingMs,
+        latency: result.latencyMs,
+        jitter: result.jitterMs,
+      };
+
+      set({
+        phase: 'done',
+        progress: 100,
+        metrics,
+        warnings: analyzeWarnings(metrics),
+        taskChecklist: calculateTaskChecklist(metrics),
+        serverName: result.serverName,
+        error: null,
+      });
+      // No cooldown for debug scenarios — reload available immediately
+    } catch (err) {
+      if (stale()) return;
+      const message = err instanceof Error ? err.message : '';
+      if (message === 'Aborted') return;
+      set({ phase: 'error', error: 'speed_test.error_test_failed' });
+    }
   },
 };
 });
@@ -270,16 +349,6 @@ const SPEED_SCENARIOS: Record<SpeedTestScenario, SpeedScenarioData> = {
   high_latency: { download: 50, upload: 25, ping: 12, latency: 180, jitter: 35 },
   error: { errorKey: 'speed_test.error_test_failed' },
 };
-
-function generateSyntheticGraph(target: number, count: number): GraphPoint[] {
-  const points: GraphPoint[] = [];
-  for (let i = 0; i < count; i++) {
-    const ramp = Math.min(i / 5, 1);
-    const noise = (Math.random() - 0.5) * target * 0.15;
-    points.push({ value: Math.max(0, target * ramp + noise) });
-  }
-  return points;
-}
 
 // --- Analysis helpers ---
 

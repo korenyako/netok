@@ -261,9 +261,9 @@
     "phase_ping": "Ping",
     "phase_download": "Download",
     "phase_upload": "Upload",
-    "tooltip_ping": "Response time when network is idle. Lower is better. Up to 20ms is excellent, up to 50ms is good.",
-    "tooltip_latency": "Response time under load (when downloading). If much higher than Ping, network gets congested during active use.",
-    "tooltip_jitter": "How stable the ping is. High jitter = stutters and freezes in games and video calls. Up to 5ms is excellent.",
+    "tooltip_ping": "Internet response time. Lower is better. Under 20 ms is great, under 50 ms is fine.",
+    "tooltip_latency": "Internet response time measured under load. If much higher than Ping, your network will struggle during active use.",
+    "tooltip_jitter": "Connection stability indicator. If it's high, video calls will freeze and games will stutter. Under 5 ms is great.",
     "warning_high_latency": "High latency under load",
     "warning_high_latency_desc": "Latency {{latency}}ms while Ping is {{ping}}ms — under load, delay increases {{ratio}}x. Video calls will stutter when someone downloads files.",
     "warning_low_speed": "Low connection speed",
@@ -296,6 +296,7 @@
     "error_rate_limited": "Too many tests in a row. Please wait a few minutes.",
     "error_connection": "Could not connect to the server. Check your connection.",
     "unit_mbps": "Mbps",
+    "unit_gbps": "Gbps",
     "unit_ms": "ms"
   },
   "diagnostic": {

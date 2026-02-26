@@ -218,7 +218,8 @@ Generated: 2026-02-26
 │   │   │   │   ├── select.tsx
 │   │   │   │   ├── separator.tsx
 │   │   │   │   ├── sonner.tsx
-│   │   │   │   └── switch.tsx
+│   │   │   │   ├── switch.tsx
+│   │   │   │   └── tooltip.tsx
 │   │   │   ├── BottomNav.tsx
 │   │   │   ├── DiagnosticMessage.tsx
 │   │   │   ├── HeaderStatus.tsx
@@ -444,6 +445,7 @@ Generated: 2026-02-26
     "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-slot": "^1.2.4",
     "@radix-ui/react-switch": "^1.2.6",
+    "@radix-ui/react-tooltip": "^1.2.8",
     "@tauri-apps/api": "^2.10.1",
     "@tauri-apps/plugin-opener": "^2.5.3",
     "@tauri-apps/plugin-process": "^2.3.1",
@@ -472,7 +474,6 @@ Generated: 2026-02-26
     "@vitest/coverage-v8": "^4.0.12",
     "@vitest/ui": "^4.0.11",
     "autoprefixer": "^10.4.21",
-    "baseline-browser-mapping": "^2.9.19",
 // ... (truncated due to syntax error)
 ```
 

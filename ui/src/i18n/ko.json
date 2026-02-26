@@ -256,9 +256,9 @@
     "phase_ping": "Ping",
     "phase_download": "다운로드",
     "phase_upload": "업로드",
-    "tooltip_ping": "네트워크가 유휴 상태일 때의 응답 시간입니다. 낮을수록 좋습니다. 20ms 이하면 우수, 50ms 이하면 양호합니다.",
-    "tooltip_latency": "부하 시(다운로드 중) 응답 시간입니다. Ping보다 훨씬 높으면 활발한 사용 시 네트워크가 혼잡해집니다.",
-    "tooltip_jitter": "Ping의 안정성입니다. 높은 Jitter = 게임과 영상 통화에서 끊김 및 멈춤 현상. 5ms 이하면 우수합니다.",
+    "tooltip_ping": "인터넷 응답 시간입니다. 낮을수록 좋습니다. 20 ms 이하면 훌륭, 50 ms 이하면 괜찮습니다.",
+    "tooltip_latency": "부하 상태에서 측정한 인터넷 응답 시간입니다. Ping보다 훨씬 높으면 사용 중 네트워크가 느려집니다.",
+    "tooltip_jitter": "연결 안정성 지표입니다. 높으면 영상 통화가 멈추고 게임이 끊깁니다. 5 ms 이하면 훌륭합니다.",
     "warning_high_latency": "부하 시 높은 지연",
     "warning_high_latency_desc": "Latency {{latency}}ms, Ping {{ping}}ms — 부하 시 지연이 {{ratio}}배 증가합니다. 파일 다운로드 시 영상 통화가 끊길 수 있습니다.",
     "warning_low_speed": "낮은 연결 속도",
@@ -277,6 +277,7 @@
     "error_rate_limited": "연속 테스트가 너무 많습니다. 몇 분 후 다시 시도하세요.",
     "error_connection": "서버에 연결할 수 없습니다. 연결을 확인하세요.",
     "unit_mbps": "Mbps",
+    "unit_gbps": "Gbps",
     "unit_ms": "ms"
   },
   "diagnostic": {

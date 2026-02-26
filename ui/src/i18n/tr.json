@@ -256,9 +256,9 @@
     "phase_ping": "Ping",
     "phase_download": "Download",
     "phase_upload": "Upload",
-    "tooltip_ping": "Ağ boştayken yanıt süresi. Düşük olan daha iyidir. 20ms'ye kadar mükemmel, 50ms'ye kadar iyi.",
-    "tooltip_latency": "Yük altında yanıt süresi (indirme sırasında). Ping'den çok daha yüksekse, aktif kullanımda ağ tıkanıyor demektir.",
-    "tooltip_jitter": "Ping'in ne kadar kararlı olduğu. Yüksek jitter = oyunlarda ve görüntülü aramalarda takılmalar ve donmalar. 5ms'ye kadar mükemmel.",
+    "tooltip_ping": "İnternetin yanıt süresi. Düşük olan daha iyidir. 20 ms altı harika, 50 ms altı iyi.",
+    "tooltip_latency": "Yük altında ölçülen internet yanıt süresi. Ping'den çok daha yüksekse, aktif kullanımda ağınız yavaşlar.",
+    "tooltip_jitter": "Bağlantı kararlılık göstergesi. Yüksekse görüntülü aramalar donar ve oyunlar takılır. 5 ms altı harika.",
     "warning_high_latency": "Yük altında yüksek latency",
     "warning_high_latency_desc": "Latency {{latency}}ms, Ping ise {{ping}}ms — yük altında gecikme {{ratio}}x artıyor. Birisi dosya indirirken görüntülü aramalar takılacaktır.",
     "warning_low_speed": "Düşük bağlantı hızı",
@@ -277,6 +277,7 @@
     "error_rate_limited": "Arka arkaya çok fazla test yapıldı. Lütfen birkaç dakika bekleyin.",
     "error_connection": "Sunucuya bağlanılamadı. Bağlantınızı kontrol edin.",
     "unit_mbps": "Mbps",
+    "unit_gbps": "Gbps",
     "unit_ms": "ms"
   },
   "diagnostic": {

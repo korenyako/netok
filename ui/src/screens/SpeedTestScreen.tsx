@@ -3,7 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { ArrowLeft, LongArrowDown, LongArrowUp, RotateCw, ChevronDown } from '../components/icons/UIIcons';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import { CloseButton } from '../components/WindowControls';
+import { PingBadge } from '../components/PingBadge';
 import {
   useSpeedTestStore,
   type TaskCheckItem,
@@ -24,7 +26,7 @@ export function SpeedTestScreen({ onBack }: SpeedTestScreenProps) {
   const availability = getNetworkAvailability(nodes);
   const internetBlocked = availability !== 'full';
 
-  const isRunning = phase === 'ping' || phase === 'download' || phase === 'upload';
+  const isRunning = phase === 'download' || phase === 'upload';
   const isCoolingDown = cooldownSecondsLeft > 0;
 
   const handleRestart = useCallback(() => {
@@ -51,7 +53,7 @@ export function SpeedTestScreen({ onBack }: SpeedTestScreenProps) {
         </div>
       </div>
 
-      <div className="flex-1 px-4 pb-6 overflow-y-auto">
+      <div className={`flex-1 px-4 overflow-y-auto flex flex-col ${phase === 'done' ? 'pb-6' : ''}`}>
           {/* Circle progress (hidden when done) */}
           {phase !== 'done' && <CircleProgress internetBlocked={internetBlocked} availability={availability} />}
 
@@ -65,14 +67,20 @@ export function SpeedTestScreen({ onBack }: SpeedTestScreenProps) {
             </>
           ) : (
             <>
-              {/* Speed metrics */}
-              <SpeedMetrics />
-
-              {/* Graph */}
-              <SpeedGraph />
-
               {/* Error state */}
               {phase === 'error' && <ErrorCard />}
+
+              {/* Top spacer */}
+              <div className="flex-1" />
+
+              {/* Download result centered in free area */}
+              <DownloadResultBanner />
+
+              {/* Bottom spacer */}
+              <div className="flex-1" />
+
+              {/* Graph pinned to bottom */}
+              <SpeedGraph />
             </>
           )}
       </div>
@@ -89,13 +97,14 @@ const CIRCUMFERENCE = 2 * Math.PI * CIRCLE_R;
 
 function CircleProgress({ internetBlocked, availability }: { internetBlocked: boolean; availability: NetworkAvailability }) {
   const { t } = useTranslation();
-  const { phase, progress, currentValue, currentUnit, cooldownSecondsLeft, startTest, metrics } = useSpeedTestStore();
+  const { phase, progress, currentValue, cooldownSecondsLeft, startTest, metrics, liveLatency } = useSpeedTestStore();
 
   const offset = CIRCUMFERENCE - (progress / 100) * CIRCUMFERENCE;
 
   const strokeColor = phase === 'upload' ? '#a855f7' : 'hsl(var(--primary))';
 
-  const showPingInCircle = metrics.ping !== null && (phase === 'download' || phase === 'upload');
+  const latencyValue = liveLatency ?? metrics.ping;
+  const showLatencyInCircle = latencyValue !== null && (phase === 'download' || phase === 'upload');
 
   return (
     <div className="flex flex-col items-center mb-6">
@@ -148,28 +157,29 @@ function CircleProgress({ internetBlocked, availability }: { internetBlocked: bo
             </div>
           )}
 
-          {phase === 'ping' && (
-            <div className="text-center">
-              <div className="text-4xl font-semibold text-foreground font-mono">
-                {currentValue}
-              </div>
-              <div className="text-sm text-muted-foreground font-mono">{t(currentUnit)}</div>
-              <span className="text-xs mt-1" style={{ color: strokeColor }}>{t('speed_test.phase_ping')}</span>
-            </div>
-          )}
+          {(phase === 'download' || phase === 'upload') && (() => {
+            const isUpload = phase === 'upload';
+            const colorClass = isUpload ? 'text-purple-500' : 'text-primary';
 
-          {(phase === 'download' || phase === 'upload') && (
-            <div className="text-center">
-              <div className="flex justify-center mb-2">
-                {phase === 'download' && <LongArrowDown className="w-8 h-8 text-primary" />}
-                {phase === 'upload' && <LongArrowUp className="w-8 h-8 text-purple-500" />}
-              </div>
-              <div className="text-4xl font-semibold text-foreground font-mono">
-                {currentValue}
-              </div>
-              <div className="text-xs text-muted-foreground font-mono">{t(currentUnit)}</div>
-            </div>
-          )}
+            return (
+              <>
+                <div className="absolute top-12 inset-x-0 flex justify-center">
+                  <span className={`text-sm font-medium ${colorClass}`}>
+                    {t(`speed_test.phase_${phase}`)}
+                  </span>
+                </div>
+                <div className={`flex justify-center ${colorClass}`}>
+                  <div>
+                    <div className="flex items-center gap-1.5 text-4xl leading-tight font-semibold font-mono">
+                      {isUpload ? <LongArrowUp className="w-5 h-5" /> : <LongArrowDown className="w-5 h-5" />}
+                      {currentValue}
+                    </div>
+                    <div className="text-xs text-muted-foreground font-mono pl-[1.75rem]">{t('speed_test.unit_mbps')}</div>
+                  </div>
+                </div>
+              </>
+            );
+          })()}
 
           {phase === 'error' && cooldownSecondsLeft > 0 && (
             <div className="text-center">
@@ -202,11 +212,9 @@ function CircleProgress({ internetBlocked, availability }: { internetBlocked: bo
         </div>
 
         {/* Ping result at the bottom of the circle */}
-        {showPingInCircle && (
-          <div className="absolute bottom-10 inset-x-0 flex flex-col items-center animate-in fade-in duration-300">
-            <span className="text-xs font-mono text-muted-foreground">
-              {t('speed_test.ping')} {Math.round(metrics.ping!)}<span className="ml-0.5">{t('speed_test.unit_ms')}</span>
-            </span>
+        {showLatencyInCircle && (
+          <div className="absolute bottom-10 inset-x-0 flex justify-center pr-3 animate-in fade-in duration-300">
+            <PingBadge value={Math.round(latencyValue!)} />
           </div>
         )}
       </div>
@@ -214,13 +222,44 @@ function CircleProgress({ internetBlocked, availability }: { internetBlocked: bo
   );
 }
 
+// ── Download Result Banner (shown during upload phase) ─────
+
+function DownloadResultBanner() {
+  const { t } = useTranslation();
+  const { phase, metrics } = useSpeedTestStore();
+
+  if (phase !== 'upload' || metrics.download === null) return null;
+
+  return (
+    <div className="flex justify-center">
+      <div>
+        <div className="flex items-center gap-1.5 text-4xl leading-tight font-semibold font-mono text-primary">
+          <LongArrowDown className="w-5 h-5" />
+          {Math.round(metrics.download)}
+        </div>
+        <div className="text-xs text-muted-foreground font-mono pl-[1.75rem]">{t('speed_test.unit_mbps')}</div>
+      </div>
+    </div>
+  );
+}
+
+// ── Speed formatting ──────────────────────────────────────
+
+function formatSpeed(mbps: number, t: (key: string) => string): { value: string; unit: string } {
+  if (mbps >= 1000) {
+    return { value: (mbps / 1000).toFixed(1), unit: t('speed_test.unit_gbps') };
+  }
+  return { value: String(Math.round(mbps)), unit: t('speed_test.unit_mbps') };
+}
+
 // ── Speed Metrics ──────────────────────────────────────────
 
 function SpeedMetrics() {
   const { t } = useTranslation();
-  const { metrics, phase } = useSpeedTestStore();
+  const { metrics } = useSpeedTestStore();
 
-  const isDone = phase === 'done';
+  const dl = metrics.download !== null ? formatSpeed(metrics.download, t) : null;
+  const ul = metrics.upload !== null ? formatSpeed(metrics.upload, t) : null;
 
   const latencyItems = [
     { label: t('speed_test.ping'), value: metrics.ping, tooltip: t('speed_test.tooltip_ping'), getLevel: getPingLevel },
@@ -231,53 +270,58 @@ function SpeedMetrics() {
   return (
     <>
       <Card className="mt-1 mb-3 bg-transparent border-2 border-border">
-        <CardContent className="py-4 px-4">
+        <CardContent className="pt-3 pb-4 px-4">
           <div className="flex">
             <div className="flex-1">
-              <div className={`flex items-center gap-1.5 text-4xl leading-tight font-semibold font-mono ${metrics.download !== null ? 'text-primary' : 'text-muted-foreground'}`}>
+              <div className={`flex items-center gap-1.5 text-4xl leading-tight font-semibold font-mono ${dl ? 'text-primary' : 'text-muted-foreground'}`}>
                 <LongArrowDown className="w-5 h-5" />
-                {metrics.download !== null ? Math.round(metrics.download) : '—'}
+                {dl ? dl.value : '—'}
               </div>
-              {metrics.download !== null && (
-                <div className="text-xs text-muted-foreground font-mono pl-6">{t('speed_test.unit_mbps')}</div>
+              {dl && (
+                <div className="text-xs text-muted-foreground font-mono pl-[1.75rem]">{dl.unit}</div>
               )}
             </div>
             <div className="flex-1">
-              <div className={`flex items-center gap-1.5 text-4xl leading-tight font-semibold font-mono ${metrics.upload !== null ? 'text-purple-500' : 'text-muted-foreground'}`}>
+              <div className={`flex items-center gap-1.5 text-4xl leading-tight font-semibold font-mono ${ul ? 'text-purple-500' : 'text-muted-foreground'}`}>
                 <LongArrowUp className="w-5 h-5" />
-                {metrics.upload !== null ? Math.round(metrics.upload) : '—'}
+                {ul ? ul.value : '—'}
               </div>
-              {metrics.upload !== null && (
-                <div className="text-xs text-muted-foreground font-mono pl-6">{t('speed_test.unit_mbps')}</div>
+              {ul && (
+                <div className="text-xs text-muted-foreground font-mono pl-[1.75rem]">{ul.unit}</div>
               )}
             </div>
           </div>
+
+          <div className="-mx-4 border-t-2 border-border mt-4 mb-3" />
+          <TooltipProvider delayDuration={300}>
+            <div className="flex justify-between">
+              {latencyItems.map((item) => {
+                const level = item.value !== null ? item.getLevel(item.value) : null;
+                const dotColor = level ? LATENCY_DOT[level] : 'bg-muted-foreground';
+
+                return (
+                  <Tooltip key={item.label}>
+                    <TooltipTrigger asChild>
+                      <div className="cursor-default">
+                        <p className="text-sm text-muted-foreground mb-1.5">{item.label}</p>
+                        <div className="flex items-center gap-2">
+                          <span className={`w-2 h-2 rounded-full shrink-0 ${dotColor}`} />
+                          <span className="text-xs font-mono text-foreground">
+                            {item.value !== null ? <>{Math.round(item.value)}<span className="ml-0.5">{t('speed_test.unit_ms')}</span></> : '—'}
+                          </span>
+                        </div>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-52 text-muted-foreground leading-relaxed">
+                      <p>{item.tooltip}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                );
+              })}
+            </div>
+          </TooltipProvider>
         </CardContent>
       </Card>
-
-      {isDone && (
-        <>
-          <div className="flex justify-between px-4 mb-3">
-            {latencyItems.map((item) => {
-              const level = item.value !== null ? item.getLevel(item.value) : null;
-              const dotColor = level ? LATENCY_DOT[level] : 'bg-muted-foreground';
-
-              return (
-                <div key={item.label} title={item.tooltip} className="cursor-default">
-                  <p className="text-sm text-muted-foreground mb-1.5">{item.label}</p>
-                  <div className="flex items-center gap-2">
-                    <span className={`w-2 h-2 rounded-full shrink-0 ${dotColor}`} />
-                    <span className="text-xs font-mono text-foreground">
-                      {item.value !== null ? <>{Math.round(item.value)}<span className="ml-0.5">{t('speed_test.unit_ms')}</span></> : '—'}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          <div className="mx-4 border-b-2 border-border" />
-        </>
-      )}
     </>
   );
 }
@@ -327,7 +371,7 @@ function SpeedGraph() {
   if (!hasData) return null;
 
   return (
-    <div ref={containerRef} className="h-20 overflow-hidden relative mt-2 mb-3">
+    <div ref={containerRef} className="h-20 overflow-hidden relative">
       <canvas ref={canvasRef} className="w-full h-full" />
     </div>
   );

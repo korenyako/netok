@@ -256,9 +256,9 @@
     "phase_ping": "Ping",
     "phase_download": "Pobieranie",
     "phase_upload": "Wysyłanie",
-    "tooltip_ping": "Czas odpowiedzi, gdy sieć jest bezczynna. Im mniej, tym lepiej. Do 20ms doskonale, do 50ms dobrze.",
-    "tooltip_latency": "Czas odpowiedzi pod obciążeniem (podczas pobierania). Jeśli znacznie wyższy niż Ping — sieć jest przeciążona przy aktywnym użytkowaniu.",
-    "tooltip_jitter": "Stabilność pingu. Wysoki jitter = szarpanie i zacinanie w grach i wideorozmowach. Do 5ms doskonale.",
+    "tooltip_ping": "Czas odpowiedzi internetu. Im mniej, tym lepiej. Poniżej 20 ms świetnie, poniżej 50 ms w porządku.",
+    "tooltip_latency": "Czas odpowiedzi internetu mierzony pod obciążeniem. Jeśli znacznie wyższy niż Ping, sieć będzie zwalniać przy aktywnym użytkowaniu.",
+    "tooltip_jitter": "Wskaźnik stabilności połączenia. Jeśli wysoki, wideorozmowy zamarzają, a gry się zacinają. Poniżej 5 ms świetnie.",
     "warning_high_latency": "Wysokie opóźnienie pod obciążeniem",
     "warning_high_latency_desc": "Latency {{latency}}ms przy Ping {{ping}}ms — pod obciążeniem opóźnienie rośnie {{ratio}}x. Wideorozmowy będą się zacinać, gdy ktoś pobiera pliki.",
     "warning_low_speed": "Niska prędkość połączenia",
@@ -277,6 +277,7 @@
     "error_rate_limited": "Za dużo testów z rzędu. Poczekaj kilka minut.",
     "error_connection": "Nie udało się połączyć z serwerem. Sprawdź połączenie.",
     "unit_mbps": "Mb/s",
+    "unit_gbps": "Gb/s",
     "unit_ms": "ms"
   },
   "diagnostic": {

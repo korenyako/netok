@@ -53,7 +53,7 @@ export function ScanProgressRing({ percent }: ScanProgressRingProps) {
           <span className="font-mono text-4xl font-medium text-foreground leading-none">
             {Math.round(clamped)}
           </span>
-          <span className="font-mono text-sm text-muted-foreground ml-0.5 leading-none">%</span>
+          <span className="font-mono text-lg text-muted-foreground ml-0.5 mt-0.5 leading-none">%</span>
         </div>
       </div>
     </div>

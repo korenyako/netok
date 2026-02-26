@@ -256,9 +256,9 @@
     "phase_ping": "Ping",
     "phase_download": "Download",
     "phase_upload": "Upload",
-    "tooltip_ping": "Antwortzeit bei inaktivem Netzwerk. Niedriger ist besser. Bis 20ms ist ausgezeichnet, bis 50ms ist gut.",
-    "tooltip_latency": "Antwortzeit unter Last (beim Herunterladen). Wenn deutlich höher als Ping, wird das Netzwerk bei aktiver Nutzung überlastet.",
-    "tooltip_jitter": "Wie stabil der Ping ist. Hoher Jitter = Ruckeln und Einfrieren in Spielen und Videoanrufen. Bis 5ms ist ausgezeichnet.",
+    "tooltip_ping": "Antwortzeit des Internets. Je niedriger, desto besser. Unter 20 ms ist super, unter 50 ms ist okay.",
+    "tooltip_latency": "Antwortzeit des Internets, gemessen unter Last. Wenn deutlich höher als Ping, wird Ihr Netzwerk bei aktiver Nutzung langsam.",
+    "tooltip_jitter": "Indikator für Verbindungsstabilität. Bei hohem Wert frieren Videoanrufe ein und Spiele ruckeln. Unter 5 ms ist super.",
     "warning_high_latency": "Hohe Latenz unter Last",
     "warning_high_latency_desc": "Latenz {{latency}}ms bei Ping {{ping}}ms — unter Last steigt die Verzögerung um das {{ratio}}-fache. Videoanrufe ruckeln, wenn jemand Dateien herunterlädt.",
     "warning_low_speed": "Niedrige Verbindungsgeschwindigkeit",
@@ -277,6 +277,7 @@
     "error_rate_limited": "Zu viele Tests hintereinander. Bitte warten Sie einige Minuten.",
     "error_connection": "Verbindung zum Server fehlgeschlagen. Überprüfen Sie Ihre Verbindung.",
     "unit_mbps": "Mbps",
+    "unit_gbps": "Gbps",
     "unit_ms": "ms"
   },
   "diagnostic": {

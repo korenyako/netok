@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 function pingColorClass(ms: number): string {
   if (ms < 50) return 'text-success';
@@ -7,6 +8,8 @@ function pingColorClass(ms: number): string {
 }
 
 export function PingBadge({ value }: { value: number | null | undefined }) {
+  const { t } = useTranslation();
+
   if (value === undefined) {
     return <span className="text-xs font-mono text-muted-foreground shrink-0 self-start mt-0.5">...</span>;
   }
@@ -16,7 +19,7 @@ export function PingBadge({ value }: { value: number | null | undefined }) {
   return (
     <span className={cn("inline-flex items-center gap-1.5 text-xs font-mono shrink-0 self-start mt-0.5", pingColorClass(value))}>
       <span className="ping-dot" />
-      {value}&thinsp;ms
+      {value}&thinsp;{t('speed_test.unit_ms')}
     </span>
   );
 }

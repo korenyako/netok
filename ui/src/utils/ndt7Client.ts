@@ -2,7 +2,7 @@
 // Protocol: https://github.com/m-lab/ndt-server/blob/main/spec/ndt7-protocol.md
 
 // Mock mode: set VITE_MOCK_SPEED_TEST=true in .env or run with env var
-const MOCK_ENABLED = import.meta.env.DEV && import.meta.env.VITE_MOCK_SPEED_TEST === 'true';
+export const MOCK_ENABLED = import.meta.env.DEV && import.meta.env.VITE_MOCK_SPEED_TEST === 'true';
 
 const LOCATE_URL = 'https://locate.measurementlab.net/v2/nearest/ndt/ndt7';
 const NDT7_SUBPROTOCOL = 'net.measurementlab.ndt.v7';
@@ -32,10 +32,11 @@ interface NDT7Measurement {
 }
 
 export interface SpeedTestCallbacks {
-  onProgress: (phase: 'ping' | 'download' | 'upload', progress: number, currentMbps: number) => void;
+  onProgress: (phase: 'download' | 'upload', progress: number, currentMbps: number) => void;
   onDataPoint: (phase: 'download' | 'upload', mbps: number) => void;
   onLatencySample: (rttMs: number) => void;
-  onPhaseComplete: (phase: 'ping' | 'download' | 'upload', value: number) => void;
+  onPingResult: (pingMs: number) => void;
+  onPhaseComplete: (phase: 'download' | 'upload', value: number) => void;
 }
 
 export interface SpeedTestResult {
@@ -116,15 +117,19 @@ async function runTestWithServer(
   console.log('[ndt7] Download URL:', downloadUrl);
   console.log('[ndt7] Upload URL:', uploadUrl);
 
-  // Ping test (also validates connectivity to this server)
-  const pingMs = await measurePing(downloadUrl, signal, callbacks);
-  callbacks.onPhaseComplete('ping', pingMs);
+  // Run ping and download in parallel — ping reports result via callback as soon as ready
+  const pingPromise = measurePing(downloadUrl, signal)
+    .then(pingMs => { callbacks.onPingResult(pingMs); return pingMs; })
+    .catch(() => null); // Don't fail test if ping fails; use latency from download
 
-  // Download test
+  // Download starts immediately
   const { throughputMbps: downloadMbps, latencySamples } = await runDownloadTest(
     downloadUrl, signal, callbacks,
   );
   callbacks.onPhaseComplete('download', downloadMbps);
+
+  // Ensure ping is done (should be — it takes ~900ms vs download ~10s)
+  const pingMs = await pingPromise;
 
   // Upload test
   const uploadMbps = await runUploadTest(uploadUrl, signal, callbacks);
@@ -133,15 +138,16 @@ async function runTestWithServer(
   // Calculate latency & jitter from download phase RTT samples
   const latencyMs = latencySamples.length > 0
     ? latencySamples.reduce((a, b) => a + b, 0) / latencySamples.length
-    : pingMs;
+    : pingMs ?? 0;
   const jitterMs = calculateJitter(latencySamples);
+  const finalPing = pingMs ?? (latencySamples.length > 0 ? Math.min(...latencySamples) : 0);
 
   abortController = null;
 
   return {
     downloadMbps: Math.round(downloadMbps * 100) / 100,
     uploadMbps: Math.round(uploadMbps * 100) / 100,
-    pingMs: Math.round(pingMs),
+    pingMs: Math.round(finalPing),
     latencyMs: Math.round(latencyMs),
     jitterMs: Math.round(jitterMs * 10) / 10,
     serverName,
@@ -202,24 +208,15 @@ function resolveUrl(server: LocateResult['results'][0], test: 'download' | 'uplo
   return `wss://${hostname}/ndt/v7/${test}`;
 }
 
-async function measurePing(
-  wsUrl: string,
-  signal: AbortSignal,
-  callbacks: SpeedTestCallbacks,
-): Promise<number> {
+async function measurePing(wsUrl: string, signal: AbortSignal): Promise<number> {
   // Measure RTT via short-lived WebSocket connections (avoids CORS issues)
   const samples: number[] = [];
   const attempts = 3;
 
   for (let i = 0; i < attempts; i++) {
     if (signal.aborted) throw new Error('Aborted');
-    callbacks.onProgress('ping', ((i + 1) / attempts) * 100, 0);
-
     const rtt = await wsPing(wsUrl, signal);
-    if (rtt > 0) {
-      samples.push(rtt);
-      callbacks.onProgress('ping', ((i + 1) / attempts) * 100, Math.round(rtt));
-    }
+    if (rtt > 0) samples.push(rtt);
   }
 
   if (samples.length === 0) {
@@ -449,6 +446,82 @@ function calculateJitter(samples: number[]): number {
   return sumDiff / (samples.length - 1);
 }
 
+// --- Scenario test for debug mode ---
+
+export interface ScenarioValues {
+  download: number;
+  upload: number;
+  ping: number;
+  latency: number;
+  jitter: number;
+}
+
+export async function runScenarioTest(
+  callbacks: SpeedTestCallbacks,
+  values: ScenarioValues,
+): Promise<SpeedTestResult> {
+  abortController = new AbortController();
+  const { signal } = abortController;
+
+  const result = await runMockWithValues(callbacks, signal, values);
+  abortController = null;
+  return result;
+}
+
+async function runMockWithValues(
+  callbacks: SpeedTestCallbacks,
+  signal: AbortSignal,
+  v: ScenarioValues,
+): Promise<SpeedTestResult> {
+  const PHASE_MS = 3_000;
+  const TICK_MS = 100;
+
+  // Ping runs in parallel — fires callback after ~900ms
+  const pingPromise = (async () => {
+    await sleep(900);
+    if (!signal.aborted) callbacks.onPingResult(Math.round(v.ping));
+  })();
+
+  // Download phase starts immediately
+  const dlSteps = PHASE_MS / TICK_MS;
+  for (let i = 1; i <= dlSteps; i++) {
+    if (signal.aborted) throw new Error('Aborted');
+    await sleep(TICK_MS);
+    const progress = (i / dlSteps) * 100;
+    const currentMbps = noise(v.download, v.download * 0.15) * Math.min(i / 5, 1);
+    callbacks.onProgress('download', progress, Math.round(currentMbps * 10) / 10);
+    if (i > 5 && i % 2 === 0) {
+      callbacks.onDataPoint('download', currentMbps);
+      callbacks.onLatencySample(noise(v.latency, v.latency * 0.1));
+    }
+  }
+  callbacks.onPhaseComplete('download', v.download);
+  await pingPromise;
+
+  // Upload phase
+  const ulSteps = PHASE_MS / TICK_MS;
+  for (let i = 1; i <= ulSteps; i++) {
+    if (signal.aborted) throw new Error('Aborted');
+    await sleep(TICK_MS);
+    const progress = (i / ulSteps) * 100;
+    const currentMbps = noise(v.upload, v.upload * 0.15) * Math.min(i / 5, 1);
+    callbacks.onProgress('upload', progress, Math.round(currentMbps * 10) / 10);
+    if (i > 5 && i % 2 === 0) {
+      callbacks.onDataPoint('upload', currentMbps);
+    }
+  }
+  callbacks.onPhaseComplete('upload', v.upload);
+
+  return {
+    downloadMbps: Math.round(v.download * 100) / 100,
+    uploadMbps: Math.round(v.upload * 100) / 100,
+    pingMs: Math.round(v.ping),
+    latencyMs: Math.round(v.latency),
+    jitterMs: Math.round(v.jitter * 10) / 10,
+    serverName: 'debug-server.example.com',
+  };
+}
+
 // --- Mock speed test for development ---
 
 const MOCK_PHASE_MS = 3_000; // Each mock phase runs 3 seconds
@@ -468,15 +541,13 @@ async function runMockSpeedTest(
   const mockLatency = noise(58, 10);
   const mockJitter = noise(12, 4);
 
-  // Ping phase
-  for (let i = 1; i <= 3; i++) {
-    if (signal.aborted) throw new Error('Aborted');
-    await sleep(300);
-    callbacks.onProgress('ping', (i / 3) * 100, Math.round(noise(mockPing, 4)));
-  }
-  callbacks.onPhaseComplete('ping', Math.round(mockPing));
+  // Ping runs in parallel — fires callback after ~900ms
+  const pingPromise = (async () => {
+    await sleep(900);
+    if (!signal.aborted) callbacks.onPingResult(Math.round(mockPing));
+  })();
 
-  // Download phase
+  // Download phase starts immediately
   const dlSteps = MOCK_PHASE_MS / MOCK_TICK_MS;
   for (let i = 1; i <= dlSteps; i++) {
     if (signal.aborted) throw new Error('Aborted');
@@ -490,6 +561,7 @@ async function runMockSpeedTest(
     }
   }
   callbacks.onPhaseComplete('download', mockDownload);
+  await pingPromise;
 
   // Upload phase
   const ulSteps = MOCK_PHASE_MS / MOCK_TICK_MS;

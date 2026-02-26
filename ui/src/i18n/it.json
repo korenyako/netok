@@ -256,9 +256,9 @@
     "phase_ping": "Ping",
     "phase_download": "Download",
     "phase_upload": "Upload",
-    "tooltip_ping": "Tempo di risposta quando la rete è inattiva. Più basso è meglio. Fino a 20ms è eccellente, fino a 50ms è buono.",
-    "tooltip_latency": "Tempo di risposta sotto carico (durante il download). Se molto più alto del Ping, la rete si congestiona durante l'uso attivo.",
-    "tooltip_jitter": "Quanto è stabile il ping. Jitter alto = scatti e blocchi nei giochi e nelle videochiamate. Fino a 5ms è eccellente.",
+    "tooltip_ping": "Tempo di risposta di internet. Più basso è meglio. Sotto 20 ms è ottimo, sotto 50 ms va bene.",
+    "tooltip_latency": "Tempo di risposta di internet misurato sotto carico. Se molto più alto del Ping, la rete rallenterà durante l'uso attivo.",
+    "tooltip_jitter": "Indicatore di stabilità della connessione. Se alto, le videochiamate si bloccano e i giochi scattano. Sotto 5 ms è ottimo.",
     "warning_high_latency": "Latency elevata sotto carico",
     "warning_high_latency_desc": "Latency {{latency}}ms mentre il Ping è {{ping}}ms — sotto carico, il ritardo aumenta di {{ratio}}x. Le videochiamate avranno scatti quando qualcuno scarica file.",
     "warning_low_speed": "Velocità di connessione bassa",
@@ -277,6 +277,7 @@
     "error_rate_limited": "Troppi test consecutivi. Attendi qualche minuto.",
     "error_connection": "Impossibile connettersi al server. Controlla la connessione.",
     "unit_mbps": "Mbps",
+    "unit_gbps": "Gbps",
     "unit_ms": "ms"
   },
   "diagnostic": {

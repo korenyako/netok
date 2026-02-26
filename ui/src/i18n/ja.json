@@ -256,9 +256,9 @@
     "phase_ping": "Ping",
     "phase_download": "ダウンロード",
     "phase_upload": "アップロード",
-    "tooltip_ping": "ネットワークがアイドル時の応答時間。低いほど良好です。20ms以内で優秀、50ms以内で良好。",
-    "tooltip_latency": "負荷時（ダウンロード中）の応答時間。Pingよりも大幅に高い場合、使用中にネットワークが混雑しています。",
-    "tooltip_jitter": "Pingの安定性。高いJitter = ゲームやビデオ通話でのカクつきやフリーズ。5ms以内で優秀。",
+    "tooltip_ping": "インターネットの応答時間。低いほど良いです。20 ms以下なら最高、50 ms以下なら問題なし。",
+    "tooltip_latency": "負荷時に測定したインターネットの応答時間。Pingよりかなり高い場合、通信中にネットワークが遅くなります。",
+    "tooltip_jitter": "接続の安定性指標。高いとビデオ通話がフリーズし、ゲームがカクつきます。5 ms以下なら最高。",
     "warning_high_latency": "負荷時の高レイテンシ",
     "warning_high_latency_desc": "レイテンシ {{latency}}ms、Ping {{ping}}ms — 負荷時に遅延が {{ratio}} 倍に増加。ダウンロード中にビデオ通話がカクつきます。",
     "warning_low_speed": "接続速度が低い",
@@ -277,6 +277,7 @@
     "error_rate_limited": "短時間にテストが多すぎます。数分お待ちください。",
     "error_connection": "サーバーに接続できません。接続を確認してください。",
     "unit_mbps": "Mbps",
+    "unit_gbps": "Gbps",
     "unit_ms": "ms"
   },
   "diagnostic": {
