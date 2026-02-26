@@ -385,10 +385,10 @@ Generated: 2026-02-26
     "windows": [
       {
         "title": "Netok",
-        "width": 320,
-        "height": 600,
-        "minWidth": 320,
-        "minHeight": 600,
+        "width": 360,
+        "height": 640,
+        "minWidth": 360,
+        "minHeight": 640,
         "resizable": true,
         "decorations": false,
         "transparent": true
@@ -609,7 +609,7 @@ function App() {
 - **Dev Path**: <http://localhost:5173>
 - **Dist Dir**: ../../ui/dist
 - **Window Title**: Netok
-- **Window Size**: 320×600
+- **Window Size**: 360×640
 
 ### Routes
 

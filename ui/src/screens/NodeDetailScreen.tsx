@@ -4,6 +4,8 @@ import { NetokLogoIcon, ShieldIcon, ToolsIcon, SettingsIcon } from '../component
 import { openUrl } from '@tauri-apps/plugin-opener';
 import { Button } from '@/components/ui/button';
 import { DiagnosticMessage } from '../components/DiagnosticMessage';
+import { PingBadge } from '../components/PingBadge';
+import { useLivePing } from '../hooks/useLivePing';
 
 import type { SingleNodeResult, DiagnosticScenario } from '../api/tauri';
 import { notifications } from '../utils/notifications';
@@ -116,6 +118,7 @@ interface InfoRow {
 export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToHome, onNavigateToSecurity, onNavigateToTools, onNavigateToSettings, onNavigateToDnsProviders, onNavigateToVpn }: NodeDetailScreenProps) {
   const { t } = useTranslation();
   const vpnConfigured = useVpnStore(s => s.configs.length > 0);
+  const vpnActive = useVpnStore(s => s.connectionState.type === 'connected');
 
   const handleCopyIp = (ip: string) => {
     navigator.clipboard.writeText(ip);
@@ -123,6 +126,16 @@ export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToHome, onN
   };
 
   const routerIp = nodeId === 'dns' ? result.router?.gateway_ip : null;
+
+  // Live ping for Router (gateway IP) and Internet (1.1.1.1) detail screens
+  // Skip router ping when VPN is active (DNS-based ping goes through tunnel)
+  const showPing = (nodeId === 'internet' || (nodeId === 'dns' && !vpnActive)) && result.node.status !== 'down';
+  const pingTargetIp = nodeId === 'dns'
+    ? (result.router?.gateway_ip ?? null)
+    : nodeId === 'internet'
+      ? '1.1.1.1'
+      : null;
+  const livePing = useLivePing(pingTargetIp, showPing && !!pingTargetIp);
 
   const handleOpenRouter = async () => {
     if (routerIp) {
@@ -257,6 +270,16 @@ export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToHome, onN
               )}
             </div>
           ))}
+
+          {/* Live ping for Router and Internet nodes */}
+          {showPing && (
+            <div>
+              <p className="text-sm text-muted-foreground">{t('speed_test.ping')}</p>
+              <div className="mt-0.5">
+                <PingBadge value={livePing} />
+              </div>
+            </div>
+          )}
 
           {/* Response time indicator for Internet node */}
           {inet?.latency_ms != null && (() => {

@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Sun, Moon, Languages, Minimize2, Info, BrushCleaning } from '../components/icons/UIIcons';
-import { toast } from 'sonner';
+import { ArrowLeft, Sun, Moon, Languages, Minimize2, Info } from '../components/icons/UIIcons';
+
 import { useThemeStore } from '../stores/themeStore';
 import { useCloseBehaviorStore } from '../stores/closeBehaviorStore';
 import { LANGUAGES, type LanguageCode } from '../constants/languages';
@@ -89,25 +89,6 @@ export function SettingsScreen({ onNavigateToTheme, onNavigateToLanguage, onNavi
           />
         </div>
 
-        <div className="flex-1" />
-
-        {/* Clear DNS cache */}
-        <Button
-          variant="outline"
-          className="w-full text-sm font-medium"
-          onClick={async () => {
-            try {
-              const { flushDns } = await import('../api/tauri');
-              await flushDns();
-              toast.success(t('dns_providers.cache_cleared'));
-            } catch (e) {
-              toast.error(String(e));
-            }
-          }}
-        >
-          <BrushCleaning className="w-4 h-4" />
-          {t('settings.tools.flush_dns')}
-        </Button>
       </div>
     </div>
   );

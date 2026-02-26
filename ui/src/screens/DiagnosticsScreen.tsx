@@ -8,9 +8,11 @@ import { MenuCard } from '@/components/MenuCard';
 import { NodeDetailScreen } from './NodeDetailScreen';
 import { DiagnosticMessage } from '../components/DiagnosticMessage';
 import { deriveScenario, type ScenarioContext } from '../utils/deriveScenario';
+import { PingBadge } from '../components/PingBadge';
 import { CloseButton } from '../components/WindowControls';
 import { useDiagnosticsStore, type NetworkNode } from '../stores/diagnosticsStore';
 import { useVpnStore } from '../stores/vpnStore';
+import { useLivePing } from '../hooks/useLivePing';
 import { openUrl } from '@tauri-apps/plugin-opener';
 import { useState, useCallback } from 'react';
 import type { DiagnosticScenario } from '../api/tauri';
@@ -52,6 +54,23 @@ export function DiagnosticsScreen({ onBack, onNavigateToSecurity, onNavigateToTo
   } = useDiagnosticsStore();
 
   const { configs: vpnConfigs, connectionState } = useVpnStore();
+
+  // Live ping for Router and Internet nodes
+  const routerGatewayIp = getRawResult('dns')?.router?.gateway_ip ?? null;
+  const routerNodeDown = nodes.find(n => n.id === 'dns')?.status === 'down';
+  const internetNodeDown = nodes.find(n => n.id === 'internet')?.status === 'down';
+  const hasInternetNode = nodes.some(n => n.id === 'internet');
+
+  const vpnActive = connectionState.type === 'connected';
+
+  const routerPing = useLivePing(
+    routerGatewayIp,
+    !isRunning && selectedNode === null && !routerNodeDown && !!routerGatewayIp && !vpnActive,
+  );
+  const internetPing = useLivePing(
+    '1.1.1.1',
+    !isRunning && selectedNode === null && !internetNodeDown && hasInternetNode,
+  );
 
   // Auto-run diagnostics on mount (skip when debug override is active)
   useEffect(() => {
@@ -187,6 +206,11 @@ export function DiagnosticsScreen({ onBack, onNavigateToSecurity, onNavigateToTo
               {/* Completed nodes */}
               {nodes.map((node) => {
                 const isDown = node.status === 'down';
+                const showPing = !isDown && !isRunning && (
+                  node.id === 'internet' || (node.id === 'dns' && !vpnActive)
+                );
+                const pingValue = node.id === 'dns' ? routerPing : node.id === 'internet' ? internetPing : undefined;
+
                 return (
                   <MenuCard
                     key={node.id}
@@ -194,6 +218,7 @@ export function DiagnosticsScreen({ onBack, onNavigateToSecurity, onNavigateToTo
                     icon={getStatusIcon(node.status)}
                     title={t(node.title)}
                     badge={node.id === 'internet' && vpnConnected ? t('diagnostics.via_vpn') : undefined}
+                    titleTrailing={showPing ? <PingBadge value={pingValue} className="self-baseline mt-0" /> : undefined}
                     subtitle={node.details.map((detail) => (
                       <div key={detail.text} className="flex"><span className="min-w-0 truncate" dir="ltr">{detail.text}</span></div>
                     ))}

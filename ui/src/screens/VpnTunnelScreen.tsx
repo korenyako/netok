@@ -210,24 +210,18 @@ export function VpnTunnelScreen({ onBack, onAddVpn }: VpnTunnelScreenProps) {
                   className="group ghost-action-card"
                   icon={<RadioDot selected={isThisActive} applying={isThisConnecting} />}
                   title={serverTitle}
+                  titleTrailing={isThisActive && isConnected ? <PingBadge value={ping} className="self-center mt-0" /> : undefined}
                   subtitle={serverSubtitle}
                   trailing={
-                    <div className="shrink-0 self-start">
-                      {isThisActive && isConnected && (
-                        <span className="group-hover:hidden">
-                          <PingBadge value={ping} />
-                        </span>
-                      )}
-                      <button
-                        className="ghost-action px-4 py-1.5 rounded-full text-[10px] font-medium uppercase tracking-wider text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all shrink-0 hidden group-hover:inline-flex"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEditServer(index);
-                        }}
-                      >
-                        {t('vpn.edit')}
-                      </button>
-                    </div>
+                    <button
+                      className="ghost-action px-4 py-1.5 rounded-full text-[10px] font-medium uppercase tracking-wider text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all shrink-0 hidden group-hover:inline-flex"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEditServer(index);
+                      }}
+                    >
+                      {t('vpn.edit')}
+                    </button>
                   }
                   onClick={() => handleSelectServer(index)}
                 />

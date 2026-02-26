@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { ArrowLeft, Loader2 } from '../components/icons/UIIcons';
-import { setDns, pingDnsServer, type DnsProvider as ApiDnsProvider } from '../api/tauri';
+import { ArrowLeft, Loader2, BrushCleaning } from '../components/icons/UIIcons';
+import { setDns, pingDnsServer, flushDns, type DnsProvider as ApiDnsProvider } from '../api/tauri';
 import { useDnsStore } from '../stores/useDnsStore';
 import { dnsStore } from '../stores/dnsStore';
 import { Button } from '@/components/ui/button';
@@ -224,8 +224,8 @@ export function DnsProvidersScreen({ onBack, onCustomIp }: DnsProvidersScreenPro
                   icon={<RadioDot selected={isActive} applying={isCardApplying} />}
                   title={t(card.nameKey)}
                   badge={card.badgeKey ? t(card.badgeKey) : undefined}
+                  titleTrailing={<PingBadge value={pings[card.id]} className="self-center mt-0" />}
                   subtitle={t(card.descKey)}
-                  trailing={<PingBadge value={pings[card.id]} />}
                   onClick={() => handleCardSelect(card)}
                 />
               </div>
@@ -242,24 +242,18 @@ export function DnsProvidersScreen({ onBack, onCustomIp }: DnsProvidersScreenPro
                   className="group ghost-action-card"
                   icon={<RadioDot selected={isCustomActive} applying={isCustomApplying} />}
                   title={t('dns_providers.custom')}
+                  titleTrailing={customIp ? <PingBadge value={pings['custom']} className="self-center mt-0" /> : undefined}
                   subtitle={customSubtitle() || t('dns_providers.custom_ip_desc')}
                   trailing={
-                    <div className="shrink-0 self-start">
-                      {customIp && (
-                        <span className="group-hover:hidden">
-                          <PingBadge value={pings['custom']} />
-                        </span>
-                      )}
-                      <button
-                        className="ghost-action px-4 py-1.5 rounded-full text-[10px] font-medium uppercase tracking-wider text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all shrink-0 hidden group-hover:inline-flex"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onCustomIp();
-                        }}
-                      >
-                        {t('dns_providers.custom_ip_edit')}
-                      </button>
-                    </div>
+                    <button
+                      className="ghost-action px-4 py-1.5 rounded-full text-[10px] font-medium uppercase tracking-wider text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all shrink-0 hidden group-hover:inline-flex"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onCustomIp();
+                      }}
+                    >
+                      {t('dns_providers.custom_ip_edit')}
+                    </button>
                   }
                   onClick={handleCustomSelect}
                 />
@@ -267,6 +261,24 @@ export function DnsProvidersScreen({ onBack, onCustomIp }: DnsProvidersScreenPro
             );
           })()}
         </div>
+
+        <div className="flex-1" />
+
+        <Button
+          variant="outline"
+          className="w-full text-sm font-medium mt-4"
+          onClick={async () => {
+            try {
+              await flushDns();
+              toast.success(t('dns_providers.cache_cleared'));
+            } catch (e) {
+              toast.error(String(e));
+            }
+          }}
+        >
+          <BrushCleaning className="w-4 h-4" />
+          {t('settings.tools.flush_dns')}
+        </Button>
       </div>
     </div>
   );

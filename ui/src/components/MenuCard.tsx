@@ -23,6 +23,8 @@ interface MenuCardProps {
   badge?: string;
   /** Custom badge styling (overrides default primary color) */
   badgeClassName?: string;
+  /** Extra element rendered after badge in the title row */
+  titleTrailing?: ReactNode;
   /** Secondary description text (string or ReactNode for multi-line content) */
   subtitle?: ReactNode;
   /** Right side element: 'chevron', 'check', 'spinner', 'switch', or custom ReactNode */
@@ -60,6 +62,7 @@ export function MenuCard({
   title,
   badge,
   badgeClassName,
+  titleTrailing,
   subtitle,
   trailing,
   switchChecked,
@@ -123,8 +126,9 @@ export function MenuCard({
           )}>
             <span className="truncate">{title}</span>
             {badge && (
-              <span className={cn("text-xs font-normal px-1.5 py-0.5 rounded shrink-0", badgeClassName || "text-primary bg-primary/10")}>{badge}</span>
+              <span className={cn("text-xs font-normal px-1.5 py-0.5 rounded shrink-0 self-center", badgeClassName || "text-primary bg-primary/10")}>{badge}</span>
             )}
+            {titleTrailing}
           </div>
           {subtitle && (
             <div className="text-sm font-normal text-muted-foreground leading-normal mt-0.5">
