@@ -66,19 +66,32 @@ export const useUpdateChecker = create<UpdateStore>((set, get) => ({
       let totalLength = 0;
       let downloaded = 0;
 
+      console.log('[Updater] Starting download...');
       await update.downloadAndInstall((event) => {
-        if (event.event === 'Started' && event.data.contentLength) {
-          totalLength = event.data.contentLength;
+        if (event.event === 'Started') {
+          totalLength = event.data.contentLength ?? 0;
+          console.log('[Updater] Download started, contentLength:', totalLength);
         } else if (event.event === 'Progress') {
           downloaded += event.data.chunkLength;
           if (totalLength > 0) {
             set({ progress: Math.round((downloaded / totalLength) * 100) });
+          } else {
+            // No content-length from server — show downloaded MB as progress hint
+            console.log('[Updater] Downloaded:', (downloaded / 1024 / 1024).toFixed(1), 'MB');
+            // Estimate based on typical installer size (~16 MB)
+            const estimated = Math.min(95, Math.round((downloaded / 16_800_000) * 100));
+            set({ progress: estimated });
           }
+        } else if (event.event === 'Finished') {
+          console.log('[Updater] Download finished');
+          set({ progress: 100 });
         }
       });
 
+      console.log('[Updater] Installing and relaunching...');
       await relaunch();
-    } catch {
+    } catch (err) {
+      console.error('[Updater] Download/install failed:', err);
       set({ status: 'error' });
     }
   },
