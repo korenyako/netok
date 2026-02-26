@@ -20,6 +20,7 @@ interface VpnState {
 
   // Runtime (not persisted)
   connectionState: VpnConnectionState;
+  lastAction: 'connect' | 'disconnect' | null;
   editingIndex: number | null;
 
   // Actions
@@ -41,6 +42,7 @@ export const useVpnStore = create<VpnState>()(
       configs: [],
       activeIndex: null,
       connectionState: { type: 'disconnected' },
+      lastAction: null,
       editingIndex: null,
 
       addConfig: (config) => {
@@ -87,7 +89,7 @@ export const useVpnStore = create<VpnState>()(
       connectByIndex: async (index) => {
         const config = get().configs[index];
         if (!config) return;
-        set({ activeIndex: index, connectionState: { type: 'connecting' } });
+        set({ activeIndex: index, connectionState: { type: 'connecting' }, lastAction: 'connect' });
         try {
           await connectVpn(config.rawKey);
           const status = await getVpnStatus();
@@ -106,7 +108,7 @@ export const useVpnStore = create<VpnState>()(
         const { configs, activeIndex } = get();
         if (activeIndex === null || !configs[activeIndex]) return;
         const config = configs[activeIndex];
-        set({ connectionState: { type: 'connecting' } });
+        set({ connectionState: { type: 'connecting' }, lastAction: 'connect' });
         try {
           await connectVpn(config.rawKey);
           const status = await getVpnStatus();
@@ -122,7 +124,7 @@ export const useVpnStore = create<VpnState>()(
       },
 
       disconnect: async () => {
-        set({ connectionState: { type: 'disconnecting' } });
+        set({ connectionState: { type: 'disconnecting' }, lastAction: 'disconnect' });
         try {
           await disconnectVpn();
           set({ connectionState: { type: 'disconnected' } });

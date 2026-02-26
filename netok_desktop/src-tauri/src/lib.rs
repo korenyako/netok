@@ -200,6 +200,65 @@ mod win_elevation {
         use windows::Win32::Foundation::{CloseHandle, HANDLE};
         let _ = unsafe { CloseHandle(HANDLE(raw_handle as *mut std::ffi::c_void)) };
     }
+
+    /// Kill a process by PID using elevated taskkill (shows UAC prompt).
+    /// Fallback for when TerminateProcess fails with ACCESS_DENIED.
+    pub fn kill_process_elevated(pid: u32) -> Result<(), String> {
+        use std::ffi::OsStr;
+        use std::mem;
+        use std::os::windows::ffi::OsStrExt;
+
+        use windows::core::PCWSTR;
+        use windows::Win32::Foundation::{CloseHandle, WAIT_OBJECT_0};
+        use windows::Win32::System::Threading::{GetExitCodeProcess, WaitForSingleObject};
+        use windows::Win32::UI::Shell::{
+            ShellExecuteExW, SEE_MASK_NOCLOSEPROCESS, SHELLEXECUTEINFOW,
+        };
+
+        fn to_wide_null(s: &str) -> Vec<u16> {
+            OsStr::new(s)
+                .encode_wide()
+                .chain(std::iter::once(0))
+                .collect()
+        }
+
+        let verb = to_wide_null("runas");
+        let file = to_wide_null("taskkill.exe");
+        let params = to_wide_null(&format!("/F /PID {}", pid));
+
+        let mut sei: SHELLEXECUTEINFOW = unsafe { mem::zeroed() };
+        sei.cbSize = mem::size_of::<SHELLEXECUTEINFOW>() as u32;
+        sei.fMask = SEE_MASK_NOCLOSEPROCESS;
+        sei.lpVerb = PCWSTR(verb.as_ptr());
+        sei.lpFile = PCWSTR(file.as_ptr());
+        sei.lpParameters = PCWSTR(params.as_ptr());
+        sei.nShow = 0; // SW_HIDE
+
+        unsafe { ShellExecuteExW(&mut sei) }.map_err(|e| {
+            format!("Elevated taskkill failed to launch: {}", e)
+        })?;
+
+        let hprocess = sei.hProcess;
+        if hprocess.is_invalid() {
+            return Err("taskkill process handle is invalid".to_string());
+        }
+
+        // Wait up to 15 seconds for taskkill to finish
+        let wait = unsafe { WaitForSingleObject(hprocess, 15_000) };
+
+        let mut exit_code: u32 = 1;
+        let _ = unsafe { GetExitCodeProcess(hprocess, &mut exit_code) };
+        let _ = unsafe { CloseHandle(hprocess) };
+
+        if wait != WAIT_OBJECT_0 {
+            return Err("Elevated taskkill timed out".to_string());
+        }
+        if exit_code != 0 {
+            return Err(format!("Elevated taskkill exited with code {}", exit_code));
+        }
+
+        Ok(())
+    }
 }
 
 // ==================== Existing Commands ====================
@@ -607,13 +666,102 @@ async fn disconnect_vpn(
         (state.elevated_pid, state.elevated_handle.take(), state.config_path.clone())
     };
 
-    // Terminate the elevated process using its handle
     #[cfg(target_os = "windows")]
     if let Some(h) = handle {
-        eprintln!("[VPN] Terminating sing-box PID: {:?}", pid);
-        tokio::task::spawn_blocking(move || win_elevation::terminate_process(h))
+        let the_pid = pid.unwrap_or(0);
+        eprintln!("[VPN] Terminating sing-box PID: {}", the_pid);
+
+        // Step 1: Try TerminateProcess with the stored handle (fast, no UAC)
+        let terminate_ok = tokio::task::spawn_blocking(move || win_elevation::terminate_process(h))
             .await
-            .map_err(|e| format!("Task error: {}", e))??;
+            .map_err(|e| format!("Task error: {}", e))?;
+
+        let mut process_dead = terminate_ok.is_ok();
+
+        if let Err(ref e) = terminate_ok {
+            eprintln!("[VPN] TerminateProcess failed: {}, trying fallbacks...", e);
+        }
+
+        // Step 2: If TerminateProcess failed, try non-elevated taskkill
+        if !process_dead && the_pid > 0 {
+            let pid_for_taskkill = the_pid;
+            let taskkill_result = tokio::task::spawn_blocking(move || {
+                use std::os::windows::process::CommandExt;
+                std::process::Command::new("taskkill")
+                    .args(["/F", "/PID", &pid_for_taskkill.to_string()])
+                    .creation_flags(0x08000000) // CREATE_NO_WINDOW
+                    .output()
+            })
+            .await
+            .ok()
+            .and_then(|r| r.ok());
+
+            if let Some(output) = taskkill_result {
+                if output.status.success() {
+                    eprintln!("[VPN] Non-elevated taskkill succeeded");
+                    // Wait a moment for process to fully exit
+                    tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+                    process_dead = true;
+                }
+            }
+        }
+
+        // Step 3: Verify process state before trying elevated kill
+        if !process_dead && the_pid > 0 {
+            let pid_check = the_pid;
+            let alive = tokio::task::spawn_blocking(move || win_elevation::is_process_alive(pid_check))
+                .await
+                .unwrap_or(true);
+            process_dead = !alive;
+        }
+
+        // Step 4: If still alive, try elevated taskkill (shows UAC prompt)
+        if !process_dead && the_pid > 0 {
+            eprintln!("[VPN] Trying elevated taskkill for PID: {}", the_pid);
+            let pid_for_elevated = the_pid;
+            let elevated_result = tokio::task::spawn_blocking(move || {
+                win_elevation::kill_process_elevated(pid_for_elevated)
+            })
+            .await
+            .map_err(|e| format!("Task error: {}", e))?;
+
+            match elevated_result {
+                Ok(()) => {
+                    eprintln!("[VPN] Elevated taskkill succeeded");
+                    tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+                    process_dead = true;
+                }
+                Err(e) => {
+                    eprintln!("[VPN] Elevated taskkill failed: {}", e);
+                }
+            }
+        }
+
+        // Step 5: Final check — is the process actually dead?
+        if !process_dead && the_pid > 0 {
+            let pid_final = the_pid;
+            let alive = tokio::task::spawn_blocking(move || win_elevation::is_process_alive(pid_final))
+                .await
+                .unwrap_or(true);
+            process_dead = !alive;
+        }
+
+        if !process_dead {
+            // All kill attempts failed — restore handle and revert state
+            // Note: handle may be stale after TerminateProcess failure,
+            // but terminate_process does NOT call CloseHandle on error,
+            // so the original handle value is still valid for future attempts.
+            // However, we no longer have the raw value since it was moved into
+            // terminate_process. We still have the PID for future kill attempts.
+            {
+                let mut state = vpn_state.lock().map_err(|e| e.to_string())?;
+                state.state = netok_bridge::VpnConnectionState::Error {
+                    message: "Failed to stop VPN process — access denied".to_string(),
+                };
+                // PID is kept so monitor can still track the process
+            }
+            return Err("Failed to terminate VPN process after all attempts".to_string());
+        }
     }
 
     // Clean up config file
@@ -621,7 +769,7 @@ async fn disconnect_vpn(
         let _ = std::fs::remove_file(path);
     }
 
-    // Update state
+    // Update state — process is confirmed dead
     {
         let mut state = vpn_state.lock().map_err(|e| e.to_string())?;
         state.state = netok_bridge::VpnConnectionState::Disconnected;

@@ -228,6 +228,7 @@
     "your_ip": "Ваш IP",
     "process_crashed": "Процес VPN несподівано зупинився",
     "connection_failed": "Не вдалося підключитися",
+    "disconnect_failed": "Не вдалося відключитися",
     "connection_failed_desc": "Не вдалося встановити VPN-з'єднання. Перевірте ключ і спробуйте ще раз.",
     "retry": "Повторити",
     "dismiss": "Сховати",

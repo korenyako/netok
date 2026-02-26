@@ -228,6 +228,7 @@
     "your_ip": "IP adresiniz",
     "process_crashed": "VPN işlemi beklenmedik şekilde durdu",
     "connection_failed": "Bağlantı başarısız",
+    "disconnect_failed": "Bağlantı kesme başarısız",
     "connection_failed_desc": "VPN bağlantısı kurulamadı. Anahtarınızı kontrol edin ve tekrar deneyin.",
     "retry": "Tekrar dene",
     "dismiss": "Kapat",

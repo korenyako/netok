@@ -228,6 +228,7 @@
     "your_ip": "내 IP",
     "process_crashed": "VPN 프로세스가 예기치 않게 중지되었습니다",
     "connection_failed": "연결 실패",
+    "disconnect_failed": "연결 해제 실패",
     "connection_failed_desc": "VPN 연결을 설정할 수 없습니다. 키를 확인하고 다시 시도하세요.",
     "retry": "다시 시도",
     "dismiss": "닫기",

@@ -228,6 +228,7 @@
     "your_ip": "您的 IP",
     "process_crashed": "VPN 进程意外停止",
     "connection_failed": "连接失败",
+    "disconnect_failed": "断开连接失败",
     "connection_failed_desc": "无法建立 VPN 连接。请检查密钥后重试。",
     "retry": "重试",
     "dismiss": "忽略",

@@ -228,6 +228,7 @@
     "your_ip": "あなたのIP",
     "process_crashed": "VPNプロセスが予期せず停止しました",
     "connection_failed": "接続に失敗しました",
+    "disconnect_failed": "切断に失敗しました",
     "connection_failed_desc": "VPN接続を確立できませんでした。キーを確認してもう一度お試しください。",
     "retry": "再試行",
     "dismiss": "閉じる",

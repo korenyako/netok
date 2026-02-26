@@ -228,6 +228,7 @@
     "your_ip": "IP شما",
     "process_crashed": "فرآیند VPN به طور غیرمنتظره‌ای متوقف شد",
     "connection_failed": "اتصال ناموفق بود",
+    "disconnect_failed": "قطع اتصال ناموفق بود",
     "connection_failed_desc": "امکان برقراری اتصال VPN وجود نداشت. کلید خود را بررسی کرده و دوباره تلاش کنید.",
     "retry": "تلاش مجدد",
     "dismiss": "رد کردن",

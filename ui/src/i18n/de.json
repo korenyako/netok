@@ -228,6 +228,7 @@
     "your_ip": "Ihre IP",
     "process_crashed": "VPN-Prozess unerwartet beendet",
     "connection_failed": "Verbindung fehlgeschlagen",
+    "disconnect_failed": "Trennung fehlgeschlagen",
     "connection_failed_desc": "VPN-Verbindung konnte nicht hergestellt werden. Überprüfen Sie Ihren Schlüssel und versuchen Sie es erneut.",
     "retry": "Erneut versuchen",
     "dismiss": "Ausblenden",

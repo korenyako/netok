@@ -233,6 +233,7 @@
     "your_ip": "Your IP",
     "process_crashed": "VPN process stopped unexpectedly",
     "connection_failed": "Failed to connect",
+    "disconnect_failed": "Failed to disconnect",
     "connection_failed_desc": "Could not establish VPN connection. Check your key and try again.",
     "retry": "Retry",
     "dismiss": "Dismiss",

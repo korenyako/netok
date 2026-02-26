@@ -228,6 +228,7 @@
     "your_ip": "Seu IP",
     "process_crashed": "O processo VPN parou inesperadamente",
     "connection_failed": "Falha ao conectar",
+    "disconnect_failed": "Falha ao desconectar",
     "connection_failed_desc": "Não foi possível estabelecer a conexão VPN. Verifique sua chave e tente novamente.",
     "retry": "Tentar novamente",
     "dismiss": "Dispensar",
