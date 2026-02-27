@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { dnsStore } from '../stores/dnsStore';
 import * as tauriApi from '../api/tauri';
 
@@ -15,13 +15,19 @@ vi.mock('../utils/notifications', () => ({
 describe('dnsStore', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.useFakeTimers();
     // Reset store state
     dnsStore['hasInitialized'] = false;
     dnsStore['initializationStarted'] = false;
     dnsStore['currentProvider'] = null;
     dnsStore['isLoading'] = true;
+    dnsStore['retryCount'] = 0;
     // Mock getDnsServers to avoid unhandled rejection in Promise.all
     vi.mocked(tauriApi.getDnsServers).mockResolvedValue([]);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   describe('initialize', () => {
@@ -36,26 +42,32 @@ describe('dnsStore', () => {
     });
 
     it('should set loading state during initialization', async () => {
+      let resolveProvider!: (value: tauriApi.DnsProvider) => void;
       vi.mocked(tauriApi.getDnsProvider).mockImplementation(
-        () =>
-          new Promise((resolve) =>
-            setTimeout(() => resolve({ type: 'Google' }), 50)
-          )
+        () => new Promise((resolve) => { resolveProvider = resolve; })
       );
 
       const initPromise = dnsStore.initialize();
       expect(dnsStore.isLoadingProvider()).toBe(true);
 
+      resolveProvider({ type: 'Google' });
       await initPromise;
       expect(dnsStore.isLoadingProvider()).toBe(false);
     });
 
-    it('should fallback to Auto on error', async () => {
+    it('should retry then fallback to Auto on persistent error', async () => {
       vi.mocked(tauriApi.getDnsProvider).mockRejectedValue(
         new Error('Failed to get DNS')
       );
 
+      // First call — triggers retry timer
       await dnsStore.initialize();
+      expect(dnsStore.isLoadingProvider()).toBe(true); // still loading during retry
+
+      // Advance through retry 1
+      await vi.advanceTimersByTimeAsync(2000);
+      // Advance through retry 2
+      await vi.advanceTimersByTimeAsync(2000);
 
       expect(dnsStore.getCurrentProvider()).toEqual({ type: 'Auto' });
       expect(dnsStore.isLoadingProvider()).toBe(false);

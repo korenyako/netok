@@ -18,11 +18,15 @@ pub fn get_active_adapter_name() -> Option<String> {
         }
     }
 
-    // Prefer the interface that currently has an IPv4 connection and the lowest metric
+    // Prefer the interface that currently has an IPv4 connection and the lowest metric.
+    // Exclude virtual adapters (Hyper-V, WSL, VPN tunnels) — they typically have
+    // no DNS configured and would cause DNS detection to fail.
     let commands = [
+        "Get-NetIPInterface -AddressFamily IPv4 | Where-Object {$_.ConnectionState -eq 'Connected'} | Sort-Object -Property InterfaceMetric | ForEach-Object { $a = Get-NetAdapter -InterfaceIndex $_.ifIndex -ErrorAction SilentlyContinue; if ($a -and -not $a.Virtual) { $_.InterfaceAlias } } | Select-Object -First 1",
+        // Fallback: any connected physical adapter
+        "Get-NetAdapter | Where-Object {$_.Status -eq 'Up' -and -not $_.Virtual} | Sort-Object -Property LinkSpeed -Descending | Select-Object -First 1 -ExpandProperty Name",
+        // Last resort: any connected adapter (including virtual)
         "Get-NetIPInterface -AddressFamily IPv4 | Where-Object {$_.ConnectionState -eq 'Connected'} | Sort-Object -Property InterfaceMetric | Select-Object -First 1 -ExpandProperty InterfaceAlias",
-        // Fallback in case the IP interface query fails
-        "Get-NetAdapter | Where-Object {$_.Status -eq 'Up'} | Sort-Object -Property LinkSpeed -Descending | Select-Object -First 1 -ExpandProperty Name",
     ];
 
     for cmd in commands {

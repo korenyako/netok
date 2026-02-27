@@ -48,7 +48,8 @@ export const useUpdateChecker = create<UpdateStore>((set, get) => ({
         set({ status: 'up-to-date' });
         return null;
       }
-    } catch {
+    } catch (err) {
+      console.error('[Updater] Check failed:', err);
       set({ status: 'error' });
       return null;
     }

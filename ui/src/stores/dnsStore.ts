@@ -20,6 +20,9 @@ class DnsStore {
   private listeners: Set<DnsStoreListener> = new Set();
   private hasInitialized: boolean = false;
   private initializationStarted: boolean = false;  // Separate flag to prevent double-fetch
+  private retryCount: number = 0;
+  private static readonly MAX_RETRIES = 2;
+  private static readonly RETRY_DELAY_MS = 2000;
 
   async initialize() {
     logDns('initialize() called', {
@@ -52,15 +55,25 @@ class DnsStore {
       this.currentProvider = provider;
       this.dnsServers = servers;
       this.hasInitialized = true;
+      this.isLoading = false;
+      logDns('initialize() finished', { provider: this.currentProvider, isLoading: this.isLoading });
+      this.notifyListeners();
     } catch (err) {
       console.error('[DNS][UI] Failed to get DNS provider:', err);
-      this.currentProvider = { type: 'Auto' };
-      logDns('Fallback to Auto due to error');
-      this.hasInitialized = true;  // Mark as initialized even on error to prevent retry loops
 
-      // Show notification only if this was a refresh (not first load)
-      // Note: we check hasInitialized BEFORE setting it above, so this only triggers on refresh
-    } finally {
+      // Retry on startup — WiFi API or adapter detection may not be ready yet
+      if (this.retryCount < DnsStore.MAX_RETRIES) {
+        this.retryCount++;
+        this.initializationStarted = false;
+        logDns(`Retrying in ${DnsStore.RETRY_DELAY_MS}ms (attempt ${this.retryCount}/${DnsStore.MAX_RETRIES})`);
+        setTimeout(() => this.initialize(), DnsStore.RETRY_DELAY_MS);
+        // Keep isLoading = true while retrying, don't notify listeners
+        return;
+      }
+
+      this.currentProvider = { type: 'Auto' };
+      logDns('Fallback to Auto after all retries exhausted');
+      this.hasInitialized = true;
       this.isLoading = false;
       logDns('initialize() finished', { provider: this.currentProvider, isLoading: this.isLoading });
       this.notifyListeners();
