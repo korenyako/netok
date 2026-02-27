@@ -546,13 +546,13 @@ function TaskCheckRow({ item, isOpen, onToggle, t }: {
     <button onClick={onToggle} className={`flex flex-col w-full text-left rounded-lg px-4 py-3 transition-colors ${isOpen ? 'bg-accent' : 'hover:bg-accent'}`}>
       <div className="flex items-center w-full gap-2">
         <span className={`w-2 h-2 rounded-full shrink-0 ${item.pass ? 'bg-success' : 'bg-destructive'}`} />
-        <span className={`text-sm flex-1 min-w-0 truncate ${item.pass ? 'text-muted-foreground' : 'text-foreground'}`}>
+        <span className={`text-base flex-1 min-w-0 truncate ${item.pass ? 'text-muted-foreground' : 'text-foreground'}`}>
           {t(item.nameKey)}
         </span>
         <ChevronDown className={`w-4 h-4 text-muted-foreground shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </div>
       {isOpen && (
-        <p className="text-xs text-muted-foreground leading-relaxed pl-4 pr-6 pt-1">
+        <p className="text-sm text-muted-foreground leading-relaxed pl-4 pr-6 pt-1">
           {t(item.descKey, item.descParams)}
         </p>
       )}

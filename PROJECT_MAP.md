@@ -167,8 +167,50 @@ Generated: 2026-02-27
 │   │   │       ├── desktop-schema.json
 │   │   │       └── windows-schema.json
 │   │   ├── icons
+│   │   │   ├── android
+│   │   │   │   ├── mipmap-anydpi-v26
+│   │   │   │   ├── mipmap-hdpi
+│   │   │   │   ├── mipmap-mdpi
+│   │   │   │   ├── mipmap-xhdpi
+│   │   │   │   ├── mipmap-xxhdpi
+│   │   │   │   ├── mipmap-xxxhdpi
+│   │   │   │   └── values
+│   │   │   ├── ios
+│   │   │   │   ├── AppIcon-20x20@1x.png
+│   │   │   │   ├── AppIcon-20x20@2x-1.png
+│   │   │   │   ├── AppIcon-20x20@2x.png
+│   │   │   │   ├── AppIcon-20x20@3x.png
+│   │   │   │   ├── AppIcon-29x29@1x.png
+│   │   │   │   ├── AppIcon-29x29@2x-1.png
+│   │   │   │   ├── AppIcon-29x29@2x.png
+│   │   │   │   ├── AppIcon-29x29@3x.png
+│   │   │   │   ├── AppIcon-40x40@1x.png
+│   │   │   │   ├── AppIcon-40x40@2x-1.png
+│   │   │   │   ├── AppIcon-40x40@2x.png
+│   │   │   │   ├── AppIcon-40x40@3x.png
+│   │   │   │   ├── AppIcon-512@2x.png
+│   │   │   │   ├── AppIcon-60x60@2x.png
+│   │   │   │   ├── AppIcon-60x60@3x.png
+│   │   │   │   ├── AppIcon-76x76@1x.png
+│   │   │   │   ├── AppIcon-76x76@2x.png
+│   │   │   │   └── AppIcon-83.5x83.5@2x.png
+│   │   │   ├── 128x128.png
+│   │   │   ├── 128x128@2x.png
 │   │   │   ├── 32x32.png
-│   │   │   └── icon.ico
+│   │   │   ├── 64x64.png
+│   │   │   ├── icon.icns
+│   │   │   ├── icon.ico
+│   │   │   ├── icon.png
+│   │   │   ├── Square107x107Logo.png
+│   │   │   ├── Square142x142Logo.png
+│   │   │   ├── Square150x150Logo.png
+│   │   │   ├── Square284x284Logo.png
+│   │   │   ├── Square30x30Logo.png
+│   │   │   ├── Square310x310Logo.png
+│   │   │   ├── Square44x44Logo.png
+│   │   │   ├── Square71x71Logo.png
+│   │   │   ├── Square89x89Logo.png
+│   │   │   └── StoreLogo.png
 │   │   ├── src
 │   │   │   ├── lib.rs
 │   │   │   └── main.rs
@@ -343,7 +385,6 @@ Generated: 2026-02-27
 ├── nul
 ├── package-lock.json
 ├── package.json
-├── parse_ico.py
 ├── PROJECT_CONTEXT.md
 ├── PROJECT_MAP.md
 ├── README.de.md
@@ -361,7 +402,6 @@ Generated: 2026-02-27
 ├── README.uk.md
 ├── README.zh.md
 ├── speedtest-prototype-v2.html
-├── telegram_icon256.ico
 └── THIRD_PARTY_LICENSES.md
 
 ```
