@@ -281,12 +281,12 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, onNa
         {/* Message + action block — centered in remaining bottom space */}
         <div className="flex-[3] flex flex-col items-center justify-center gap-2">
           {messageText && (
-            <p className="text-sm text-center leading-normal max-w-[240px] text-foreground font-medium">
+            <p className="text-sm text-center leading-normal max-w-[85%] text-foreground font-medium">
               {messageText}
             </p>
           )}
           {actionText && (
-            <p className="text-sm text-center leading-normal max-w-[240px] text-muted-foreground">
+            <p className="text-sm text-center leading-normal max-w-[85%] text-muted-foreground">
               {actionText}
             </p>
           )}

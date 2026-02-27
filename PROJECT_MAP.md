@@ -1,6 +1,6 @@
 # Project Map - Netok
 
-Generated: 2026-02-26
+Generated: 2026-02-27
 
 ## TREE (ASCII)
 
@@ -385,9 +385,9 @@ Generated: 2026-02-26
     "windows": [
       {
         "title": "Netok",
-        "width": 360,
+        "width": 340,
         "height": 640,
-        "minWidth": 360,
+        "minWidth": 340,
         "minHeight": 640,
         "resizable": true,
         "decorations": false,
@@ -609,7 +609,7 @@ function App() {
 - **Dev Path**: <http://localhost:5173>
 - **Dist Dir**: ../../ui/dist
 - **Window Title**: Netok
-- **Window Size**: 360×640
+- **Window Size**: 340×640
 
 ### Routes
 
