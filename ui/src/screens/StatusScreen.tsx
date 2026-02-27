@@ -232,7 +232,8 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, onNa
         {/* Status Circle - Clickable */}
         <button
           onClick={onOpenDiagnostics}
-          className="relative w-60 h-60 shrink-0 rounded-full focus:outline-none cursor-pointer"
+          className="status-circle-hover relative w-60 h-60 shrink-0 rounded-full focus:outline-none cursor-pointer"
+          style={{ '--circle-color': strokeColor } as React.CSSProperties}
         >
           <svg
             className="w-full h-full overflow-visible"

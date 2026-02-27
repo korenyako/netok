@@ -230,6 +230,29 @@ html, body, #root {
     position: relative;
   }
 
+  /* Radial reveal for status circle — same animation, color from CSS variable */
+  .status-circle-hover {
+    z-index: 1;
+  }
+  .status-circle-hover::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--circle-color);
+    opacity: 0.08;
+    z-index: -1;
+    transform: scale(0);
+    transition: transform 400ms ease-out;
+    pointer-events: none;
+  }
+  .status-circle-hover:hover::after {
+    transform: scale(1);
+  }
+  .status-circle-hover > * {
+    position: relative;
+  }
+
   /* Ghost action pattern (Material Design):
      When a .ghost-action button inside a card is hovered,
      suppress the card's hover background so only the button stands out. */
