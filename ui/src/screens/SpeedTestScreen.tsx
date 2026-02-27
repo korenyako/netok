@@ -29,6 +29,14 @@ export function SpeedTestScreen({ onBack }: SpeedTestScreenProps) {
   const isRunning = phase === 'download' || phase === 'upload';
   const isCoolingDown = cooldownSecondsLeft > 0;
 
+  // Auto-start test on mount if idle and internet available
+  useEffect(() => {
+    if (phase === 'idle' && cooldownSecondsLeft === 0 && !internetBlocked) {
+      startTest();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only on mount
+
   const handleRestart = useCallback(() => {
     if (isRunning) cancelTest();
     reset();
@@ -108,6 +116,7 @@ function CircleProgress({ internetBlocked, availability }: { internetBlocked: bo
 
   return (
     <div className="flex flex-col items-center mb-6">
+      <div className="h-4 shrink-0" />
       <div className="relative w-60 h-60">
         <svg className="-rotate-90" viewBox={`0 0 ${CIRCLE_SIZE} ${CIRCLE_SIZE}`} fill="none" style={{ width: '100%', height: '100%' }}>
           <circle

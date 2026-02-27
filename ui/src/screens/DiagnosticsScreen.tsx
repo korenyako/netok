@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, RotateCw } from '../components/icons/UIIcons';
-import { NetokLogoIcon, ShieldIcon, ToolsIcon, SettingsIcon } from '../components/icons/NavigationIcons';
 import { NodeOkIcon, NodeWarningIcon, NodeErrorIcon, NodeLoadingIcon } from '../components/icons/DiagnosticStatusIcons';
 import { Button } from '@/components/ui/button';
 import { MenuCard } from '@/components/MenuCard';
@@ -19,9 +18,6 @@ import type { DiagnosticScenario } from '../api/tauri';
 
 interface DiagnosticsScreenProps {
   onBack: () => void;
-  onNavigateToSecurity?: () => void;
-  onNavigateToTools?: () => void;
-  onNavigateToSettings?: () => void;
   onNavigateToDnsProviders?: () => void;
   onNavigateToVpn?: () => void;
 }
@@ -39,7 +35,7 @@ const BASE_SCENARIO_ACTIONS: Partial<Record<DiagnosticScenario, 'dns' | 'vpn' | 
   wifi_not_connected: 'wifi_settings',
 };
 
-export function DiagnosticsScreen({ onBack, onNavigateToSecurity, onNavigateToTools, onNavigateToSettings, onNavigateToDnsProviders, onNavigateToVpn }: DiagnosticsScreenProps) {
+export function DiagnosticsScreen({ onBack, onNavigateToDnsProviders, onNavigateToVpn }: DiagnosticsScreenProps) {
   const { t } = useTranslation();
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
 
@@ -142,10 +138,6 @@ export function DiagnosticsScreen({ onBack, onNavigateToSecurity, onNavigateToTo
         nodeId={selectedNode}
         result={selectedResult}
         onBack={() => setSelectedNode(null)}
-        onNavigateToHome={onBack}
-        onNavigateToSecurity={onNavigateToSecurity}
-        onNavigateToTools={onNavigateToTools}
-        onNavigateToSettings={onNavigateToSettings}
         onNavigateToDnsProviders={onNavigateToDnsProviders}
         onNavigateToVpn={onNavigateToVpn}
       />
@@ -153,7 +145,7 @@ export function DiagnosticsScreen({ onBack, onNavigateToSecurity, onNavigateToTo
   }
 
   return (
-    <div className="flex flex-col h-full bg-background">
+    <div className="flex flex-col flex-1 min-h-0 bg-background">
       {/* Header */}
       <div data-tauri-drag-region className="px-4 pt-4 pb-3">
         <div className="flex items-center gap-2 pointer-events-auto">
@@ -246,23 +238,6 @@ export function DiagnosticsScreen({ onBack, onNavigateToSecurity, onNavigateToTo
         </div>
       )}
 
-      {/* Bottom Navigation Bar */}
-      <nav className="bg-background px-4 py-4">
-        <div className="flex items-center justify-between">
-          <Button variant="ghost" size="icon" className="h-12 w-12 text-foreground bg-accent" onClick={onBack}>
-            <NetokLogoIcon className="w-6 h-6" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-12 w-12 text-muted-foreground" onClick={onNavigateToSecurity}>
-            <ShieldIcon className="w-6 h-6" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-12 w-12 text-muted-foreground" onClick={onNavigateToTools}>
-            <ToolsIcon className="w-6 h-6" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-12 w-12 text-muted-foreground" onClick={onNavigateToSettings}>
-            <SettingsIcon className="w-6 h-6" />
-          </Button>
-        </div>
-      </nav>
     </div>
   );
 }

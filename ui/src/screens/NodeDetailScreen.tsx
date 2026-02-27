@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Copy, ArrowUpRight, Lock, LockOpen, Wifi } from '../components/icons/UIIcons';
-import { NetokLogoIcon, ShieldIcon, ToolsIcon, SettingsIcon } from '../components/icons/NavigationIcons';
 import { openUrl } from '@tauri-apps/plugin-opener';
 import { Button } from '@/components/ui/button';
 import { DiagnosticMessage } from '../components/DiagnosticMessage';
@@ -16,10 +15,6 @@ interface NodeDetailScreenProps {
   nodeId: string;
   result: SingleNodeResult;
   onBack: () => void;
-  onNavigateToHome?: () => void;
-  onNavigateToSecurity?: () => void;
-  onNavigateToTools?: () => void;
-  onNavigateToSettings?: () => void;
   onNavigateToDnsProviders?: () => void;
   onNavigateToVpn?: () => void;
 }
@@ -115,7 +110,7 @@ interface InfoRow {
   valueClass?: string;
 }
 
-export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToHome, onNavigateToSecurity, onNavigateToTools, onNavigateToSettings, onNavigateToDnsProviders, onNavigateToVpn }: NodeDetailScreenProps) {
+export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToDnsProviders, onNavigateToVpn }: NodeDetailScreenProps) {
   const { t } = useTranslation();
   const vpnConfigured = useVpnStore(s => s.configs.length > 0);
   const vpnActive = useVpnStore(s => s.connectionState.type === 'connected');
@@ -215,7 +210,7 @@ export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToHome, onN
   }
 
   return (
-    <div className="flex flex-col h-full bg-background">
+    <div className="flex flex-col flex-1 min-h-0 bg-background">
       {/* Header */}
       <div data-tauri-drag-region className="px-4 pt-4 pb-3">
         <div className="flex items-center gap-2 pointer-events-auto">
@@ -357,23 +352,6 @@ export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToHome, onN
         )}
       </div>
 
-      {/* Bottom Navigation Bar */}
-      <nav className="bg-background px-4 py-4">
-        <div className="flex items-center justify-between">
-          <Button variant="ghost" size="icon" className="h-12 w-12 text-muted-foreground" onClick={onNavigateToHome}>
-            <NetokLogoIcon className="w-6 h-6" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-12 w-12 text-muted-foreground" onClick={onNavigateToSecurity}>
-            <ShieldIcon className="w-6 h-6" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-12 w-12 text-muted-foreground" onClick={onNavigateToTools}>
-            <ToolsIcon className="w-6 h-6" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-12 w-12 text-muted-foreground" onClick={onNavigateToSettings}>
-            <SettingsIcon className="w-6 h-6" />
-          </Button>
-        </div>
-      </nav>
     </div>
   );
 }

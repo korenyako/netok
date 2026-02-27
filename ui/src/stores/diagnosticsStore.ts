@@ -392,6 +392,23 @@ export const shouldRefreshDiagnostics = (lastUpdated: number | null): boolean =>
   return lastUpdated < thirtySecondsAgo;
 };
 
+// Derive overall status color from diagnostic nodes
+export type StatusColor = 'success' | 'warning' | 'error' | 'loading';
+
+export function getStatusColor(nodes: { status: string }[], isRunning: boolean): StatusColor {
+  if (isRunning || nodes.length === 0) return 'loading';
+  if (nodes.some(n => n.status === 'down')) return 'error';
+  if (nodes.some(n => n.status === 'partial')) return 'warning';
+  return 'success';
+}
+
+export const STATUS_TEXT_CLASS: Record<StatusColor, string> = {
+  loading: 'text-muted-foreground hover:text-muted-foreground',
+  success: 'text-primary hover:text-primary',
+  warning: 'text-warning hover:text-warning',
+  error: 'text-destructive hover:text-destructive',
+};
+
 // Derive network availability level from current diagnostic nodes
 export type NetworkAvailability = 'full' | 'local_only' | 'no_network';
 

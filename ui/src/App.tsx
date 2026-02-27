@@ -91,14 +91,18 @@ function App() {
     return (
       <ThemeProvider>
         <Toaster />
-                <div id="app" className="h-full flex flex-col bg-background">
+        <div id="app" className="h-full flex flex-col bg-background">
           <DiagnosticsScreen
             onBack={goBack}
+            onNavigateToDnsProviders={() => navigateToSecuritySubScreen('dns-providers')}
+            onNavigateToVpn={() => navigateToSecuritySubScreen('vpn')}
+          />
+          <BottomNav
+            currentScreen={currentScreen}
+            onNavigateToHome={goBack}
             onNavigateToSecurity={navigateToSecurity}
             onNavigateToTools={navigateToTools}
             onNavigateToSettings={navigateToSettings}
-            onNavigateToDnsProviders={() => navigateToSecuritySubScreen('dns-providers')}
-            onNavigateToVpn={() => navigateToSecuritySubScreen('vpn')}
           />
         </div>
       </ThemeProvider>

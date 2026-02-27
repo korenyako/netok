@@ -398,6 +398,26 @@ function taskItem(nameKey: string, pass: boolean, params: Record<string, string>
   return { nameKey, pass, descKey: nameKey + suffix, descParams: params };
 }
 
+function gamingTask(ping: number, jitter: number, params: Record<string, string>): TaskCheckItem {
+  const nameKey = 'speed_test.task_online_gaming';
+  const pingOk = ping <= 50;
+  const jitterOk = jitter <= 30;
+  const pass = pingOk && jitterOk;
+  if (pass) return { nameKey, pass, descKey: nameKey + '_pass', descParams: params };
+  const suffix = !pingOk && !jitterOk ? '_fail_both' : !pingOk ? '_fail_ping' : '_fail_jitter';
+  return { nameKey, pass, descKey: nameKey + suffix, descParams: params };
+}
+
+function videoCallsTask(dl: number, ping: number, params: Record<string, string>): TaskCheckItem {
+  const nameKey = 'speed_test.task_video_calls';
+  const dlOk = dl >= 3;
+  const pingOk = ping <= 100;
+  const pass = dlOk && pingOk;
+  if (pass) return { nameKey, pass, descKey: nameKey + '_pass', descParams: params };
+  const suffix = !dlOk && !pingOk ? '_fail_both' : !dlOk ? '_fail_download' : '_fail_ping';
+  return { nameKey, pass, descKey: nameKey + suffix, descParams: params };
+}
+
 function calculateTaskChecklist(m: SpeedTestMetrics): TaskCheckItem[] {
   const dl = m.download ?? 0;
   const ul = m.upload ?? 0;
@@ -413,8 +433,8 @@ function calculateTaskChecklist(m: SpeedTestMetrics): TaskCheckItem[] {
 
   const tasks: TaskCheckItem[] = [
     taskItem('speed_test.task_4k_video',        dl >= 25,                              p),
-    taskItem('speed_test.task_online_gaming',    ping <= 50 && jitter <= 30,            p),
-    taskItem('speed_test.task_video_calls',      dl >= 5 && ul >= 3 && ping <= 100,     p),
+    gamingTask(ping, jitter, p),
+    videoCallsTask(dl, ping, p),
     taskItem('speed_test.task_hd_video',         dl >= 10,                              p),
     taskItem('speed_test.task_music_podcasts',   dl >= 1,                               p),
     taskItem('speed_test.task_social_web',       dl >= 3,                               p),

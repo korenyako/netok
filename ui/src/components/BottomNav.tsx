@@ -1,6 +1,7 @@
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { NetokLogoIcon, ShieldIcon, ToolsIcon, SettingsIcon } from './icons/NavigationIcons';
+import { useDiagnosticsStore, getStatusColor, STATUS_TEXT_CLASS } from '../stores/diagnosticsStore';
 import type { Screen } from '../hooks/useNavigation';
 
 interface BottomNavProps {
@@ -18,6 +19,9 @@ export function BottomNav({
   onNavigateToTools,
   onNavigateToSettings,
 }: BottomNavProps) {
+  const { nodes, isRunning } = useDiagnosticsStore();
+  const statusColor = getStatusColor(nodes, isRunning);
+
   return (
     <nav className="bg-background px-4 py-4">
       <div className="flex items-center justify-between">
@@ -27,7 +31,8 @@ export function BottomNav({
           onClick={onNavigateToHome}
           className={cn(
             'h-12 w-12',
-            currentScreen === 'home' ? 'text-foreground bg-accent' : 'text-muted-foreground'
+            STATUS_TEXT_CLASS[statusColor],
+            currentScreen === 'home' && 'bg-accent'
           )}
         >
           <NetokLogoIcon className="w-6 h-6" />
