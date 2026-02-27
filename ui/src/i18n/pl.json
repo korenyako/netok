@@ -1,6 +1,9 @@
 {
   "network": {
-    "unknown": "Nieznane"
+    "unknown": "Nieznane",
+    "unavailable": "Niedostępne",
+    "scan_unavailable_no_network": "Niedostępne — brak połączenia z siecią",
+    "scan_unavailable_no_internet": "Niedostępne — brak połączenia z internetem"
   },
   "dns_providers": {
     "title": "DNS",
@@ -184,7 +187,9 @@
       "flush_dns": "Wyczyść pamięć podręczną DNS",
       "flush_dns_desc": "Rozwiąż problem «strona się nie ładuje»",
       "device_scan": "Skanowanie urządzeń",
-      "device_scan_desc": "Zobacz, kto jest w Twojej sieci"
+      "device_scan_desc": "Zobacz, kto jest w Twojej sieci",
+      "wifi_security": "Bezpieczeństwo\nWi-Fi",
+      "wifi_security_desc": "Sprawdź bezpieczeństwo sieci"
     }
   },
   "protection": {
@@ -267,12 +272,30 @@
     "warning_unstable": "Niestabilne połączenie",
     "warning_unstable_desc": "Jitter {{jitter}}ms — połączenie jest niestabilne. Możliwe zacinanie w grach i wideorozmowach.",
     "task_4k_video": "Wideo 4K",
+    "task_4k_video_pass": "Możesz oglądać w 4K bez buforowania",
+    "task_4k_video_fail": "Do 4K potrzeba co najmniej 25 Mbps",
     "task_online_gaming": "Gry online",
+    "task_online_gaming_pass": "Możesz grać online bez lagów",
+    "task_online_gaming_fail_ping": "Do komfortowej gry ping musi być poniżej 50 ms",
+    "task_online_gaming_fail_jitter": "Do komfortowej gry jitter musi być poniżej 30 ms",
+    "task_online_gaming_fail_both": "Do komfortowej gry ping musi być poniżej 50 ms, a jitter poniżej 30 ms",
     "task_video_calls": "Wideorozmowy",
+    "task_video_calls_pass": "Rozmowy będą działać bez zacięć",
+    "task_video_calls_fail_download": "Do stabilnych rozmów potrzeba co najmniej 3 Mbps",
+    "task_video_calls_fail_ping": "Do stabilnych rozmów ping musi być poniżej 100 ms",
+    "task_video_calls_fail_both": "Do stabilnych rozmów potrzeba co najmniej 3 Mbps i ping poniżej 100 ms",
     "task_hd_video": "Wideo HD",
+    "task_hd_video_pass": "Możesz oglądać w HD bez przerw",
+    "task_hd_video_fail": "Do HD potrzeba co najmniej 10 Mbps",
     "task_music_podcasts": "Muzyka i podcasty",
+    "task_music_podcasts_pass": "Muzyka i podcasty grają bez przerw",
+    "task_music_podcasts_fail": "Do płynnego odtwarzania potrzeba co najmniej 1 Mbps",
     "task_social_web": "Media społecznościowe i web",
+    "task_social_web_pass": "Strony ładują się szybko",
+    "task_social_web_fail": "Do szybkiego przeglądania potrzeba co najmniej 3 Mbps",
     "task_email_messengers": "E-mail i komunikatory",
+    "task_email_messengers_pass": "Wiadomości docierają natychmiast",
+    "task_email_messengers_fail": "Prędkość poniżej 0,5 Mbps — internet działa, ale bardzo wolno",
     "error_no_server": "Nie znaleziono serwera testowego. Sprawdź połączenie z internetem.",
     "error_test_failed": "Test prędkości nie powiódł się. Spróbuj ponownie.",
     "error_rate_limited": "Za dużo testów z rzędu. Poczekaj kilka minut.",

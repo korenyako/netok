@@ -1,6 +1,9 @@
 {
   "network": {
-    "unknown": "未知"
+    "unknown": "未知",
+    "unavailable": "不可用",
+    "scan_unavailable_no_network": "不可用——没有网络连接",
+    "scan_unavailable_no_internet": "不可用——没有互联网连接"
   },
   "dns_providers": {
     "title": "DNS",
@@ -184,7 +187,9 @@
       "flush_dns": "清除 DNS 缓存",
       "flush_dns_desc": "解决「网站无法打开」的问题",
       "device_scan": "设备扫描",
-      "device_scan_desc": "查看网络上连接的设备"
+      "device_scan_desc": "查看网络上连接的设备",
+      "wifi_security": "Wi-Fi\n安全",
+      "wifi_security_desc": "检查网络安全状况"
     }
   },
   "protection": {
@@ -267,12 +272,30 @@
     "warning_unstable": "连接不稳定",
     "warning_unstable_desc": "Jitter {{jitter}}ms — 连接不稳定。游戏和视频通话中可能出现冻结。",
     "task_4k_video": "4K 视频",
+    "task_4k_video_pass": "可以流畅观看4K视频",
+    "task_4k_video_fail": "4K视频至少需要25 Mbps",
     "task_online_gaming": "在线游戏",
+    "task_online_gaming_pass": "可以流畅进行在线游戏",
+    "task_online_gaming_fail_ping": "流畅游戏需要延迟低于50 ms",
+    "task_online_gaming_fail_jitter": "流畅游戏需要抖动低于30 ms",
+    "task_online_gaming_fail_both": "流畅游戏需要延迟低于50 ms且抖动低于30 ms",
     "task_video_calls": "视频通话",
+    "task_video_calls_pass": "通话不会卡顿",
+    "task_video_calls_fail_download": "稳定通话至少需要3 Mbps",
+    "task_video_calls_fail_ping": "稳定通话需要延迟低于100 ms",
+    "task_video_calls_fail_both": "稳定通话至少需要3 Mbps且延迟低于100 ms",
     "task_hd_video": "高清视频",
+    "task_hd_video_pass": "可以流畅观看高清视频",
+    "task_hd_video_fail": "高清视频至少需要10 Mbps",
     "task_music_podcasts": "音乐和播客",
+    "task_music_podcasts_pass": "音乐和播客播放流畅",
+    "task_music_podcasts_fail": "流畅播放至少需要1 Mbps",
     "task_social_web": "社交媒体和网页",
+    "task_social_web_pass": "网页加载很快",
+    "task_social_web_fail": "快速浏览至少需要3 Mbps",
     "task_email_messengers": "邮件和即时通讯",
+    "task_email_messengers_pass": "消息即时送达",
+    "task_email_messengers_fail": "网速低于0.5 Mbps——能上网，但非常慢",
     "error_no_server": "找不到测试服务器。请检查您的互联网连接。",
     "error_test_failed": "测速失败。请重试。",
     "error_rate_limited": "短时间内测试次数过多。请等待几分钟。",

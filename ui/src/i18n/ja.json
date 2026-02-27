@@ -1,6 +1,9 @@
 {
   "network": {
-    "unknown": "不明"
+    "unknown": "不明",
+    "unavailable": "利用不可",
+    "scan_unavailable_no_network": "利用不可 — ネットワーク接続がありません",
+    "scan_unavailable_no_internet": "利用不可 — インターネット接続がありません"
   },
   "dns_providers": {
     "title": "DNS",
@@ -184,7 +187,9 @@
       "flush_dns": "DNSキャッシュをクリア",
       "flush_dns_desc": "「サイトが読み込まれない」問題を修正",
       "device_scan": "デバイススキャン",
-      "device_scan_desc": "ネットワーク上のデバイスを確認"
+      "device_scan_desc": "ネットワーク上のデバイスを確認",
+      "wifi_security": "Wi-Fi\nセキュリティ",
+      "wifi_security_desc": "ネットワークのセキュリティを確認"
     }
   },
   "protection": {
@@ -267,12 +272,30 @@
     "warning_unstable": "接続が不安定",
     "warning_unstable_desc": "Jitter {{jitter}}ms — 接続が不安定です。ゲームやビデオ通話でフリーズが発生する可能性があります。",
     "task_4k_video": "4K動画",
+    "task_4k_video_pass": "4K動画をバッファなしで視聴できます",
+    "task_4k_video_fail": "4Kには最低25 Mbps必要です",
     "task_online_gaming": "オンラインゲーム",
+    "task_online_gaming_pass": "ラグなしでオンラインゲームができます",
+    "task_online_gaming_fail_ping": "快適にプレイするにはPingが50 ms以下である必要があります",
+    "task_online_gaming_fail_jitter": "快適にプレイするにはジッターが30 ms以下である必要があります",
+    "task_online_gaming_fail_both": "快適にプレイするにはPingが50 ms以下、ジッターが30 ms以下である必要があります",
     "task_video_calls": "ビデオ通話",
+    "task_video_calls_pass": "通話はフリーズなしで利用できます",
+    "task_video_calls_fail_download": "安定した通話には最低3 Mbps必要です",
+    "task_video_calls_fail_ping": "安定した通話にはPingが100 ms以下である必要があります",
+    "task_video_calls_fail_both": "安定した通話には最低3 MbpsとPing 100 ms以下が必要です",
     "task_hd_video": "HD動画",
+    "task_hd_video_pass": "HD動画を途切れなく視聴できます",
+    "task_hd_video_fail": "HDには最低10 Mbps必要です",
     "task_music_podcasts": "音楽とポッドキャスト",
+    "task_music_podcasts_pass": "音楽とポッドキャストが途切れず再生されます",
+    "task_music_podcasts_fail": "スムーズな再生には最低1 Mbps必要です",
     "task_social_web": "SNSとウェブ",
+    "task_social_web_pass": "ページがすばやく読み込まれます",
+    "task_social_web_fail": "快適なブラウジングには最低3 Mbps必要です",
     "task_email_messengers": "メールとメッセージ",
+    "task_email_messengers_pass": "メッセージが即座に届きます",
+    "task_email_messengers_fail": "速度が0.5 Mbps未満 — インターネットは使えますが非常に遅い状態です",
     "error_no_server": "テストサーバーが見つかりません。インターネット接続を確認してください。",
     "error_test_failed": "スピードテストに失敗しました。もう一度お試しください。",
     "error_rate_limited": "短時間にテストが多すぎます。数分お待ちください。",

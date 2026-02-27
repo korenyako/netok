@@ -1,6 +1,9 @@
 {
   "network": {
-    "unknown": "Невідомо"
+    "unknown": "Невідомо",
+    "unavailable": "Недоступно",
+    "scan_unavailable_no_network": "Недоступно — немає підключення до мережі",
+    "scan_unavailable_no_internet": "Недоступно — немає підключення до інтернету"
   },
   "dns_providers": {
     "title": "DNS",
@@ -184,7 +187,9 @@
       "flush_dns": "Очистити кеш DNS",
       "flush_dns_desc": "Вирішити проблему «сайт не відкривається»",
       "device_scan": "Пристрої в мережі",
-      "device_scan_desc": "Подивіться, хто підключений"
+      "device_scan_desc": "Подивіться, хто підключений",
+      "wifi_security": "Безпека\nWi-Fi",
+      "wifi_security_desc": "Перевірте безпеку мережі"
     }
   },
   "protection": {
@@ -267,12 +272,30 @@
     "warning_unstable": "Нестабільне з'єднання",
     "warning_unstable_desc": "Jitter {{jitter}}ms — з'єднання нестабільне. Можливі зависання в іграх та відеодзвінках.",
     "task_4k_video": "4K відео",
+    "task_4k_video_pass": "Можна дивитися в 4K без буферизації",
+    "task_4k_video_fail": "Для 4K потрібно мінімум 25 Мбіт/с",
     "task_online_gaming": "Онлайн-ігри",
+    "task_online_gaming_pass": "Можна грати онлайн без лагів",
+    "task_online_gaming_fail_ping": "Для комфортної гри потрібен пінг до 50 мс",
+    "task_online_gaming_fail_jitter": "Для комфортної гри потрібен джитер до 30 мс",
+    "task_online_gaming_fail_both": "Для комфортної гри потрібен пінг до 50 мс і джитер до 30 мс",
     "task_video_calls": "Відеодзвінки",
+    "task_video_calls_pass": "Дзвінки працюватимуть без зависань",
+    "task_video_calls_fail_download": "Для стабільних дзвінків потрібно мінімум 3 Мбіт/с",
+    "task_video_calls_fail_ping": "Для стабільних дзвінків потрібен пінг до 100 мс",
+    "task_video_calls_fail_both": "Для стабільних дзвінків потрібно мінімум 3 Мбіт/с і пінг до 100 мс",
     "task_hd_video": "HD відео",
+    "task_hd_video_pass": "Можна дивитися в HD без переривань",
+    "task_hd_video_fail": "Для HD потрібно мінімум 10 Мбіт/с",
     "task_music_podcasts": "Музика і подкасти",
+    "task_music_podcasts_pass": "Музика і подкасти грають без переривань",
+    "task_music_podcasts_fail": "Для плавного відтворення потрібен хоча б 1 Мбіт/с",
     "task_social_web": "Соцмережі і веб",
+    "task_social_web_pass": "Сторінки завантажуються швидко",
+    "task_social_web_fail": "Для швидкого завантаження потрібно мінімум 3 Мбіт/с",
     "task_email_messengers": "Пошта і месенджери",
+    "task_email_messengers_pass": "Повідомлення доходять миттєво",
+    "task_email_messengers_fail": "Швидкість нижче 0.5 Мбіт/с — інтернет працює, але дуже повільно",
     "error_no_server": "Не вдалося знайти сервер для тесту. Перевірте підключення до інтернету.",
     "error_test_failed": "Тест швидкості не вдався. Спробуйте ще раз.",
     "error_rate_limited": "Забагато тестів поспіль. Зачекайте кілька хвилин.",

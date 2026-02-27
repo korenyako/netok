@@ -1,6 +1,9 @@
 {
   "network": {
-    "unknown": "Unbekannt"
+    "unknown": "Unbekannt",
+    "unavailable": "Nicht verfügbar",
+    "scan_unavailable_no_network": "Nicht verfügbar — keine Netzwerkverbindung",
+    "scan_unavailable_no_internet": "Nicht verfügbar — keine Internetverbindung"
   },
   "dns_providers": {
     "title": "DNS",
@@ -184,7 +187,9 @@
       "flush_dns": "DNS-Cache leeren",
       "flush_dns_desc": "Probleme mit \"Seite lädt nicht\" beheben",
       "device_scan": "Gerätescan",
-      "device_scan_desc": "Sehen Sie, wer in Ihrem Netzwerk ist"
+      "device_scan_desc": "Sehen Sie, wer in Ihrem Netzwerk ist",
+      "wifi_security": "WLAN-\nSicherheit",
+      "wifi_security_desc": "Netzwerksicherheit prüfen"
     }
   },
   "protection": {
@@ -267,12 +272,30 @@
     "warning_unstable": "Instabile Verbindung",
     "warning_unstable_desc": "Jitter {{jitter}}ms — Verbindung ist instabil. Einfrieren in Spielen und Videoanrufen möglich.",
     "task_4k_video": "4K-Video",
+    "task_4k_video_pass": "4K-Streaming ohne Puffern möglich",
+    "task_4k_video_fail": "Für 4K werden mindestens 25 Mbit/s benötigt",
     "task_online_gaming": "Online-Spiele",
+    "task_online_gaming_pass": "Online-Spielen ohne Verzögerungen möglich",
+    "task_online_gaming_fail_ping": "Für flüssiges Spielen wird ein Ping unter 50 ms benötigt",
+    "task_online_gaming_fail_jitter": "Für flüssiges Spielen wird ein Jitter unter 30 ms benötigt",
+    "task_online_gaming_fail_both": "Für flüssiges Spielen werden ein Ping unter 50 ms und ein Jitter unter 30 ms benötigt",
     "task_video_calls": "Videoanrufe",
+    "task_video_calls_pass": "Videoanrufe funktionieren ohne Unterbrechungen",
+    "task_video_calls_fail_download": "Für stabile Anrufe werden mindestens 3 Mbit/s benötigt",
+    "task_video_calls_fail_ping": "Für stabile Anrufe wird ein Ping unter 100 ms benötigt",
+    "task_video_calls_fail_both": "Für stabile Anrufe werden mindestens 3 Mbit/s und ein Ping unter 100 ms benötigt",
     "task_hd_video": "HD-Video",
+    "task_hd_video_pass": "HD-Streaming ohne Unterbrechungen möglich",
+    "task_hd_video_fail": "Für HD werden mindestens 10 Mbit/s benötigt",
     "task_music_podcasts": "Musik & Podcasts",
+    "task_music_podcasts_pass": "Musik und Podcasts laufen ohne Unterbrechungen",
+    "task_music_podcasts_fail": "Für unterbrechungsfreie Wiedergabe wird mindestens 1 Mbit/s benötigt",
     "task_social_web": "Soziale Medien & Web",
+    "task_social_web_pass": "Seiten laden schnell",
+    "task_social_web_fail": "Für schnelles Surfen werden mindestens 3 Mbit/s benötigt",
     "task_email_messengers": "E-Mail & Messenger",
+    "task_email_messengers_pass": "Nachrichten werden sofort zugestellt",
+    "task_email_messengers_fail": "Geschwindigkeit unter 0,5 Mbit/s — Internet funktioniert, aber sehr langsam",
     "error_no_server": "Kein Testserver gefunden. Überprüfen Sie Ihre Internetverbindung.",
     "error_test_failed": "Geschwindigkeitstest fehlgeschlagen. Bitte versuchen Sie es erneut.",
     "error_rate_limited": "Zu viele Tests hintereinander. Bitte warten Sie einige Minuten.",

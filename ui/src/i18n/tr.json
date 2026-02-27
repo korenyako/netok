@@ -1,6 +1,9 @@
 {
   "network": {
-    "unknown": "Bilinmiyor"
+    "unknown": "Bilinmiyor",
+    "unavailable": "Kullanılamıyor",
+    "scan_unavailable_no_network": "Kullanılamıyor — ağ bağlantısı yok",
+    "scan_unavailable_no_internet": "Kullanılamıyor — internet bağlantısı yok"
   },
   "dns_providers": {
     "title": "DNS",
@@ -184,7 +187,9 @@
       "flush_dns": "DNS önbelleğini temizle",
       "flush_dns_desc": "\"Site yüklenmiyor\" sorunlarını düzelt",
       "device_scan": "Cihaz taraması",
-      "device_scan_desc": "Ağınızda kimlerin olduğunu görün"
+      "device_scan_desc": "Ağınızda kimlerin olduğunu görün",
+      "wifi_security": "Wi-Fi\ngüvenliği",
+      "wifi_security_desc": "Ağ güvenliğinizi kontrol edin"
     }
   },
   "protection": {
@@ -267,12 +272,30 @@
     "warning_unstable": "Kararsız bağlantı",
     "warning_unstable_desc": "Jitter {{jitter}}ms — bağlantı kararsız. Oyunlarda ve görüntülü aramalarda donmalar yaşayabilirsiniz.",
     "task_4k_video": "4K video",
+    "task_4k_video_pass": "4K videoları takılmadan izleyebilirsiniz",
+    "task_4k_video_fail": "4K için en az 25 Mbps gerekli",
     "task_online_gaming": "Çevrimiçi oyunlar",
+    "task_online_gaming_pass": "Gecikmesiz çevrimiçi oynayabilirsiniz",
+    "task_online_gaming_fail_ping": "Rahat oynamak için ping 50 ms altında olmalı",
+    "task_online_gaming_fail_jitter": "Rahat oynamak için jitter 30 ms altında olmalı",
+    "task_online_gaming_fail_both": "Rahat oynamak için ping 50 ms ve jitter 30 ms altında olmalı",
     "task_video_calls": "Görüntülü aramalar",
+    "task_video_calls_pass": "Aramalar donma olmadan çalışacak",
+    "task_video_calls_fail_download": "Kararlı aramalar için en az 3 Mbps gerekli",
+    "task_video_calls_fail_ping": "Kararlı aramalar için ping 100 ms altında olmalı",
+    "task_video_calls_fail_both": "Kararlı aramalar için en az 3 Mbps ve ping 100 ms altında olmalı",
     "task_hd_video": "HD video",
+    "task_hd_video_pass": "HD videoları kesintisiz izleyebilirsiniz",
+    "task_hd_video_fail": "HD için en az 10 Mbps gerekli",
     "task_music_podcasts": "Müzik ve podcastler",
+    "task_music_podcasts_pass": "Müzik ve podcastler kesintisiz çalar",
+    "task_music_podcasts_fail": "Kesintisiz dinleme için en az 1 Mbps gerekli",
     "task_social_web": "Sosyal medya ve web",
+    "task_social_web_pass": "Sayfalar hızlı yükleniyor",
+    "task_social_web_fail": "Hızlı gezinme için en az 3 Mbps gerekli",
     "task_email_messengers": "E-posta ve mesajlaşma",
+    "task_email_messengers_pass": "Mesajlar anında ulaşıyor",
+    "task_email_messengers_fail": "Hız 0,5 Mbps altında — internet çalışıyor ama çok yavaş",
     "error_no_server": "Test sunucusu bulunamadı. İnternet bağlantınızı kontrol edin.",
     "error_test_failed": "Hız testi başarısız oldu. Lütfen tekrar deneyin.",
     "error_rate_limited": "Arka arkaya çok fazla test yapıldı. Lütfen birkaç dakika bekleyin.",

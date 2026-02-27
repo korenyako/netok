@@ -343,6 +343,7 @@ Generated: 2026-02-27
 ├── nul
 ├── package-lock.json
 ├── package.json
+├── parse_ico.py
 ├── PROJECT_CONTEXT.md
 ├── PROJECT_MAP.md
 ├── README.de.md

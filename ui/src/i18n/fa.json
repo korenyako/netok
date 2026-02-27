@@ -1,6 +1,9 @@
 {
   "network": {
-    "unknown": "ناشناخته"
+    "unknown": "ناشناخته",
+    "unavailable": "در دسترس نیست",
+    "scan_unavailable_no_network": "در دسترس نیست — اتصال شبکه وجود ندارد",
+    "scan_unavailable_no_internet": "در دسترس نیست — اتصال اینترنت وجود ندارد"
   },
   "dns_providers": {
     "title": "DNS",
@@ -184,7 +187,9 @@
       "flush_dns": "پاک‌سازی حافظه پنهان DNS",
       "flush_dns_desc": "رفع مشکل «سایت بارگذاری نمی‌شود»",
       "device_scan": "اسکن دستگاه‌ها",
-      "device_scan_desc": "ببینید چه کسی به شبکه شما متصل است"
+      "device_scan_desc": "ببینید چه کسی به شبکه شما متصل است",
+      "wifi_security": "امنیت\nWi-Fi",
+      "wifi_security_desc": "امنیت شبکه خود را بررسی کنید"
     }
   },
   "protection": {
@@ -267,12 +272,30 @@
     "warning_unstable": "اتصال ناپایدار",
     "warning_unstable_desc": "Jitter {{jitter}}ms — اتصال ناپایدار است. ممکن است در بازی‌ها و تماس‌های تصویری فریز تجربه کنید.",
     "task_4k_video": "ویدیوی 4K",
+    "task_4k_video_pass": "می‌توانید ویدیوی 4K را بدون بافر تماشا کنید",
+    "task_4k_video_fail": "برای 4K حداقل 25 مگابیت بر ثانیه لازم است",
     "task_online_gaming": "بازی آنلاین",
+    "task_online_gaming_pass": "می‌توانید بدون تأخیر آنلاین بازی کنید",
+    "task_online_gaming_fail_ping": "برای بازی راحت، پینگ باید زیر 50 میلی‌ثانیه باشد",
+    "task_online_gaming_fail_jitter": "برای بازی راحت، جیتر باید زیر 30 میلی‌ثانیه باشد",
+    "task_online_gaming_fail_both": "برای بازی راحت، پینگ باید زیر 50 و جیتر زیر 30 میلی‌ثانیه باشد",
     "task_video_calls": "تماس تصویری",
+    "task_video_calls_pass": "تماس‌ها بدون قطعی کار می‌کنند",
+    "task_video_calls_fail_download": "برای تماس پایدار حداقل 3 مگابیت بر ثانیه لازم است",
+    "task_video_calls_fail_ping": "برای تماس پایدار، پینگ باید زیر 100 میلی‌ثانیه باشد",
+    "task_video_calls_fail_both": "برای تماس پایدار حداقل 3 مگابیت بر ثانیه و پینگ زیر 100 میلی‌ثانیه لازم است",
     "task_hd_video": "ویدیوی HD",
+    "task_hd_video_pass": "می‌توانید ویدیوی HD را بدون وقفه تماشا کنید",
+    "task_hd_video_fail": "برای HD حداقل 10 مگابیت بر ثانیه لازم است",
     "task_music_podcasts": "موسیقی و پادکست",
+    "task_music_podcasts_pass": "موسیقی و پادکست بدون وقفه پخش می‌شود",
+    "task_music_podcasts_fail": "برای پخش روان حداقل 1 مگابیت بر ثانیه لازم است",
     "task_social_web": "شبکه‌های اجتماعی و وب",
+    "task_social_web_pass": "صفحات سریع بارگذاری می‌شوند",
+    "task_social_web_fail": "برای مرور سریع حداقل 3 مگابیت بر ثانیه لازم است",
     "task_email_messengers": "ایمیل و پیام‌رسان",
+    "task_email_messengers_pass": "پیام‌ها فوراً ارسال می‌شوند",
+    "task_email_messengers_fail": "سرعت کمتر از 0.5 مگابیت بر ثانیه — اینترنت کار می‌کند ولی بسیار کند است",
     "error_no_server": "سرور تست پیدا نشد. اتصال اینترنت خود را بررسی کنید.",
     "error_test_failed": "تست سرعت ناموفق بود. لطفاً دوباره تلاش کنید.",
     "error_rate_limited": "تست‌های زیادی پشت سر هم انجام شده. لطفاً چند دقیقه صبر کنید.",

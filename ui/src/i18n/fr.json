@@ -1,6 +1,9 @@
 {
   "network": {
-    "unknown": "Inconnu"
+    "unknown": "Inconnu",
+    "unavailable": "Indisponible",
+    "scan_unavailable_no_network": "Indisponible — pas de connexion réseau",
+    "scan_unavailable_no_internet": "Indisponible — pas de connexion Internet"
   },
   "dns_providers": {
     "title": "DNS",
@@ -184,7 +187,9 @@
       "flush_dns": "Vider le cache DNS",
       "flush_dns_desc": "Résoudre les problèmes de « site inaccessible »",
       "device_scan": "Analyse des appareils",
-      "device_scan_desc": "Voir qui est connecté à votre réseau"
+      "device_scan_desc": "Voir qui est connecté à votre réseau",
+      "wifi_security": "Sécurité\nWi-Fi",
+      "wifi_security_desc": "Vérifiez la sécurité de votre réseau"
     }
   },
   "protection": {
@@ -267,12 +272,30 @@
     "warning_unstable": "Connexion instable",
     "warning_unstable_desc": "Jitter {{jitter}}ms — la connexion est instable. Des gels dans les jeux et appels vidéo sont possibles.",
     "task_4k_video": "Vidéo 4K",
+    "task_4k_video_pass": "Vous pouvez regarder en 4K sans mise en mémoire tampon",
+    "task_4k_video_fail": "La 4K nécessite au moins 25 Mbit/s",
     "task_online_gaming": "Jeux en ligne",
+    "task_online_gaming_pass": "Vous pouvez jouer en ligne sans lag",
+    "task_online_gaming_fail_ping": "Pour jouer confortablement, le ping doit être inférieur à 50 ms",
+    "task_online_gaming_fail_jitter": "Pour jouer confortablement, la gigue doit être inférieure à 30 ms",
+    "task_online_gaming_fail_both": "Pour jouer confortablement, le ping doit être inférieur à 50 ms et la gigue inférieure à 30 ms",
     "task_video_calls": "Appels vidéo",
+    "task_video_calls_pass": "Les appels fonctionneront sans coupures",
+    "task_video_calls_fail_download": "Les appels stables nécessitent au moins 3 Mbit/s",
+    "task_video_calls_fail_ping": "Les appels stables nécessitent un ping inférieur à 100 ms",
+    "task_video_calls_fail_both": "Les appels stables nécessitent au moins 3 Mbit/s et un ping inférieur à 100 ms",
     "task_hd_video": "Vidéo HD",
+    "task_hd_video_pass": "Vous pouvez regarder en HD sans interruptions",
+    "task_hd_video_fail": "La HD nécessite au moins 10 Mbit/s",
     "task_music_podcasts": "Musique et podcasts",
+    "task_music_podcasts_pass": "Musique et podcasts sans interruptions",
+    "task_music_podcasts_fail": "Une lecture fluide nécessite au moins 1 Mbit/s",
     "task_social_web": "Réseaux sociaux et web",
+    "task_social_web_pass": "Les pages se chargent rapidement",
+    "task_social_web_fail": "Une navigation rapide nécessite au moins 3 Mbit/s",
     "task_email_messengers": "E-mail et messagerie",
+    "task_email_messengers_pass": "Les messages arrivent instantanément",
+    "task_email_messengers_fail": "Débit inférieur à 0,5 Mbit/s — Internet fonctionne, mais très lentement",
     "error_no_server": "Aucun serveur de test trouvé. Vérifiez votre connexion Internet.",
     "error_test_failed": "Le test de débit a échoué. Veuillez réessayer.",
     "error_rate_limited": "Trop de tests consécutifs. Veuillez patienter quelques minutes.",

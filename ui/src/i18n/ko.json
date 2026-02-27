@@ -1,6 +1,9 @@
 {
   "network": {
-    "unknown": "알 수 없음"
+    "unknown": "알 수 없음",
+    "unavailable": "사용 불가",
+    "scan_unavailable_no_network": "사용 불가 — 네트워크 연결 없음",
+    "scan_unavailable_no_internet": "사용 불가 — 인터넷 연결 없음"
   },
   "dns_providers": {
     "title": "DNS",
@@ -184,7 +187,9 @@
       "flush_dns": "DNS 캐시 비우기",
       "flush_dns_desc": "\"사이트가 로드되지 않음\" 문제 해결",
       "device_scan": "장치 스캔",
-      "device_scan_desc": "네트워크에 연결된 장치 확인"
+      "device_scan_desc": "네트워크에 연결된 장치 확인",
+      "wifi_security": "Wi-Fi\n보안",
+      "wifi_security_desc": "네트워크 보안 상태 확인"
     }
   },
   "protection": {
@@ -267,12 +272,30 @@
     "warning_unstable": "불안정한 연결",
     "warning_unstable_desc": "Jitter {{jitter}}ms — 연결이 불안정합니다. 게임과 영상 통화에서 멈춤 현상이 발생할 수 있습니다.",
     "task_4k_video": "4K 영상",
+    "task_4k_video_pass": "4K 영상을 끊김 없이 시청할 수 있어요",
+    "task_4k_video_fail": "4K에는 최소 25 Mbps가 필요해요",
     "task_online_gaming": "온라인 게임",
+    "task_online_gaming_pass": "렉 없이 온라인 게임을 할 수 있어요",
+    "task_online_gaming_fail_ping": "쾌적한 게임을 위해 핑이 50 ms 이하여야 해요",
+    "task_online_gaming_fail_jitter": "쾌적한 게임을 위해 지터가 30 ms 이하여야 해요",
+    "task_online_gaming_fail_both": "쾌적한 게임을 위해 핑 50 ms 이하, 지터 30 ms 이하가 필요해요",
     "task_video_calls": "영상 통화",
+    "task_video_calls_pass": "통화가 끊김 없이 잘 돼요",
+    "task_video_calls_fail_download": "안정적인 통화에는 최소 3 Mbps가 필요해요",
+    "task_video_calls_fail_ping": "안정적인 통화에는 핑이 100 ms 이하여야 해요",
+    "task_video_calls_fail_both": "안정적인 통화에는 최소 3 Mbps와 핑 100 ms 이하가 필요해요",
     "task_hd_video": "HD 영상",
+    "task_hd_video_pass": "HD 영상을 끊김 없이 시청할 수 있어요",
+    "task_hd_video_fail": "HD에는 최소 10 Mbps가 필요해요",
     "task_music_podcasts": "음악 및 팟캐스트",
+    "task_music_podcasts_pass": "음악과 팟캐스트가 끊김 없이 재생돼요",
+    "task_music_podcasts_fail": "끊김 없는 재생에는 최소 1 Mbps가 필요해요",
     "task_social_web": "SNS 및 웹",
+    "task_social_web_pass": "페이지가 빠르게 로딩돼요",
+    "task_social_web_fail": "빠른 웹서핑에는 최소 3 Mbps가 필요해요",
     "task_email_messengers": "이메일 및 메신저",
+    "task_email_messengers_pass": "메시지가 즉시 전달돼요",
+    "task_email_messengers_fail": "속도가 0.5 Mbps 미만 — 인터넷은 되지만 매우 느려요",
     "error_no_server": "테스트 서버를 찾을 수 없습니다. 인터넷 연결을 확인하세요.",
     "error_test_failed": "속도 테스트에 실패했습니다. 다시 시도해 주세요.",
     "error_rate_limited": "연속 테스트가 너무 많습니다. 몇 분 후 다시 시도하세요.",
