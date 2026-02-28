@@ -69,6 +69,8 @@ pub struct NetworkInfo {
     pub frequency: Option<String>,
     /// Wi-Fi encryption type: "WPA2", "WPA3", "WEP", "WPA", "Open", or None if unknown
     pub encryption: Option<String>,
+    /// Negotiated PHY link speed in Mbps (transmit rate)
+    pub link_speed_mbps: Option<u32>,
 }
 
 /// Information about the router/gateway.

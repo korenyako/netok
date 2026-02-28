@@ -77,6 +77,10 @@
     "ip_address": "IP address",
     "network_name": "Network",
     "signal": "Signal",
+    "security": "Security",
+    "frequency": "Frequency",
+    "bandwidth": "Bandwidth",
+    "unit_mbps": "Mbps",
     "manufacturer": "Manufacturer",
     "isp": "ISP",
     "location": "Location",
@@ -127,7 +131,8 @@
       "security_open": "Open network — your data is not encrypted",
       "link_field": "Link",
       "link_yes": "Connected",
-      "link_no": "Disconnected"
+      "link_no": "Disconnected",
+      "channel": "Channel {{channel}}"
     },
     "router": {
       "name": "Router",
@@ -397,7 +402,7 @@
     "arp_safe": "No signs of traffic interception",
     "arp_warning": "Suspicious activity in the network — possible traffic interception",
     "arp_danger": "Traffic interception attempt detected. Do not enter passwords or open banking apps",
-    "dns_safe": "DNS is working correctly — websites open at real addresses",
+    "dns_safe": "Websites open at real addresses",
     "dns_warning": "This network may be spoofing website addresses. Enable DNS protection in Netok settings",
     "recommend_dns": "Enable DNS protection",
     "recommend_vpn": "Use VPN"

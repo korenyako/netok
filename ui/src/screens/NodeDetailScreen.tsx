@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Copy, ArrowUpRight, Lock, LockOpen, Wifi } from '../components/icons/UIIcons';
+import { ArrowLeft, Copy, ArrowUpRight } from '../components/icons/UIIcons';
 import { openUrl } from '@tauri-apps/plugin-opener';
 import { Button } from '@/components/ui/button';
 import { DiagnosticMessage } from '../components/DiagnosticMessage';
@@ -44,10 +44,10 @@ function getSignalLevel(rssi: number): SignalLevel {
   return 'very_weak';
 }
 
-const SIGNAL_TEXT_COLOR: Record<SignalLevel, string> = {
-  excellent: 'text-success', good: 'text-success',
-  fair: 'text-warning',
-  weak: 'text-destructive', very_weak: 'text-destructive',
+const SIGNAL_BADGE_CLASS: Record<SignalLevel, string> = {
+  excellent: 'text-success bg-success/10', good: 'text-success bg-success/10',
+  fair: 'text-warning bg-warning/10',
+  weak: 'text-destructive bg-destructive/10', very_weak: 'text-destructive bg-destructive/10',
 };
 
 type EncryptionLevel = 'safe' | 'warning' | 'danger';
@@ -83,10 +83,10 @@ function getEncryptionI18nKey(encryption: string): string {
   }
 }
 
-const ENCRYPTION_TEXT_COLOR: Record<EncryptionLevel, string> = {
-  safe: 'text-success',
-  warning: 'text-warning',
-  danger: 'text-destructive',
+const ENCRYPTION_BADGE_CLASS: Record<EncryptionLevel, string> = {
+  safe: 'text-success bg-success/10',
+  warning: 'text-warning bg-warning/10',
+  danger: 'text-destructive bg-destructive/10',
 };
 
 type LatencyLevel = 'excellent' | 'good' | 'fair' | 'slow';
@@ -108,6 +108,8 @@ interface InfoRow {
   value: string;
   copyable?: boolean;
   valueClass?: string;
+  subtitle?: string;
+  subtitleClass?: string;
 }
 
 export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToDnsProviders, onNavigateToVpn }: NodeDetailScreenProps) {
@@ -150,7 +152,52 @@ export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToDnsProvid
   }
 
   if (nodeId === 'network' && result.network) {
-    // ssid shown directly without label — the network name is self-explanatory
+    const net = result.network;
+
+    // Network name
+    if (net.ssid) {
+      rows.push({ label: t('node_detail.network_name'), value: net.ssid });
+    }
+
+    // Security
+    if (net.encryption) {
+      rows.push({
+        label: t('node_detail.security'),
+        value: net.encryption,
+        subtitle: t(getEncryptionI18nKey(net.encryption)),
+        subtitleClass: ENCRYPTION_BADGE_CLASS[getEncryptionLevel(net.encryption)],
+      });
+    }
+
+    // Signal
+    if (net.rssi != null) {
+      const level = getSignalLevel(net.rssi);
+      rows.push({
+        label: t('node_detail.signal'),
+        value: `${net.rssi} dBm`,
+        subtitle: t(`nodes.network.signal_label_${level}`),
+        subtitleClass: SIGNAL_BADGE_CLASS[level],
+      });
+    }
+
+    // Frequency + Channel
+    if (net.frequency) {
+      const freqValue = net.channel
+        ? `${net.frequency} (${t('nodes.network.channel', { channel: net.channel })})`
+        : net.frequency;
+      rows.push({
+        label: t('node_detail.frequency'),
+        value: freqValue,
+      });
+    }
+
+    // Bandwidth (link speed)
+    if (net.link_speed_mbps != null) {
+      rows.push({
+        label: t('node_detail.bandwidth'),
+        value: `${net.link_speed_mbps} ${t('node_detail.unit_mbps')}`,
+      });
+    }
   }
 
   if (nodeId === 'dns' && result.router) {
@@ -239,10 +286,6 @@ export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToDnsProvid
         )}
 
         <div className="ps-12 space-y-4">
-          {/* Network SSID as prominent text (no label) */}
-          {nodeId === 'network' && result.network?.ssid && (
-            <p className="text-base font-medium text-foreground">{result.network.ssid}</p>
-          )}
           {rows.map((row) => (
             <div key={row.label}>
               <p className="text-sm text-muted-foreground">{row.label}</p>
@@ -259,8 +302,13 @@ export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToDnsProvid
                   </Button>
                 </div>
               ) : (
-                <div className="flex">
-                  <span className={`text-sm min-w-0 ${row.valueClass ?? 'text-foreground'}`} dir="ltr">{row.value}</span>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-sm min-w-0 ${row.valueClass ?? 'text-foreground'}`} dir="ltr">{row.value}</span>
+                    {row.subtitle && (
+                      <span className={`inline-flex items-center text-xs font-normal px-1.5 py-0.5 rounded ${row.subtitleClass ?? 'text-muted-foreground bg-muted'}`}>{row.subtitle}</span>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -295,47 +343,6 @@ export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToDnsProvid
             );
           })()}
 
-          {/* Network security for Wi-Fi node */}
-          {nodeId === 'network' && result.network?.encryption && (() => {
-            const encryption = result.network!.encryption!;
-            const level = getEncryptionLevel(encryption);
-            const textColor = ENCRYPTION_TEXT_COLOR[level];
-            const IconComponent = level === 'danger' ? LockOpen : Lock;
-
-            return (
-              <div>
-                <div className={`flex items-center gap-1.5 ${textColor}`}>
-                  <IconComponent className="w-3.5 h-3.5" />
-                  <span className="text-xs font-mono">{encryption}</span>
-                </div>
-                <p className="text-sm font-medium text-foreground mt-0.5">
-                  {t(getEncryptionI18nKey(encryption))}
-                </p>
-              </div>
-            );
-          })()}
-
-          {/* Signal strength for Wi-Fi node */}
-          {nodeId === 'network' && result.network?.rssi != null && (() => {
-            const rssi = result.network!.rssi!;
-            const level = getSignalLevel(rssi);
-            const textColor = SIGNAL_TEXT_COLOR[level];
-
-            return (
-              <div>
-                <div className={`flex items-center gap-1.5 ${textColor}`}>
-                  <Wifi className="w-3.5 h-3.5" />
-                  <span className="text-xs font-mono">{rssi} dBm</span>
-                </div>
-                <p className="text-sm font-medium text-foreground mt-0.5">
-                  {t(`nodes.network.signal_label_${level}`)}
-                </p>
-                <p className="text-sm text-muted-foreground mt-0.5">
-                  {t(`nodes.network.signal_desc_${level}`)}
-                </p>
-              </div>
-            );
-          })()}
         </div>
 
         <div className="flex-1" />

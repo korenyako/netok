@@ -198,6 +198,35 @@ export function WiFiSecurityScreen({ onBack, onNavigateToDns, onNavigateToVpn }:
       {/* Scrollable content */}
       {(visibleChecks.length > 0 || showLoadingPlaceholder) && (
         <div className="flex-1 px-4 overflow-y-auto pb-4">
+          {/* Summary banner — no threats found */}
+          {allRevealed && !isRunning && !hasIssues && (
+            <div className="pb-3 animate-in fade-in duration-300">
+              <div className="rounded-lg bg-accent p-4">
+                <div className="flex items-start gap-3">
+                  <span className="flex items-center justify-center w-4 h-4 shrink-0 mt-1">
+                    <span className="w-2 h-2 rounded-full bg-primary" />
+                  </span>
+                  <div className="flex-1">
+                    <p className="text-base font-medium leading-normal mb-1 text-primary">
+                      {t('protection.no_threats')}
+                    </p>
+                    <p className="text-sm text-muted-foreground leading-normal">
+                      {t('wifi_security.overall_safe')}
+                    </p>
+                    <Button
+                      variant="outline-card"
+                      size="sm"
+                      className="mt-3"
+                      onClick={doRefresh}
+                    >
+                      {t('protection.check_security')}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Error inline — shown after partial results */}
           {error && visibleChecks.length > 0 && (
             <div className="mb-4 text-sm text-destructive animate-in fade-in duration-300">

@@ -77,6 +77,8 @@
     "ip_address": "Adres IP",
     "network_name": "Sieć",
     "signal": "Sygnał",
+    "bandwidth": "Przepustowość",
+    "unit_mbps": "Mbps",
     "manufacturer": "Producent",
     "isp": "Dostawca",
     "location": "Lokalizacja",
@@ -397,7 +399,7 @@
     "arp_safe": "Brak oznak przechwytywania ruchu",
     "arp_warning": "Podejrzana aktywność w sieci — możliwe przechwytywanie ruchu",
     "arp_danger": "Wykryto próbę przechwycenia ruchu. Nie wpisuj haseł ani nie otwieraj aplikacji bankowych",
-    "dns_safe": "DNS działa poprawnie — strony otwierają się pod prawdziwymi adresami",
+    "dns_safe": "Strony otwierają się pod prawdziwymi adresami",
     "dns_warning": "Ta sieć może fałszować adresy stron. Włącz ochronę DNS w ustawieniach Netok",
     "recommend_dns": "Włącz ochronę DNS",
     "recommend_vpn": "Użyj VPN"

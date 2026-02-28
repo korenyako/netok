@@ -77,6 +77,8 @@
     "ip_address": "Indirizzo IP",
     "network_name": "Rete",
     "signal": "Segnale",
+    "bandwidth": "Larghezza di banda",
+    "unit_mbps": "Mbps",
     "manufacturer": "Produttore",
     "isp": "ISP",
     "location": "Posizione",
@@ -397,7 +399,7 @@
     "arp_safe": "Nessun segno di intercettazione del traffico",
     "arp_warning": "Attività sospetta nella rete — possibile intercettazione del traffico",
     "arp_danger": "Rilevato tentativo di intercettazione del traffico. Non inserire password e non aprire app bancarie",
-    "dns_safe": "Il DNS funziona correttamente — i siti si aprono con indirizzi reali",
+    "dns_safe": "I siti si aprono con indirizzi reali",
     "dns_warning": "Questa rete potrebbe falsificare gli indirizzi dei siti. Attiva la protezione DNS nelle impostazioni Netok",
     "recommend_dns": "Attiva protezione DNS",
     "recommend_vpn": "Usa VPN"

@@ -77,6 +77,8 @@
     "ip_address": "IP 주소",
     "network_name": "네트워크",
     "signal": "신호",
+    "bandwidth": "대역폭",
+    "unit_mbps": "Mbps",
     "manufacturer": "제조사",
     "isp": "ISP",
     "location": "위치",
@@ -397,7 +399,7 @@
     "arp_safe": "트래픽 가로채기 징후 없음",
     "arp_warning": "네트워크에서 의심스러운 활동 — 트래픽 가로채기 가능성",
     "arp_danger": "트래픽 가로채기 시도가 감지되었습니다. 비밀번호를 입력하거나 뱅킹 앱을 열지 마세요",
-    "dns_safe": "DNS가 정상 작동 중 — 사이트가 실제 주소로 열림",
+    "dns_safe": "사이트가 실제 주소로 열림",
     "dns_warning": "이 네트워크가 사이트 주소를 위조할 수 있습니다. Netok 설정에서 DNS 보호를 활성화하세요",
     "recommend_dns": "DNS 보호 활성화",
     "recommend_vpn": "VPN 사용"

@@ -13,24 +13,41 @@ pub enum WifiAdapterState {
     Connected,
 }
 
+/// Detailed Wi-Fi connection information from the WLAN API.
+#[derive(Debug, Clone, Default)]
+pub struct WifiDetails {
+    pub ssid: Option<String>,
+    pub rssi: Option<i32>,
+    pub interface_desc: Option<String>,
+    pub adapter_state: WifiAdapterState,
+    /// Transmit link speed in kbps (PHY rate negotiated with AP)
+    pub tx_rate_kbps: Option<u32>,
+    /// Center frequency of the connected channel in kHz
+    pub channel_frequency_khz: Option<u32>,
+}
+
+impl Default for WifiAdapterState {
+    fn default() -> Self {
+        Self::Absent
+    }
+}
+
 /// Get Wi-Fi information on Windows using WLAN API.
 ///
-/// Returns a tuple of (SSID, RSSI in dBm, interface description, adapter state)
-/// for the currently connected Wi-Fi network.
+/// Returns detailed Wi-Fi connection info including SSID, signal,
+/// link speed, and channel frequency.
 ///
-/// When not connected:
-/// - SSID and RSSI are None
-/// - adapter state distinguishes Absent / Disabled / Disconnected
+/// When not connected, only `adapter_state` is meaningful.
 ///
 /// # Platform Support
 /// - **Windows**: Full support via Windows WLAN API
-/// - **macOS/Linux**: Returns (None, None, None, Absent) - TODO
+/// - **macOS/Linux**: Returns default (Absent) - TODO
 ///
 /// # Safety
 /// This function uses the Windows WLAN API which requires careful resource management.
 /// All safety invariants are documented inline within the unsafe block.
 #[cfg(target_os = "windows")]
-pub fn get_wifi_info() -> (Option<String>, Option<i32>, Option<String>, WifiAdapterState) {
+pub fn get_wifi_info() -> WifiDetails {
     use std::ptr;
     use windows::Win32::Foundation::*;
     use windows::Win32::NetworkManagement::WiFi::*;
@@ -58,6 +75,7 @@ pub fn get_wifi_info() -> (Option<String>, Option<i32>, Option<String>, WifiAdap
     //    - WlanOpenHandle creates a handle that MUST be closed with WlanCloseHandle
     //    - WlanEnumInterfaces allocates memory that MUST be freed with WlanFreeMemory
     //    - WlanQueryInterface allocates memory that MUST be freed with WlanFreeMemory
+    //    - WlanGetNetworkBssList allocates memory that MUST be freed with WlanFreeMemory
     //    - All handles and pointers are checked for validity before use
     //
     // 2. Pointer Safety:
@@ -69,6 +87,7 @@ pub fn get_wifi_info() -> (Option<String>, Option<i32>, Option<String>, WifiAdap
     //    - Interface list iteration uses dwNumberOfItems as the bounds check
     //    - SSID byte array access is bounds-checked with uSSIDLength
     //    - Interface description array uses null-terminator search with bounds
+    //    - BSS list iteration uses dwNumberOfItems as the bounds check
     //
     // 4. Error Handling:
     //    - All Windows API calls check return codes (0 = success, non-zero = error)
@@ -90,7 +109,7 @@ pub fn get_wifi_info() -> (Option<String>, Option<i32>, Option<String>, WifiAdap
         );
 
         if result != 0 || client_handle.is_invalid() {
-            return (None, None, None, WifiAdapterState::Absent);
+            return WifiDetails::default();
         }
 
         // Wrap handle in RAII guard to ensure cleanup on all code paths
@@ -105,13 +124,10 @@ pub fn get_wifi_info() -> (Option<String>, Option<i32>, Option<String>, WifiAdap
         let result = WlanEnumInterfaces(client_handle, None, &mut interface_list);
 
         if result != 0 || interface_list.is_null() {
-            return (None, None, None, WifiAdapterState::Absent);
+            return WifiDetails::default();
         }
 
-        let mut ssid = None;
-        let mut rssi = None;
-        let mut interface_desc = None;
-        let mut adapter_state = WifiAdapterState::Absent;
+        let mut details = WifiDetails::default();
 
         // SAFETY: Dereferencing interface_list pointer.
         // - Pointer is non-null (checked above)
@@ -135,26 +151,27 @@ pub fn get_wifi_info() -> (Option<String>, Option<i32>, Option<String>, WifiAdap
                 .unwrap_or(desc_bytes.len());
             if desc_len > 0 {
                 // String::from_utf16 safely handles UTF-16 conversion
-                interface_desc = String::from_utf16(&desc_bytes[..desc_len]).ok();
+                details.interface_desc = String::from_utf16(&desc_bytes[..desc_len]).ok();
             }
 
             // Track the best adapter state across all interfaces
             // (prefer Connected > Disconnected > Disabled > Absent)
             if interface.isState == wlan_interface_state_not_ready {
-                if adapter_state == WifiAdapterState::Absent {
-                    adapter_state = WifiAdapterState::Disabled;
+                if details.adapter_state == WifiAdapterState::Absent {
+                    details.adapter_state = WifiAdapterState::Disabled;
                 }
             } else if interface.isState != wlan_interface_state_connected {
                 // Any state other than not_ready and connected means the adapter
                 // is enabled (disconnected, scanning, associating, etc.)
-                if adapter_state != WifiAdapterState::Connected {
-                    adapter_state = WifiAdapterState::Disconnected;
+                if details.adapter_state != WifiAdapterState::Connected {
+                    details.adapter_state = WifiAdapterState::Disconnected;
                 }
             }
 
             if interface.isState == wlan_interface_state_connected {
-                adapter_state = WifiAdapterState::Connected;
-                // Query current connection
+                details.adapter_state = WifiAdapterState::Connected;
+
+                // ---------- Query current connection attributes ----------
                 let mut data_size: u32 = 0;
                 let mut connection_attrs: *mut WLAN_CONNECTION_ATTRIBUTES = ptr::null_mut();
 
@@ -174,6 +191,9 @@ pub fn get_wifi_info() -> (Option<String>, Option<i32>, Option<String>, WifiAdap
                     None, // opcode value type (not needed)
                 );
 
+                // Connected BSSID to match in BSS list
+                let mut connected_bssid = [0u8; 6];
+
                 if result == 0 && !connection_attrs.is_null() {
                     // SAFETY: Dereferencing connection_attrs pointer.
                     // - Pointer is non-null (checked above)
@@ -189,17 +209,64 @@ pub fn get_wifi_info() -> (Option<String>, Option<i32>, Option<String>, WifiAdap
                         // - ucSSID is a fixed-size array of 32 bytes
                         let ssid_bytes =
                             &attrs.wlanAssociationAttributes.dot11Ssid.ucSSID[..ssid_len];
-                        ssid = String::from_utf8(ssid_bytes.to_vec()).ok();
+                        details.ssid = String::from_utf8(ssid_bytes.to_vec()).ok();
                     }
 
                     // Get signal quality (0-100) and convert to approximate RSSI
                     let quality = attrs.wlanAssociationAttributes.wlanSignalQuality;
                     // Rough conversion: 100% ≈ -40 dBm, 0% ≈ -90 dBm
-                    rssi = Some(-90 + (quality as i32) / 2);
+                    details.rssi = Some(-90 + (quality as i32) / 2);
+
+                    // Get transmit link speed (kbps)
+                    let tx = attrs.wlanAssociationAttributes.ulTxRate;
+                    if tx > 0 {
+                        details.tx_rate_kbps = Some(tx);
+                    }
+
+                    // Save BSSID for matching in BSS list
+                    connected_bssid = attrs.wlanAssociationAttributes.dot11Bssid;
 
                     // SAFETY: Free memory allocated by WlanQueryInterface
                     // - connection_attrs is non-null and was allocated by Windows API
                     WlanFreeMemory(connection_attrs as *const core::ffi::c_void);
+                }
+
+                // ---------- Query BSS list for channel frequency ----------
+                if details.ssid.is_some() {
+                    let mut bss_list_ptr: *mut WLAN_BSS_LIST = ptr::null_mut();
+
+                    // SAFETY: WlanGetNetworkBssList retrieves visible BSS entries.
+                    // - client_handle and interface GUID are valid
+                    // - bss_list_ptr is a valid local pointer
+                    // - Returned memory MUST be freed with WlanFreeMemory
+                    let result = WlanGetNetworkBssList(
+                        client_handle,
+                        &interface.InterfaceGuid,
+                        None,
+                        dot11_BSS_type_infrastructure,
+                        true,
+                        None,
+                        &mut bss_list_ptr,
+                    );
+
+                    if result == 0 && !bss_list_ptr.is_null() {
+                        let bss_list = &*bss_list_ptr;
+                        let bss_entry_ptr = bss_list.wlanBssEntries.as_ptr();
+
+                        // Find the BSS entry matching our connected BSSID
+                        for j in 0..bss_list.dwNumberOfItems as usize {
+                            let entry = &*bss_entry_ptr.add(j);
+                            if entry.dot11Bssid == connected_bssid {
+                                let freq = entry.ulChCenterFrequency;
+                                if freq > 0 {
+                                    details.channel_frequency_khz = Some(freq);
+                                }
+                                break;
+                            }
+                        }
+
+                        WlanFreeMemory(bss_list_ptr as *const core::ffi::c_void);
+                    }
                 }
 
                 // Found connected interface, no need to check others
@@ -213,12 +280,12 @@ pub fn get_wifi_info() -> (Option<String>, Option<i32>, Option<String>, WifiAdap
 
         // Note: WlanCloseHandle is called automatically by _handle_guard destructor
 
-        (ssid, rssi, interface_desc, adapter_state)
+        details
     }
 }
 
 #[cfg(not(target_os = "windows"))]
-pub fn get_wifi_info() -> (Option<String>, Option<i32>, Option<String>, WifiAdapterState) {
+pub fn get_wifi_info() -> WifiDetails {
     // TODO: Implement for Linux and macOS
-    (None, None, None, WifiAdapterState::Absent)
+    WifiDetails::default()
 }

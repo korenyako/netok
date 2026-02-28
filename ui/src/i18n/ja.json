@@ -77,6 +77,8 @@
     "ip_address": "IPアドレス",
     "network_name": "ネットワーク",
     "signal": "信号",
+    "bandwidth": "帯域幅",
+    "unit_mbps": "Mbps",
     "manufacturer": "メーカー",
     "isp": "ISP",
     "location": "所在地",
@@ -397,7 +399,7 @@
     "arp_safe": "トラフィック傍受の兆候はありません",
     "arp_warning": "ネットワークで不審な活動 — トラフィック傍受の可能性",
     "arp_danger": "トラフィック傍受の試みが検出されました。パスワードを入力したり、バンキングアプリを開かないでください",
-    "dns_safe": "DNSは正常に動作しています — ウェブサイトは正しいアドレスで開きます",
+    "dns_safe": "ウェブサイトは正しいアドレスで開きます",
     "dns_warning": "このネットワークはウェブサイトのアドレスを偽装している可能性があります。NetokのDNS保護を有効にしてください",
     "recommend_dns": "DNS保護を有効にする",
     "recommend_vpn": "VPNを使用する"

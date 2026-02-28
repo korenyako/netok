@@ -260,7 +260,8 @@ pub fn get_computer_info() -> ComputerInfo {
     let hostname = hostname::get().ok().and_then(|s| s.into_string().ok());
 
     // Try to get Wi-Fi info first to determine active adapter
-    let (_ssid, _rssi, wifi_adapter_desc, _wifi_state) = get_wifi_info();
+    let wifi = get_wifi_info();
+    let wifi_adapter_desc = wifi.interface_desc;
 
     // Collect all non-loopback interfaces with private IPv4
     let interfaces: Vec<(String, String)> = match get_if_addrs() {
@@ -311,6 +312,31 @@ pub fn get_computer_info() -> ComputerInfo {
     }
 }
 
+/// Derive Wi-Fi channel number from center frequency in kHz.
+fn channel_from_frequency_khz(freq_khz: u32) -> Option<u8> {
+    let freq_mhz = freq_khz / 1000;
+    match freq_mhz {
+        // 2.4 GHz band: channels 1-13
+        2412..=2472 => Some(((freq_mhz - 2407) / 5) as u8),
+        // 2.4 GHz channel 14
+        2484 => Some(14),
+        // 5 GHz band: channels 36-177
+        5000..=5895 => Some(((freq_mhz - 5000) / 5) as u8),
+        _ => None,
+    }
+}
+
+/// Derive frequency band string from center frequency in kHz.
+fn band_from_frequency_khz(freq_khz: u32) -> Option<String> {
+    let freq_mhz = freq_khz / 1000;
+    match freq_mhz {
+        2400..=2500 => Some("2.4 GHz".to_string()),
+        5000..=5900 => Some("5 GHz".to_string()),
+        5925..=7125 => Some("6 GHz".to_string()),
+        _ => None,
+    }
+}
+
 /// Get network connection information.
 pub fn get_network_info(adapter_name: Option<&str>) -> NetworkInfo {
     use crate::infrastructure::wifi::WifiAdapterState;
@@ -320,10 +346,10 @@ pub fn get_network_info(adapter_name: Option<&str>) -> NetworkInfo {
         .unwrap_or(ConnectionType::Unknown);
 
     // Try to get Wi-Fi info from system API
-    let (ssid, rssi, _wifi_adapter_desc, wifi_state) = get_wifi_info();
+    let wifi = get_wifi_info();
 
     // Determine final connection type using Wi-Fi adapter state
-    let final_connection_type = match wifi_state {
+    let final_connection_type = match wifi.adapter_state {
         WifiAdapterState::Connected => ConnectionType::Wifi,
         WifiAdapterState::Disabled | WifiAdapterState::Absent => {
             // Wi-Fi adapter disabled/absent — check if we have Ethernet
@@ -350,14 +376,22 @@ pub fn get_network_info(adapter_name: Option<&str>) -> NetworkInfo {
         None
     };
 
+    // Derive channel number and frequency band from raw channel frequency
+    let channel = wifi.channel_frequency_khz.and_then(channel_from_frequency_khz);
+    let frequency = wifi.channel_frequency_khz.and_then(band_from_frequency_khz);
+
+    // Convert link speed from kbps to Mbps
+    let link_speed_mbps = wifi.tx_rate_kbps.map(|kbps| kbps / 1000);
+
     NetworkInfo {
         connection_type: final_connection_type,
-        ssid,
-        rssi,
+        ssid: wifi.ssid,
+        rssi: wifi.rssi,
         signal_quality: None,
-        channel: None,
-        frequency: None,
+        channel,
+        frequency,
         encryption,
+        link_speed_mbps,
     }
 }
 

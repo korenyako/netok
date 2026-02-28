@@ -77,6 +77,8 @@
     "ip_address": "IP adresi",
     "network_name": "Ağ",
     "signal": "Sinyal",
+    "bandwidth": "Bant genişliği",
+    "unit_mbps": "Mbps",
     "manufacturer": "Üretici",
     "isp": "İSS",
     "location": "Konum",
@@ -397,7 +399,7 @@
     "arp_safe": "Trafik dinleme belirtisi yok",
     "arp_warning": "Ağda şüpheli etkinlik — olası trafik dinleme",
     "arp_danger": "Trafik dinleme girişimi tespit edildi. Şifre girmeyin ve bankacılık uygulamalarını açmayın",
-    "dns_safe": "DNS doğru çalışıyor — siteler gerçek adreslerle açılıyor",
+    "dns_safe": "Siteler gerçek adreslerle açılıyor",
     "dns_warning": "Bu ağ site adreslerini taklit ediyor olabilir. Netok ayarlarından DNS korumasını etkinleştirin",
     "recommend_dns": "DNS korumasını etkinleştir",
     "recommend_vpn": "VPN kullan"

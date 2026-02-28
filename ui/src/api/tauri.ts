@@ -32,6 +32,7 @@ export interface NetworkInfo {
   channel: number | null;
   frequency: string | null;  // "2.4 GHz" | "5 GHz"
   encryption: string | null;  // "WPA2", "WPA3", "WEP", "WPA", "Open"
+  link_speed_mbps: number | null;  // negotiated PHY link speed in Mbps
 }
 
 export interface RouterInfo {

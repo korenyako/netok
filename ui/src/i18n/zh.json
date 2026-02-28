@@ -77,6 +77,8 @@
     "ip_address": "IP 地址",
     "network_name": "网络",
     "signal": "信号",
+    "bandwidth": "带宽",
+    "unit_mbps": "Mbps",
     "manufacturer": "制造商",
     "isp": "运营商",
     "location": "位置",
@@ -397,7 +399,7 @@
     "arp_safe": "没有流量拦截的迹象",
     "arp_warning": "网络中存在可疑活动 - 可能存在流量拦截",
     "arp_danger": "检测到流量拦截尝试。请勿输入密码或打开银行应用",
-    "dns_safe": "DNS 正常工作 - 网站以真实地址打开",
+    "dns_safe": "网站以真实地址打开",
     "dns_warning": "此网络可能在伪造网站地址。请在 Netok 设置中启用 DNS 保护",
     "recommend_dns": "启用 DNS 保护",
     "recommend_vpn": "使用 VPN"
