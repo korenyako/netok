@@ -78,6 +78,7 @@
     "network_name": "Ağ",
     "signal": "Sinyal",
     "bandwidth": "Bant genişliği",
+    "bandwidth_bottleneck": "İnternet hızınızı sınırlayabilir",
     "unit_mbps": "Mbps",
     "manufacturer": "Üretici",
     "isp": "İSS",

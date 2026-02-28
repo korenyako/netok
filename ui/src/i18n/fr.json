@@ -78,6 +78,7 @@
     "network_name": "Réseau",
     "signal": "Signal",
     "bandwidth": "Bande passante",
+    "bandwidth_bottleneck": "Peut limiter votre vitesse internet",
     "unit_mbps": "Mbit/s",
     "manufacturer": "Fabricant",
     "isp": "FAI",

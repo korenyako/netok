@@ -78,6 +78,7 @@
     "network_name": "Мережа",
     "signal": "Сигнал",
     "bandwidth": "Смуга пропускання",
+    "bandwidth_bottleneck": "Може обмежувати швидкість інтернету",
     "unit_mbps": "Мбіт/с",
     "manufacturer": "Виробник",
     "isp": "Провайдер",

@@ -78,6 +78,7 @@
     "network_name": "Sieć",
     "signal": "Sygnał",
     "bandwidth": "Przepustowość",
+    "bandwidth_bottleneck": "Może ograniczać prędkość internetu",
     "unit_mbps": "Mbps",
     "manufacturer": "Producent",
     "isp": "Dostawca",

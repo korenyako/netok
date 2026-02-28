@@ -78,6 +78,7 @@
     "network_name": "Red",
     "signal": "Señal",
     "bandwidth": "Ancho de banda",
+    "bandwidth_bottleneck": "Puede limitar la velocidad de internet",
     "unit_mbps": "Mbps",
     "manufacturer": "Fabricante",
     "isp": "Proveedor",

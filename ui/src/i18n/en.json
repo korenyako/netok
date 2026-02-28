@@ -80,6 +80,7 @@
     "security": "Security",
     "frequency": "Frequency",
     "bandwidth": "Bandwidth",
+    "bandwidth_bottleneck": "May limit your internet speed",
     "unit_mbps": "Mbps",
     "manufacturer": "Manufacturer",
     "isp": "ISP",

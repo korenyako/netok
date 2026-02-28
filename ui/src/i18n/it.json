@@ -78,6 +78,7 @@
     "network_name": "Rete",
     "signal": "Segnale",
     "bandwidth": "Larghezza di banda",
+    "bandwidth_bottleneck": "Potrebbe limitare la velocità di internet",
     "unit_mbps": "Mbps",
     "manufacturer": "Produttore",
     "isp": "ISP",

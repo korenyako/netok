@@ -10,6 +10,7 @@ import type { SingleNodeResult, DiagnosticScenario } from '../api/tauri';
 import { notifications } from '../utils/notifications';
 import { CloseButton } from '../components/WindowControls';
 import { useVpnStore } from '../stores/vpnStore';
+import { useSpeedTestStore } from '../stores/speedTestStore';
 
 interface NodeDetailScreenProps {
   nodeId: string;
@@ -191,11 +192,21 @@ export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToDnsProvid
       });
     }
 
-    // Bandwidth (link speed)
+    // Bandwidth (link speed) with bottleneck warning
     if (net.link_speed_mbps != null) {
+      const downloadMbps = useSpeedTestStore.getState().metrics.download;
+      const isBottleneck =
+        downloadMbps != null &&
+        net.link_speed_mbps <= 150 &&
+        downloadMbps >= net.link_speed_mbps * 0.7;
+
       rows.push({
         label: t('node_detail.bandwidth'),
         value: `${net.link_speed_mbps} ${t('node_detail.unit_mbps')}`,
+        ...(isBottleneck && {
+          subtitle: t('node_detail.bandwidth_bottleneck'),
+          subtitleClass: 'text-warning bg-warning/10',
+        }),
       });
     }
   }
