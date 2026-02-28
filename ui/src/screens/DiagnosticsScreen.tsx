@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, RotateCw } from '../components/icons/UIIcons';
+import { ArrowLeft, RotateCw, AlertTriangle } from '../components/icons/UIIcons';
 import { NodeOkIcon, NodeWarningIcon, NodeErrorIcon, NodeLoadingIcon } from '../components/icons/DiagnosticStatusIcons';
 import { Button } from '@/components/ui/button';
 import { MenuCard } from '@/components/MenuCard';
@@ -47,6 +47,7 @@ export function DiagnosticsScreen({ onBack, onNavigateToDnsProviders, onNavigate
     runDiagnostics,
     getRawResult,
     scenarioOverride,
+    networkInfo,
   } = useDiagnosticsStore();
 
   const { configs: vpnConfigs, connectionState } = useVpnStore();
@@ -183,6 +184,12 @@ export function DiagnosticsScreen({ onBack, onNavigateToDnsProviders, onNavigate
                 actionLabel={actionButtonText}
               />
             </div>
+          )}
+          {showScenarioCard && scenarioResult.scenario !== 'wifi_disabled' && networkInfo?.is_legacy_wifi && (
+            <p className="flex items-center gap-1.5 text-xs text-warning px-1 pb-3 animate-in fade-in duration-300">
+              <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+              <span>{t('diagnostic.legacy_adapter_hint')}</span>
+            </p>
           )}
 
           {/* Error inline — shown after partial completion */}

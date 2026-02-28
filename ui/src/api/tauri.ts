@@ -33,6 +33,8 @@ export interface NetworkInfo {
   frequency: string | null;  // "2.4 GHz" | "5 GHz"
   encryption: string | null;  // "WPA2", "WPA3", "WEP", "WPA", "Open"
   link_speed_mbps: number | null;  // negotiated PHY link speed in Mbps
+  wifi_standard: string | null;  // "Wi-Fi 5 (802.11ac)", etc.
+  is_legacy_wifi: boolean;  // true if Wi-Fi 4 or older
 }
 
 export interface RouterInfo {

@@ -92,7 +92,9 @@
     "response_time_good": "Bon",
     "response_time_fair": "Normal",
     "response_time_slow": "Lent",
-    "open_router": "Ouvrir les paramètres"
+    "open_router": "Ouvrir les paramètres",
+    "wifi_standard": "Norme de l'adaptateur",
+    "wifi_outdated": "Adaptateur obsolète"
   },
   "nodes": {
     "computer": {
@@ -354,7 +356,8 @@
         "message": "Le Wi-Fi fonctionne, mais le signal est faible — des coupures sont possibles.",
         "action": "Rapprochez-vous du routeur ou retirez les obstacles entre lui et votre ordinateur."
       }
-    }
+    },
+    "legacy_adapter_hint": "Votre adaptateur Wi-Fi est obsolète — cela peut causer des problèmes de connexion."
   },
   "device_scan": {
     "title": "Appareils",

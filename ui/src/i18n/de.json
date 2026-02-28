@@ -92,7 +92,9 @@
     "response_time_good": "Gut",
     "response_time_fair": "Normal",
     "response_time_slow": "Langsam",
-    "open_router": "Einstellungen öffnen"
+    "open_router": "Einstellungen öffnen",
+    "wifi_standard": "Adapterstandard",
+    "wifi_outdated": "Veralteter Adapter"
   },
   "nodes": {
     "computer": {
@@ -354,7 +356,8 @@
         "message": "Wi-Fi funktioniert, aber das Signal ist schwach — Verbindungsabbrüche sind möglich.",
         "action": "Gehen Sie näher an den Router oder entfernen Sie Hindernisse zwischen ihm und Ihrem Computer."
       }
-    }
+    },
+    "legacy_adapter_hint": "Ihr WLAN-Adapter ist veraltet — dies kann Verbindungsprobleme verursachen."
   },
   "device_scan": {
     "title": "Geräte",

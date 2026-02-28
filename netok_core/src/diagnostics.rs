@@ -337,6 +337,24 @@ fn band_from_frequency_khz(freq_khz: u32) -> Option<String> {
     }
 }
 
+/// Map a DOT11_PHY_TYPE value to a human-readable Wi-Fi standard name.
+/// Returns (display_name, is_legacy) where is_legacy is true for Wi-Fi 4 and older.
+fn wifi_standard_from_phy_type(phy_type: u32) -> Option<(String, bool)> {
+    match phy_type {
+        1 => Some(("802.11 FHSS".into(), true)),            // dot11_phy_type_fhss
+        2 => Some(("802.11 DSSS".into(), true)),            // dot11_phy_type_dsss
+        3 => Some(("802.11 IR".into(), true)),              // dot11_phy_type_irbaseband
+        4 => Some(("802.11a".into(), true)),                // dot11_phy_type_ofdm
+        5 => Some(("802.11b".into(), true)),                // dot11_phy_type_hrdsss
+        6 => Some(("802.11g".into(), true)),                // dot11_phy_type_erp
+        7 => Some(("Wi-Fi 4 (802.11n)".into(), true)),     // dot11_phy_type_ht
+        8 => Some(("Wi-Fi 5 (802.11ac)".into(), false)),   // dot11_phy_type_vht
+        10 => Some(("Wi-Fi 6 (802.11ax)".into(), false)),  // dot11_phy_type_he
+        11 => Some(("Wi-Fi 7 (802.11be)".into(), false)),  // dot11_phy_type_eht
+        _ => None,
+    }
+}
+
 /// Get network connection information.
 pub fn get_network_info(adapter_name: Option<&str>) -> NetworkInfo {
     use crate::infrastructure::wifi::WifiAdapterState;
@@ -383,6 +401,13 @@ pub fn get_network_info(adapter_name: Option<&str>) -> NetworkInfo {
     // Convert link speed from kbps to Mbps
     let link_speed_mbps = wifi.tx_rate_kbps.map(|kbps| kbps / 1000);
 
+    // Derive Wi-Fi standard name from PHY type
+    let (wifi_standard, is_legacy_wifi) = wifi
+        .current_phy_type
+        .and_then(wifi_standard_from_phy_type)
+        .map(|(name, legacy)| (Some(name), legacy))
+        .unwrap_or((None, false));
+
     NetworkInfo {
         connection_type: final_connection_type,
         ssid: wifi.ssid,
@@ -392,6 +417,8 @@ pub fn get_network_info(adapter_name: Option<&str>) -> NetworkInfo {
         frequency,
         encryption,
         link_speed_mbps,
+        wifi_standard,
+        is_legacy_wifi,
     }
 }
 

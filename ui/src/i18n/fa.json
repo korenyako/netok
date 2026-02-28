@@ -92,7 +92,9 @@
     "response_time_good": "خوب",
     "response_time_fair": "معمولی",
     "response_time_slow": "کند",
-    "open_router": "باز کردن تنظیمات"
+    "open_router": "باز کردن تنظیمات",
+    "wifi_standard": "استاندارد آداپتور",
+    "wifi_outdated": "آداپتور قدیمی"
   },
   "nodes": {
     "computer": {
@@ -354,7 +356,8 @@
         "message": "Wi-Fi کار می‌کند، اما سیگنال ضعیف است — قطعی احتمالی وجود دارد.",
         "action": "به روتر نزدیک‌تر شوید یا موانع بین آن و رایانه خود را بردارید."
       }
-    }
+    },
+    "legacy_adapter_hint": "آداپتور Wi-Fi شما قدیمی است — این ممکن است مشکلات اتصال ایجاد کند."
   },
   "device_scan": {
     "title": "دستگاه‌ها",

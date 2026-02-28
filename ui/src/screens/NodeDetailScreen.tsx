@@ -147,6 +147,17 @@ export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToDnsProvid
     if (result.computer.adapter) {
       rows.push({ label: t('node_detail.adapter'), value: result.computer.adapter });
     }
+    // Wi-Fi standard
+    if (result.network?.wifi_standard) {
+      rows.push({
+        label: t('node_detail.wifi_standard'),
+        value: result.network.wifi_standard,
+        ...(result.network.is_legacy_wifi && {
+          subtitle: t('node_detail.wifi_outdated'),
+          subtitleClass: 'text-warning bg-warning/10',
+        }),
+      });
+    }
     // Bandwidth (link speed) with bottleneck warning
     if (result.network?.link_speed_mbps != null) {
       const linkSpeed = result.network.link_speed_mbps;
@@ -207,6 +218,18 @@ export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToDnsProvid
       rows.push({
         label: t('node_detail.frequency'),
         value: freqValue,
+      });
+    }
+
+    // Wi-Fi standard
+    if (net.wifi_standard) {
+      rows.push({
+        label: t('node_detail.wifi_standard'),
+        value: net.wifi_standard,
+        ...(net.is_legacy_wifi && {
+          subtitle: t('node_detail.wifi_outdated'),
+          subtitleClass: 'text-warning bg-warning/10',
+        }),
       });
     }
 
@@ -332,12 +355,10 @@ export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToDnsProvid
                 </div>
               ) : (
                 <div>
-                  <div className="flex items-center gap-2">
-                    <span className={`text-sm min-w-0 ${row.valueClass ?? 'text-foreground'}`} dir="ltr">{row.value}</span>
-                    {row.subtitle && (
-                      <span className={`inline-flex items-center text-xs font-normal px-1.5 py-0.5 rounded ${row.subtitleClass ?? 'text-muted-foreground bg-muted'}`}>{row.subtitle}</span>
-                    )}
-                  </div>
+                  <p className={`text-sm ${row.valueClass ?? 'text-foreground'}`} dir="ltr">{row.value}</p>
+                  {row.subtitle && (
+                    <span className={`inline-flex items-center text-xs font-normal px-1.5 py-0.5 rounded mt-1 ${row.subtitleClass ?? 'text-muted-foreground bg-muted'}`}>{row.subtitle}</span>
+                  )}
                 </div>
               )}
             </div>

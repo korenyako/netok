@@ -92,7 +92,9 @@
     "response_time_good": "Bueno",
     "response_time_fair": "Normal",
     "response_time_slow": "Lento",
-    "open_router": "Abrir configuración"
+    "open_router": "Abrir configuración",
+    "wifi_standard": "Estándar del adaptador",
+    "wifi_outdated": "Adaptador obsoleto"
   },
   "nodes": {
     "computer": {
@@ -354,7 +356,8 @@
         "message": "El Wi-Fi funciona, pero la señal es débil — pueden producirse cortes.",
         "action": "Acércate al router o elimina los obstáculos entre él y tu ordenador."
       }
-    }
+    },
+    "legacy_adapter_hint": "Tu adaptador Wi-Fi está obsoleto — esto puede causar problemas de conexión."
   },
   "device_scan": {
     "title": "Dispositivos",

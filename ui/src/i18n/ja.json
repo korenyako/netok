@@ -92,7 +92,9 @@
     "response_time_good": "良好",
     "response_time_fair": "普通",
     "response_time_slow": "遅い",
-    "open_router": "設定を開く"
+    "open_router": "設定を開く",
+    "wifi_standard": "アダプター規格",
+    "wifi_outdated": "古いアダプター"
   },
   "nodes": {
     "computer": {
@@ -354,7 +356,8 @@
         "message": "Wi-Fiは動作していますが、信号が弱いため接続が切れる可能性があります。",
         "action": "ルーターに近づくか、ルーターとコンピュータの間の障害物を取り除いてください。"
       }
-    }
+    },
+    "legacy_adapter_hint": "お使いのWi-Fiアダプターは旧式です — 接続の問題が発生する可能性があります。"
   },
   "device_scan": {
     "title": "デバイス",

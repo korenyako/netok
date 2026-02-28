@@ -5,7 +5,7 @@ import { useDnsStore } from '../stores/useDnsStore';
 import { useVpnStore } from '../stores/vpnStore';
 import { deriveScenario, type ScenarioContext } from '../utils/deriveScenario';
 import { CloseButton } from '../components/WindowControls';
-import { Globe, Lock, LockOpen, Wifi } from '../components/icons/UIIcons';
+import { Globe, Lock, LockOpen, Wifi, AlertTriangle } from '../components/icons/UIIcons';
 import { Button } from '@/components/ui/button';
 import { useWifiSecurityStore } from '../stores/wifiSecurityStore';
 import { openUrl } from '@tauri-apps/plugin-opener';
@@ -300,6 +300,12 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, onNa
             >
               {actionButtonText}
             </Button>
+          )}
+          {showAction && scenarioResult.scenario !== 'wifi_disabled' && networkInfo?.is_legacy_wifi && (
+            <p className="flex items-center gap-1.5 text-xs text-warning text-center leading-normal max-w-[85%] mt-3">
+              <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+              <span>{t('diagnostic.legacy_adapter_hint')}</span>
+            </p>
           )}
         </div>
       </div>

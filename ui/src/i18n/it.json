@@ -92,7 +92,9 @@
     "response_time_good": "Buono",
     "response_time_fair": "Normale",
     "response_time_slow": "Lento",
-    "open_router": "Apri impostazioni"
+    "open_router": "Apri impostazioni",
+    "wifi_standard": "Standard adattatore",
+    "wifi_outdated": "Adattatore obsoleto"
   },
   "nodes": {
     "computer": {
@@ -354,7 +356,8 @@
         "message": "Il Wi-Fi funziona, ma il segnale è debole — possibili interruzioni.",
         "action": "Avvicinati al router o rimuovi gli ostacoli tra esso e il tuo computer."
       }
-    }
+    },
+    "legacy_adapter_hint": "Il tuo adattatore Wi-Fi è obsoleto — questo potrebbe causare problemi di connessione."
   },
   "device_scan": {
     "title": "Dispositivi",

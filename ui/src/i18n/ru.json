@@ -2,8 +2,8 @@
   "network": {
     "unknown": "Неизвестно",
     "unavailable": "Недоступно",
-    "scan_unavailable_no_network": "Недоступно \u2014 нет подключения к сети",
-    "scan_unavailable_no_internet": "Недоступно \u2014 нет подключения к интернету"
+    "scan_unavailable_no_network": "Недоступно — нет подключения к сети",
+    "scan_unavailable_no_internet": "Недоступно — нет подключения к интернету"
   },
   "dns_providers": {
     "title": "DNS",
@@ -94,7 +94,9 @@
     "response_time_good": "Хорошо",
     "response_time_fair": "Нормально",
     "response_time_slow": "Медленно",
-    "open_router": "Открыть настройки"
+    "open_router": "Открыть настройки",
+    "wifi_standard": "Стандарт адаптера",
+    "wifi_outdated": "Устаревший адаптер"
   },
   "nodes": {
     "computer": {
@@ -357,7 +359,8 @@
         "message": "Wi-Fi работает, но сигнал слабый — возможны обрывы.",
         "action": "Подойдите ближе к роутеру или уберите препятствия между ним и компьютером."
       }
-    }
+    },
+    "legacy_adapter_hint": "Ваш Wi-Fi адаптер устарел — это может вызывать проблемы с подключением."
   },
   "device_scan": {
     "title": "Устройства",

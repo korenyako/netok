@@ -92,7 +92,9 @@
     "response_time_good": "Dobry",
     "response_time_fair": "Normalny",
     "response_time_slow": "Wolny",
-    "open_router": "Otwórz ustawienia"
+    "open_router": "Otwórz ustawienia",
+    "wifi_standard": "Standard adaptera",
+    "wifi_outdated": "Przestarzały adapter"
   },
   "nodes": {
     "computer": {
@@ -354,7 +356,8 @@
         "message": "Wi-Fi działa, ale sygnał jest słaby — możliwe są przerwy.",
         "action": "Podejdź bliżej routera lub usuń przeszkody między nim a komputerem."
       }
-    }
+    },
+    "legacy_adapter_hint": "Twój adapter Wi-Fi jest przestarzały — to może powodować problemy z połączeniem."
   },
   "device_scan": {
     "title": "Urządzenia",

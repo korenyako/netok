@@ -71,6 +71,10 @@ pub struct NetworkInfo {
     pub encryption: Option<String>,
     /// Negotiated PHY link speed in Mbps (transmit rate)
     pub link_speed_mbps: Option<u32>,
+    /// Wi-Fi standard name: "Wi-Fi 4 (802.11n)", "Wi-Fi 5 (802.11ac)", etc.
+    pub wifi_standard: Option<String>,
+    /// True if adapter uses Wi-Fi 4 or older standard
+    pub is_legacy_wifi: bool,
 }
 
 /// Information about the router/gateway.

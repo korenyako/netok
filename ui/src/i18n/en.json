@@ -2,8 +2,8 @@
   "network": {
     "unknown": "Unknown",
     "unavailable": "Unavailable",
-    "scan_unavailable_no_network": "Unavailable \u2014 no network connection",
-    "scan_unavailable_no_internet": "Unavailable \u2014 no internet connection"
+    "scan_unavailable_no_network": "Unavailable — no network connection",
+    "scan_unavailable_no_internet": "Unavailable — no internet connection"
   },
   "dns_providers": {
     "title": "DNS",
@@ -94,7 +94,9 @@
     "response_time_good": "Good",
     "response_time_fair": "Normal",
     "response_time_slow": "Slow",
-    "open_router": "Open settings"
+    "open_router": "Open settings",
+    "wifi_standard": "Adapter standard",
+    "wifi_outdated": "Outdated adapter"
   },
   "nodes": {
     "computer": {
@@ -357,7 +359,8 @@
         "message": "Wi-Fi is working, but the signal is weak — dropouts are possible.",
         "action": "Move closer to your router or remove obstacles between it and your computer."
       }
-    }
+    },
+    "legacy_adapter_hint": "Your Wi-Fi adapter is outdated — this may cause connection issues."
   },
   "device_scan": {
     "title": "Devices",

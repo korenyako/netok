@@ -92,7 +92,9 @@
     "response_time_good": "良好",
     "response_time_fair": "一般",
     "response_time_slow": "缓慢",
-    "open_router": "打开设置"
+    "open_router": "打开设置",
+    "wifi_standard": "适配器标准",
+    "wifi_outdated": "适配器已过时"
   },
   "nodes": {
     "computer": {
@@ -354,7 +356,8 @@
         "message": "Wi-Fi 正常工作，但信号较弱——可能会出现断连。",
         "action": "靠近路由器或移除您与路由器之间的障碍物。"
       }
-    }
+    },
+    "legacy_adapter_hint": "您的 Wi-Fi 适配器已过时——这可能导致连接问题。"
   },
   "device_scan": {
     "title": "设备",

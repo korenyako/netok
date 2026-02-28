@@ -92,7 +92,9 @@
     "response_time_good": "İyi",
     "response_time_fair": "Normal",
     "response_time_slow": "Yavaş",
-    "open_router": "Ayarları aç"
+    "open_router": "Ayarları aç",
+    "wifi_standard": "Adaptör standardı",
+    "wifi_outdated": "Eski adaptör"
   },
   "nodes": {
     "computer": {
@@ -354,7 +356,8 @@
         "message": "Wi-Fi çalışıyor, ancak sinyal zayıf — bağlantı kopmaları olabilir.",
         "action": "Yönlendiriciye yaklaşın veya onunla bilgisayarınız arasındaki engelleri kaldırın."
       }
-    }
+    },
+    "legacy_adapter_hint": "Wi-Fi adaptörünüz eski — bu bağlantı sorunlarına neden olabilir."
   },
   "device_scan": {
     "title": "Cihazlar",

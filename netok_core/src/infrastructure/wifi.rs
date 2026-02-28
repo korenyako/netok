@@ -24,6 +24,8 @@ pub struct WifiDetails {
     pub tx_rate_kbps: Option<u32>,
     /// Center frequency of the connected channel in kHz
     pub channel_frequency_khz: Option<u32>,
+    /// DOT11_PHY_TYPE of the active connection (e.g. 7 = HT/802.11n, 8 = VHT/802.11ac)
+    pub current_phy_type: Option<u32>,
 }
 
 impl Default for WifiAdapterState {
@@ -225,6 +227,12 @@ pub fn get_wifi_info() -> WifiDetails {
 
                     // Save BSSID for matching in BSS list
                     connected_bssid = attrs.wlanAssociationAttributes.dot11Bssid;
+
+                    // Get current PHY type from association attributes
+                    let phy_type = attrs.wlanAssociationAttributes.dot11PhyType.0;
+                    if phy_type > 0 {
+                        details.current_phy_type = Some(phy_type as u32);
+                    }
 
                     // SAFETY: Free memory allocated by WlanQueryInterface
                     // - connection_attrs is non-null and was allocated by Windows API

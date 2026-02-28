@@ -92,7 +92,9 @@
     "response_time_good": "Bom",
     "response_time_fair": "Normal",
     "response_time_slow": "Lento",
-    "open_router": "Abrir configurações"
+    "open_router": "Abrir configurações",
+    "wifi_standard": "Padrão do adaptador",
+    "wifi_outdated": "Adaptador desatualizado"
   },
   "nodes": {
     "computer": {
@@ -354,7 +356,8 @@
         "message": "O Wi-Fi está funcionando, mas o sinal está fraco — quedas são possíveis.",
         "action": "Aproxime-se do roteador ou remova obstáculos entre ele e seu computador."
       }
-    }
+    },
+    "legacy_adapter_hint": "Seu adaptador Wi-Fi está desatualizado — isso pode causar problemas de conexão."
   },
   "device_scan": {
     "title": "Dispositivos",
