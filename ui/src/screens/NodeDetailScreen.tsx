@@ -248,7 +248,7 @@ export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToDnsProvid
               <p className="text-sm text-muted-foreground">{row.label}</p>
               {row.copyable ? (
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-cyan-600 dark:text-cyan-400 font-mono" dir="ltr">{row.value}</span>
+                  <span className="text-xs font-mono text-foreground" dir="ltr">{row.value}</span>
                   <Button
                     variant="ghost"
                     size="icon"

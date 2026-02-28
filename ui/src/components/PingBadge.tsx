@@ -10,16 +10,22 @@ function pingColorClass(ms: number): string {
 export function PingBadge({ value, className }: { value: number | null | undefined; className?: string }) {
   const { t } = useTranslation();
 
-  if (value === undefined) {
-    return <span className={cn("text-xs font-mono text-muted-foreground shrink-0 self-start mt-0.5", className)}>...</span>;
-  }
-  if (value === null) {
-    return <span className={cn("text-xs font-mono text-muted-foreground shrink-0 self-start mt-0.5", className)}>&mdash;</span>;
-  }
+  const colorClass = value === undefined
+    ? 'text-foreground'
+    : value === null
+      ? 'text-warning'
+      : pingColorClass(value);
+
+  const label = value === undefined
+    ? '...'
+    : value === null
+      ? '\u2014'
+      : `${value}\u2009${t('speed_test.unit_ms')}`;
+
   return (
-    <span className={cn("inline-flex items-center gap-1.5 text-xs font-mono shrink-0 self-start mt-0.5", pingColorClass(value), className)}>
+    <span className={cn("inline-flex items-center gap-1.5 text-xs font-mono shrink-0 self-start mt-0.5", colorClass, className)}>
       <span className="ping-dot" />
-      {value}&thinsp;{t('speed_test.unit_ms')}
+      {label}
     </span>
   );
 }
