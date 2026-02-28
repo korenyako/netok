@@ -78,6 +78,7 @@
     "network_name": "네트워크",
     "signal": "신호",
     "bandwidth": "대역폭",
+    "bandwidth_adapter": "어댑터 대역폭",
     "bandwidth_bottleneck": "인터넷 속도를 제한할 수 있음",
     "unit_mbps": "Mbps",
     "manufacturer": "제조사",

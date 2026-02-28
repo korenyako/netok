@@ -78,6 +78,7 @@
     "network_name": "网络",
     "signal": "信号",
     "bandwidth": "带宽",
+    "bandwidth_adapter": "适配器带宽",
     "bandwidth_bottleneck": "可能会限制您的网速",
     "unit_mbps": "Mbps",
     "manufacturer": "制造商",

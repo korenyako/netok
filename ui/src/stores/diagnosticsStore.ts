@@ -276,6 +276,11 @@ export const useDiagnosticsStore = create<DiagnosticsStore>((set, get) => ({
         const newRawResults = new Map(state.rawResults);
         newRawResults.set(networkResult.node.id, networkResult);
         newRawResults.set(routerResult.node.id, routerResult);
+        // Enrich computer rawResult with network info (for bandwidth on detail screen)
+        const computerRaw = newRawResults.get('computer');
+        if (computerRaw && networkResult.network) {
+          newRawResults.set('computer', { ...computerRaw, network: networkResult.network });
+        }
         let nodes = upsertNode(state.nodes, networkNode);
         nodes = upsertNode(nodes, routerNode);
         return {

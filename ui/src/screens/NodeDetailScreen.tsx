@@ -147,9 +147,6 @@ export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToDnsProvid
     if (result.computer.adapter) {
       rows.push({ label: t('node_detail.adapter'), value: result.computer.adapter });
     }
-    if (result.computer.local_ip) {
-      rows.push({ label: t('node_detail.ip_address'), value: result.computer.local_ip, copyable: true });
-    }
     // Bandwidth (link speed) with bottleneck warning
     if (result.network?.link_speed_mbps != null) {
       const linkSpeed = result.network.link_speed_mbps;
@@ -160,13 +157,16 @@ export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToDnsProvid
         downloadMbps >= linkSpeed * 0.7;
 
       rows.push({
-        label: t('node_detail.bandwidth'),
+        label: t('node_detail.bandwidth_adapter'),
         value: `${linkSpeed} ${t('node_detail.unit_mbps')}`,
         ...(isBottleneck && {
           subtitle: t('node_detail.bandwidth_bottleneck'),
           subtitleClass: 'text-warning bg-warning/10',
         }),
       });
+    }
+    if (result.computer.local_ip) {
+      rows.push({ label: t('node_detail.ip_address'), value: result.computer.local_ip, copyable: true });
     }
   }
 
@@ -219,7 +219,7 @@ export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToDnsProvid
         downloadMbps >= net.link_speed_mbps * 0.7;
 
       rows.push({
-        label: t('node_detail.bandwidth'),
+        label: t('node_detail.bandwidth_adapter'),
         value: `${net.link_speed_mbps} ${t('node_detail.unit_mbps')}`,
         ...(isBottleneck && {
           subtitle: t('node_detail.bandwidth_bottleneck'),
@@ -347,7 +347,7 @@ export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToDnsProvid
           {showPing && (
             <div>
               <p className="text-sm text-muted-foreground">{t('speed_test.ping')}</p>
-              <div className="mt-0.5">
+              <div className="mt-0.5 -ms-4">
                 <PingBadge value={livePing} />
               </div>
             </div>

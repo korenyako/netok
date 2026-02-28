@@ -78,6 +78,7 @@
     "network_name": "Sieć",
     "signal": "Sygnał",
     "bandwidth": "Przepustowość",
+    "bandwidth_adapter": "Przepustowość adaptera",
     "bandwidth_bottleneck": "Może ograniczać prędkość internetu",
     "unit_mbps": "Mbps",
     "manufacturer": "Producent",

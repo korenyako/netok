@@ -78,6 +78,7 @@
     "network_name": "Rede",
     "signal": "Sinal",
     "bandwidth": "Largura de banda",
+    "bandwidth_adapter": "Largura de banda do adaptador",
     "bandwidth_bottleneck": "Pode limitar a velocidade da internet",
     "unit_mbps": "Mbps",
     "manufacturer": "Fabricante",

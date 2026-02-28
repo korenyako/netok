@@ -78,6 +78,7 @@
     "network_name": "Netzwerk",
     "signal": "Signal",
     "bandwidth": "Bandbreite",
+    "bandwidth_adapter": "Adapter-Bandbreite",
     "bandwidth_bottleneck": "Kann Ihre Internetgeschwindigkeit begrenzen",
     "unit_mbps": "Mbit/s",
     "manufacturer": "Hersteller",

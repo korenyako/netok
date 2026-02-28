@@ -78,6 +78,7 @@
     "network_name": "شبکه",
     "signal": "سیگنال",
     "bandwidth": "پهنای باند",
+    "bandwidth_adapter": "پهنای باند آداپتور",
     "bandwidth_bottleneck": "ممکن است سرعت اینترنت شما را محدود کند",
     "unit_mbps": "Mbps",
     "manufacturer": "سازنده",
