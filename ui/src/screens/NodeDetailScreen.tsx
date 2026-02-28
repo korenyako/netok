@@ -150,6 +150,24 @@ export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToDnsProvid
     if (result.computer.local_ip) {
       rows.push({ label: t('node_detail.ip_address'), value: result.computer.local_ip, copyable: true });
     }
+    // Bandwidth (link speed) with bottleneck warning
+    if (result.network?.link_speed_mbps != null) {
+      const linkSpeed = result.network.link_speed_mbps;
+      const downloadMbps = useSpeedTestStore.getState().metrics.download;
+      const isBottleneck =
+        downloadMbps != null &&
+        linkSpeed <= 150 &&
+        downloadMbps >= linkSpeed * 0.7;
+
+      rows.push({
+        label: t('node_detail.bandwidth'),
+        value: `${linkSpeed} ${t('node_detail.unit_mbps')}`,
+        ...(isBottleneck && {
+          subtitle: t('node_detail.bandwidth_bottleneck'),
+          subtitleClass: 'text-warning bg-warning/10',
+        }),
+      });
+    }
   }
 
   if (nodeId === 'network' && result.network) {
