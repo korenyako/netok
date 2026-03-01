@@ -62,9 +62,9 @@ When VPN is active, DNS queries are routed through Cloudflare DNS-over-HTTPS (`1
 | Data | Storage | Persistence |
 |------|---------|-------------|
 | Diagnostic results (IP, ISP, signal, latency) | In-memory (RAM) | Cleared on app close |
-| VPN server configurations | Browser localStorage | Persists between sessions |
-| VPN server location (country, city) | Browser localStorage | Persists between sessions |
-| Application settings (language, theme) | Browser localStorage | Persists between sessions |
+| VPN server configurations | Local app storage (WebView) | Persists between sessions |
+| VPN server location (country, city) | Local app storage (WebView) | Persists between sessions |
+| Application settings (language, theme) | Local app storage (WebView) | Persists between sessions |
 
 Netok does not write log files, does not store network traffic, and does not maintain history of diagnostic results.
 
