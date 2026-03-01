@@ -207,6 +207,9 @@ function buildSyntheticResults(
         channel: null,
         frequency: null,
         encryption: connectionType === 'Wifi' ? 'WPA2' : null,
+        link_speed_mbps: null,
+        wifi_standard: null,
+        is_legacy_wifi: false,
       } : null,
       router: id === 'dns' ? { gateway_ip: '192.168.1.1', gateway_mac: null, vendor: null, model: null } : null,
       internet: id === 'internet' ? {
@@ -408,7 +411,7 @@ export const shouldRefreshDiagnostics = (lastUpdated: number | null): boolean =>
 // Derive overall status color from diagnostic nodes
 export type StatusColor = 'success' | 'warning' | 'error' | 'loading';
 
-export function getStatusColor(nodes: { status: string }[], isRunning: boolean): StatusColor {
+export function getStatusColor(nodes: { status: string }[], _isRunning: boolean): StatusColor {
   if (nodes.length === 0) return 'loading';
   if (nodes.some(n => n.status === 'down')) return 'error';
   if (nodes.some(n => n.status === 'partial')) return 'warning';

@@ -47,7 +47,6 @@ export function DiagnosticsScreen({ onBack, onNavigateToDnsProviders, onNavigate
     runDiagnostics,
     getRawResult,
     scenarioOverride,
-    networkInfo,
   } = useDiagnosticsStore();
 
   const { configs: vpnConfigs, connectionState } = useVpnStore();

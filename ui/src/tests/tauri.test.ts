@@ -33,6 +33,9 @@ describe('Tauri API', () => {
           channel: null,
           frequency: null,
           encryption: null,
+          link_speed_mbps: null,
+          wifi_standard: null,
+          is_legacy_wifi: false,
         },
         router: { gateway_ip: null, gateway_mac: null, vendor: null, model: null },
         internet: {
