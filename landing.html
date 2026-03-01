@@ -542,6 +542,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); -web
   </div>
 </section>
 
+<
 <!-- Diagnostics Chain -->
 <section class="chain" id="diagnostics">
   <div class="section-label">Diagnostics</div>
@@ -550,4 +551,214 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); -web
 
   <div class="chain-grid">
     <div class="chain-node fade-up">
-      <div class="chain-node-icon"><i data-lucide="monitor" sty
+      <div class="chain-node-icon"><i data-lucide="monitor" style="width:22px;height:22px;stroke:var(--green)"></i></div>
+      <div class="chain-node-title">Computer</div>
+      <div class="chain-node-desc">Is your network adapter working? Netok checks and tells you in plain words.</div>
+      <div class="chain-node-status"><span class="chain-node-status-dot"></span> Healthy</div>
+    </div>
+    <div class="chain-node fade-up">
+      <div class="chain-node-icon"><i data-lucide="wifi" style="width:22px;height:22px;stroke:var(--green)"></i></div>
+      <div class="chain-node-title">Wi-Fi</div>
+      <div class="chain-node-desc">"Excellent signal" or "Weak — try moving closer to the router." Not −67 dBm.</div>
+      <div class="chain-node-status"><span class="chain-node-status-dot"></span> Excellent</div>
+    </div>
+    <div class="chain-node fade-up">
+      <div class="chain-node-icon"><i data-lucide="router" style="width:22px;height:22px;stroke:var(--green)"></i></div>
+      <div class="chain-node-title">Router</div>
+      <div class="chain-node-desc">Who made it, what's the IP, and a button to open the admin page. That simple.</div>
+      <div class="chain-node-status"><span class="chain-node-status-dot"></span> Reachable</div>
+    </div>
+    <div class="chain-node fade-up">
+      <div class="chain-node-icon"><i data-lucide="globe" style="width:22px;height:22px;stroke:var(--green)"></i></div>
+      <div class="chain-node-title">Internet</div>
+      <div class="chain-node-desc">Your provider, your location, your external IP. The last link to the outside world.</div>
+      <div class="chain-node-status"><span class="chain-node-status-dot"></span> Online</div>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="features" id="features">
+  <div class="section-label">Features</div>
+  <h2 class="section-title">Stop juggling apps</h2>
+  <p class="section-desc">Speed test app. VPN client. DNS manager. Ad blocker. Network scanner. You used to need all of them separately. Now you don't.</p>
+
+  <div class="features-grid">
+    <div class="feature-card fade-up">
+      <div class="feature-icon"><i data-lucide="shield-check" style="width:24px;height:24px;stroke:var(--green)"></i></div>
+      <div class="feature-title">DNS Protection</div>
+      <div class="feature-desc">Block ads, trackers, and malware with one click. No terminal, no config files. Just pick a provider and you're protected.</div>
+    </div>
+    <div class="feature-card fade-up">
+      <div class="feature-icon"><i data-lucide="lock" style="width:24px;height:24px;stroke:var(--green)"></i></div>
+      <div class="feature-title">Bring Your Own VPN</div>
+      <div class="feature-desc">Bought a key on Telegram? Got a config from a friend? Just paste it. Supports VLESS, Shadowsocks, Trojan, WireGuard, Outline.</div>
+    </div>
+    <div class="feature-card fade-up">
+      <div class="feature-icon"><i data-lucide="gauge" style="width:24px;height:24px;stroke:var(--green)"></i></div>
+      <div class="feature-title">Speed Test</div>
+      <div class="feature-desc">Measure your real connection speed and compare with what your provider promises.</div>
+      <span class="feature-tag">coming soon</span>
+    </div>
+    <div class="feature-card fade-up">
+      <div class="feature-icon"><i data-lucide="scan-search" style="width:24px;height:24px;stroke:var(--green)"></i></div>
+      <div class="feature-title">Device Scan</div>
+      <div class="feature-desc">Who's on your Wi-Fi? See every connected device and spot anything unfamiliar. No network expertise needed.</div>
+    </div>
+    <div class="feature-card fade-up">
+      <div class="feature-icon"><i data-lucide="languages" style="width:24px;height:24px;stroke:var(--green)"></i></div>
+      <div class="feature-title">15 Languages</div>
+      <div class="feature-desc">From English and Russian to Farsi, Chinese, Japanese, and Korean. Your language, your interface.</div>
+    </div>
+    <div class="feature-card fade-up">
+      <div class="feature-icon"><i data-lucide="sun-moon" style="width:24px;height:24px;stroke:var(--green)"></i></div>
+      <div class="feature-title">Runs Everywhere</div>
+      <div class="feature-desc">Windows, macOS, Linux. Dark and light themes. Minimizes to system tray. Not locked to any ecosystem.</div>
+    </div>
+  </div>
+</section>
+
+<!-- DNS -->
+<section class="dns" id="dns">
+  <div class="dns-layout">
+    <div>
+      <div class="section-label">DNS Protection</div>
+      <h2 class="section-title">Safer internet<br>without a PhD</h2>
+      <p class="section-desc">You shouldn't need to know what DNS is to be protected from trackers and malware. Pick a provider, click once, done. Netok handles everything else.</p>
+    </div>
+    <div class="app-window">
+      <!-- Header -->
+      <div class="app-window-header">
+        <div class="app-window-back">
+          <i data-lucide="arrow-left" style="width:20px;height:20px"></i>
+        </div>
+        <div class="app-window-title">DNS</div>
+        <div class="app-window-close">
+          <i data-lucide="x" style="width:20px;height:20px"></i>
+        </div>
+      </div>
+      <!-- Provider list -->
+      <div class="app-window-content">
+        <div class="dns-row">
+          <div class="dns-radio"></div>
+          <div class="dns-row-text">
+            <div class="dns-row-top">
+              <div class="dns-row-name">Standard DNS</div>
+            </div>
+            <div class="dns-row-sub">No protection</div>
+          </div>
+        </div>
+
+        <div class="dns-row dns-row--active">
+          <div class="dns-radio"></div>
+          <div class="dns-row-text">
+            <div class="dns-row-top">
+              <div class="dns-row-name">Cloudflare</div>
+            </div>
+            <div class="dns-row-sub">Fastest</div>
+          </div>
+          <span class="dns-row-ping"><span class="ping-dot"></span>11 ms</span>
+        </div>
+
+        <div class="dns-row">
+          <div class="dns-radio"></div>
+          <div class="dns-row-text">
+            <div class="dns-row-top">
+              <div class="dns-row-name">AdGuard</div>
+            </div>
+            <div class="dns-row-sub">Blocks ads and trackers</div>
+          </div>
+          <span class="dns-row-ping"><span class="ping-dot"></span>23 ms</span>
+        </div>
+
+        <div class="dns-row">
+          <div class="dns-radio"></div>
+          <div class="dns-row-text">
+            <div class="dns-row-top">
+              <div class="dns-row-name">Quad9</div>
+            </div>
+            <div class="dns-row-sub">Blocks malware and phishing</div>
+          </div>
+          <span class="dns-row-ping"><span class="ping-dot"></span>32 ms</span>
+        </div>
+
+        <div class="dns-row">
+          <div class="dns-radio"></div>
+          <div class="dns-row-text">
+            <div class="dns-row-top">
+              <div class="dns-row-name">Custom DNS</div>
+            </div>
+            <div class="dns-row-sub">Enter DNS addresses manually</div>
+          </div>
+        </div>
+
+        <div class="dns-flush-btn">
+          <i data-lucide="paintbrush" style="width:16px;height:16px"></i>
+          Clear DNS cache
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta" id="download">
+  <div class="cta-inner">
+    <h2 class="cta-title">Your network tools.<br>One app. Free.</h2>
+    <p class="cta-desc">Diagnostics, VPN, DNS protection, speed test, device scanner — all in plain language, on every desktop platform.</p>
+    <a href="#" class="btn-primary">
+      <i data-lucide="download" style="width:16px;height:16px"></i> Download for free
+    </a>
+    <p class="cta-note">Windows · macOS · Linux · No account required</p>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-left">
+    <div class="footer-logo">
+      <span class="footer-logo-dot"></span>
+      Netok
+    </div>
+    <nav class="footer-links">
+      <a href="#">GitHub</a>
+      <a href="#">Documentation</a>
+      <a href="#">Privacy</a>
+    </nav>
+  </div>
+  <span class="footer-copy">Built with Rust + Tauri · Free and open · © 2024</span>
+</footer>
+
+<script>
+// Init Lucide icons
+lucide.createIcons();
+
+// Scroll reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.15 });
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+// DNS mockup interactive
+document.querySelectorAll('.dns-row').forEach(row => {
+  row.addEventListener('click', () => {
+    document.querySelectorAll('.dns-row').forEach(r => r.classList.remove('dns-row--active'));
+    row.classList.add('dns-row--active');
+  });
+});
+
+// Flush DNS button
+document.querySelector('.dns-flush-btn').addEventListener('click', function() {
+  if (this.classList.contains('is-loading')) return;
+  const saved = this.innerHTML;
+  this.classList.add('is-loading');
+  this.innerHTML = '<div class="dns-flush-spinner"></div>';
+  setTimeout(() => {
+    this.innerHTML = saved;
+    lucide.createIcons({ nodes: this.querySelectorAll('[data-lucide]') });
+    this.classList.remove('is-loading');
+  }, 1500);
+});
+</script>
+</body>
+</html>
