@@ -409,14 +409,14 @@ export const shouldRefreshDiagnostics = (lastUpdated: number | null): boolean =>
 export type StatusColor = 'success' | 'warning' | 'error' | 'loading';
 
 export function getStatusColor(nodes: { status: string }[], isRunning: boolean): StatusColor {
-  if (isRunning || nodes.length === 0) return 'loading';
+  if (nodes.length === 0) return 'loading';
   if (nodes.some(n => n.status === 'down')) return 'error';
   if (nodes.some(n => n.status === 'partial')) return 'warning';
   return 'success';
 }
 
 export const STATUS_TEXT_CLASS: Record<StatusColor, string> = {
-  loading: 'text-muted-foreground hover:text-muted-foreground',
+  loading: 'text-foreground hover:text-foreground',
   success: 'text-primary hover:text-primary',
   warning: 'text-warning hover:text-warning',
   error: 'text-destructive hover:text-destructive',
