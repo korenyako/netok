@@ -94,8 +94,9 @@ ne bozuldu, nerede ve ne yapilmali.
   <a href="https://github.com/korenyako/netok/releases/latest"><img src="https://img.shields.io/github/v/release/korenyako/netok?label=Windows%20i%C3%A7in%20indir&style=for-the-badge&logo=windows&logoColor=white" alt="Windows icin indir"></a>
 </p>
 
-> **Not:** Windows ilk calistirmada SmartScreen uyarisi gosterebilir —
-> imzasiz uygulamalar icin bu normaldir. Devam etmek icin "Yine de calistir" secenegine tiklayin.
+### Code signing policy
+
+Free code signing provided by [SignPath.io](https://signpath.io), certificate by [SignPath Foundation](https://signpath.org).
 
 ---
 
@@ -111,6 +112,10 @@ ne bozuldu, nerede ve ne yapilmali.
 ## Lisans
 
 GPL-3.0. Bkz. [LICENSE](LICENSE) ve [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).
+
+## Gizlilik ve güvenlik
+
+Bkz. [PRIVACY.md](PRIVACY.md) ve [SECURITY.md](SECURITY.md).
 
 ---
 

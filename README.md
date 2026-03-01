@@ -93,8 +93,9 @@ what's broken, where, and what to do about it.
   <a href="https://github.com/korenyako/netok/releases/latest"><img src="https://img.shields.io/github/v/release/korenyako/netok?label=Download%20for%20Windows&style=for-the-badge&logo=windows&logoColor=white" alt="Download for Windows"></a>
 </p>
 
-> **Note:** Windows may show a SmartScreen warning on first launch — this is normal
-> for unsigned applications. Click "Run anyway" to proceed.
+### Code signing policy
+
+Free code signing provided by [SignPath.io](https://signpath.io), certificate by [SignPath Foundation](https://signpath.org).
 
 ---
 
@@ -110,6 +111,10 @@ what's broken, where, and what to do about it.
 ## License
 
 GPL-3.0. See [LICENSE](LICENSE) and [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).
+
+## Privacy & Security
+
+See [PRIVACY.md](PRIVACY.md) and [SECURITY.md](SECURITY.md).
 
 ---
 

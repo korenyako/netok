@@ -94,8 +94,9 @@
   <a href="https://github.com/korenyako/netok/releases/latest"><img src="https://img.shields.io/github/v/release/korenyako/netok?label=Windows%E7%89%88%E3%82%92%E3%83%80%E3%82%A6%E3%83%B3%E3%83%AD%E3%83%BC%E3%83%89&style=for-the-badge&logo=windows&logoColor=white" alt="Windows版をダウンロード"></a>
 </p>
 
-> **注意:** 初回起動時にWindowsがSmartScreen警告を表示する場合があります —
-> これは署名されていないアプリケーションでは正常です。「実行」をクリックして続行してください。
+### Code signing policy
+
+Free code signing provided by [SignPath.io](https://signpath.io), certificate by [SignPath Foundation](https://signpath.org).
 
 ---
 
@@ -111,6 +112,10 @@
 ## ライセンス
 
 GPL-3.0。[LICENSE](LICENSE)と[THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md)を参照。
+
+## プライバシーとセキュリティ
+
+[PRIVACY.md](PRIVACY.md)と[SECURITY.md](SECURITY.md)を参照。
 
 ---
 

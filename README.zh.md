@@ -92,8 +92,9 @@ Netok 会用通俗易懂的语言告诉您：哪里出了问题、在哪里、�
   <a href="https://github.com/korenyako/netok/releases/latest"><img src="https://img.shields.io/github/v/release/korenyako/netok?label=%E4%B8%8B%E8%BD%BD%20Windows%20%E7%89%88&style=for-the-badge&logo=windows&logoColor=white" alt="下载 Windows 版"></a>
 </p>
 
-> **注意：** 首次启动时 Windows 可能会显示 SmartScreen 警告 ——
-> 这对于未签名的应用程序是正常的。点击"仍要运行"继续。
+### Code signing policy
+
+Free code signing provided by [SignPath.io](https://signpath.io), certificate by [SignPath Foundation](https://signpath.org).
 
 ---
 
@@ -109,6 +110,10 @@ Netok 会用通俗易懂的语言告诉您：哪里出了问题、在哪里、�
 ## 许可证
 
 GPL-3.0。参见 [LICENSE](LICENSE) 和 [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md)。
+
+## 隐私与安全
+
+参见 [PRIVACY.md](PRIVACY.md) 和 [SECURITY.md](SECURITY.md)。
 
 ---
 

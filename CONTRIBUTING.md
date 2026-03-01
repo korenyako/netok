@@ -80,6 +80,18 @@ chore: bump dependencies
 3. Make sure tests pass (`cargo test` and `cd ui && npm run test:run`)
 4. Open a PR with a clear description of what and why
 
+## Project Governance
+
+Netok is a solo-maintainer project. All governance roles are held by the project author. External contributors submit changes via pull requests, which are reviewed before merge.
+
+### Roles
+
+| Role | Person | Responsibilities |
+|------|--------|------------------|
+| **Author / Committer** | Anton Korenyako ([@korenyako](https://github.com/korenyako)) | Modifies source code, maintains the repository |
+| **Reviewer** | Anton Korenyako ([@korenyako](https://github.com/korenyako)) | Reviews all pull requests before merge |
+| **Approver** | Anton Korenyako ([@korenyako](https://github.com/korenyako)) | Authorizes release builds and code signing |
+
 ## Philosophy
 
 Netok's core principle is **machines should speak human language**. When contributing, ask yourself: "Would a non-technical person understand this?" If the answer is no — let's find a way to make it clearer.

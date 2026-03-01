@@ -94,8 +94,9 @@ was kaputt ist, wo, und was Sie dagegen tun können.
   <a href="https://github.com/korenyako/netok/releases/latest"><img src="https://img.shields.io/github/v/release/korenyako/netok?label=F%C3%BCr%20Windows%20herunterladen&style=for-the-badge&logo=windows&logoColor=white" alt="Für Windows herunterladen"></a>
 </p>
 
-> **Hinweis:** Windows zeigt beim ersten Start möglicherweise eine SmartScreen-Warnung an —
-> das ist normal für unsignierte Anwendungen. Klicken Sie auf „Trotzdem ausführen", um fortzufahren.
+### Code signing policy
+
+Free code signing provided by [SignPath.io](https://signpath.io), certificate by [SignPath Foundation](https://signpath.org).
 
 ---
 
@@ -111,6 +112,10 @@ was kaputt ist, wo, und was Sie dagegen tun können.
 ## Lizenz
 
 GPL-3.0. Siehe [LICENSE](LICENSE) und [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).
+
+## Datenschutz & Sicherheit
+
+Siehe [PRIVACY.md](PRIVACY.md) und [SECURITY.md](SECURITY.md).
 
 ---
 

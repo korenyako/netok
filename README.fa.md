@@ -93,8 +93,9 @@
   <a href="https://github.com/korenyako/netok/releases/latest"><img src="https://img.shields.io/github/v/release/korenyako/netok?label=Download%20for%20Windows&style=for-the-badge&logo=windows&logoColor=white" alt="دانلود برای ویندوز"></a>
 </p>
 
-> **توجه:** ویندوز ممکن است هنگام اولین اجرا هشدار SmartScreen نشان دهد —
-> این برای برنامه‌های بدون امضا طبیعی است. روی «Run anyway» کلیک کنید.
+### Code signing policy
+
+Free code signing provided by [SignPath.io](https://signpath.io), certificate by [SignPath Foundation](https://signpath.org).
 
 ---
 
@@ -110,6 +111,10 @@
 ## مجوز
 
 GPL-3.0. مراجعه کنید به [LICENSE](LICENSE) و [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).
+
+## حریم خصوصی و امنیت
+
+مراجعه کنید به [PRIVACY.md](PRIVACY.md) و [SECURITY.md](SECURITY.md).
 
 ---
 

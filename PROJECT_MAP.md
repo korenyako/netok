@@ -374,8 +374,10 @@ Generated: 2026-03-01
 ├── Cargo.lock
 ├── Cargo.toml
 ├── CLAUDE.md
+├── CODE_OF_CONDUCT.md
 ├── CONTRIBUTING.md
 ├── etsy-hover-effects-fixed.html
+├── landing.html
 ├── LICENSE
 ├── logo.svg
 ├── manuf.txt
@@ -385,6 +387,7 @@ Generated: 2026-03-01
 ├── nul
 ├── package-lock.json
 ├── package.json
+├── PRIVACY.md
 ├── PROJECT_CONTEXT.md
 ├── PROJECT_MAP.md
 ├── README.de.md
@@ -401,6 +404,7 @@ Generated: 2026-03-01
 ├── README.tr.md
 ├── README.uk.md
 ├── README.zh.md
+├── SECURITY.md
 ├── speedtest-prototype-v2.html
 └── THIRD_PARTY_LICENSES.md
 
