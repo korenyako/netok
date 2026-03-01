@@ -128,7 +128,7 @@ export function MenuCard({
             {badge && (
               <span className={cn("text-xs font-normal px-1.5 py-0.5 rounded shrink-0 self-center", badgeClassName || "text-primary bg-primary/10")}>{badge}</span>
             )}
-            {titleTrailing}
+            {titleTrailing && <span className="ml-auto shrink-0">{titleTrailing}</span>}
           </div>
           {subtitle && (
             <div className="text-sm font-normal text-muted-foreground leading-normal mt-0.5">

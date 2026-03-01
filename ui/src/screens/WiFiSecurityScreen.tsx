@@ -257,7 +257,7 @@ export function WiFiSecurityScreen({ onBack, onNavigateToDns, onNavigateToVpn }:
                 variant="static"
                 icon={<NodeLoadingIcon className="w-5 h-5 text-muted-foreground animate-spin" />}
                 title={t(CHECK_ORDER[currentCheckIndex].labelKey)}
-                subtitle={<span className="text-muted-foreground/60">{t('wifi_security.checking')}</span>}
+                subtitle={<span className="text-muted-foreground">{t('wifi_security.checking')}</span>}
                 muted
                 className="animate-in fade-in duration-200"
               />

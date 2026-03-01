@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, RotateCw, AlertTriangle } from '../components/icons/UIIcons';
+import { ArrowLeft, RotateCw } from '../components/icons/UIIcons';
 import { NodeOkIcon, NodeWarningIcon, NodeErrorIcon, NodeLoadingIcon } from '../components/icons/DiagnosticStatusIcons';
 import { Button } from '@/components/ui/button';
 import { MenuCard } from '@/components/MenuCard';
@@ -185,12 +185,6 @@ export function DiagnosticsScreen({ onBack, onNavigateToDnsProviders, onNavigate
               />
             </div>
           )}
-          {showScenarioCard && scenarioResult.scenario !== 'wifi_disabled' && networkInfo?.is_legacy_wifi && (
-            <p className="flex items-center gap-1.5 text-xs text-warning px-1 pb-3 animate-in fade-in duration-300">
-              <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-              <span>{t('diagnostic.legacy_adapter_hint')}</span>
-            </p>
-          )}
 
           {/* Error inline — shown after partial completion */}
           {error && nodes.length > 0 && (
@@ -217,10 +211,16 @@ export function DiagnosticsScreen({ onBack, onNavigateToDnsProviders, onNavigate
                     icon={getStatusIcon(node.status)}
                     title={t(node.title)}
                     badge={node.id === 'internet' && vpnConnected ? t('diagnostics.via_vpn') : undefined}
-                    titleTrailing={showPing ? <PingBadge value={pingValue} className="self-baseline mt-0" /> : undefined}
-                    subtitle={node.details.map((detail) => (
-                      <div key={detail.text} className="flex"><span className="min-w-0 truncate" dir="ltr">{detail.text}</span></div>
-                    ))}
+                    subtitle={<>
+                      {node.details.map((detail) => (
+                        <div key={detail.text} className="flex"><span className="min-w-0 truncate" dir="ltr">{detail.text}</span></div>
+                      ))}
+                      {showPing && (
+                        <div className="mt-0.5 -ms-4">
+                          <PingBadge value={pingValue} />
+                        </div>
+                      )}
+                    </>}
                     trailing={isDown ? undefined : 'chevron'}
                     onClick={isDown ? undefined : () => setSelectedNode(node.id)}
                     className="animate-in fade-in slide-in-from-bottom-2 duration-300"
@@ -234,7 +234,7 @@ export function DiagnosticsScreen({ onBack, onNavigateToDnsProviders, onNavigate
                   variant="static"
                   icon={<NodeLoadingIcon className="w-5 h-5 text-muted-foreground animate-spin" />}
                   title={t(LOADING_LABELS[currentCheckIndex])}
-                  subtitle={<span className="text-muted-foreground/60">{t('diagnostics.checking')}</span>}
+                  subtitle={<span className="text-muted-foreground">{t('diagnostics.checking')}</span>}
                   muted
                   className="animate-in fade-in duration-200"
                 />

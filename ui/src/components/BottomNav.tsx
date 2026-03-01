@@ -44,7 +44,7 @@ export function BottomNav({
           onClick={onNavigateToSecurity}
           className={cn(
             'h-12 w-12',
-            currentScreen === 'security' ? 'text-foreground bg-accent' : 'text-muted-foreground'
+            currentScreen === 'security' ? 'text-foreground bg-accent' : 'text-foreground'
           )}
         >
           <ShieldIcon className="w-6 h-6" />
@@ -56,7 +56,7 @@ export function BottomNav({
           onClick={onNavigateToTools}
           className={cn(
             'h-12 w-12',
-            currentScreen === 'tools' ? 'text-foreground bg-accent' : 'text-muted-foreground'
+            currentScreen === 'tools' ? 'text-foreground bg-accent' : 'text-foreground'
           )}
         >
           <ToolsIcon className="w-6 h-6" />
@@ -68,7 +68,7 @@ export function BottomNav({
           onClick={onNavigateToSettings}
           className={cn(
             'h-12 w-12',
-            currentScreen === 'settings' ? 'text-foreground bg-accent' : 'text-muted-foreground'
+            currentScreen === 'settings' ? 'text-foreground bg-accent' : 'text-foreground'
           )}
         >
           <SettingsIcon className="w-6 h-6" />

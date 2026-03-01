@@ -53,6 +53,7 @@ interface DiagnosticsActions {
   getRawResult: (nodeId: string) => SingleNodeResult | undefined;
   overrideScenario: (scenario: DiagnosticScenario, t: (key: string) => string) => void;
   clearOverride: (t: (key: string) => string) => void;
+  setLegacyWifi: (value: boolean) => void;
 }
 
 export type DiagnosticsStore = DiagnosticsState & DiagnosticsActions;
@@ -387,6 +388,13 @@ export const useDiagnosticsStore = create<DiagnosticsStore>((set, get) => ({
   clearOverride: (t: (key: string) => string) => {
     set({ scenarioOverride: null });
     get().runDiagnostics(t);
+  },
+
+  setLegacyWifi: (value: boolean) => {
+    const info = get().networkInfo;
+    if (info) {
+      set({ networkInfo: { ...info, is_legacy_wifi: value } });
+    }
   },
 }));
 

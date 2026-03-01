@@ -200,7 +200,8 @@ export function DnsProvidersScreen({ onBack, onCustomIp }: DnsProvidersScreenPro
             return (
               <div className={cn(isApplying && !isSystemActive && !isSystemApplying && 'pointer-events-none opacity-50')}>
                 <MenuCard
-                  variant="ghost"
+                  variant={isSystemActive ? 'filled' : 'ghost'}
+                  className={cn(isSystemActive && 'border-muted-foreground/30')}
                   icon={<RadioDot selected={isSystemActive} applying={isSystemApplying} />}
                   title={t('dns_providers.system')}
                   subtitle={t('dns_providers.system_desc')}
@@ -220,7 +221,8 @@ export function DnsProvidersScreen({ onBack, onCustomIp }: DnsProvidersScreenPro
             return (
               <div key={card.id} className={cn(isApplying && !isActive && !isCardApplying && 'pointer-events-none opacity-50')}>
                 <MenuCard
-                  variant="ghost"
+                  variant={isActive ? 'filled' : 'ghost'}
+                  className={cn(isActive && 'border-muted-foreground/30')}
                   icon={<RadioDot selected={isActive} applying={isCardApplying} />}
                   title={t(card.nameKey)}
                   badge={card.badgeKey ? t(card.badgeKey) : undefined}
@@ -238,22 +240,24 @@ export function DnsProvidersScreen({ onBack, onCustomIp }: DnsProvidersScreenPro
             return (
               <div className={cn(isApplying && !isCustomActive && !isCustomApplying && 'pointer-events-none opacity-50')}>
                 <MenuCard
-                  variant="ghost"
-                  className="group ghost-action-card"
+                  variant={isCustomActive ? 'filled' : 'ghost'}
+                  className={cn('group ghost-action-card', isCustomActive && 'border-muted-foreground/30')}
                   icon={<RadioDot selected={isCustomActive} applying={isCustomApplying} />}
                   title={t('dns_providers.custom')}
-                  titleTrailing={customIp ? <PingBadge value={pings['custom']} className="self-center mt-0" /> : undefined}
                   subtitle={customSubtitle() || t('dns_providers.custom_ip_desc')}
                   trailing={
-                    <button
-                      className="ghost-action px-4 py-1.5 rounded-full text-[10px] font-medium uppercase tracking-wider text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all shrink-0 hidden group-hover:inline-flex"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onCustomIp();
-                      }}
-                    >
-                      {t('dns_providers.custom_ip_edit')}
-                    </button>
+                    <div className="flex flex-col items-end self-stretch shrink-0">
+                      {customIp ? <PingBadge value={pings['custom']} className="mt-0.5" /> : <span />}
+                      <button
+                        className="ghost-action px-4 py-1.5 rounded-full text-[10px] font-medium uppercase tracking-wider text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all mt-auto invisible group-hover:visible"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onCustomIp();
+                        }}
+                      >
+                        {t('dns_providers.custom_ip_edit')}
+                      </button>
+                    </div>
                   }
                   onClick={handleCustomSelect}
                 />

@@ -337,7 +337,7 @@ export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToDnsProvid
           </div>
         )}
 
-        <div className="ps-12 space-y-4">
+        <div className="ps-12 space-y-6">
           {rows.map((row) => (
             <div key={row.label}>
               <p className="text-sm text-muted-foreground">{row.label}</p>
@@ -386,7 +386,7 @@ export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToDnsProvid
                 <p className={`text-base font-medium ${textColor}`}>
                   {t(`node_detail.response_time_${level}`)}
                 </p>
-                <p className="text-xs text-muted-foreground/50 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   {ms} ms
                 </p>
               </div>

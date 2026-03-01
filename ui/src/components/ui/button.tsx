@@ -44,7 +44,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <Comp
         className={cn(
           buttonVariants({ variant, size }),
-          isGhostIcon && "radial-hover hover:bg-transparent",
+          isGhostIcon && "radial-hover hover:bg-transparent [&>svg]:transition-colors [&:hover>.text-muted-foreground]:text-foreground",
           className
         )}
         ref={ref}

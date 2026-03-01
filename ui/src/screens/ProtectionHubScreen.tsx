@@ -68,7 +68,7 @@ export function ProtectionHubScreen({ onBack, onNavigateToDns, onNavigateToVpn }
 
   const dnsIconColor = isDnsLoading
     ? 'text-warning animate-pulse'
-    : isDnsEnabled ? 'text-primary' : 'text-muted-foreground';
+    : isDnsEnabled ? 'text-primary' : 'text-foreground';
 
   const vpnIconColor = (() => {
     switch (connectionState.type) {
@@ -81,7 +81,7 @@ export function ProtectionHubScreen({ onBack, onNavigateToDns, onNavigateToVpn }
       case 'elevation_denied':
         return 'text-destructive';
       default:
-        return 'text-muted-foreground';
+        return 'text-foreground';
     }
   })();
 

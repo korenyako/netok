@@ -178,7 +178,8 @@ export function VpnTunnelScreen({ onBack, onAddVpn }: VpnTunnelScreenProps) {
           {/* Disabled card */}
           <div className={cn(isBusy && !isDisconnecting && 'pointer-events-none opacity-50')}>
             <MenuCard
-              variant="ghost"
+              variant={isDisabled ? 'filled' : 'ghost'}
+              className={cn(isDisabled && 'border-muted-foreground/30')}
               icon={<RadioDot selected={isDisabled} applying={isDisconnecting} />}
               title={t('vpn.disabled')}
               subtitle={t('vpn.disabled_desc')}
@@ -206,22 +207,24 @@ export function VpnTunnelScreen({ onBack, onAddVpn }: VpnTunnelScreenProps) {
             return (
               <div key={index} className={cn(isBusy && !isThisConnecting && 'pointer-events-none opacity-50')}>
                 <MenuCard
-                  variant="ghost"
-                  className="group ghost-action-card"
+                  variant={isThisActive ? 'filled' : 'ghost'}
+                  className={cn('group ghost-action-card', isThisActive && 'border-muted-foreground/30')}
                   icon={<RadioDot selected={isThisActive} applying={isThisConnecting} />}
                   title={serverTitle}
-                  titleTrailing={isThisActive && isConnected ? <PingBadge value={ping} className="self-center mt-0" /> : undefined}
                   subtitle={serverSubtitle}
                   trailing={
-                    <button
-                      className="ghost-action px-4 py-1.5 rounded-full text-[10px] font-medium uppercase tracking-wider text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all shrink-0 hidden group-hover:inline-flex"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleEditServer(index);
-                      }}
-                    >
-                      {t('vpn.edit')}
-                    </button>
+                    <div className="flex flex-col items-end self-stretch shrink-0">
+                      {isThisActive && isConnected ? <PingBadge value={ping} className="mt-0.5" /> : <span />}
+                      <button
+                        className="ghost-action px-4 py-1.5 rounded-full text-[10px] font-medium uppercase tracking-wider text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all mt-auto invisible group-hover:visible"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditServer(index);
+                        }}
+                      >
+                        {t('vpn.edit')}
+                      </button>
+                    </div>
                   }
                   onClick={() => handleSelectServer(index)}
                 />

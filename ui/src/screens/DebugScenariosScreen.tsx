@@ -39,7 +39,7 @@ const SEVERITY_DOT: Record<DiagnosticSeverity, string> = {
 
 export function DebugScenariosScreen({ onBack, onNavigateToHome, onNavigateToSpeedTest }: DebugScenariosScreenProps) {
   const { t } = useTranslation();
-  const { overrideScenario, clearOverride, scenarioOverride } = useDiagnosticsStore();
+  const { overrideScenario, clearOverride, scenarioOverride, networkInfo, setLegacyWifi } = useDiagnosticsStore();
   const speedTestStore = useSpeedTestStore();
 
   const handleSelect = (scenario: DiagnosticScenario) => {
@@ -110,6 +110,23 @@ export function DebugScenariosScreen({ onBack, onNavigateToHome, onNavigateToSpe
               <span className="text-xs text-muted-foreground font-mono">{scenario}</span>
             </button>
           ))}
+        </div>
+
+        {/* Flags */}
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mt-5 mb-2">Flags</p>
+        <div className="space-y-1.5">
+          <button
+            onClick={() => setLegacyWifi(!networkInfo?.is_legacy_wifi)}
+            className={cn(
+              'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-left transition-colors',
+              'hover:bg-accent/50',
+              networkInfo?.is_legacy_wifi && 'bg-accent',
+            )}
+          >
+            <span className={cn('w-2 h-2 rounded-full shrink-0', networkInfo?.is_legacy_wifi ? 'bg-warning' : 'bg-muted-foreground/30')} />
+            <span className="flex-1 text-foreground">Legacy Wi-Fi Adapter</span>
+            <span className="text-xs text-muted-foreground font-mono">is_legacy_wifi</span>
+          </button>
         </div>
 
         <div className="flex-1" />

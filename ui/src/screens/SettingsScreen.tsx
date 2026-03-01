@@ -24,8 +24,8 @@ export function SettingsScreen({ onNavigateToTheme, onNavigateToLanguage, onNavi
   const currentLanguage = i18n.language;
 
   const themeIcon = currentTheme === 'dark'
-    ? <Moon className="w-5 h-5 text-muted-foreground" />
-    : <Sun className="w-5 h-5 text-muted-foreground" />;
+    ? <Moon className="w-5 h-5 text-foreground" />
+    : <Sun className="w-5 h-5 text-foreground" />;
 
   const themeSubtitle = currentTheme === 'dark'
     ? t('settings.general.theme_dark')
@@ -65,7 +65,7 @@ export function SettingsScreen({ onNavigateToTheme, onNavigateToLanguage, onNavi
           />
 
           <MenuCard
-            icon={<Languages className="w-5 h-5 text-muted-foreground" />}
+            icon={<Languages className="w-5 h-5 text-foreground" />}
             title={t('settings.general.language')}
             subtitle={languageSubtitle}
             trailing="chevron"
@@ -73,7 +73,7 @@ export function SettingsScreen({ onNavigateToTheme, onNavigateToLanguage, onNavi
           />
 
           <MenuCard
-            icon={<Minimize2 className="w-5 h-5 text-muted-foreground" />}
+            icon={<Minimize2 className="w-5 h-5 text-foreground" />}
             title={t('settings.general.close_behavior')}
             subtitle={closeBehaviorSubtitle}
             trailing="chevron"
@@ -81,7 +81,7 @@ export function SettingsScreen({ onNavigateToTheme, onNavigateToLanguage, onNavi
           />
 
           <MenuCard
-            icon={<Info className="w-5 h-5 text-muted-foreground" />}
+            icon={<Info className="w-5 h-5 text-foreground" />}
             title={t('settings.general.about')}
             subtitle={t('settings.general.about_desc')}
             trailing="chevron"

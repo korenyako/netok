@@ -5,7 +5,7 @@ import { useDnsStore } from '../stores/useDnsStore';
 import { useVpnStore } from '../stores/vpnStore';
 import { deriveScenario, type ScenarioContext } from '../utils/deriveScenario';
 import { CloseButton } from '../components/WindowControls';
-import { Globe, Lock, LockOpen, Wifi, AlertTriangle } from '../components/icons/UIIcons';
+import { Globe, Lock, LockOpen, Wifi } from '../components/icons/UIIcons';
 import { Button } from '@/components/ui/button';
 import { useWifiSecurityStore } from '../stores/wifiSecurityStore';
 import { openUrl } from '@tauri-apps/plugin-opener';
@@ -271,7 +271,7 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, onNa
 
             {/* Network Info inside circle */}
             {showNetworkInfo && networkInfo && (
-              <div className="text-xs font-mono text-muted-foreground/60 mt-2">
+              <div className="text-xs font-mono text-muted-foreground mt-2">
                 {networkInfo.connection_type && t(CONNECTION_TYPE_KEYS[networkInfo.connection_type] ?? 'network.unknown')}
                 {networkInfo.ssid && ` ${networkInfo.ssid}`}
               </div>
@@ -302,9 +302,8 @@ export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, onNa
             </Button>
           )}
           {showAction && scenarioResult.scenario !== 'wifi_disabled' && networkInfo?.is_legacy_wifi && (
-            <p className="flex items-center gap-1.5 text-xs text-warning text-center leading-normal max-w-[85%] mt-3">
-              <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-              <span>{t('diagnostic.legacy_adapter_hint')}</span>
+            <p className="text-xs text-warning text-center leading-normal max-w-[85%] mt-3">
+              {t('diagnostic.legacy_adapter_hint')}
             </p>
           )}
         </div>

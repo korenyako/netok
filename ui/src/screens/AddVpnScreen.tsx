@@ -150,7 +150,7 @@ export function AddVpnScreen({ onBack, onAdded }: AddVpnScreenProps) {
 
         <div className="flex-1 flex flex-col min-h-0 gap-3">
           {!isEditMode && (
-            <span className="text-xs text-muted-foreground/60">{t('vpn.key_example')}</span>
+            <span className="text-xs text-muted-foreground">{t('vpn.key_example')}</span>
           )}
           <textarea
             placeholder=""
