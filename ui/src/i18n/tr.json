@@ -77,6 +77,8 @@
     "ip_address": "IP adresi",
     "network_name": "Ağ",
     "signal": "Sinyal",
+    "security": "Güvenlik",
+    "frequency": "Frekans",
     "bandwidth": "Bant genişliği",
     "bandwidth_adapter": "Adaptör bant genişliği",
     "bandwidth_bottleneck": "İnternet hızınızı sınırlayabilir",
@@ -133,7 +135,8 @@
       "security_open": "Açık ağ — verileriniz şifrelenmemiş",
       "link_field": "Bağlantı",
       "link_yes": "Bağlı",
-      "link_no": "Bağlantı kesildi"
+      "link_no": "Bağlantı kesildi",
+      "channel": "Kanal {{channel}}"
     },
     "router": {
       "name": "Yönlendirici",

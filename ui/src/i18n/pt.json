@@ -77,6 +77,8 @@
     "ip_address": "Endereço IP",
     "network_name": "Rede",
     "signal": "Sinal",
+    "security": "Segurança",
+    "frequency": "Frequência",
     "bandwidth": "Largura de banda",
     "bandwidth_adapter": "Largura de banda do adaptador",
     "bandwidth_bottleneck": "Pode limitar a velocidade da internet",
@@ -133,7 +135,8 @@
       "security_open": "Rede aberta — seus dados não estão criptografados",
       "link_field": "Link",
       "link_yes": "Conectado",
-      "link_no": "Desconectado"
+      "link_no": "Desconectado",
+      "channel": "Canal {{channel}}"
     },
     "router": {
       "name": "Roteador",

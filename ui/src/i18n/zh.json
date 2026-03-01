@@ -77,6 +77,8 @@
     "ip_address": "IP 地址",
     "network_name": "网络",
     "signal": "信号",
+    "security": "安全性",
+    "frequency": "频率",
     "bandwidth": "带宽",
     "bandwidth_adapter": "适配器带宽",
     "bandwidth_bottleneck": "可能会限制您的网速",
@@ -133,7 +135,8 @@
       "security_open": "开放网络 — 您的数据未加密",
       "link_field": "链路",
       "link_yes": "已连接",
-      "link_no": "已断开"
+      "link_no": "已断开",
+      "channel": "频道 {{channel}}"
     },
     "router": {
       "name": "路由器",

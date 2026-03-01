@@ -77,6 +77,8 @@
     "ip_address": "Indirizzo IP",
     "network_name": "Rete",
     "signal": "Segnale",
+    "security": "Sicurezza",
+    "frequency": "Frequenza",
     "bandwidth": "Larghezza di banda",
     "bandwidth_adapter": "Larghezza di banda dell'adattatore",
     "bandwidth_bottleneck": "Potrebbe limitare la velocità di internet",
@@ -133,7 +135,8 @@
       "security_open": "Rete aperta — i tuoi dati non sono crittografati",
       "link_field": "Collegamento",
       "link_yes": "Connesso",
-      "link_no": "Disconnesso"
+      "link_no": "Disconnesso",
+      "channel": "Canale {{channel}}"
     },
     "router": {
       "name": "Router",

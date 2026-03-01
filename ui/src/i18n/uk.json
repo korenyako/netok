@@ -77,6 +77,8 @@
     "ip_address": "IP-адреса",
     "network_name": "Мережа",
     "signal": "Сигнал",
+    "security": "Безпека",
+    "frequency": "Частота",
     "bandwidth": "Смуга пропускання",
     "bandwidth_adapter": "Смуга пропускання адаптера",
     "bandwidth_bottleneck": "Може обмежувати швидкість інтернету",
@@ -133,7 +135,8 @@
       "security_open": "Відкрита мережа — дані не шифруються",
       "link_field": "З'єднання",
       "link_yes": "Підключено",
-      "link_no": "Відключено"
+      "link_no": "Відключено",
+      "channel": "Канал {{channel}}"
     },
     "router": {
       "name": "Роутер",

@@ -77,6 +77,8 @@
     "ip_address": "Adres IP",
     "network_name": "Sieć",
     "signal": "Sygnał",
+    "security": "Bezpieczeństwo",
+    "frequency": "Częstotliwość",
     "bandwidth": "Przepustowość",
     "bandwidth_adapter": "Przepustowość adaptera",
     "bandwidth_bottleneck": "Może ograniczać prędkość internetu",
@@ -133,7 +135,8 @@
       "security_open": "Otwarta sieć — dane nie są szyfrowane",
       "link_field": "Łącze",
       "link_yes": "Połączono",
-      "link_no": "Rozłączono"
+      "link_no": "Rozłączono",
+      "channel": "Kanał {{channel}}"
     },
     "router": {
       "name": "Router",

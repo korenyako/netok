@@ -77,6 +77,8 @@
     "ip_address": "آدرس IP",
     "network_name": "شبکه",
     "signal": "سیگنال",
+    "security": "امنیت",
+    "frequency": "فرکانس",
     "bandwidth": "پهنای باند",
     "bandwidth_adapter": "پهنای باند آداپتور",
     "bandwidth_bottleneck": "ممکن است سرعت اینترنت شما را محدود کند",
@@ -133,7 +135,8 @@
       "security_open": "شبکه باز — داده‌های شما رمزنگاری نمی‌شوند",
       "link_field": "اتصال",
       "link_yes": "متصل",
-      "link_no": "قطع شده"
+      "link_no": "قطع شده",
+      "channel": "کانال {{channel}}"
     },
     "router": {
       "name": "روتر",
