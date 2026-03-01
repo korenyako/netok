@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Netok — One app instead of five</title>
+<title>Netok — Your network, explained</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,6 +26,14 @@ a { text-decoration: none; color: inherit; }
   --green: #3DD68C;
   --green-dim: rgba(61,214,140,0.12);
   --green-glow: rgba(61,214,140,0.2);
+  --red: #EF4444;
+  --red-dim: rgba(239,68,68,0.12);
+  --amber: #F59F0A;
+  --amber-dim: rgba(245,159,10,0.12);
+  --purple: #a855f7;
+  --purple-dim: rgba(168,85,247,0.12);
+  --cyan: #22D3EE;
+  --cyan-dim: rgba(34,211,238,0.12);
   --blue: #58A6FF;
   --font: 'Inter', -apple-system, sans-serif;
   --mono: 'Martian Mono', monospace;
@@ -171,11 +179,8 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); -web
 }
 
 /* ============================================
-   FEATURES CHAIN
+   SHARED SECTION STYLES
    ============================================ */
-.chain {
-  padding: 100px 40px 120px; max-width: 1100px; margin: 0 auto;
-}
 .section-label {
   font-family: var(--mono); font-size: 12px; font-weight: 500;
   color: var(--green); letter-spacing: 0.05em;
@@ -190,6 +195,122 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); -web
   max-width: 560px; margin-bottom: 56px;
 }
 
+/* ============================================
+   SHOWCASE — generic 2-col deep-dive layout
+   ============================================ */
+.showcase {
+  padding: 0 40px 120px; max-width: 1100px; margin: 0 auto;
+}
+.showcase--first {
+  padding-top: 100px;
+}
+.showcase-layout {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 48px;
+  align-items: center;
+}
+.showcase .section-desc:last-child { margin-bottom: 0; }
+
+/* ============================================
+   APP WINDOW MOCKUP — matches Netok dark theme
+   ============================================ */
+.app-window {
+  width: 340px; max-width: 100%;
+  background: #131314;
+  border: 1px solid #29282A;
+  border-radius: 8px; overflow: hidden;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+  margin: 0 auto;
+}
+.app-window-header {
+  display: flex; align-items: center; gap: 8px;
+  padding: 16px 16px 12px;
+}
+.app-window-back {
+  width: 40px; height: 40px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: #808080;
+  transition: background 0.15s;
+}
+.app-window-back:hover { background: #202121; }
+.app-window-title {
+  flex: 1; font-size: 16px; font-weight: 600; color: #CBC4CC;
+}
+.app-window-close {
+  width: 40px; height: 40px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: #808080;
+  transition: background 0.15s;
+}
+.app-window-close:hover { background: #202121; }
+.app-window-content {
+  padding: 0 16px 16px; display: flex; flex-direction: column; gap: 8px;
+}
+
+/* ============================================
+   DIAGNOSTIC MOCKUP — node rows + message card
+   ============================================ */
+.mockup-nodes {
+  padding: 4px 8px 12px; display: flex; flex-direction: column; gap: 2px;
+}
+.mockup-node {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px; border-radius: 10px;
+}
+.mockup-node-dot {
+  width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0;
+  position: relative;
+}
+.mockup-node-dot--ok { background: #3CB47C; }
+.mockup-node-dot--ok::after {
+  content: ''; position: absolute;
+  top: 3px; left: 5.5px; width: 4px; height: 7px;
+  border: solid #131314; border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg);
+}
+.mockup-node-dot--error { background: #EF4444; }
+.mockup-node-dot--error::before,
+.mockup-node-dot--error::after {
+  content: ''; position: absolute;
+  top: 50%; left: 50%; width: 8px; height: 1.5px;
+  background: #131314; border-radius: 1px;
+}
+.mockup-node-dot--error::before { transform: translate(-50%, -50%) rotate(45deg); }
+.mockup-node-dot--error::after { transform: translate(-50%, -50%) rotate(-45deg); }
+.mockup-node-dot--warn { background: #F59F0A; }
+.mockup-node-dot--warn::after {
+  content: '!'; position: absolute;
+  top: 50%; left: 50%; transform: translate(-50%, -50%);
+  color: #131314; font-size: 10px; font-weight: 800; line-height: 1;
+}
+.mockup-node-info { flex: 1; min-width: 0; }
+.mockup-node-name { font-size: 13px; font-weight: 500; color: #CBC4CC; }
+.mockup-node-sub { font-size: 11px; color: #808080; margin-top: 1px; }
+.mockup-node-trailing {
+  font-family: var(--mono); font-size: 11px; color: #808080;
+  flex-shrink: 0;
+}
+
+/* Diagnostic message card inside mockup */
+.mockup-diag {
+  margin: 0 12px 8px; padding: 12px 14px;
+  background: #202121; border-radius: 12px;
+  display: flex; gap: 10px;
+}
+.mockup-diag-bead {
+  width: 3px; border-radius: 2px; flex-shrink: 0; align-self: stretch;
+}
+.mockup-diag-bead--red { background: var(--red); }
+.mockup-diag-bead--green { background: #3CB47C; }
+.mockup-diag-content {}
+.mockup-diag-title { font-size: 13px; font-weight: 600; color: #CBC4CC; margin-bottom: 4px; }
+.mockup-diag-text { font-size: 11px; color: #808080; line-height: 1.5; }
+
+/* ============================================
+   DIAGNOSTICS CHAIN
+   ============================================ */
+.chain {
+  padding: 100px 40px 120px; max-width: 1100px; margin: 0 auto;
+}
 .chain-grid {
   display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px;
   position: relative;
@@ -212,9 +333,11 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); -web
 }
 .chain-node-icon {
   width: 48px; height: 48px; border-radius: 12px;
-  background: var(--green-dim); display: flex; align-items: center; justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   margin: 0 auto 16px; line-height: 0;
 }
+.chain-node-icon--green { background: var(--green-dim); }
+.chain-node-icon--red { background: var(--red-dim); }
 .chain-node-title {
   font-size: 15px; font-weight: 600; margin-bottom: 8px;
 }
@@ -223,12 +346,15 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); -web
 }
 .chain-node-status {
   display: inline-flex; align-items: center; gap: 5px;
-  font-size: 11px; font-weight: 500; color: var(--green);
-  margin-top: 12px;
+  font-size: 11px; font-weight: 500; margin-top: 12px;
 }
+.chain-node-status--green { color: var(--green); }
+.chain-node-status--red { color: var(--red); }
 .chain-node-status-dot {
-  width: 5px; height: 5px; border-radius: 50%; background: var(--green);
+  width: 5px; height: 5px; border-radius: 50%;
 }
+.chain-node-status--green .chain-node-status-dot { background: var(--green); }
+.chain-node-status--red .chain-node-status-dot { background: var(--red); }
 
 /* ============================================
    FEATURES GRID
@@ -259,100 +385,53 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); -web
 .feature-desc {
   font-size: 14px; line-height: 1.6; color: var(--text-muted);
 }
-.feature-tag {
-  display: inline-block; margin-top: 14px;
-  font-family: var(--mono); font-size: 11px; color: var(--green);
-  background: var(--green-dim); padding: 3px 10px; border-radius: 4px;
-}
 
 /* ============================================
-   DNS SECTION
+   DNS ROWS — matches MenuCard component
    ============================================ */
-.dns {
-  padding: 0 40px 120px; max-width: 1100px; margin: 0 auto;
-}
-.dns-layout {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 48px;
-  align-items: center;
-}
-/* App window mockup — matches Netok dark theme exactly */
-.app-window {
-  width: 340px; max-width: 100%;
-  background: #131314; /* --background */
-  border: 1px solid #29282A; /* --border */
-  border-radius: 8px; overflow: hidden; /* --radius */
-  box-shadow: 0 24px 80px rgba(0,0,0,0.5);
-  margin: 0 auto;
-}
-.app-window-header {
-  display: flex; align-items: center; gap: 8px; /* gap-2 */
-  padding: 16px 16px 12px; /* px-4 pt-4 pb-3 */
-}
-.app-window-back {
-  width: 40px; height: 40px; border-radius: 50%; /* rounded-full */
-  display: flex; align-items: center; justify-content: center;
-  color: #808080; /* muted-foreground */
-  transition: background 0.15s;
-}
-.app-window-back:hover { background: #202121; /* accent */ }
-.app-window-title {
-  flex: 1; font-size: 16px; font-weight: 600; color: #CBC4CC; /* text-lg semibold foreground */
-}
-.app-window-close {
-  width: 40px; height: 40px; border-radius: 50%; /* rounded-full */
-  display: flex; align-items: center; justify-content: center;
-  color: #808080; /* muted-foreground */
-  transition: background 0.15s;
-}
-.app-window-close:hover { background: #202121; }
-.app-window-content {
-  padding: 0 16px 16px; display: flex; flex-direction: column; gap: 8px; /* space-y-2 */
-}
-
-/* DNS option rows — matches MenuCard component */
 .dns-row {
-  display: flex; align-items: flex-start; gap: 12px; /* gap-3 */
-  padding: 12px 16px; border-radius: 12px; /* py-3 px-4 rounded-xl */
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 16px; border-radius: 12px;
   background: transparent; border: 1px solid transparent;
-  transition: background-color 0.15s, border-color 0.15s; /* transition-colors */
+  transition: background-color 0.15s, border-color 0.15s;
   cursor: pointer;
 }
-.dns-row:hover { background: #202121; } /* ghost hover:bg-accent */
+.dns-row:hover { background: #202121; }
 .dns-row.dns-row--active {
-  background: rgba(60,180,124,0.1); /* bg-primary/10 */
-  border-color: #3CB47C; /* border-primary */
+  background: rgba(60,180,124,0.1);
+  border-color: #3CB47C;
 }
-.dns-row.dns-row--active:hover { background: rgba(60,180,124,0.15); } /* hover:bg-primary/15 */
+.dns-row.dns-row--active:hover { background: rgba(60,180,124,0.15); }
 .dns-radio {
-  width: 20px; height: 20px; border-radius: 50%; /* w-5 h-5 */
-  border: 2px solid rgba(128,128,128,0.4); /* border-muted-foreground/40 */
+  width: 20px; height: 20px; border-radius: 50%;
+  border: 2px solid rgba(128,128,128,0.4);
   flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
-  margin-top: 2px; /* mt-0.5 */
+  margin-top: 2px;
   transition: border-color 0.15s;
 }
-.dns-row--active .dns-radio { border-color: #3CB47C; } /* border-primary */
+.dns-row--active .dns-radio { border-color: #3CB47C; }
 .dns-row--active .dns-radio::after {
-  content: ''; width: 10px; height: 10px; border-radius: 50%; /* w-2.5 h-2.5 */
-  background: #3CB47C; /* bg-primary */
+  content: ''; width: 10px; height: 10px; border-radius: 50%;
+  background: #3CB47C;
 }
 .dns-row-text { flex: 1; min-width: 0; }
 .dns-row-top {
-  display: flex; align-items: baseline; gap: 8px; /* items-baseline gap-2 */
+  display: flex; align-items: baseline; gap: 8px;
 }
-.dns-row-name { font-size: 14px; font-weight: 500; color: #CBC4CC; line-height: 1.4; } /* text-base medium foreground leading-normal */
+.dns-row-name { font-size: 14px; font-weight: 500; color: #CBC4CC; line-height: 1.4; }
 .dns-row-badge {
-  font-size: 12px; font-weight: 400; /* text-xs */
-  color: #3CB47C; background: rgba(60,180,124,0.1); /* text-primary bg-primary/10 */
-  padding: 2px 6px; border-radius: 4px; /* px-1.5 py-0.5 rounded */
+  font-size: 12px; font-weight: 400;
+  color: #3CB47C; background: rgba(60,180,124,0.1);
+  padding: 2px 6px; border-radius: 4px;
   flex-shrink: 0;
 }
-.dns-row-sub { font-size: 13px; color: #808080; margin-top: 4px; line-height: 1.4; } /* text-sm muted-foreground leading-normal */
+.dns-row-sub { font-size: 13px; color: #808080; margin-top: 4px; line-height: 1.4; }
 .dns-row-ping {
-  font-family: var(--mono); font-size: 12px; flex-shrink: 0; /* text-xs font-mono */
-  display: inline-flex; align-items: center; gap: 6px; /* gap-1.5 */
-  color: #3CB47C; /* text-success */
-  margin-top: 2px; align-self: flex-start; /* mt-0.5 */
+  font-family: var(--mono); font-size: 12px; flex-shrink: 0;
+  display: inline-flex; align-items: center; gap: 6px;
+  color: #3CB47C;
+  margin-top: 2px; align-self: flex-start;
 }
 .dns-row-ping .ping-dot {
   display: inline-block;
@@ -367,20 +446,20 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); -web
 }
 
 .dns-flush-btn {
-  display: flex; align-items: center; justify-content: center; gap: 8px; /* gap-2 */
-  width: 100%; margin-top: 16px; height: 48px; /* mt-4 h-12 */
-  padding: 12px 16px; /* px-4 py-3 */
-  font-family: var(--font); font-size: 13px; font-weight: 500; /* text-sm font-medium */
-  color: #CBC4CC; /* foreground */
-  background: #131314; /* bg-background */
-  border: 2px solid #454547; /* border-2 border-input */
-  border-radius: 9999px; /* rounded-full */
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; margin-top: 16px; height: 48px;
+  padding: 12px 16px;
+  font-family: var(--font); font-size: 13px; font-weight: 500;
+  color: #CBC4CC;
+  background: #131314;
+  border: 2px solid #454547;
+  border-radius: 9999px;
   cursor: pointer; transition: all 0.15s;
 }
 .dns-flush-btn:hover {
-  background: #202121; /* hover:bg-accent */
-  color: #CBC4CC; /* hover:text-accent-foreground */
-  border-color: transparent; /* hover:border-transparent */
+  background: #202121;
+  color: #CBC4CC;
+  border-color: transparent;
 }
 .dns-flush-btn.is-loading { pointer-events: none; }
 .dns-flush-spinner {
@@ -390,6 +469,169 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); -web
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* ============================================
+   SPEED TEST MOCKUP
+   ============================================ */
+.speed-hero {
+  display: flex; align-items: baseline; justify-content: center; gap: 40px;
+  padding: 16px 16px 20px;
+}
+.speed-col { text-align: center; }
+.speed-value {
+  font-family: var(--mono); font-size: 36px; font-weight: 700; color: #CBC4CC;
+}
+.speed-unit { font-size: 11px; color: #808080; margin-top: 2px; }
+.speed-dir {
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+  font-size: 11px; color: #808080; margin-top: 6px;
+}
+.speed-metrics {
+  display: flex; justify-content: space-around;
+  padding: 14px 16px;
+  border-top: 1px solid #29282A;
+  border-bottom: 1px solid #29282A;
+}
+.speed-metric { text-align: center; }
+.speed-metric-dot {
+  width: 6px; height: 6px; border-radius: 50%; display: inline-block;
+  margin-right: 4px; vertical-align: middle;
+}
+.speed-metric-val {
+  font-family: var(--mono); font-size: 13px; color: #CBC4CC;
+}
+.speed-metric-label { font-size: 10px; color: #808080; margin-top: 3px; }
+
+.speed-tasks {
+  padding: 12px 16px 16px; display: flex; flex-direction: column; gap: 4px;
+}
+.speed-task {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 8px 0;
+}
+.speed-task-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  margin-top: 4px;
+}
+.speed-task-dot--pass { background: #3CB47C; }
+.speed-task-dot--fail { background: #EF4444; }
+.speed-task-text {}
+.speed-task-name { font-size: 13px; color: #CBC4CC; font-weight: 500; }
+.speed-task-desc { font-size: 11px; color: #808080; margin-top: 1px; }
+
+/* ============================================
+   SECURITY CHECK MOCKUP
+   ============================================ */
+.security-banner {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 16px; margin: 0 12px 8px;
+  background: rgba(61,214,140,0.06); border-radius: 12px;
+}
+.security-banner-bead {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #3CB47C; flex-shrink: 0;
+}
+.security-banner-text { font-size: 13px; font-weight: 600; color: #3CB47C; }
+.security-checks {
+  padding: 0 8px 16px; display: flex; flex-direction: column; gap: 2px;
+}
+.security-check {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 8px 12px; border-radius: 10px;
+}
+.security-check-dot {
+  width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0;
+  margin-top: 1px; position: relative;
+}
+.security-check-dot--ok { background: #3CB47C; }
+.security-check-dot--ok::after {
+  content: ''; position: absolute;
+  top: 3px; left: 5.5px; width: 4px; height: 7px;
+  border: solid #131314; border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg);
+}
+.security-check-info {}
+.security-check-name { font-size: 13px; font-weight: 500; color: #CBC4CC; }
+.security-check-desc { font-size: 11px; color: #808080; margin-top: 1px; }
+
+/* ============================================
+   DEVICE SCAN MOCKUP
+   ============================================ */
+.scan-header {
+  padding: 0 16px 8px;
+  font-size: 12px; color: #808080;
+}
+.scan-devices {
+  padding: 0 8px 16px; display: flex; flex-direction: column; gap: 2px;
+}
+.scan-device {
+  display: flex; align-items: center; gap: 12px;
+  padding: 8px 12px; border-radius: 10px;
+}
+.scan-device-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.scan-device-info { flex: 1; min-width: 0; }
+.scan-device-name {
+  font-size: 13px; font-weight: 500; color: #CBC4CC;
+  display: flex; align-items: center; gap: 6px;
+}
+.scan-device-badge {
+  font-size: 10px; padding: 1px 6px; border-radius: 4px;
+  background: rgba(61,214,140,0.1); color: #3CB47C;
+  font-weight: 400;
+}
+.scan-device-ip {
+  font-family: var(--mono); font-size: 11px; color: #808080; margin-top: 2px;
+}
+
+/* ============================================
+   VPN MOCKUP
+   ============================================ */
+.vpn-badge {
+  font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 4px;
+  background: var(--purple-dim); color: var(--purple);
+  margin-top: 4px; display: inline-block;
+}
+.vpn-add-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; margin-top: 8px; height: 44px;
+  padding: 10px 16px;
+  font-family: var(--font); font-size: 13px; font-weight: 500;
+  color: #CBC4CC; background: #131314;
+  border: 2px solid #454547; border-radius: 9999px;
+  cursor: pointer; transition: all 0.15s;
+}
+.vpn-add-btn:hover { background: #202121; border-color: transparent; }
+
+/* ============================================
+   OPEN SOURCE
+   ============================================ */
+.opensource {
+  padding: 0 40px 120px; max-width: 1100px; margin: 0 auto;
+  text-align: center;
+}
+.opensource .section-desc {
+  max-width: 560px; margin: 0 auto 56px;
+}
+.trust-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+  max-width: 720px; margin: 0 auto;
+}
+.trust-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  padding: 28px 20px; text-align: center; transition: all 0.3s;
+}
+.trust-card:first-child { border-radius: 16px 0 0 0; }
+.trust-card:nth-child(3) { border-radius: 0 16px 0 0; }
+.trust-card:nth-child(4) { border-radius: 0 0 0 16px; }
+.trust-card:last-child { border-radius: 0 0 16px 0; }
+.trust-card:hover {
+  border-color: var(--border-hover); background: var(--bg-raised);
+}
+.trust-card-icon { margin-bottom: 12px; line-height: 0; }
+.trust-card-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+.trust-card-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
 
 /* ============================================
    CTA
@@ -462,8 +704,13 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); -web
   .features-grid { grid-template-columns: 1fr; gap: 12px; }
   .feature-card, .feature-card:first-child, .feature-card:nth-child(3),
   .feature-card:nth-child(4), .feature-card:last-child { border-radius: 12px; }
-  .dns { padding: 0 24px 80px; }
-  .dns-layout { grid-template-columns: 1fr; gap: 32px; }
+  .showcase { padding: 0 24px 80px; }
+  .showcase--first { padding-top: 60px; }
+  .showcase-layout { grid-template-columns: 1fr; gap: 32px; }
+  .opensource { padding: 0 24px 80px; }
+  .trust-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .trust-card, .trust-card:first-child, .trust-card:nth-child(3),
+  .trust-card:nth-child(4), .trust-card:last-child { border-radius: 12px; }
   .cta { padding: 0 24px 80px; }
   .cta-inner { padding: 48px 24px; }
   .footer { padding: 24px; flex-direction: column; gap: 16px; }
@@ -471,6 +718,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); -web
 }
 @media (max-width: 600px) {
   .chain-grid { grid-template-columns: 1fr; }
+  .trust-grid { grid-template-columns: 1fr; }
 }
 
 /* ============================================
@@ -495,9 +743,10 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); -web
     Netok
   </div>
   <div class="nav-links">
-    <a href="#diagnostics">Diagnostics</a>
+    <a href="#diagnostics">How it works</a>
     <a href="#features">Features</a>
-    <a href="#dns">DNS Protection</a>
+    <a href="#dns">DNS</a>
+    <a href="#speed">Speed Test</a>
   </div>
   <a href="#download" class="nav-download">Download free</a>
 </nav>
@@ -542,155 +791,200 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); -web
   </div>
 </section>
 
-<!-- Diagnostics Chain -->
+<!-- ============================================
+     PAIN SECTION — "Your internet is down"
+     ============================================ -->
+<section class="showcase showcase--first" id="problem">
+  <div class="showcase-layout">
+    <div>
+      <div class="section-label">The Problem</div>
+      <h2 class="section-title">Your internet is down.<br>Now you'll know why.</h2>
+      <p class="section-desc" style="margin-bottom:24px;">No more googling "DNS_PROBE_FINISHED_NXDOMAIN". No more waiting 40 minutes on hold with your provider. No more restarting everything and hoping for the best.</p>
+      <p class="section-desc" style="margin-bottom:0;">Netok checks every step from your device to the internet and tells you exactly what's wrong — and what to do about it. In plain language.</p>
+    </div>
+    <div class="app-window fade-up">
+      <div class="app-window-header">
+        <div class="app-window-back"><i data-lucide="arrow-left" style="width:20px;height:20px"></i></div>
+        <div class="app-window-title">Diagnostics</div>
+        <div class="app-window-close"><i data-lucide="x" style="width:20px;height:20px"></i></div>
+      </div>
+      <!-- Diagnostic message -->
+      <div class="mockup-diag">
+        <div class="mockup-diag-bead mockup-diag-bead--red"></div>
+        <div class="mockup-diag-content">
+          <div class="mockup-diag-title">No Internet</div>
+          <div class="mockup-diag-text">The router is working, but there is no internet access. Restart your router — turn it off for 10 seconds and turn it back on. If that doesn't help, call your provider.</div>
+        </div>
+      </div>
+      <!-- Node chain -->
+      <div class="mockup-nodes">
+        <div class="mockup-node">
+          <div class="mockup-node-dot mockup-node-dot--ok"></div>
+          <div class="mockup-node-info">
+            <div class="mockup-node-name">Computer</div>
+            <div class="mockup-node-sub">MacBook Pro · 192.168.1.42</div>
+          </div>
+        </div>
+        <div class="mockup-node">
+          <div class="mockup-node-dot mockup-node-dot--ok"></div>
+          <div class="mockup-node-info">
+            <div class="mockup-node-name">Wi-Fi</div>
+            <div class="mockup-node-sub">Home_5G · Good signal</div>
+          </div>
+        </div>
+        <div class="mockup-node">
+          <div class="mockup-node-dot mockup-node-dot--ok"></div>
+          <div class="mockup-node-info">
+            <div class="mockup-node-name">Router</div>
+            <div class="mockup-node-sub">TP-Link · 192.168.1.1</div>
+          </div>
+          <span class="mockup-node-trailing">3 ms</span>
+        </div>
+        <div class="mockup-node">
+          <div class="mockup-node-dot mockup-node-dot--error"></div>
+          <div class="mockup-node-info">
+            <div class="mockup-node-name">Internet</div>
+            <div class="mockup-node-sub" style="color:#EF4444;">No connection</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================
+     DIAGNOSTICS CHAIN — "How it works"
+     ============================================ -->
 <section class="chain" id="diagnostics">
-  <div class="section-label">Diagnostics</div>
-  <h2 class="section-title">Your connection, explained<br>like a human would</h2>
-  <p class="section-desc">Not "DNS_PROBE_FINISHED_NXDOMAIN". Instead: "Your DNS server isn't responding. Try switching to Cloudflare — here's a button." Every node in the chain speaks your language.</p>
+  <div class="section-label">How it works</div>
+  <h2 class="section-title">Every step from your device<br>to the internet — checked</h2>
+  <p class="section-desc">Not error codes. Not "check your connection." Netok tests each link in the chain and explains the result in words you understand. If something breaks, you'll know exactly where.</p>
 
   <div class="chain-grid">
     <div class="chain-node fade-up">
-      <div class="chain-node-icon"><i data-lucide="monitor" style="width:22px;height:22px;stroke:var(--green)"></i></div>
+      <div class="chain-node-icon chain-node-icon--green"><i data-lucide="monitor" style="width:22px;height:22px;stroke:var(--green)"></i></div>
       <div class="chain-node-title">Computer</div>
-      <div class="chain-node-desc">Is your network adapter working? Netok checks and tells you in plain words.</div>
-      <div class="chain-node-status"><span class="chain-node-status-dot"></span> Healthy</div>
+      <div class="chain-node-desc">Is your network adapter working? Wi-Fi on or off? Netok checks and tells you in plain words.</div>
+      <div class="chain-node-status chain-node-status--green"><span class="chain-node-status-dot"></span> Healthy</div>
     </div>
     <div class="chain-node fade-up">
-      <div class="chain-node-icon"><i data-lucide="wifi" style="width:22px;height:22px;stroke:var(--green)"></i></div>
+      <div class="chain-node-icon chain-node-icon--green"><i data-lucide="wifi" style="width:22px;height:22px;stroke:var(--green)"></i></div>
       <div class="chain-node-title">Wi-Fi</div>
       <div class="chain-node-desc">"Excellent signal" or "Weak — try moving closer to the router." Not −67 dBm.</div>
-      <div class="chain-node-status"><span class="chain-node-status-dot"></span> Excellent</div>
+      <div class="chain-node-status chain-node-status--green"><span class="chain-node-status-dot"></span> Excellent</div>
     </div>
     <div class="chain-node fade-up">
-      <div class="chain-node-icon"><i data-lucide="router" style="width:22px;height:22px;stroke:var(--green)"></i></div>
+      <div class="chain-node-icon chain-node-icon--green"><i data-lucide="router" style="width:22px;height:22px;stroke:var(--green)"></i></div>
       <div class="chain-node-title">Router</div>
-      <div class="chain-node-desc">Who made it, what's the IP, and a button to open the admin page. That simple.</div>
-      <div class="chain-node-status"><span class="chain-node-status-dot"></span> Reachable</div>
+      <div class="chain-node-desc">Is it reachable? Who made it? A button to open the admin page. That simple.</div>
+      <div class="chain-node-status chain-node-status--green"><span class="chain-node-status-dot"></span> Reachable</div>
     </div>
     <div class="chain-node fade-up">
-      <div class="chain-node-icon"><i data-lucide="globe" style="width:22px;height:22px;stroke:var(--green)"></i></div>
+      <div class="chain-node-icon chain-node-icon--red"><i data-lucide="globe" style="width:22px;height:22px;stroke:var(--red)"></i></div>
       <div class="chain-node-title">Internet</div>
-      <div class="chain-node-desc">Your provider, your location, your external IP. The last link to the outside world.</div>
-      <div class="chain-node-status"><span class="chain-node-status-dot"></span> Online</div>
+      <div class="chain-node-desc">The last link. Your provider, your IP, whether the outside world is reachable — or where it breaks.</div>
+      <div class="chain-node-status chain-node-status--red"><span class="chain-node-status-dot"></span> Problem found</div>
     </div>
   </div>
 </section>
 
-<!-- Features -->
+<!-- ============================================
+     FEATURES GRID — "One app instead of five"
+     ============================================ -->
 <section class="features" id="features">
   <div class="section-label">Features</div>
-  <h2 class="section-title">Stop juggling apps</h2>
-  <p class="section-desc">Speed test app. VPN client. DNS manager. Ad blocker. Network scanner. You used to need all of them separately. Now you don't.</p>
+  <h2 class="section-title">One app instead of five</h2>
+  <p class="section-desc">Speed test. VPN. DNS manager. Network scanner. Wi-Fi security checker. You used to need five separate apps. Now you need one.</p>
 
   <div class="features-grid">
     <div class="feature-card fade-up">
+      <div class="feature-icon"><i data-lucide="activity" style="width:24px;height:24px;stroke:var(--green)"></i></div>
+      <div class="feature-title">Diagnostics</div>
+      <div class="feature-desc">See your connection path from device to internet. When something breaks, Netok shows you exactly where — and tells you what to do.</div>
+    </div>
+    <div class="feature-card fade-up">
+      <div class="feature-icon"><i data-lucide="gauge" style="width:24px;height:24px;stroke:var(--purple)"></i></div>
+      <div class="feature-title">Speed Test</div>
+      <div class="feature-desc">Not just numbers. "Can I watch 4K?" "Will my video call work?" Netok answers the questions you actually care about.</div>
+    </div>
+    <div class="feature-card fade-up">
       <div class="feature-icon"><i data-lucide="shield-check" style="width:24px;height:24px;stroke:var(--green)"></i></div>
       <div class="feature-title">DNS Protection</div>
-      <div class="feature-desc">Block ads, trackers, and malware with one click. No terminal, no config files. Just pick a provider and you're protected.</div>
+      <div class="feature-desc">Block ads, protect kids, faster browsing. One-tap switch between Cloudflare, AdGuard, and Quad9. No tutorials needed.</div>
     </div>
     <div class="feature-card fade-up">
-      <div class="feature-icon"><i data-lucide="lock" style="width:24px;height:24px;stroke:var(--green)"></i></div>
-      <div class="feature-title">Bring Your Own VPN</div>
-      <div class="feature-desc">Bought a key on Telegram? Got a config from a friend? Just paste it. Supports VLESS, Shadowsocks, Trojan, WireGuard, Outline.</div>
+      <div class="feature-icon"><i data-lucide="wifi" style="width:24px;height:24px;stroke:var(--cyan)"></i></div>
+      <div class="feature-title">Wi-Fi Security</div>
+      <div class="feature-desc">Check if your network is safe. Netok scans for weak encryption, fake access points, traffic interception, and DNS hijacking.</div>
     </div>
     <div class="feature-card fade-up">
-      <div class="feature-icon"><i data-lucide="gauge" style="width:24px;height:24px;stroke:var(--green)"></i></div>
-      <div class="feature-title">Speed Test</div>
-      <div class="feature-desc">Measure your real connection speed and compare with what your provider promises.</div>
-      <span class="feature-tag">coming soon</span>
+      <div class="feature-icon"><i data-lucide="lock" style="width:24px;height:24px;stroke:var(--blue)"></i></div>
+      <div class="feature-title">VPN</div>
+      <div class="feature-desc">Paste your key, connect. Supports VLESS, VMess, Shadowsocks, Trojan, WireGuard. No separate app needed.</div>
     </div>
     <div class="feature-card fade-up">
-      <div class="feature-icon"><i data-lucide="scan-search" style="width:24px;height:24px;stroke:var(--green)"></i></div>
-      <div class="feature-title">Device Scan</div>
-      <div class="feature-desc">Who's on your Wi-Fi? See every connected device and spot anything unfamiliar. No network expertise needed.</div>
-    </div>
-    <div class="feature-card fade-up">
-      <div class="feature-icon"><i data-lucide="languages" style="width:24px;height:24px;stroke:var(--green)"></i></div>
-      <div class="feature-title">15 Languages</div>
-      <div class="feature-desc">From English and Russian to Farsi, Chinese, Japanese, and Korean. Your language, your interface.</div>
-    </div>
-    <div class="feature-card fade-up">
-      <div class="feature-icon"><i data-lucide="sun-moon" style="width:24px;height:24px;stroke:var(--green)"></i></div>
-      <div class="feature-title">Runs Everywhere</div>
-      <div class="feature-desc">Windows, macOS, Linux. Dark and light themes. Minimizes to system tray. Not locked to any ecosystem.</div>
+      <div class="feature-icon"><i data-lucide="monitor-smartphone" style="width:24px;height:24px;stroke:var(--amber)"></i></div>
+      <div class="feature-title">Network Scanner</div>
+      <div class="feature-desc">See every device on your network. Phones, laptops, smart TVs — and anything that shouldn't be there.</div>
     </div>
   </div>
 </section>
 
-<!-- DNS -->
-<section class="dns" id="dns">
-  <div class="dns-layout">
+<!-- ============================================
+     DNS DEEP DIVE
+     ============================================ -->
+<section class="showcase" id="dns">
+  <div class="showcase-layout">
     <div>
       <div class="section-label">DNS Protection</div>
       <h2 class="section-title">Safer internet<br>without a PhD</h2>
-      <p class="section-desc">You shouldn't need to know what DNS is to be protected from trackers and malware. Pick a provider, click once, done. Netok handles everything else.</p>
+      <p class="section-desc" style="margin-bottom:0;">You shouldn't need to know what DNS is to be protected from trackers and malware. Pick a provider, click once, done. Netok handles everything else.</p>
     </div>
-    <div class="app-window">
-      <!-- Header -->
+    <div class="app-window fade-up">
       <div class="app-window-header">
-        <div class="app-window-back">
-          <i data-lucide="arrow-left" style="width:20px;height:20px"></i>
-        </div>
+        <div class="app-window-back"><i data-lucide="arrow-left" style="width:20px;height:20px"></i></div>
         <div class="app-window-title">DNS</div>
-        <div class="app-window-close">
-          <i data-lucide="x" style="width:20px;height:20px"></i>
-        </div>
+        <div class="app-window-close"><i data-lucide="x" style="width:20px;height:20px"></i></div>
       </div>
-      <!-- Provider list -->
       <div class="app-window-content">
         <div class="dns-row">
           <div class="dns-radio"></div>
           <div class="dns-row-text">
-            <div class="dns-row-top">
-              <div class="dns-row-name">Standard DNS</div>
-            </div>
+            <div class="dns-row-top"><div class="dns-row-name">Standard DNS</div></div>
             <div class="dns-row-sub">No protection</div>
           </div>
         </div>
-
         <div class="dns-row dns-row--active">
           <div class="dns-radio"></div>
           <div class="dns-row-text">
-            <div class="dns-row-top">
-              <div class="dns-row-name">Cloudflare</div>
-            </div>
+            <div class="dns-row-top"><div class="dns-row-name">Cloudflare</div></div>
             <div class="dns-row-sub">Fastest</div>
           </div>
           <span class="dns-row-ping"><span class="ping-dot"></span>11 ms</span>
         </div>
-
         <div class="dns-row">
           <div class="dns-radio"></div>
           <div class="dns-row-text">
-            <div class="dns-row-top">
-              <div class="dns-row-name">AdGuard</div>
-            </div>
+            <div class="dns-row-top"><div class="dns-row-name">AdGuard</div></div>
             <div class="dns-row-sub">Blocks ads and trackers</div>
           </div>
           <span class="dns-row-ping"><span class="ping-dot"></span>23 ms</span>
         </div>
-
         <div class="dns-row">
           <div class="dns-radio"></div>
           <div class="dns-row-text">
-            <div class="dns-row-top">
-              <div class="dns-row-name">Quad9</div>
-            </div>
+            <div class="dns-row-top"><div class="dns-row-name">Quad9</div></div>
             <div class="dns-row-sub">Blocks malware and phishing</div>
           </div>
           <span class="dns-row-ping"><span class="ping-dot"></span>32 ms</span>
         </div>
-
         <div class="dns-row">
           <div class="dns-radio"></div>
           <div class="dns-row-text">
-            <div class="dns-row-top">
-              <div class="dns-row-name">Custom DNS</div>
-            </div>
+            <div class="dns-row-top"><div class="dns-row-name">Custom DNS</div></div>
             <div class="dns-row-sub">Enter DNS addresses manually</div>
           </div>
         </div>
-
         <div class="dns-flush-btn">
           <i data-lucide="paintbrush" style="width:16px;height:16px"></i>
           Clear DNS cache
@@ -700,15 +994,313 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); -web
   </div>
 </section>
 
-<!-- CTA -->
+<!-- ============================================
+     SPEED TEST DEEP DIVE
+     ============================================ -->
+<section class="showcase" id="speed">
+  <div class="showcase-layout">
+    <div class="app-window fade-up">
+      <div class="app-window-header">
+        <div class="app-window-back"><i data-lucide="arrow-left" style="width:20px;height:20px"></i></div>
+        <div class="app-window-title">Speed test</div>
+        <div class="app-window-close"><i data-lucide="x" style="width:20px;height:20px"></i></div>
+      </div>
+      <!-- Results -->
+      <div class="speed-hero">
+        <div class="speed-col">
+          <div class="speed-value" style="color:#3CB47C;">94.2</div>
+          <div class="speed-unit">Mbps</div>
+          <div class="speed-dir">
+            <i data-lucide="arrow-down" style="width:12px;height:12px;stroke:#3CB47C"></i> Download
+          </div>
+        </div>
+        <div class="speed-col">
+          <div class="speed-value" style="color:#a855f7;">41.7</div>
+          <div class="speed-unit">Mbps</div>
+          <div class="speed-dir">
+            <i data-lucide="arrow-up" style="width:12px;height:12px;stroke:#a855f7"></i> Upload
+          </div>
+        </div>
+      </div>
+      <!-- Metrics -->
+      <div class="speed-metrics">
+        <div class="speed-metric">
+          <div><span class="speed-metric-dot" style="background:#3CB47C;"></span><span class="speed-metric-val">8 ms</span></div>
+          <div class="speed-metric-label">Ping</div>
+        </div>
+        <div class="speed-metric">
+          <div><span class="speed-metric-dot" style="background:#3CB47C;"></span><span class="speed-metric-val">12 ms</span></div>
+          <div class="speed-metric-label">Latency</div>
+        </div>
+        <div class="speed-metric">
+          <div><span class="speed-metric-dot" style="background:#3CB47C;"></span><span class="speed-metric-val">3 ms</span></div>
+          <div class="speed-metric-label">Jitter</div>
+        </div>
+      </div>
+      <!-- Task checklist -->
+      <div class="speed-tasks">
+        <div class="speed-task">
+          <span class="speed-task-dot speed-task-dot--pass"></span>
+          <div class="speed-task-text">
+            <div class="speed-task-name">4K video</div>
+            <div class="speed-task-desc">You can watch in 4K without buffering</div>
+          </div>
+        </div>
+        <div class="speed-task">
+          <span class="speed-task-dot speed-task-dot--pass"></span>
+          <div class="speed-task-text">
+            <div class="speed-task-name">Video calls</div>
+            <div class="speed-task-desc">Calls will work without freezing</div>
+          </div>
+        </div>
+        <div class="speed-task">
+          <span class="speed-task-dot speed-task-dot--pass"></span>
+          <div class="speed-task-text">
+            <div class="speed-task-name">Online gaming</div>
+            <div class="speed-task-desc">You can game online without lag</div>
+          </div>
+        </div>
+        <div class="speed-task">
+          <span class="speed-task-dot speed-task-dot--pass"></span>
+          <div class="speed-task-text">
+            <div class="speed-task-name">HD video</div>
+            <div class="speed-task-desc">You can watch in HD without interruptions</div>
+          </div>
+        </div>
+        <div class="speed-task">
+          <span class="speed-task-dot speed-task-dot--pass"></span>
+          <div class="speed-task-text">
+            <div class="speed-task-name">Music &amp; podcasts</div>
+            <div class="speed-task-desc">Music and podcasts play without interruptions</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="section-label">Speed Test</div>
+      <h2 class="section-title">Not just numbers.<br>Answers.</h2>
+      <p class="section-desc" style="margin-bottom:0;">"94 Mbps download" means nothing to most people. "Your connection handles 4K video and video calls without issues" — that means everything. Netok tests your speed and tells you what you can actually do with it.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================
+     WI-FI SECURITY DEEP DIVE
+     ============================================ -->
+<section class="showcase" id="security">
+  <div class="showcase-layout">
+    <div>
+      <div class="section-label">Wi-Fi Security</div>
+      <h2 class="section-title">Is this coffee shop<br>Wi-Fi actually safe?</h2>
+      <p class="section-desc" style="margin-bottom:0;">You connect to "Starbucks_WiFi" and hope for the best. Netok checks four things before you type a single password: encryption strength, fake networks, traffic interception, and DNS spoofing. Takes seconds.</p>
+    </div>
+    <div class="app-window fade-up">
+      <div class="app-window-header">
+        <div class="app-window-back"><i data-lucide="arrow-left" style="width:20px;height:20px"></i></div>
+        <div class="app-window-title">Security</div>
+        <div class="app-window-close"><i data-lucide="x" style="width:20px;height:20px"></i></div>
+      </div>
+      <div class="security-banner">
+        <span class="security-banner-bead"></span>
+        <span class="security-banner-text">No threats detected</span>
+      </div>
+      <div class="security-checks">
+        <div class="security-check">
+          <div class="security-check-dot security-check-dot--ok"></div>
+          <div class="security-check-info">
+            <div class="security-check-name">Encryption</div>
+            <div class="security-check-desc">Protected with modern encryption</div>
+          </div>
+        </div>
+        <div class="security-check">
+          <div class="security-check-dot security-check-dot--ok"></div>
+          <div class="security-check-info">
+            <div class="security-check-name">Network authenticity</div>
+            <div class="security-check-desc">No suspicious access points nearby</div>
+          </div>
+        </div>
+        <div class="security-check">
+          <div class="security-check-dot security-check-dot--ok"></div>
+          <div class="security-check-info">
+            <div class="security-check-name">Traffic interception</div>
+            <div class="security-check-desc">No signs of traffic interception</div>
+          </div>
+        </div>
+        <div class="security-check">
+          <div class="security-check-dot security-check-dot--ok"></div>
+          <div class="security-check-info">
+            <div class="security-check-name">DNS integrity</div>
+            <div class="security-check-desc">Websites open at real addresses</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================
+     NETWORK SCANNER DEEP DIVE
+     ============================================ -->
+<section class="showcase" id="scanner">
+  <div class="showcase-layout">
+    <div class="app-window fade-up">
+      <div class="app-window-header">
+        <div class="app-window-back"><i data-lucide="arrow-left" style="width:20px;height:20px"></i></div>
+        <div class="app-window-title">Devices</div>
+        <div class="app-window-close"><i data-lucide="x" style="width:20px;height:20px"></i></div>
+      </div>
+      <div class="scan-header">5 devices found · Just now</div>
+      <div class="scan-devices">
+        <div class="scan-device">
+          <div class="scan-device-icon" style="background:var(--green-dim);">
+            <i data-lucide="wifi" style="width:18px;height:18px;stroke:var(--green)"></i>
+          </div>
+          <div class="scan-device-info">
+            <div class="scan-device-name">TP-Link Router <span class="scan-device-badge">Router</span></div>
+            <div class="scan-device-ip">192.168.1.1</div>
+          </div>
+        </div>
+        <div class="scan-device">
+          <div class="scan-device-icon" style="background:rgba(88,166,255,0.12);">
+            <i data-lucide="monitor" style="width:18px;height:18px;stroke:var(--blue)"></i>
+          </div>
+          <div class="scan-device-info">
+            <div class="scan-device-name">MacBook Pro <span class="scan-device-badge">This device</span></div>
+            <div class="scan-device-ip">192.168.1.42</div>
+          </div>
+        </div>
+        <div class="scan-device">
+          <div class="scan-device-icon" style="background:var(--green-dim);">
+            <i data-lucide="smartphone" style="width:18px;height:18px;stroke:var(--green)"></i>
+          </div>
+          <div class="scan-device-info">
+            <div class="scan-device-name">iPhone</div>
+            <div class="scan-device-ip">192.168.1.15</div>
+          </div>
+        </div>
+        <div class="scan-device">
+          <div class="scan-device-icon" style="background:var(--amber-dim);">
+            <i data-lucide="tv" style="width:18px;height:18px;stroke:var(--amber)"></i>
+          </div>
+          <div class="scan-device-info">
+            <div class="scan-device-name">Samsung TV</div>
+            <div class="scan-device-ip">192.168.1.23</div>
+          </div>
+        </div>
+        <div class="scan-device">
+          <div class="scan-device-icon" style="background:rgba(128,128,128,0.12);">
+            <i data-lucide="help-circle" style="width:18px;height:18px;stroke:#808080"></i>
+          </div>
+          <div class="scan-device-info">
+            <div class="scan-device-name">Unknown device</div>
+            <div class="scan-device-ip">192.168.1.87</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="section-label">Network Scanner</div>
+      <h2 class="section-title">Who else is on<br>your Wi-Fi?</h2>
+      <p class="section-desc" style="margin-bottom:0;">Your neighbor? A forgotten smart bulb? A device you don't recognize? See every device connected to your network — with names, types, and IP addresses. Spot anything unfamiliar instantly.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================
+     VPN DEEP DIVE
+     ============================================ -->
+<section class="showcase" id="vpn">
+  <div class="showcase-layout">
+    <div>
+      <div class="section-label">VPN</div>
+      <h2 class="section-title">Got a VPN key?<br>Just paste it.</h2>
+      <p class="section-desc" style="margin-bottom:0;">No separate app. No subscription. Got a VPN key from your provider, a friend, or Telegram? Paste it, connect with one click. Netok supports VLESS, VMess, Shadowsocks, Trojan, and WireGuard.</p>
+    </div>
+    <div class="app-window fade-up">
+      <div class="app-window-header">
+        <div class="app-window-back"><i data-lucide="arrow-left" style="width:20px;height:20px"></i></div>
+        <div class="app-window-title">VPN</div>
+        <div class="app-window-close"><i data-lucide="x" style="width:20px;height:20px"></i></div>
+      </div>
+      <div class="app-window-content">
+        <div class="dns-row vpn-row">
+          <div class="dns-radio"></div>
+          <div class="dns-row-text">
+            <div class="dns-row-top"><div class="dns-row-name">VPN Disabled</div></div>
+            <div class="dns-row-sub">Internet traffic is not routed through VPN</div>
+          </div>
+        </div>
+        <div class="dns-row dns-row--active vpn-row">
+          <div class="dns-radio"></div>
+          <div class="dns-row-text">
+            <div class="dns-row-top"><div class="dns-row-name">nl-1.vpnserver.com</div></div>
+            <div class="dns-row-sub">Netherlands, Amsterdam</div>
+            <div class="vpn-badge">WireGuard</div>
+          </div>
+          <span class="dns-row-ping"><span class="ping-dot"></span>24 ms</span>
+        </div>
+        <button class="vpn-add-btn">
+          <i data-lucide="plus" style="width:16px;height:16px"></i>
+          Add VPN
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================
+     OPEN SOURCE / TRUST
+     ============================================ -->
+<section class="opensource" id="opensource">
+  <div class="section-label">Open Source</div>
+  <h2 class="section-title">Free. Open. Yours.</h2>
+  <p class="section-desc">No subscriptions. No accounts. No tracking. Your data never leaves your device. The code is open for anyone to inspect.</p>
+
+  <div class="trust-grid">
+    <div class="trust-card fade-up">
+      <div class="trust-card-icon"><i data-lucide="heart" style="width:22px;height:22px;stroke:var(--green)"></i></div>
+      <div class="trust-card-title">Free forever</div>
+      <div class="trust-card-desc">No hidden costs, no premium tiers</div>
+    </div>
+    <div class="trust-card fade-up">
+      <div class="trust-card-icon"><i data-lucide="code" style="width:22px;height:22px;stroke:var(--green)"></i></div>
+      <div class="trust-card-title">Open Source</div>
+      <div class="trust-card-desc">GPL v3 — inspect every line of code</div>
+    </div>
+    <div class="trust-card fade-up">
+      <div class="trust-card-icon"><i data-lucide="user-x" style="width:22px;height:22px;stroke:var(--green)"></i></div>
+      <div class="trust-card-title">No account</div>
+      <div class="trust-card-desc">Download, open, use. That's it.</div>
+    </div>
+    <div class="trust-card fade-up">
+      <div class="trust-card-icon"><i data-lucide="eye-off" style="width:22px;height:22px;stroke:var(--green)"></i></div>
+      <div class="trust-card-title">No tracking</div>
+      <div class="trust-card-desc">Your data stays on your device</div>
+    </div>
+    <div class="trust-card fade-up">
+      <div class="trust-card-icon"><i data-lucide="cpu" style="width:22px;height:22px;stroke:var(--green)"></i></div>
+      <div class="trust-card-title">Rust + Tauri</div>
+      <div class="trust-card-desc">Fast, lightweight, and secure</div>
+    </div>
+    <div class="trust-card fade-up">
+      <div class="trust-card-icon"><i data-lucide="languages" style="width:22px;height:22px;stroke:var(--green)"></i></div>
+      <div class="trust-card-title">15 languages</div>
+      <div class="trust-card-desc">From English to Korean</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================
+     CTA / DOWNLOAD
+     ============================================ -->
 <section class="cta" id="download">
   <div class="cta-inner">
-    <h2 class="cta-title">Your network tools.<br>One app. Free.</h2>
-    <p class="cta-desc">Diagnostics, VPN, DNS protection, speed test, device scanner — all in plain language, on every desktop platform.</p>
+    <h2 class="cta-title">Take control of your network</h2>
+    <p class="cta-desc">Diagnostics, VPN, DNS protection, speed test, device scanner — all in plain language. Free and open source.</p>
     <a href="#" class="btn-primary">
-      <i data-lucide="download" style="width:16px;height:16px"></i> Download for free
+      <i data-lucide="download" style="width:16px;height:16px"></i> Download for Windows
     </a>
-    <p class="cta-note">Windows · macOS · Linux · No account required</p>
+    <p class="cta-note">Android coming soon · macOS & Linux planned</p>
   </div>
 </section>
 
@@ -720,12 +1312,11 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); -web
       Netok
     </div>
     <nav class="footer-links">
-      <a href="#">GitHub</a>
-      <a href="#">Documentation</a>
-      <a href="#">Privacy</a>
+      <a href="https://github.com/nicepkg/netok" target="_blank">GitHub</a>
+      <a href="#">GPL v3</a>
     </nav>
   </div>
-  <span class="footer-copy">Built with Rust + Tauri · Free and open · © 2024</span>
+  <span class="footer-copy">Built with Rust + Tauri · Free and open source · © 2025</span>
 </footer>
 
 <script>
@@ -739,9 +1330,17 @@ const observer = new IntersectionObserver((entries) => {
 document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 
 // DNS mockup interactive
-document.querySelectorAll('.dns-row').forEach(row => {
+document.querySelectorAll('#dns .dns-row').forEach(row => {
   row.addEventListener('click', () => {
-    document.querySelectorAll('.dns-row').forEach(r => r.classList.remove('dns-row--active'));
+    document.querySelectorAll('#dns .dns-row').forEach(r => r.classList.remove('dns-row--active'));
+    row.classList.add('dns-row--active');
+  });
+});
+
+// VPN mockup interactive
+document.querySelectorAll('#vpn .vpn-row').forEach(row => {
+  row.addEventListener('click', () => {
+    document.querySelectorAll('#vpn .vpn-row').forEach(r => r.classList.remove('dns-row--active'));
     row.classList.add('dns-row--active');
   });
 });
