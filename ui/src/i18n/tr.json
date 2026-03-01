@@ -55,7 +55,12 @@
     "router": "Yönlendirici",
     "internet": "İnternet",
     "checking": "Kontrol ediliyor...",
-    "via_vpn": "VPN"
+    "via_vpn": "VPN",
+    "status_disabled": "Devre dışı",
+    "status_not_connected": "Bağlı değil",
+    "status_no_data": "Veri yok",
+    "status_unreachable": "Ulaşılamıyor",
+    "status_no_connection": "Bağlantı yok"
   },
   "status": {
     "internet_ok": "Bağlı",

@@ -55,7 +55,12 @@
     "router": "روتر",
     "internet": "اینترنت",
     "checking": "در حال بررسی...",
-    "via_vpn": "VPN"
+    "via_vpn": "VPN",
+    "status_disabled": "غیرفعال",
+    "status_not_connected": "متصل نیست",
+    "status_no_data": "بدون داده",
+    "status_unreachable": "در دسترس نیست",
+    "status_no_connection": "بدون اتصال"
   },
   "status": {
     "internet_ok": "متصل",

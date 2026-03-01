@@ -55,7 +55,12 @@
     "router": "Роутер",
     "internet": "Інтернет",
     "checking": "Перевірка...",
-    "via_vpn": "VPN"
+    "via_vpn": "VPN",
+    "status_disabled": "Вимкнено",
+    "status_not_connected": "Не підключено",
+    "status_no_data": "Немає даних",
+    "status_unreachable": "Недоступний",
+    "status_no_connection": "Немає з'єднання"
   },
   "status": {
     "internet_ok": "Підключено",

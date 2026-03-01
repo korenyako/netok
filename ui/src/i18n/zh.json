@@ -55,7 +55,12 @@
     "router": "路由器",
     "internet": "互联网",
     "checking": "正在检查...",
-    "via_vpn": "VPN"
+    "via_vpn": "VPN",
+    "status_disabled": "已禁用",
+    "status_not_connected": "未连接",
+    "status_no_data": "无数据",
+    "status_unreachable": "无法访问",
+    "status_no_connection": "无连接"
   },
   "status": {
     "internet_ok": "已连接",

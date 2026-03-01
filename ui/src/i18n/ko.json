@@ -55,7 +55,12 @@
     "router": "라우터",
     "internet": "인터넷",
     "checking": "확인 중...",
-    "via_vpn": "VPN"
+    "via_vpn": "VPN",
+    "status_disabled": "비활성화됨",
+    "status_not_connected": "연결되지 않음",
+    "status_no_data": "데이터 없음",
+    "status_unreachable": "연결할 수 없음",
+    "status_no_connection": "연결 없음"
   },
   "status": {
     "internet_ok": "연결됨",

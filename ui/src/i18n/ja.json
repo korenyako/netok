@@ -55,7 +55,12 @@
     "router": "ルーター",
     "internet": "インターネット",
     "checking": "確認中...",
-    "via_vpn": "VPN"
+    "via_vpn": "VPN",
+    "status_disabled": "無効",
+    "status_not_connected": "未接続",
+    "status_no_data": "データなし",
+    "status_unreachable": "到達不能",
+    "status_no_connection": "接続なし"
   },
   "status": {
     "internet_ok": "接続済み",

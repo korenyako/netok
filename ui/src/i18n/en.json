@@ -55,7 +55,12 @@
     "router": "Router",
     "internet": "Internet",
     "checking": "Checking...",
-    "via_vpn": "VPN"
+    "via_vpn": "VPN",
+    "status_disabled": "Disabled",
+    "status_not_connected": "Not connected",
+    "status_no_data": "No data",
+    "status_unreachable": "Unreachable",
+    "status_no_connection": "No connection"
   },
   "status": {
     "internet_ok": "Connected",

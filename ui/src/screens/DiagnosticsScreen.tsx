@@ -212,7 +212,7 @@ export function DiagnosticsScreen({ onBack, onNavigateToDnsProviders, onNavigate
                     badge={node.id === 'internet' && vpnConnected ? t('diagnostics.via_vpn') : undefined}
                     subtitle={<>
                       {node.details.map((detail) => (
-                        <div key={detail.text} className="flex"><span className="min-w-0 truncate" dir="ltr">{detail.text}</span></div>
+                        <div key={detail.text} className="flex"><span className={`min-w-0 truncate${detail.isStatus && node.status === 'down' ? ' text-destructive' : ''}`} dir="ltr">{detail.text}</span></div>
                       ))}
                       {showPing && (
                         <div className="mt-0.5 -ms-4">

@@ -15,6 +15,7 @@ import {
 // Node detail for display
 interface NodeDetail {
   text: string;
+  isStatus?: boolean;
 }
 
 // UI representation of a network node
@@ -91,48 +92,72 @@ function transformSingleNode(
     ip = result.computer.local_ip ?? undefined;
   }
 
-  if (node.id === 'network' && result.network) {
-    if (result.network.ssid) {
-      details.push({ text: result.network.ssid });
-    }
-    if (result.network.rssi !== null) {
-      const rssi = result.network.rssi;
-      let labelKey = '';
-      if (rssi >= -50) {
-        labelKey = 'nodes.network.signal_label_excellent';
-      } else if (rssi >= -60) {
-        labelKey = 'nodes.network.signal_label_good';
-      } else if (rssi >= -70) {
-        labelKey = 'nodes.network.signal_label_fair';
-      } else {
-        labelKey = 'nodes.network.signal_label_weak';
+  if (node.id === 'network') {
+    if (result.network) {
+      if (result.network.ssid) {
+        details.push({ text: result.network.ssid });
       }
-      details.push({ text: t(labelKey) });
+      if (result.network.rssi !== null) {
+        const rssi = result.network.rssi;
+        let labelKey = '';
+        if (rssi >= -50) {
+          labelKey = 'nodes.network.signal_label_excellent';
+        } else if (rssi >= -60) {
+          labelKey = 'nodes.network.signal_label_good';
+        } else if (rssi >= -70) {
+          labelKey = 'nodes.network.signal_label_fair';
+        } else {
+          labelKey = 'nodes.network.signal_label_weak';
+        }
+        details.push({ text: t(labelKey) });
+      }
+    }
+    if (details.length === 0 && node.status === 'down') {
+      const ct = result.network?.connection_type;
+      if (ct === 'Disabled') {
+        details.push({ text: t('diagnostics.status_disabled'), isStatus: true });
+      } else {
+        details.push({ text: t('diagnostics.status_not_connected'), isStatus: true });
+      }
     }
   }
 
-  if (node.id === 'dns' && result.router) {
-    if (result.router.vendor) {
-      details.push({ text: result.router.vendor });
+  if (node.id === 'dns') {
+    if (result.router) {
+      if (result.router.vendor) {
+        details.push({ text: result.router.vendor });
+      }
+      if (result.router.model) {
+        details.push({ text: result.router.model });
+      }
+      ip = result.router.gateway_ip ?? undefined;
     }
-    if (result.router.model) {
-      details.push({ text: result.router.model });
+    if (details.length === 0 && node.status === 'down') {
+      if (result.router?.gateway_ip) {
+        details.push({ text: t('diagnostics.status_unreachable'), isStatus: true });
+      } else {
+        details.push({ text: t('diagnostics.status_no_data'), isStatus: true });
+      }
     }
-    ip = result.router.gateway_ip ?? undefined;
   }
 
-  if (node.id === 'internet' && result.internet) {
-    if (result.internet.isp) {
-      details.push({ text: cleanIspName(result.internet.isp) });
+  if (node.id === 'internet') {
+    if (result.internet) {
+      if (result.internet.isp) {
+        details.push({ text: cleanIspName(result.internet.isp) });
+      }
+      if (result.internet.city && result.internet.country) {
+        details.push({ text: `${result.internet.city}, ${result.internet.country}` });
+      } else if (result.internet.country) {
+        details.push({ text: result.internet.country });
+      } else if (result.internet.city) {
+        details.push({ text: result.internet.city });
+      }
+      ip = result.internet.public_ip ?? undefined;
     }
-    if (result.internet.city && result.internet.country) {
-      details.push({ text: `${result.internet.city}, ${result.internet.country}` });
-    } else if (result.internet.country) {
-      details.push({ text: result.internet.country });
-    } else if (result.internet.city) {
-      details.push({ text: result.internet.city });
+    if (details.length === 0 && node.status === 'down') {
+      details.push({ text: t('diagnostics.status_no_connection'), isStatus: true });
     }
-    ip = result.internet.public_ip ?? undefined;
   }
 
   return {
@@ -211,7 +236,7 @@ function buildSyntheticResults(
         wifi_standard: null,
         is_legacy_wifi: false,
       } : null,
-      router: id === 'dns' ? { gateway_ip: '192.168.1.1', gateway_mac: null, vendor: null, model: null } : null,
+      router: id === 'dns' ? { gateway_ip: statuses['network'] === 'down' ? null : '192.168.1.1', gateway_mac: null, vendor: null, model: null } : null,
       internet: id === 'internet' ? {
         public_ip: null, isp: null, country: null, city: null,
         dns_ok: scenario === 'http_blocked' ? true : status === 'ok',
