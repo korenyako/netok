@@ -50,6 +50,7 @@ pub struct WiFiSecurityReport {
 // ==================== Encryption Check (Windows) ====================
 
 /// Wi-Fi encryption type.
+#[cfg(target_os = "windows")]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum EncryptionType {
     Open,
@@ -60,6 +61,7 @@ pub enum EncryptionType {
     Unknown(String),
 }
 
+#[cfg(target_os = "windows")]
 impl std::fmt::Display for EncryptionType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -890,6 +892,7 @@ mod tests {
         assert_eq!(parsed.network_ssid, Some("TestNetwork".to_string()));
     }
 
+    #[cfg(target_os = "windows")]
     #[test]
     fn test_encryption_type_display() {
         assert_eq!(EncryptionType::Open.to_string(), "Open");

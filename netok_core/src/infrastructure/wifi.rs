@@ -1,15 +1,19 @@
 //! Wi-Fi information retrieval.
 
 /// State of the Wi-Fi adapter as reported by the WLAN API.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub enum WifiAdapterState {
     /// No wireless interface found on the system
+    #[default]
     Absent,
     /// Adapter exists but is disabled / not ready
+    #[allow(dead_code)]
     Disabled,
     /// Adapter is enabled but not connected to any network
+    #[allow(dead_code)]
     Disconnected,
     /// Adapter is connected to a network
+    #[allow(dead_code)]
     Connected,
 }
 
@@ -26,12 +30,6 @@ pub struct WifiDetails {
     pub channel_frequency_khz: Option<u32>,
     /// DOT11_PHY_TYPE of the active connection (e.g. 7 = HT/802.11n, 8 = VHT/802.11ac)
     pub current_phy_type: Option<u32>,
-}
-
-impl Default for WifiAdapterState {
-    fn default() -> Self {
-        Self::Absent
-    }
 }
 
 /// Get Wi-Fi information on Windows using WLAN API.

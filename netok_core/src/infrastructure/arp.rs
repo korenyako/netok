@@ -65,6 +65,7 @@ pub struct ArpEntry {
 }
 
 /// Format a raw MAC string (from PowerShell) into AA:BB:CC:DD:EE:FF.
+#[cfg(target_os = "windows")]
 fn format_mac(raw: &str) -> Option<String> {
     let formatted = if raw.contains('-') {
         raw.replace('-', ":").to_uppercase()
@@ -93,6 +94,7 @@ fn format_mac(raw: &str) -> Option<String> {
 }
 
 /// Extract subnet prefix from a gateway IP (e.g., "192.168.1.1" → "192.168.1").
+#[cfg(target_os = "windows")]
 fn subnet_prefix(gateway_ip: &str) -> Option<String> {
     let parts: Vec<&str> = gateway_ip.split('.').collect();
     if parts.len() == 4 {
