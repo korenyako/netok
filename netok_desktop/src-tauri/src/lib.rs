@@ -709,9 +709,10 @@ async fn disconnect_vpn(
         // Step 3: Verify process state before trying elevated kill
         if !process_dead && the_pid > 0 {
             let pid_check = the_pid;
-            let alive = tokio::task::spawn_blocking(move || win_elevation::is_process_alive(pid_check))
-                .await
-                .unwrap_or(true);
+            let alive =
+                tokio::task::spawn_blocking(move || win_elevation::is_process_alive(pid_check))
+                    .await
+                    .unwrap_or(true);
             process_dead = !alive;
         }
 
@@ -740,9 +741,10 @@ async fn disconnect_vpn(
         // Step 5: Final check — is the process actually dead?
         if !process_dead && the_pid > 0 {
             let pid_final = the_pid;
-            let alive = tokio::task::spawn_blocking(move || win_elevation::is_process_alive(pid_final))
-                .await
-                .unwrap_or(true);
+            let alive =
+                tokio::task::spawn_blocking(move || win_elevation::is_process_alive(pid_final))
+                    .await
+                    .unwrap_or(true);
             process_dead = !alive;
         }
 
@@ -950,7 +952,10 @@ fn cleanup_vpn(vpn_state: &Mutex<VpnProcessState>) {
     if let Ok(mut state) = vpn_state.lock() {
         #[cfg(target_os = "windows")]
         if let Some(h) = state.elevated_handle.take() {
-            eprintln!("[VPN] Cleaning up: terminating PID {:?}", state.elevated_pid);
+            eprintln!(
+                "[VPN] Cleaning up: terminating PID {:?}",
+                state.elevated_pid
+            );
             let _ = win_elevation::terminate_process(h);
         }
 
