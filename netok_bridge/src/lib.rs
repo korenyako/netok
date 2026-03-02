@@ -484,9 +484,10 @@ pub async fn validate_vpn_key(raw_uri: String) -> Result<VpnKeyValidation, Strin
 
 // ==================== VPN Types ====================
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Default)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum VpnConnectionState {
+    #[default]
     Disconnected,
     Connecting,
     Connected {
@@ -498,12 +499,6 @@ pub enum VpnConnectionState {
         message: String,
     },
     ElevationDenied,
-}
-
-impl Default for VpnConnectionState {
-    fn default() -> Self {
-        Self::Disconnected
-    }
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
