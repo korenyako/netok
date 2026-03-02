@@ -343,6 +343,7 @@ Generated: 2026-03-02
 ├── landing.html
 ├── LICENSE
 ├── logo.svg
+├── MACOS_PORT_ANALYSIS.md
 ├── manuf.txt
 ├── netok-protection-hub.jsx
 ├── netok-status.jsx
