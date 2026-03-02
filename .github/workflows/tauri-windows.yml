@@ -36,10 +36,16 @@ jobs:
         run: |
           npm ci
 
+      - name: Download sing-box binary
+        shell: bash
+        run: |
+          curl -sL "https://github.com/SagerNet/sing-box/releases/download/v1.12.21/sing-box-1.12.21-windows-amd64.zip" -o sing-box.zip
+          unzip -j sing-box.zip "sing-box-1.12.21-windows-amd64/sing-box.exe" -d netok_desktop/src-tauri/binaries/
+          mv netok_desktop/src-tauri/binaries/sing-box.exe netok_desktop/src-tauri/binaries/sing-box-x86_64-pc-windows-msvc.exe
+
       - name: Build (Tauri)
         working-directory: netok_desktop
         env:
-          # Optional: silence telemetry etc.
           CI: true
         run: |
           npm run tauri build

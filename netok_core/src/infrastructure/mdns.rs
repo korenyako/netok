@@ -106,7 +106,7 @@ pub fn mdns_discover(timeout: Duration) -> HashMap<String, MdnsDeviceInfo> {
                             });
                     }
                 }
-                Ok(_) => {} // SearchStarted, ServiceFound, etc. — ignore
+                Ok(_) => {}  // SearchStarted, ServiceFound, etc. — ignore
                 Err(_) => {} // Timeout or channel closed — continue polling others
             }
         }
@@ -133,10 +133,7 @@ fn extract_instance_name(fullname: &str, service_type: &str) -> String {
     let suffix = format!(".{}", service_trimmed);
 
     // Try stripping ".{service_type}" (with or without trailing dot)
-    if let Some(name) = fullname
-        .trim_end_matches('.')
-        .strip_suffix(service_trimmed)
-    {
+    if let Some(name) = fullname.trim_end_matches('.').strip_suffix(service_trimmed) {
         return name.trim_end_matches('.').to_string();
     }
 
@@ -145,11 +142,7 @@ fn extract_instance_name(fullname: &str, service_type: &str) -> String {
     }
 
     // Fallback: everything before first "._" segment
-    fullname
-        .split("._")
-        .next()
-        .unwrap_or(fullname)
-        .to_string()
+    fullname.split("._").next().unwrap_or(fullname).to_string()
 }
 
 /// Clean up a device name extracted from mDNS.
@@ -204,10 +197,7 @@ mod tests {
 
     #[test]
     fn test_extract_instance_name_ipp() {
-        let name = extract_instance_name(
-            "HP LaserJet Pro._ipp._tcp.local.",
-            "_ipp._tcp.local.",
-        );
+        let name = extract_instance_name("HP LaserJet Pro._ipp._tcp.local.", "_ipp._tcp.local.");
         assert_eq!(name, "HP LaserJet Pro");
     }
 
@@ -231,10 +221,7 @@ mod tests {
 
     #[test]
     fn test_extract_instance_name_fallback() {
-        let name = extract_instance_name(
-            "SomeDevice._unknown._tcp.local.",
-            "_other._tcp.local.",
-        );
+        let name = extract_instance_name("SomeDevice._unknown._tcp.local.", "_other._tcp.local.");
         assert_eq!(name, "SomeDevice");
     }
 

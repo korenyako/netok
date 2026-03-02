@@ -174,7 +174,10 @@ pub fn build_dns_commands(provider: DnsProvider) -> Result<Vec<String>, String> 
     match provider {
         DnsProvider::Auto => {
             cmds.push(format!(r#"netsh interface ip set dns "{}" dhcp"#, adapter));
-            cmds.push(format!(r#"netsh interface ipv6 set dns "{}" dhcp"#, adapter));
+            cmds.push(format!(
+                r#"netsh interface ipv6 set dns "{}" dhcp"#,
+                adapter
+            ));
         }
         _ => {
             // IPv4
@@ -239,8 +242,7 @@ pub fn get_current_dns() -> Result<Vec<String>, String> {
         adapter_name.replace('\'', "''")
     );
 
-    let text = run_powershell(&command)
-        .ok_or_else(|| "Failed to get DNS servers".to_string())?;
+    let text = run_powershell(&command).ok_or_else(|| "Failed to get DNS servers".to_string())?;
 
     let dns_servers: Vec<String> = text
         .lines()

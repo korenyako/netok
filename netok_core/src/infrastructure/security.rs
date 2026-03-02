@@ -490,7 +490,9 @@ pub fn check_arp_spoofing() -> SecurityCheck {
         };
         println!(
             "[security] check_arp_spoofing: Warning (MAC dup: {}) ({} entries) in {:.1}ms",
-            mac, entry_count, start.elapsed().as_secs_f64() * 1000.0
+            mac,
+            entry_count,
+            start.elapsed().as_secs_f64() * 1000.0
         );
         return r;
     }

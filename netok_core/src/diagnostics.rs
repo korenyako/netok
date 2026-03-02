@@ -11,12 +11,11 @@ use crate::domain::{
     ComputerInfo, ConnectionType, DeviceType, DiagnosticsSnapshot, DnsProvider, InternetInfo,
     NetworkDevice, NetworkInfo, NodeId, NodeInfo, RouterInfo, Settings, Status,
 };
+use crate::infrastructure::mdns::infer_device_type_from_services;
 use crate::infrastructure::{
     arp::get_all_arp_entries, detect_connection_type, get_default_gateway, get_router_mac,
-    get_wifi_info, mdns_discover,
-    security::check_encryption,
+    get_wifi_info, mdns_discover, security::check_encryption,
 };
-use crate::infrastructure::mdns::infer_device_type_from_services;
 use crate::oui_database::OUI_DATABASE;
 
 /// DNS Test: try to resolve known domains.
@@ -341,16 +340,16 @@ fn band_from_frequency_khz(freq_khz: u32) -> Option<String> {
 /// Returns (display_name, is_legacy) where is_legacy is true for Wi-Fi 4 and older.
 fn wifi_standard_from_phy_type(phy_type: u32) -> Option<(String, bool)> {
     match phy_type {
-        1 => Some(("802.11 FHSS".into(), true)),            // dot11_phy_type_fhss
-        2 => Some(("802.11 DSSS".into(), true)),            // dot11_phy_type_dsss
-        3 => Some(("802.11 IR".into(), true)),              // dot11_phy_type_irbaseband
-        4 => Some(("802.11a".into(), true)),                // dot11_phy_type_ofdm
-        5 => Some(("802.11b".into(), true)),                // dot11_phy_type_hrdsss
-        6 => Some(("802.11g".into(), true)),                // dot11_phy_type_erp
-        7 => Some(("Wi-Fi 4 (802.11n)".into(), true)),     // dot11_phy_type_ht
-        8 => Some(("Wi-Fi 5 (802.11ac)".into(), false)),   // dot11_phy_type_vht
-        10 => Some(("Wi-Fi 6 (802.11ax)".into(), false)),  // dot11_phy_type_he
-        11 => Some(("Wi-Fi 7 (802.11be)".into(), false)),  // dot11_phy_type_eht
+        1 => Some(("802.11 FHSS".into(), true)), // dot11_phy_type_fhss
+        2 => Some(("802.11 DSSS".into(), true)), // dot11_phy_type_dsss
+        3 => Some(("802.11 IR".into(), true)),   // dot11_phy_type_irbaseband
+        4 => Some(("802.11a".into(), true)),     // dot11_phy_type_ofdm
+        5 => Some(("802.11b".into(), true)),     // dot11_phy_type_hrdsss
+        6 => Some(("802.11g".into(), true)),     // dot11_phy_type_erp
+        7 => Some(("Wi-Fi 4 (802.11n)".into(), true)), // dot11_phy_type_ht
+        8 => Some(("Wi-Fi 5 (802.11ac)".into(), false)), // dot11_phy_type_vht
+        10 => Some(("Wi-Fi 6 (802.11ax)".into(), false)), // dot11_phy_type_he
+        11 => Some(("Wi-Fi 7 (802.11be)".into(), false)), // dot11_phy_type_eht
         _ => None,
     }
 }
@@ -395,7 +394,9 @@ pub fn get_network_info(adapter_name: Option<&str>) -> NetworkInfo {
     };
 
     // Derive channel number and frequency band from raw channel frequency
-    let channel = wifi.channel_frequency_khz.and_then(channel_from_frequency_khz);
+    let channel = wifi
+        .channel_frequency_khz
+        .and_then(channel_from_frequency_khz);
     let frequency = wifi.channel_frequency_khz.and_then(band_from_frequency_khz);
 
     // Convert link speed from kbps to Mbps
@@ -498,8 +499,8 @@ pub fn check_network(adapter_name: Option<&str>) -> (NodeInfo, NetworkInfo) {
     let network = get_network_info(adapter_name);
     let latency = start.elapsed().as_millis() as u32;
     let status = match network.connection_type {
-        ConnectionType::Disabled => Status::Fail,        // adapter off → down
-        ConnectionType::Disconnected => Status::Fail,    // not connected → down
+        ConnectionType::Disabled => Status::Fail, // adapter off → down
+        ConnectionType::Disconnected => Status::Fail, // not connected → down
         ConnectionType::Unknown => Status::Warn,
         _ => Status::Ok,
     };
@@ -820,9 +821,7 @@ pub fn scan_network_devices() -> Vec<NetworkDevice> {
 /// Type alias for the optional progress callback.
 pub type ProgressCallback = Option<Box<dyn Fn(&str) + Send + Sync>>;
 
-pub fn scan_network_devices_with_progress(
-    on_progress: ProgressCallback,
-) -> Vec<NetworkDevice> {
+pub fn scan_network_devices_with_progress(on_progress: ProgressCallback) -> Vec<NetworkDevice> {
     use crate::brand_mapping::map_vendor_to_brand;
     use crate::infrastructure::{ping_sweep, reverse_dns_lookup};
 
@@ -843,9 +842,7 @@ pub fn scan_network_devices_with_progress(
     }
 
     // Phase 0.5: Start mDNS discovery in background (runs concurrently with ARP + reverse DNS)
-    let mdns_handle = std::thread::spawn(|| {
-        mdns_discover(Duration::from_secs(3))
-    });
+    let mdns_handle = std::thread::spawn(|| mdns_discover(Duration::from_secs(3)));
 
     // Phase 1: Read ARP table + OUI + classification
     progress("identifying");
@@ -945,9 +942,8 @@ pub fn scan_network_devices_with_progress(
 
     // Sort by numeric IP (e.g. 192.168.1.7 before 192.168.1.21)
     devices.sort_by(|a, b| {
-        let parse_ip = |ip: &str| -> Vec<u32> {
-            ip.split('.').filter_map(|s| s.parse().ok()).collect()
-        };
+        let parse_ip =
+            |ip: &str| -> Vec<u32> { ip.split('.').filter_map(|s| s.parse().ok()).collect() };
         parse_ip(&a.ip).cmp(&parse_ip(&b.ip))
     });
 

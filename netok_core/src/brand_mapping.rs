@@ -11,6 +11,7 @@ use std::collections::HashMap;
 use std::sync::LazyLock;
 
 /// Mapping from lowercase OUI full vendor name to clean brand name.
+#[rustfmt::skip]
 static BRAND_MAP: LazyLock<HashMap<&'static str, &'static str>> = LazyLock::new(|| {
     let mut map = HashMap::with_capacity(27470);
     map.insert("(un)manned", "Manned");

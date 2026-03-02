@@ -40,7 +40,11 @@ mod win_elevation {
 
     /// Spawn a process elevated (with UAC prompt) and return (PID, raw HANDLE).
     /// The caller MUST close the handle via `close_handle()` or `terminate_process()`.
-    pub fn spawn_elevated(exe_path: &Path, args: &str, working_dir: &Path) -> Result<(u32, isize), String> {
+    pub fn spawn_elevated(
+        exe_path: &Path,
+        args: &str,
+        working_dir: &Path,
+    ) -> Result<(u32, isize), String> {
         use std::ffi::OsStr;
         use std::mem;
         use std::os::windows::ffi::OsStrExt;
@@ -189,7 +193,10 @@ mod win_elevation {
         let _ = unsafe { CloseHandle(handle) };
 
         if wait_result != WAIT_OBJECT_0 {
-            eprintln!("[VPN] Warning: process did not exit within 5s (wait_result={:?})", wait_result);
+            eprintln!(
+                "[VPN] Warning: process did not exit within 5s (wait_result={:?})",
+                wait_result
+            );
         }
 
         Ok(())
@@ -234,9 +241,8 @@ mod win_elevation {
         sei.lpParameters = PCWSTR(params.as_ptr());
         sei.nShow = 0; // SW_HIDE
 
-        unsafe { ShellExecuteExW(&mut sei) }.map_err(|e| {
-            format!("Elevated taskkill failed to launch: {}", e)
-        })?;
+        unsafe { ShellExecuteExW(&mut sei) }
+            .map_err(|e| format!("Elevated taskkill failed to launch: {}", e))?;
 
         let hprocess = sei.hProcess;
         if hprocess.is_invalid() {
@@ -287,10 +293,15 @@ async fn set_dns(provider: DnsProviderType) -> Result<(), String> {
     let log_path = std::env::temp_dir().join("netok_dns.log");
 
     // Build netsh commands (no elevation needed — only reads adapter name)
-    let commands = netok_bridge::build_dns_commands(provider).await.map_err(|e| {
-        let _ = std::fs::write(&log_path, format!("[DNS] build_dns_commands failed: {}\n", e));
-        e
-    })?;
+    let commands = netok_bridge::build_dns_commands(provider)
+        .await
+        .map_err(|e| {
+            let _ = std::fs::write(
+                &log_path,
+                format!("[DNS] build_dns_commands failed: {}\n", e),
+            );
+            e
+        })?;
 
     let mut log = String::new();
     log.push_str("[DNS] Commands to execute:\n");
@@ -323,9 +334,10 @@ async fn set_dns(provider: DnsProviderType) -> Result<(), String> {
         let cmd_exe = std::path::PathBuf::from("cmd.exe");
         let args = format!(r#"/c "{}""#, bat_str);
         log.push_str(&format!("[DNS] Running elevated: cmd.exe {}\n", args));
-        let res = tokio::task::spawn_blocking(move || win_elevation::run_elevated_wait(&cmd_exe, &args))
-            .await
-            .map_err(|e| format!("Task error: {}", e))?;
+        let res =
+            tokio::task::spawn_blocking(move || win_elevation::run_elevated_wait(&cmd_exe, &args))
+                .await
+                .map_err(|e| format!("Task error: {}", e))?;
         match &res {
             Ok(()) => log.push_str("[DNS] SUCCESS\n"),
             Err(e) => log.push_str(&format!("[DNS] FAILED: {}\n", e)),
@@ -432,7 +444,9 @@ async fn flush_dns() -> Result<(), String> {
 // ==================== Device Scan ====================
 
 #[tauri::command]
-async fn scan_network_devices(app: tauri::AppHandle) -> Result<Vec<netok_bridge::NetworkDevice>, String> {
+async fn scan_network_devices(
+    app: tauri::AppHandle,
+) -> Result<Vec<netok_bridge::NetworkDevice>, String> {
     netok_bridge::scan_network_devices_with_progress(move |stage| {
         let _ = app.emit("scan-progress", stage);
     })
@@ -547,8 +561,7 @@ async fn connect_vpn(
         .join("singbox.log")
         .to_string_lossy()
         .to_string();
-    let config_json =
-        netok_bridge::generate_vpn_config_with_log(&raw_uri, Some(&log_path))?;
+    let config_json = netok_bridge::generate_vpn_config_with_log(&raw_uri, Some(&log_path))?;
 
     // Step 2: Write config to disk
     std::fs::write(&config_path, &config_json)
@@ -663,7 +676,11 @@ async fn disconnect_vpn(
     let (pid, handle, config_path) = {
         let mut state = vpn_state.lock().map_err(|e| e.to_string())?;
         state.state = netok_bridge::VpnConnectionState::Disconnecting;
-        (state.elevated_pid, state.elevated_handle.take(), state.config_path.clone())
+        (
+            state.elevated_pid,
+            state.elevated_handle.take(),
+            state.config_path.clone(),
+        )
     };
 
     #[cfg(target_os = "windows")]
