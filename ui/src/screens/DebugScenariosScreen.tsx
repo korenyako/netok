@@ -123,7 +123,7 @@ export function DebugScenariosScreen({ onBack, onNavigateToHome, onNavigateToSpe
               networkInfo?.is_legacy_wifi && 'bg-accent',
             )}
           >
-            <span className={cn('w-2 h-2 rounded-full shrink-0', networkInfo?.is_legacy_wifi ? 'bg-warning' : 'bg-muted-foreground/30')} />
+            <span className={cn('w-2 h-2 rounded-full shrink-0', networkInfo?.is_legacy_wifi ? 'bg-warning' : 'bg-muted-foreground/40')} />
             <span className="flex-1 text-foreground">Legacy Wi-Fi Adapter</span>
             <span className="text-xs text-muted-foreground font-mono">is_legacy_wifi</span>
           </button>

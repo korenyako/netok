@@ -233,7 +233,7 @@ export function CustomIpScreen({ onBack, onApplied }: CustomIpScreenProps) {
                 value={primaryDns}
                 onChange={(e) => { setPrimaryDns(e.target.value); setPrimaryError(false); setServerUnreachable(false); setShowPing(false); }}
                 onBlur={handlePrimaryBlur}
-                className={cn('font-mono pr-8 placeholder:font-sans placeholder:font-normal placeholder:text-xs placeholder:tracking-normal placeholder:text-muted-foreground/35', primaryError && 'ring-1 ring-destructive')}
+                className={cn('font-mono pr-8 placeholder:text-muted-foreground/60', primaryError && 'ring-1 ring-destructive')}
               />
               {primaryDns && (
                 <button
@@ -259,7 +259,7 @@ export function CustomIpScreen({ onBack, onApplied }: CustomIpScreenProps) {
                 value={secondaryDns}
                 onChange={(e) => { setSecondaryDns(e.target.value); setSecondaryError(false); }}
                 onBlur={handleSecondaryBlur}
-                className={cn('font-mono pr-8 placeholder:font-sans placeholder:font-normal placeholder:text-xs placeholder:tracking-normal placeholder:text-muted-foreground/35', secondaryError && 'ring-1 ring-destructive')}
+                className={cn('font-mono pr-8 placeholder:text-muted-foreground/60', secondaryError && 'ring-1 ring-destructive')}
               />
               {secondaryDns && (
                 <button
@@ -290,7 +290,7 @@ export function CustomIpScreen({ onBack, onApplied }: CustomIpScreenProps) {
                 value={primaryIpv6}
                 onChange={(e) => { setPrimaryIpv6(e.target.value); setPrimaryIpv6Error(false); }}
                 onBlur={handlePrimaryIpv6Blur}
-                className={cn('font-mono pr-8 placeholder:font-sans placeholder:font-normal placeholder:text-xs placeholder:tracking-normal placeholder:text-muted-foreground/35', primaryIpv6Error && 'ring-1 ring-destructive')}
+                className={cn('font-mono pr-8 placeholder:text-muted-foreground/60', primaryIpv6Error && 'ring-1 ring-destructive')}
               />
               {primaryIpv6 && (
                 <button
@@ -316,7 +316,7 @@ export function CustomIpScreen({ onBack, onApplied }: CustomIpScreenProps) {
                 value={secondaryIpv6}
                 onChange={(e) => { setSecondaryIpv6(e.target.value); setSecondaryIpv6Error(false); }}
                 onBlur={handleSecondaryIpv6Blur}
-                className={cn('font-mono pr-8 placeholder:font-sans placeholder:font-normal placeholder:text-xs placeholder:tracking-normal placeholder:text-muted-foreground/35', secondaryIpv6Error && 'ring-1 ring-destructive')}
+                className={cn('font-mono pr-8 placeholder:text-muted-foreground/60', secondaryIpv6Error && 'ring-1 ring-destructive')}
               />
               {secondaryIpv6 && (
                 <button

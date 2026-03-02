@@ -201,7 +201,7 @@ export function DnsProvidersScreen({ onBack, onCustomIp }: DnsProvidersScreenPro
               <div className={cn(isApplying && !isSystemActive && !isSystemApplying && 'pointer-events-none opacity-50')}>
                 <MenuCard
                   variant={isSystemActive ? 'filled' : 'ghost'}
-                  className={cn(isSystemActive && 'border-muted-foreground/30')}
+                  className={cn(isSystemActive && 'border-muted-foreground/40')}
                   icon={<RadioDot selected={isSystemActive} applying={isSystemApplying} />}
                   title={t('dns_providers.system')}
                   subtitle={t('dns_providers.system_desc')}
@@ -222,7 +222,7 @@ export function DnsProvidersScreen({ onBack, onCustomIp }: DnsProvidersScreenPro
               <div key={card.id} className={cn(isApplying && !isActive && !isCardApplying && 'pointer-events-none opacity-50')}>
                 <MenuCard
                   variant={isActive ? 'filled' : 'ghost'}
-                  className={cn(isActive && 'border-muted-foreground/30')}
+                  className={cn(isActive && 'border-muted-foreground/40')}
                   icon={<RadioDot selected={isActive} applying={isCardApplying} />}
                   title={t(card.nameKey)}
                   badge={card.badgeKey ? t(card.badgeKey) : undefined}
@@ -241,7 +241,7 @@ export function DnsProvidersScreen({ onBack, onCustomIp }: DnsProvidersScreenPro
               <div className={cn(isApplying && !isCustomActive && !isCustomApplying && 'pointer-events-none opacity-50')}>
                 <MenuCard
                   variant={isCustomActive ? 'filled' : 'ghost'}
-                  className={cn('group ghost-action-card', isCustomActive && 'border-muted-foreground/30')}
+                  className={cn('group ghost-action-card', isCustomActive && 'border-muted-foreground/40')}
                   icon={<RadioDot selected={isCustomActive} applying={isCustomApplying} />}
                   title={t('dns_providers.custom')}
                   subtitle={customSubtitle() || t('dns_providers.custom_ip_desc')}

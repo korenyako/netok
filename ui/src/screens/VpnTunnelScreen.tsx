@@ -179,7 +179,7 @@ export function VpnTunnelScreen({ onBack, onAddVpn }: VpnTunnelScreenProps) {
           <div className={cn(isBusy && !isDisconnecting && 'pointer-events-none opacity-50')}>
             <MenuCard
               variant={isDisabled ? 'filled' : 'ghost'}
-              className={cn(isDisabled && 'border-muted-foreground/30')}
+              className={cn(isDisabled && 'border-muted-foreground/40')}
               icon={<RadioDot selected={isDisabled} applying={isDisconnecting} />}
               title={t('vpn.disabled')}
               subtitle={t('vpn.disabled_desc')}
@@ -208,7 +208,7 @@ export function VpnTunnelScreen({ onBack, onAddVpn }: VpnTunnelScreenProps) {
               <div key={index} className={cn(isBusy && !isThisConnecting && 'pointer-events-none opacity-50')}>
                 <MenuCard
                   variant={isThisActive ? 'filled' : 'ghost'}
-                  className={cn('group ghost-action-card', isThisActive && 'border-muted-foreground/30')}
+                  className={cn('group ghost-action-card', isThisActive && 'border-muted-foreground/40')}
                   icon={<RadioDot selected={isThisActive} applying={isThisConnecting} />}
                   title={serverTitle}
                   subtitle={serverSubtitle}
