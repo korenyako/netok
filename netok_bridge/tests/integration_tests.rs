@@ -142,10 +142,8 @@ async fn test_diagnostics_serialization() {
         .expect("Diagnostics should complete");
 
     // Should serialize to JSON
-    let json_str =
-        serde_json::to_string(&snapshot).expect("Snapshot should serialize to JSON");
-    let value: serde_json::Value =
-        serde_json::from_str(&json_str).expect("Should parse as JSON");
+    let json_str = serde_json::to_string(&snapshot).expect("Snapshot should serialize to JSON");
+    let value: serde_json::Value = serde_json::from_str(&json_str).expect("Should parse as JSON");
 
     assert!(value.get("overall").is_some());
     assert!(value.get("nodes").is_some());
