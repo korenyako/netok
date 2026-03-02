@@ -14,12 +14,9 @@ fn test_get_settings_returns_valid_json() {
     // Should return non-empty string
     assert!(!json.is_empty());
 
-    // Should be valid JSON
-    let parsed: Result<serde_json::Value, _> = serde_json::from_str(&json);
-    assert!(parsed.is_ok(), "Settings JSON should be valid: {}", json);
-
-    // Should contain expected fields
-    let settings = parsed.unwrap();
+    // Should be valid JSON with expected fields
+    let settings: serde_json::Value =
+        serde_json::from_str(&json).expect("Settings JSON should be valid");
     assert!(settings.get("language").is_some());
     assert!(settings.get("test_timeout_ms").is_some());
 }
@@ -66,11 +63,9 @@ fn test_set_settings_with_incomplete_structure() {
 
 #[tokio::test]
 async fn test_run_diagnostics_returns_valid_snapshot() {
-    let result = run_diagnostics_struct().await;
-
-    assert!(result.is_ok(), "Diagnostics should complete successfully");
-
-    let snapshot = result.unwrap();
+    let snapshot = run_diagnostics_struct()
+        .await
+        .expect("Diagnostics should complete successfully");
 
     // Check basic structure
     assert!(
@@ -81,10 +76,9 @@ async fn test_run_diagnostics_returns_valid_snapshot() {
 
 #[tokio::test]
 async fn test_diagnostics_snapshot_has_overall_status() {
-    let result = run_diagnostics_struct().await;
-    assert!(result.is_ok());
-
-    let snapshot = result.unwrap();
+    let snapshot = run_diagnostics_struct()
+        .await
+        .expect("Diagnostics should complete");
 
     // Verify overall status is one of the valid values
     match snapshot.overall {
@@ -96,10 +90,9 @@ async fn test_diagnostics_snapshot_has_overall_status() {
 
 #[tokio::test]
 async fn test_diagnostics_snapshot_includes_all_sections() {
-    let result = run_diagnostics_struct().await;
-    assert!(result.is_ok());
-
-    let snapshot = result.unwrap();
+    let snapshot = run_diagnostics_struct()
+        .await
+        .expect("Diagnostics should complete");
 
     // Verify all main sections exist (even if fields are null)
     // Computer section should have at least some info
@@ -115,10 +108,9 @@ async fn test_diagnostics_snapshot_includes_all_sections() {
 
 #[tokio::test]
 async fn test_diagnostics_nodes_have_valid_structure() {
-    let result = run_diagnostics_struct().await;
-    assert!(result.is_ok());
-
-    let snapshot = result.unwrap();
+    let snapshot = run_diagnostics_struct()
+        .await
+        .expect("Diagnostics should complete");
 
     for node in &snapshot.nodes {
         // Each node should have a valid ID
@@ -145,18 +137,15 @@ async fn test_diagnostics_nodes_have_valid_structure() {
 
 #[tokio::test]
 async fn test_diagnostics_serialization() {
-    let result = run_diagnostics_struct().await;
-    assert!(result.is_ok());
-
-    let snapshot = result.unwrap();
+    let snapshot = run_diagnostics_struct()
+        .await
+        .expect("Diagnostics should complete");
 
     // Should serialize to JSON
-    let json = serde_json::to_string(&snapshot);
-    assert!(json.is_ok(), "Snapshot should serialize to JSON");
-
-    // Verify JSON contains expected fields
-    let json_str = json.unwrap();
-    let value: serde_json::Value = serde_json::from_str(&json_str).expect("Should parse as JSON");
+    let json_str =
+        serde_json::to_string(&snapshot).expect("Snapshot should serialize to JSON");
+    let value: serde_json::Value =
+        serde_json::from_str(&json_str).expect("Should parse as JSON");
 
     assert!(value.get("overall").is_some());
     assert!(value.get("nodes").is_some());
@@ -172,9 +161,7 @@ async fn test_get_dns_provider_returns_valid_type() {
     let result = get_dns_provider().await;
 
     // May fail on some systems, but should not panic
-    if result.is_ok() {
-        let provider = result.unwrap();
-
+    if let Ok(provider) = result {
         // Verify it's one of the known types by serializing
         let json = serde_json::to_value(&provider);
         assert!(json.is_ok(), "DNS provider should be serializable");
@@ -356,10 +343,9 @@ fn test_settings_json_roundtrip() {
 
 #[tokio::test]
 async fn test_diagnostics_nodes_contain_computer() {
-    let result = run_diagnostics_struct().await;
-    assert!(result.is_ok());
-
-    let snapshot = result.unwrap();
+    let snapshot = run_diagnostics_struct()
+        .await
+        .expect("Diagnostics should complete");
     let has_computer = snapshot
         .nodes
         .iter()
@@ -370,10 +356,9 @@ async fn test_diagnostics_nodes_contain_computer() {
 
 #[tokio::test]
 async fn test_diagnostics_nodes_contain_internet() {
-    let result = run_diagnostics_struct().await;
-    assert!(result.is_ok());
-
-    let snapshot = result.unwrap();
+    let snapshot = run_diagnostics_struct()
+        .await
+        .expect("Diagnostics should complete");
     let has_internet = snapshot
         .nodes
         .iter()
