@@ -1,6 +1,6 @@
 # Project Map - Netok
 
-Generated: 2026-03-02
+Generated: 2026-03-04
 
 ## TREE (ASCII)
 
@@ -20,7 +20,14 @@ Generated: 2026-03-02
 │   └── pre-commit
 ├── docs
 │   ├── screenshots
-│   │   └── netok-farsi.gif
+│   │   ├── netok-diagnostics.gif
+│   │   ├── netok-dns.gif
+│   │   ├── netok-farsi.gif
+│   │   ├── netok-rtl.gif
+│   │   ├── netok-speed.gif
+│   │   ├── netok-vpn.gif
+│   │   ├── netok-weak.gif
+│   │   └── netok-wifi.gif
 │   ├── IMPLEMENTATION-PLAN.md
 │   ├── MOBILE-PLAN.md
 │   ├── README.md
@@ -246,10 +253,12 @@ Generated: 2026-03-02
 │   │   │   ├── MartianMono-Variable.ttf
 │   │   │   └── NotoSansArabic-Variable.ttf
 │   │   ├── hooks
+│   │   │   ├── useDemoHotkeys.ts
 │   │   │   ├── useLivePing.ts
 │   │   │   ├── useNavigation.ts
 │   │   │   ├── useTheme.ts
-│   │   │   └── useUpdateChecker.ts
+│   │   │   ├── useUpdateChecker.ts
+│   │   │   └── useVpnState.ts
 │   │   ├── i18n
 │   │   │   ├── de.json
 │   │   │   ├── en.json
@@ -289,6 +298,7 @@ Generated: 2026-03-02
 │   │   ├── store
 │   │   ├── stores
 │   │   │   ├── closeBehaviorStore.ts
+│   │   │   ├── demoStore.ts
 │   │   │   ├── deviceScanStore.ts
 │   │   │   ├── diagnosticsStore.ts
 │   │   │   ├── dnsStore.ts
@@ -573,6 +583,7 @@ import { SpeedTestScreen } from './screens/SpeedTestScreen';
 import { DeviceScanScreen } from './screens/DeviceScanScreen';
 import { useNavigation } from './hooks/useNavigation';
 import { useUpdateChecker } from './hooks/useUpdateChecker';
+import { useDemoHotkeys } from './hooks/useDemoHotkeys';
 
 function App() {
   const {
@@ -596,6 +607,7 @@ function App() {
 
   const { t } = useTranslation();
   const { checkForUpdates, downloadAndInstall } = useUpdateChecker();
+  useDemoHotkeys();
 
   useEffect(() => {
     checkForUpdates().then((update) => {
@@ -605,9 +617,7 @@ function App() {
           action: {
             label: t('settings.about.update_to', { version: update.version }),
             onClick: () => downloadAndInstall(),
-          },
-        });
-      }}}}))
+          },}}}}})))
 ```
 
 ## MAP

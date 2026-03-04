@@ -102,6 +102,79 @@ Free code signing provided by [SignPath.io](https://signpath.io), certificate by
 
 ---
 
+## Diagnostics
+
+Computer → Wi-Fi → Router → Internet — see your full connection path step by step. Each node is tested independently so you know exactly where the problem is.
+
+<p align="center">
+  <img src="docs/screenshots/netok-diagnostics.gif" alt="Netok diagnostics — step-by-step connection check">
+</p>
+
+---
+
+## Plain Language
+
+No error codes, no technical jargon. When something breaks, Netok tells you what happened and what to do — in words anyone can understand.
+
+<p align="center">
+  <img src="docs/screenshots/netok-weak.gif" alt="Netok plain language — clear explanation of weak signal">
+</p>
+
+---
+
+## DNS Protection
+
+Switch your DNS provider in one click — Cloudflare, AdGuard, CleanBrowsing, or set your own custom servers. Block ads, malware, and adult content at the network level.
+
+<p align="center">
+  <img src="docs/screenshots/netok-dns.gif" alt="Netok DNS protection — switching DNS providers">
+</p>
+
+---
+
+## VPN
+
+Connect through VLESS, VMess, Shadowsocks, Trojan, or WireGuard — powered by sing-box. Paste a link, scan a QR code, or import a config file.
+
+<p align="center">
+  <img src="docs/screenshots/netok-vpn.gif" alt="Netok VPN — connecting through sing-box">
+</p>
+
+---
+
+## Speed Test
+
+Measure your real download and upload speed with human-readable ratings — not just raw numbers.
+
+<p align="center">
+  <img src="docs/screenshots/netok-speed.gif" alt="Netok speed test — real-world speed ratings">
+</p>
+
+---
+
+## Wi-Fi Security
+
+Detect weak encryption, open networks, and other vulnerabilities. Know if your Wi-Fi is safe before you connect.
+
+<p align="center">
+  <img src="docs/screenshots/netok-wifi.gif" alt="Netok Wi-Fi security — detecting vulnerabilities">
+</p>
+
+---
+
+## Languages
+
+Netok speaks 15 languages — including right-to-left scripts like Farsi.
+Every label, every message, every tooltip is fully translated. No half-baked Google Translate patches — each locale is reviewed for natural phrasing.
+
+**Supported:** English, Deutsch, Español, Français, Italiano, Polski, Português, Türkçe, Українська, Русский, 日本語, 한국어, 中文, فارسی, and more coming.
+
+<p align="center">
+  <img src="docs/screenshots/netok-rtl.gif" alt="Netok in Farsi — right-to-left interface">
+</p>
+
+---
+
 ## Built with
 
 - [Rust](https://www.rust-lang.org/) — core diagnostics engine
