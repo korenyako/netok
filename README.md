@@ -22,6 +22,10 @@
 </p>
 
 <p align="center">
+  <img src="docs/screenshots/netok-start.gif" alt="Netok — network diagnostics demo">
+</p>
+
+<p align="center">
   <a href="https://github.com/korenyako/netok/releases/latest"><img src="https://img.shields.io/badge/Windows-Ready-brightgreen?style=for-the-badge&logo=windows&logoColor=white" alt="Windows: Ready"></a>
   <img src="https://img.shields.io/badge/Android-In%20progress-orange?style=for-the-badge&logo=android&logoColor=white" alt="Android: In progress">
   <img src="https://img.shields.io/badge/macOS-Planned-lightgrey?style=for-the-badge&logo=apple&logoColor=white" alt="macOS: Planned">
@@ -36,7 +40,7 @@ When your internet stops working, you shouldn't need to know what
 `DNS_PROBE_FINISHED_NXDOMAIN` means. Netok translates that into something useful:
 what's broken, where, and what to do about it.
 
----
+
 
 ## Features
 
@@ -85,7 +89,7 @@ what's broken, where, and what to do about it.
 </tr>
 </table>
 
----
+
 
 ## Download
 
@@ -100,7 +104,7 @@ Free code signing provided by [SignPath.io](https://signpath.io), certificate by
 - **Roles:** all governance roles (committer, reviewer, approver) are held by [Anton Korenyako](https://github.com/korenyako). See [CONTRIBUTING.md](CONTRIBUTING.md#project-governance) for details.
 - **Privacy:** this application does not transfer any information to other networked systems unless specifically requested by the user or required for core diagnostic functionality. See [PRIVACY.md](PRIVACY.md) for the full list of network requests.
 
----
+
 
 ## Diagnostics
 
@@ -110,7 +114,7 @@ Computer → Wi-Fi → Router → Internet — see your full connection path ste
   <img src="docs/screenshots/netok-diagnostics.gif" alt="Netok diagnostics — step-by-step connection check">
 </p>
 
----
+
 
 ## Plain Language
 
@@ -120,7 +124,7 @@ No error codes, no technical jargon. When something breaks, Netok tells you what
   <img src="docs/screenshots/netok-weak.gif" alt="Netok plain language — clear explanation of weak signal">
 </p>
 
----
+
 
 ## DNS Protection
 
@@ -130,7 +134,7 @@ Switch your DNS provider in one click — Cloudflare, AdGuard, CleanBrowsing, or
   <img src="docs/screenshots/netok-dns.gif" alt="Netok DNS protection — switching DNS providers">
 </p>
 
----
+
 
 ## VPN
 
@@ -140,7 +144,6 @@ Connect through VLESS, VMess, Shadowsocks, Trojan, or WireGuard — powered by s
   <img src="docs/screenshots/netok-vpn.gif" alt="Netok VPN — connecting through sing-box">
 </p>
 
----
 
 ## Speed Test
 
@@ -150,7 +153,6 @@ Measure your real download and upload speed with human-readable ratings — not 
   <img src="docs/screenshots/netok-speed.gif" alt="Netok speed test — real-world speed ratings">
 </p>
 
----
 
 ## Wi-Fi Security
 
@@ -160,7 +162,6 @@ Detect weak encryption, open networks, and other vulnerabilities. Know if your W
   <img src="docs/screenshots/netok-wifi.gif" alt="Netok Wi-Fi security — detecting vulnerabilities">
 </p>
 
----
 
 ## Languages
 
@@ -173,7 +174,6 @@ Every label, every message, every tooltip is fully translated. No half-baked Goo
   <img src="docs/screenshots/netok-rtl.gif" alt="Netok in Farsi — right-to-left interface">
 </p>
 
----
 
 ## Built with
 
@@ -182,7 +182,7 @@ Every label, every message, every tooltip is fully translated. No half-baked Goo
 - [React](https://react.dev/) + TypeScript — UI
 - [sing-box](https://sing-box.sagernet.org/) — VPN tunneling
 
----
+
 
 ## License
 
