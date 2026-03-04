@@ -9,7 +9,7 @@ import { useLivePing } from '../hooks/useLivePing';
 import type { SingleNodeResult, DiagnosticScenario } from '../api/tauri';
 import { notifications } from '../utils/notifications';
 import { CloseButton } from '../components/WindowControls';
-import { useVpnStore } from '../stores/vpnStore';
+import { useVpnState } from '../hooks/useVpnState';
 import { useSpeedTestStore } from '../stores/speedTestStore';
 
 interface NodeDetailScreenProps {
@@ -115,8 +115,9 @@ interface InfoRow {
 
 export function NodeDetailScreen({ nodeId, result, onBack, onNavigateToDnsProviders, onNavigateToVpn }: NodeDetailScreenProps) {
   const { t } = useTranslation();
-  const vpnConfigured = useVpnStore(s => s.configs.length > 0);
-  const vpnActive = useVpnStore(s => s.connectionState.type === 'connected');
+  const { configs: vpnConfigs, connectionState: vpnConnectionState } = useVpnState();
+  const vpnConfigured = vpnConfigs.length > 0;
+  const vpnActive = vpnConnectionState.type === 'connected';
 
   const handleCopyIp = (ip: string) => {
     navigator.clipboard.writeText(ip);

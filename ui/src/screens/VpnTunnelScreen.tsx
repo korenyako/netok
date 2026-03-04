@@ -7,6 +7,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { CloseButton } from '../components/WindowControls';
 import { PingBadge } from '../components/PingBadge';
 import { useVpnStore } from '../stores/vpnStore';
+import { useVpnState } from '../hooks/useVpnState';
+import { useDemoStore } from '../stores/demoStore';
+import { useDiagnosticsStore } from '../stores/diagnosticsStore';
 import { pingDnsServer } from '../api/tauri';
 import { cn } from '@/lib/utils';
 
@@ -30,15 +33,36 @@ function RadioDot({ selected, applying }: { selected: boolean; applying: boolean
 
 export function VpnTunnelScreen({ onBack, onAddVpn }: VpnTunnelScreenProps) {
   const { t } = useTranslation();
+  const { configs, activeIndex, connectionState } = useVpnState();
   const {
-    configs,
-    activeIndex,
-    connectionState,
     lastAction,
-    connectByIndex,
-    disconnect,
+    connectByIndex: realConnectByIndex,
+    disconnect: realDisconnect,
     setEditingIndex,
   } = useVpnStore();
+  const { isDemoMode, vpnDemoScenario, animateVpnTransition } = useDemoStore();
+  const isDemoVpn = isDemoMode && vpnDemoScenario !== null;
+
+  // In demo mode, wrap connect/disconnect to use animated transitions
+  const connectByIndex = isDemoVpn
+    ? async () => {
+        await animateVpnTransition('vpn_connected');
+        const diagStore = useDiagnosticsStore.getState();
+        if (diagStore.scenarioOverride) {
+          diagStore.overrideScenario(diagStore.scenarioOverride, t);
+        }
+      }
+    : realConnectByIndex;
+
+  const disconnect = isDemoVpn
+    ? async () => {
+        await animateVpnTransition('vpn_disconnected');
+        const diagStore = useDiagnosticsStore.getState();
+        if (diagStore.scenarioOverride) {
+          diagStore.overrideScenario(diagStore.scenarioOverride, t);
+        }
+      }
+    : realDisconnect;
 
   const isConnected = connectionState.type === 'connected';
 

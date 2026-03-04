@@ -7,10 +7,14 @@ import {
   lookupIpLocation,
   type SingleNodeResult,
   type NetworkInfo,
+  type ComputerInfo,
+  type RouterInfo,
+  type InternetInfo,
   type DiagnosticScenario,
   type NodeStatus,
   type ConnectionType,
 } from '../api/tauri';
+import { useDemoStore } from './demoStore';
 
 // Node detail for display
 interface NodeDetail {
@@ -53,6 +57,7 @@ interface DiagnosticsActions {
   reset: () => void;
   getRawResult: (nodeId: string) => SingleNodeResult | undefined;
   overrideScenario: (scenario: DiagnosticScenario, t: (key: string) => string) => void;
+  overrideScenarioProgressive: (scenario: DiagnosticScenario, t: (key: string) => string) => Promise<void>;
   clearOverride: (t: (key: string) => string) => void;
   setLegacyWifi: (value: boolean) => void;
 }
@@ -256,8 +261,125 @@ function buildSyntheticResults(
   return { nodes, rawResults, networkInfo };
 }
 
+// Build realistic demo diagnostics data for video/GIF recording
+function buildDemoResults(
+  scenario: DiagnosticScenario,
+  t: (key: string) => string,
+): { nodes: NetworkNode[]; rawResults: Map<string, SingleNodeResult>; networkInfo: NetworkInfo | null } {
+  const statuses = SCENARIO_NODE_STATUSES[scenario];
+  const connectionType = SCENARIO_CONNECTION_TYPE[scenario] ?? 'Wifi';
+  const vpnConnected = useDemoStore.getState().vpnDemoScenario === 'vpn_connected';
+  const networkDown = connectionType === 'Disabled' || connectionType === 'Disconnected';
+
+  const computerInfo: ComputerInfo = {
+    hostname: 'HONOR-LAPTOP',
+    model: 'HONOR MagicBook X16',
+    adapter: 'Intel Wi-Fi 6 AX201 160MHz',
+    local_ip: '192.168.1.42',
+  };
+
+  const networkInfo: NetworkInfo = networkDown
+    ? {
+        connection_type: connectionType,
+        ssid: null, rssi: null, signal_quality: null, channel: null,
+        frequency: null, encryption: null, link_speed_mbps: null,
+        wifi_standard: null, is_legacy_wifi: false,
+      }
+    : {
+        connection_type: connectionType,
+        ssid: 'Home_WiFi_5G',
+        rssi: scenario === 'weak_signal' ? -78 : -35,
+        signal_quality: scenario === 'weak_signal' ? 'Poor' : 'Excellent',
+        channel: 36,
+        frequency: '5 GHz',
+        encryption: 'WPA2-Personal',
+        link_speed_mbps: scenario === 'weak_signal' ? 54 : 866,
+        wifi_standard: 'Wi-Fi 6 (802.11ax)',
+        is_legacy_wifi: false,
+      };
+
+  const routerInfo: RouterInfo = networkDown
+    ? { gateway_ip: null, gateway_mac: null, vendor: null, model: null }
+    : { gateway_ip: '192.168.1.1', gateway_mac: 'B0:BE:76:A3:4F:12', vendor: 'TP-Link', model: 'Archer AX55' };
+
+  const internetOk = statuses['internet'] === 'ok';
+  const internetInfo: InternetInfo = (() => {
+    if (scenario === 'no_internet' || networkDown) {
+      return {
+        public_ip: null, isp: null, country: null, city: null,
+        dns_ok: false, http_ok: false, latency_ms: null,
+        speed_down_mbps: null, speed_up_mbps: null,
+      };
+    }
+    if (scenario === 'dns_failure') {
+      return {
+        public_ip: null, isp: null, country: null, city: null,
+        dns_ok: false, http_ok: false, latency_ms: null,
+        speed_down_mbps: null, speed_up_mbps: null,
+      };
+    }
+    if (scenario === 'http_blocked') {
+      return {
+        public_ip: null, isp: null, country: null, city: null,
+        dns_ok: true, http_ok: false, latency_ms: null,
+        speed_down_mbps: null, speed_up_mbps: null,
+      };
+    }
+    if (scenario === 'router_unreachable') {
+      return {
+        public_ip: null, isp: null, country: null, city: null,
+        dns_ok: false, http_ok: false, latency_ms: null,
+        speed_down_mbps: null, speed_up_mbps: null,
+      };
+    }
+    // Internet is ok
+    return {
+      public_ip: vpnConnected ? '162.55.41.88' : '79.56.184.23',
+      isp: vpnConnected ? 'Hetzner Online GmbH' : 'TIM S.p.A.',
+      country: vpnConnected ? 'Germany' : 'Italy',
+      city: vpnConnected ? 'Frankfurt' : 'Turin',
+      dns_ok: true,
+      http_ok: true,
+      latency_ms: vpnConnected ? 24 : 14,
+      speed_down_mbps: null,
+      speed_up_mbps: null,
+    };
+  })();
+
+  const nodeIds: Array<{ id: 'computer' | 'network' | 'dns' | 'internet'; labelKey: string }> = [
+    { id: 'computer', labelKey: 'diagnostics.computer' },
+    { id: 'network', labelKey: 'diagnostics.wifi' },
+    { id: 'dns', labelKey: 'diagnostics.router' },
+    { id: 'internet', labelKey: 'diagnostics.internet' },
+  ];
+
+  const nodes: NetworkNode[] = [];
+  const rawResults = new Map<string, SingleNodeResult>();
+
+  for (const { id, labelKey } of nodeIds) {
+    const status = statuses[id];
+    const label = t(labelKey);
+
+    const raw: SingleNodeResult = {
+      node: { id, label, status, latency_ms: internetOk && id === 'internet' ? (vpnConnected ? 24 : 14) : (status === 'ok' ? 12 : null), details: null },
+      computer: id === 'computer' ? computerInfo : null,
+      network: id === 'network' ? networkInfo : null,
+      router: id === 'dns' ? routerInfo : null,
+      internet: id === 'internet' ? internetInfo : null,
+    };
+
+    nodes.push(transformSingleNode(raw, t));
+    rawResults.set(id, raw);
+  }
+
+  return { nodes, rawResults, networkInfo: rawResults.get('network')?.network ?? null };
+}
+
 // Run ID for cancellation
 let runIdCounter = 0;
+
+// Progressive override run ID (separate counter to avoid conflicts with real diagnostics)
+let progressiveRunId = 0;
 
 export const useDiagnosticsStore = create<DiagnosticsStore>((set, get) => ({
   ...initialState,
@@ -400,7 +522,8 @@ export const useDiagnosticsStore = create<DiagnosticsStore>((set, get) => ({
   },
 
   overrideScenario: (scenario: DiagnosticScenario, t: (key: string) => string) => {
-    const { nodes, rawResults, networkInfo } = buildSyntheticResults(scenario, t);
+    const builder = useDemoStore.getState().isDemoMode ? buildDemoResults : buildSyntheticResults;
+    const { nodes, rawResults, networkInfo } = builder(scenario, t);
     set({
       scenarioOverride: scenario,
       nodes,
@@ -411,6 +534,50 @@ export const useDiagnosticsStore = create<DiagnosticsStore>((set, get) => ({
       lastUpdated: Date.now(),
       error: null,
     });
+  },
+
+  overrideScenarioProgressive: async (scenario: DiagnosticScenario, t: (key: string) => string) => {
+    const thisRunId = ++progressiveRunId;
+    const stale = () => progressiveRunId !== thisRunId;
+
+    const builder = useDemoStore.getState().isDemoMode ? buildDemoResults : buildSyntheticResults;
+    const { nodes: finalNodes, rawResults: finalRawResults, networkInfo } = builder(scenario, t);
+
+    // Start: clear everything, show loading
+    set({
+      scenarioOverride: scenario,
+      nodes: [],
+      rawResults: new Map(),
+      isRunning: true,
+      currentCheckIndex: 0,
+      error: null,
+      networkInfo: null,
+    });
+
+    const delays = [300, 500, 400, 600]; // computer, network, dns, internet
+    const nodeIds = ['computer', 'network', 'dns', 'internet'];
+
+    for (let i = 0; i < nodeIds.length; i++) {
+      await new Promise((r) => setTimeout(r, delays[i]));
+      if (stale()) return;
+
+      const nodeId = nodeIds[i];
+      const node = finalNodes.find((n) => n.id === nodeId);
+      const raw = finalRawResults.get(nodeId);
+      if (node && raw) {
+        const isLast = i === nodeIds.length - 1;
+        set((state) => {
+          const newRawResults = new Map(state.rawResults);
+          newRawResults.set(nodeId, raw);
+          return {
+            nodes: upsertNode(state.nodes, node),
+            rawResults: newRawResults,
+            currentCheckIndex: i + 1,
+            ...(isLast ? { isRunning: false, lastUpdated: Date.now(), networkInfo } : {}),
+          };
+        });
+      }
+    }
   },
 
   clearOverride: (t: (key: string) => string) => {

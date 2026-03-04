@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { MenuCard } from '@/components/MenuCard';
 import { CloseButton } from '../components/WindowControls';
 import { useDnsStore } from '../stores/useDnsStore';
-import { useVpnStore } from '../stores/vpnStore';
+import { useVpnState } from '../hooks/useVpnState';
 import { loadCustomDnsConfig } from '../utils/customDnsStorage';
 import { lookupDnsProvider } from '../utils/dnsProviderLookup';
 
@@ -28,7 +28,7 @@ const PROVIDER_DISPLAY: Record<string, string> = {
 export function ProtectionHubScreen({ onBack, onNavigateToDns, onNavigateToVpn }: ProtectionHubScreenProps) {
   const { t } = useTranslation();
   const { currentProvider: dnsProvider, isLoading: isDnsLoading } = useDnsStore();
-  const { configs, activeIndex, connectionState } = useVpnStore();
+  const { configs, activeIndex, connectionState } = useVpnState();
   const vpnConfig = activeIndex !== null ? configs[activeIndex] : null;
 
   const isDnsEnabled = dnsProvider !== null && KNOWN_PROVIDERS.includes(dnsProvider.type);

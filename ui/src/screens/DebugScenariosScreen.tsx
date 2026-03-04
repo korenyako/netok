@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { CloseButton } from '../components/WindowControls';
 import { useDiagnosticsStore } from '../stores/diagnosticsStore';
 import { useSpeedTestStore, type SpeedTestScenario } from '../stores/speedTestStore';
+import { useDemoStore, type VpnDemoScenario } from '../stores/demoStore';
 import type { DiagnosticScenario, DiagnosticSeverity } from '../api/tauri';
 import { cn } from '@/lib/utils';
 
@@ -31,6 +32,12 @@ const SPEED_SCENARIOS: Array<{ scenario: SpeedTestScenario; label: string; sever
   { scenario: 'error', label: 'Test Error', severity: 'error' },
 ];
 
+const VPN_SCENARIOS: Array<{ scenario: VpnDemoScenario; label: string; severity: DiagnosticSeverity }> = [
+  { scenario: 'vpn_disconnected', label: 'Disconnected', severity: 'success' },
+  { scenario: 'vpn_connected', label: 'Connected (Frankfurt)', severity: 'success' },
+  { scenario: 'vpn_error', label: 'Error', severity: 'error' },
+];
+
 const SEVERITY_DOT: Record<DiagnosticSeverity, string> = {
   success: 'bg-primary',
   warning: 'bg-warning',
@@ -39,11 +46,16 @@ const SEVERITY_DOT: Record<DiagnosticSeverity, string> = {
 
 export function DebugScenariosScreen({ onBack, onNavigateToHome, onNavigateToSpeedTest }: DebugScenariosScreenProps) {
   const { t } = useTranslation();
-  const { overrideScenario, clearOverride, scenarioOverride, networkInfo, setLegacyWifi } = useDiagnosticsStore();
+  const { overrideScenario, overrideScenarioProgressive, clearOverride, scenarioOverride, networkInfo, setLegacyWifi } = useDiagnosticsStore();
   const speedTestStore = useSpeedTestStore();
+  const { isDemoMode, toggleDemoMode, vpnDemoScenario, animateVpnTransition, setVpnDemoScenario, resetAll } = useDemoStore();
 
   const handleSelect = (scenario: DiagnosticScenario) => {
-    overrideScenario(scenario, t);
+    if (isDemoMode) {
+      overrideScenarioProgressive(scenario, t);
+    } else {
+      overrideScenario(scenario, t);
+    }
     onNavigateToHome();
   };
 
@@ -52,7 +64,22 @@ export function DebugScenariosScreen({ onBack, onNavigateToHome, onNavigateToSpe
     onNavigateToSpeedTest();
   };
 
+  const handleVpnSelect = (scenario: VpnDemoScenario) => {
+    if (scenario === 'vpn_error') {
+      setVpnDemoScenario(scenario);
+    } else {
+      animateVpnTransition(scenario).then(() => {
+        // Re-apply diagnostics scenario to update internet node data
+        const diagStore = useDiagnosticsStore.getState();
+        if (diagStore.scenarioOverride) {
+          overrideScenario(diagStore.scenarioOverride, t);
+        }
+      });
+    }
+  };
+
   const handleReset = () => {
+    resetAll();
     clearOverride(t);
     speedTestStore.reset();
     onNavigateToHome();
@@ -73,6 +100,25 @@ export function DebugScenariosScreen({ onBack, onNavigateToHome, onNavigateToSpe
 
       {/* Scenario list */}
       <div className="flex-1 px-4 pb-4 flex flex-col min-h-0 overflow-y-auto">
+        {/* Demo Data toggle */}
+        <div className="flex items-center justify-between py-2 mb-3">
+          <span className="text-sm font-medium text-foreground">Demo Data</span>
+          <button
+            onClick={toggleDemoMode}
+            className={cn(
+              'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
+              isDemoMode ? 'bg-primary' : 'bg-muted-foreground/30',
+            )}
+          >
+            <span
+              className={cn(
+                'inline-block h-4 w-4 transform rounded-full bg-white transition-transform',
+                isDemoMode ? 'translate-x-6' : 'translate-x-1',
+              )}
+            />
+          </button>
+        </div>
+
         {/* Diagnostics section */}
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Diagnostics</p>
         <div className="space-y-1.5">
@@ -112,6 +158,26 @@ export function DebugScenariosScreen({ onBack, onNavigateToHome, onNavigateToSpe
           ))}
         </div>
 
+        {/* VPN section */}
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mt-5 mb-2">VPN</p>
+        <div className="space-y-1.5">
+          {VPN_SCENARIOS.map(({ scenario, label, severity }) => (
+            <button
+              key={scenario}
+              onClick={() => handleVpnSelect(scenario)}
+              className={cn(
+                'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-left transition-colors',
+                'hover:bg-accent/50',
+                vpnDemoScenario === scenario && 'bg-accent',
+              )}
+            >
+              <span className={cn('w-2 h-2 rounded-full shrink-0', SEVERITY_DOT[severity])} />
+              <span className="flex-1 text-foreground">{label}</span>
+              <span className="text-xs text-muted-foreground font-mono">{scenario}</span>
+            </button>
+          ))}
+        </div>
+
         {/* Flags */}
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mt-5 mb-2">Flags</p>
         <div className="space-y-1.5">
@@ -130,6 +196,15 @@ export function DebugScenariosScreen({ onBack, onNavigateToHome, onNavigateToSpe
         </div>
 
         <div className="flex-1" />
+
+        {/* Hotkey reference (dev only, when demo active) */}
+        {import.meta.env.DEV && isDemoMode && (
+          <div className="text-[10px] text-muted-foreground/60 space-y-0.5 mb-3 font-mono">
+            <p>Ctrl+1..8 Diagnostics · Ctrl+Shift+1..4 Speed</p>
+            <p>Ctrl+Shift+V VPN toggle · Ctrl+Shift+E VPN error</p>
+            <p>Ctrl+Shift+D Demo toggle · Ctrl+Shift+R Reset all</p>
+          </div>
+        )}
 
         {/* Reset button */}
         <Button

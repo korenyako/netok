@@ -2,7 +2,7 @@ import { useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDiagnosticsStore, shouldRefreshDiagnostics, getNetworkAvailability } from '../stores/diagnosticsStore';
 import { useDnsStore } from '../stores/useDnsStore';
-import { useVpnStore } from '../stores/vpnStore';
+import { useVpnState } from '../hooks/useVpnState';
 import { deriveScenario, type ScenarioContext } from '../utils/deriveScenario';
 import { CloseButton } from '../components/WindowControls';
 import { Globe, Lock, LockOpen, Wifi } from '../components/icons/UIIcons';
@@ -89,7 +89,7 @@ const CIRCLE_CLASSES: Record<VisualState, string> = {
 export function StatusScreen({ onOpenDiagnostics, onNavigateToDnsProviders, onNavigateToVpn, onNavigateToWifiSecurity }: StatusScreenProps) {
   const { t } = useTranslation();
   const { currentProvider: dnsProvider, isLoading: isDnsLoading } = useDnsStore();
-  const { configs, activeIndex, connectionState } = useVpnStore();
+  const { configs, activeIndex, connectionState } = useVpnState();
   const wifiReport = useWifiSecurityStore(s => s.report);
   const wifiIsRunning = useWifiSecurityStore(s => s.isRunning);
   const runQuietWifiScan = useWifiSecurityStore(s => s.runQuietScan);

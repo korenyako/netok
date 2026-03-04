@@ -13,6 +13,7 @@ import { SpeedTestScreen } from './screens/SpeedTestScreen';
 import { DeviceScanScreen } from './screens/DeviceScanScreen';
 import { useNavigation } from './hooks/useNavigation';
 import { useUpdateChecker } from './hooks/useUpdateChecker';
+import { useDemoHotkeys } from './hooks/useDemoHotkeys';
 
 function App() {
   const {
@@ -36,6 +37,7 @@ function App() {
 
   const { t } = useTranslation();
   const { checkForUpdates, downloadAndInstall } = useUpdateChecker();
+  useDemoHotkeys();
 
   useEffect(() => {
     checkForUpdates().then((update) => {

@@ -10,7 +10,7 @@ import { deriveScenario, type ScenarioContext } from '../utils/deriveScenario';
 import { PingBadge } from '../components/PingBadge';
 import { CloseButton } from '../components/WindowControls';
 import { useDiagnosticsStore, type NetworkNode } from '../stores/diagnosticsStore';
-import { useVpnStore } from '../stores/vpnStore';
+import { useVpnState } from '../hooks/useVpnState';
 import { useLivePing } from '../hooks/useLivePing';
 import { openUrl } from '@tauri-apps/plugin-opener';
 import { useState, useCallback } from 'react';
@@ -49,7 +49,7 @@ export function DiagnosticsScreen({ onBack, onNavigateToDnsProviders, onNavigate
     scenarioOverride,
   } = useDiagnosticsStore();
 
-  const { configs: vpnConfigs, connectionState } = useVpnStore();
+  const { configs: vpnConfigs, connectionState } = useVpnState();
 
   // Live ping for Router and Internet nodes
   const routerGatewayIp = getRawResult('dns')?.router?.gateway_ip ?? null;
