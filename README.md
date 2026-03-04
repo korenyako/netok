@@ -22,7 +22,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/netok-start.gif" alt="Netok — network diagnostics demo">
+  <img src="docs/screenshots/netok-flow.gif" alt="Netok — network diagnostics demo">
 </p>
 
 <p align="center">
