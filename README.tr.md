@@ -9,8 +9,8 @@
 <h1 align="center">Netok</h1>
 
 <p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/Lisans-GPL--3.0-blue?style=flat-square" alt="Lisans: GPL-3.0"></a>
-  <a href="https://github.com/korenyako/netok/releases"><img src="https://img.shields.io/github/downloads/korenyako/netok/total?style=flat-square&label=%C4%B0ndirmeler" alt="Toplam indirmeler"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/Lisans-GPL--3.0-blue?style=for-the-badge" alt="Lisans: GPL-3.0"></a>
+  <a href="https://github.com/korenyako/netok/releases"><img src="https://img.shields.io/github/downloads/korenyako/netok/total?style=for-the-badge" alt="Toplam indirmeler"></a>
 </p>
 
 <p align="center">

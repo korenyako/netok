@@ -9,8 +9,8 @@
 <h1 align="center">Netok</h1>
 
 <p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/Licencia-GPL--3.0-blue?style=flat-square" alt="Licencia: GPL-3.0"></a>
-  <a href="https://github.com/korenyako/netok/releases"><img src="https://img.shields.io/github/downloads/korenyako/netok/total?style=flat-square&label=Descargas" alt="Descargas totales"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/Licencia-GPL--3.0-blue?style=for-the-badge" alt="Licencia: GPL-3.0"></a>
+  <a href="https://github.com/korenyako/netok/releases"><img src="https://img.shields.io/github/downloads/korenyako/netok/total?style=for-the-badge" alt="Descargas totales"></a>
 </p>
 
 <p align="center">
