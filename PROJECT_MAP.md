@@ -34,7 +34,6 @@ Generated: 2026-03-05
 │   ├── IMPLEMENTATION-PLAN.md
 │   ├── MOBILE-PLAN.md
 │   ├── README.md
-│   ├── SoT-ARCH.md
 │   ├── SPEED-TEST-INTERNALS.md
 │   ├── TESTING.md
 │   ├── UI-SPEC.md

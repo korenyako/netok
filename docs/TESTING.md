@@ -1,146 +1,201 @@
-# План ручного тестирования Netok
+# Manual Testing Plan — Netok
 
-## Введение
+## Introduction
 
-Этот документ содержит сценарии для ручного тестирования приложения Netok в различных условиях сети. Цель — убедиться, что приложение корректно определяет проблемы и показывает понятные сообщения пользователю.
+This document contains scenarios for manually testing the Netok application under various network conditions. The goal is to verify that the app correctly identifies problems and shows clear messages to the user.
 
-**Когда использовать:**
-- Перед релизом новой версии
-- После изменений в модуле диагностики (`netok_core/src/diagnostics.rs`)
-- При добавлении новых сообщений об ошибках
-
----
-
-## Подготовка к тестированию
-
-### Необходимо
-
-- [ ] Приложение Netok запущено
-- [ ] Права администратора (для изменения DNS)
-- [ ] Доступ к роутеру (для некоторых сценариев)
-- [ ] Возможность отойти от роутера (для теста слабого сигнала)
-
-### Рекомендуется
-
-- Тестировать на реальном железе (не в VM)
-- Иметь мобильный интернет как резерв
-- Записывать скриншоты результатов
+**When to use:**
+- Before releasing a new version
+- After changes to the diagnostics module (`netok_core/src/diagnostics.rs`)
+- When adding new error messages
 
 ---
 
-## Чеклист тестирования
+## Test Preparation
 
-### Легенда статусов
+### Required
 
-| Статус | Значение |
-|--------|----------|
-| ✅ | Тест пройден |
-| ❌ | Тест провален |
-| ⚠️ | Частично работает |
-| ⏳ | Не проверено |
+- [ ] Netok application running
+- [ ] Administrator privileges (for DNS changes)
+- [ ] Access to router (for some scenarios)
+- [ ] Ability to move away from router (for weak signal test)
 
----
+### Recommended
 
-### Сценарии ошибок
-
-| # | Сценарий | Как воспроизвести (Windows) | Ожидаемое сообщение (RU) | Ожидаемое сообщение (EN) | Результат |
-|---|----------|----------------------------|--------------------------|--------------------------|-----------|
-| 1 | **Wi-Fi адаптер отключен** | Трей → значок сети → Wi-Fi → Выкл. Или: Диспетчер устройств → Сетевые адаптеры → ПКМ на Wi-Fi → Отключить | Адаптер Wi-Fi выключен. Включите Wi-Fi в настройках Windows. | Wi-Fi adapter is disabled. Turn on Wi-Fi in Windows settings. | ⏳ |
-| 2 | **Wi-Fi включен, но не подключен** | Настройки → Сеть → Wi-Fi → текущая сеть → Забыть. Или: выключить роутер | Нет подключения к Wi-Fi. Выберите сеть и подключитесь. | Not connected to Wi-Fi. Select a network and connect. | ⏳ |
-| 3 | **Подключен к Wi-Fi, роутер не отвечает** | Выключить роутер из розетки (Wi-Fi на ноутбуке останется "подключённым" несколько секунд) | Роутер не отвечает. Проверьте, включён ли роутер и горят ли на нём индикаторы. | Router is not responding. Check if your router is powered on and its lights are on. | ⏳ |
-| 4 | **Роутер работает, нет интернета** | Выдернуть WAN-кабель (интернет-кабель) из роутера. Или: позвонить провайдеру и попросить временно отключить | Роутер работает, но интернет отсутствует. Проверьте кабель от провайдера или позвоните в поддержку. | Router is working, but there's no internet. Check the cable from your provider or contact support. | ⏳ |
-| 5 | **DNS не работает** | Панель управления → Сеть → Свойства адаптера → IPv4 → Использовать DNS: `1.2.3.4` | Не удаётся найти адреса сайтов. Попробуйте сменить DNS на автоматический или используйте Cloudflare (1.1.1.1). | Cannot resolve website addresses. Try switching DNS to automatic or use Cloudflare (1.1.1.1). | ⏳ |
-| 6 | **DNS работает, HTTP заблокирован** | Брандмауэр Windows → Правила исходящие → Заблокировать порты 80 и 443. Или: VPN с kill-switch → отключить VPN | Интернет частично работает. Сайты недоступны, но DNS отвечает. Проверьте настройки VPN или брандмауэра. | Internet is partially working. Websites are unavailable, but DNS responds. Check your VPN or firewall settings. | ⏳ |
-| 7 | **Слабый Wi-Fi сигнал** | Уйти в дальнюю комнату / за несколько стен от роутера | Слабый сигнал Wi-Fi. Подойдите ближе к роутеру или проверьте, нет ли помех. | Weak Wi-Fi signal. Move closer to your router or check for interference. | ⏳ |
-| 8 | **Всё работает нормально** | Обычное подключение к домашней сети | Интернет работает. | Internet is working. | ⏳ |
+- Test on real hardware (not in a VM)
+- Have mobile internet as backup
+- Take screenshots of results
 
 ---
 
-### Дополнительные сценарии (edge cases)
+## Test Checklist
 
-| # | Сценарий | Как воспроизвести | Ожидаемое поведение | Результат |
-|---|----------|-------------------|---------------------|-----------|
-| 9 | **Ethernet вместо Wi-Fi** | Подключить кабель напрямую к ноутбуку | Показывает "Ethernet" вместо "Wi-Fi", диагностика работает | ⏳ |
-| 10 | **Несколько сетевых адаптеров** | VPN + Wi-Fi одновременно | Определяет активный адаптер, показывает корректный IP | ⏳ |
-| 11 | **Очень медленный интернет** | Ограничить скорость через роутер (QoS) до 100 Кбит/с | Диагностика завершается (может дольше), показывает статус | ⏳ |
-| 12 | **Публичный Wi-Fi с captive portal** | Подключиться к Wi-Fi в кафе/аэропорту без авторизации | Показывает что интернет недоступен, предлагает открыть страницу авторизации | ⏳ |
+### Status Legend
+
+| Status | Meaning |
+|--------|---------|
+| ✅ | Test passed |
+| ❌ | Test failed |
+| ⚠️ | Partially working |
+| ⏳ | Not tested |
 
 ---
 
-## Откат изменений после тестирования
+### Error Scenarios
 
-### Вернуть DNS в автоматический режим
+| # | Scenario | How to reproduce (Windows) | Expected message (RU) | Expected message (EN) | Result |
+|---|----------|----------------------------|----------------------|----------------------|--------|
+| 1 | **Wi-Fi adapter disabled** | Tray → network icon → Wi-Fi → Off. Or: Device Manager → Network adapters → Right-click Wi-Fi → Disable | Адаптер Wi-Fi выключен. Включите Wi-Fi в настройках Windows. | Wi-Fi adapter is disabled. Turn on Wi-Fi in Windows settings. | ⏳ |
+| 2 | **Wi-Fi on but not connected** | Settings → Network → Wi-Fi → current network → Forget. Or: turn off router | Нет подключения к Wi-Fi. Выберите сеть и подключитесь. | Not connected to Wi-Fi. Select a network and connect. | ⏳ |
+| 3 | **Connected to Wi-Fi, router not responding** | Unplug router (Wi-Fi on laptop will stay "connected" for a few seconds) | Роутер не отвечает. Проверьте, включён ли роутер и горят ли на нём индикаторы. | Router is not responding. Check if your router is powered on and its lights are on. | ⏳ |
+| 4 | **Router works, no internet** | Unplug WAN cable from router. Or: ask ISP to temporarily disconnect | Роутер работает, но интернет отсутствует. Проверьте кабель от провайдера или позвоните в поддержку. | Router is working, but there's no internet. Check the cable from your provider or contact support. | ⏳ |
+| 5 | **DNS not working** | Control Panel → Network → Adapter Properties → IPv4 → Use DNS: `1.2.3.4` | Не удаётся найти адреса сайтов. Попробуйте сменить DNS на автоматический или используйте Cloudflare (1.1.1.1). | Cannot resolve website addresses. Try switching DNS to automatic or use Cloudflare (1.1.1.1). | ⏳ |
+| 6 | **DNS works, HTTP blocked** | Windows Firewall → Outbound Rules → Block ports 80 and 443. Or: VPN with kill-switch → disconnect VPN | Интернет частично работает. Сайты недоступны, но DNS отвечает. Проверьте настройки VPN или брандмауэра. | Internet is partially working. Websites are unavailable, but DNS responds. Check your VPN or firewall settings. | ⏳ |
+| 7 | **Weak Wi-Fi signal** | Move to a distant room / behind several walls from the router | Слабый сигнал Wi-Fi. Подойдите ближе к роутеру или проверьте, нет ли помех. | Weak Wi-Fi signal. Move closer to your router or check for interference. | ⏳ |
+| 8 | **Everything works normally** | Normal home network connection | Интернет работает. | Internet is working. | ⏳ |
 
-1. Панель управления → Центр управления сетями
-2. Изменение параметров адаптера
-3. ПКМ на активном адаптере → Свойства
-4. IPv4 → Свойства
-5. Выбрать "Получить адрес DNS-сервера автоматически"
+---
+
+### Edge Cases
+
+| # | Scenario | How to reproduce | Expected behavior | Result |
+|---|----------|-----------------|-------------------|--------|
+| 9 | **Ethernet instead of Wi-Fi** | Plug cable directly into laptop | Shows "Ethernet" instead of "Wi-Fi", diagnostics work | ⏳ |
+| 10 | **Multiple network adapters** | VPN + Wi-Fi simultaneously | Detects active adapter, shows correct IP | ⏳ |
+| 11 | **Very slow internet** | Throttle speed via router (QoS) to 100 Kbps | Diagnostics complete (may take longer), shows status | ⏳ |
+| 12 | **Public Wi-Fi with captive portal** | Connect to Wi-Fi in a cafe/airport without authorization | Shows internet unavailable, suggests opening authorization page | ⏳ |
+
+---
+
+### Speed Test (NDT7)
+
+| # | Scenario | How to reproduce | Expected behavior | Result |
+|---|----------|-----------------|-------------------|--------|
+| 13 | **Normal speed** | Run speed test on a good connection | Shows download/upload/ping/latency/jitter, task checklist (4K, gaming, etc.) | ⏳ |
+| 14 | **Slow connection** | Throttle speed to <10 Mbps (QoS or tethering) | "Low speed" warning, 4K/HD video tasks fail | ⏳ |
+| 15 | **Repeat run (cooldown)** | Run test again immediately after completion | 60-second cooldown, button disabled | ⏳ |
+| 16 | **No internet** | Disconnect internet before test | Test doesn't start (checks diagnosticsStore) | ⏳ |
+
+---
+
+### Wi-Fi Security
+
+| # | Scenario | How to reproduce | Expected behavior | Result |
+|---|----------|-----------------|-------------------|--------|
+| 17 | **WPA2 network, normal** | Connect to a regular WPA2 network | Encryption: Safe (WPA2), all 4 checks pass | ⏳ |
+| 18 | **Open network** | Connect to an open Wi-Fi network | Encryption: Danger (Open) | ⏳ |
+| 19 | **ARP spoofing** | Artificially create a duplicate MAC in ARP table | ARP Spoofing: Warning or Danger | ⏳ |
+| 20 | **DNS hijacking** | Set custom DNS that intercepts example.com | DNS Hijacking: Warning | ⏳ |
+
+---
+
+### DNS Management
+
+| # | Scenario | How to reproduce | Expected behavior | Result |
+|---|----------|-----------------|-------------------|--------|
+| 21 | **Switch DNS to Cloudflare** | Security → DNS → select Cloudflare 1.1.1.1 | DNS changes, test shows reachable | ⏳ |
+| 22 | **Restore system DNS** | Security → DNS → select Auto | DNS reverts to DHCP | ⏳ |
+| 23 | **Custom DNS** | Security → DNS → Custom → enter IP | IPv4 validation, apply, test | ⏳ |
+| 24 | **Flush DNS cache** | Press "Flush DNS" | Runs `ipconfig /flushdns`, success notification | ⏳ |
+
+---
+
+### Network Device Scan
+
+| # | Scenario | How to reproduce | Expected behavior | Result |
+|---|----------|-----------------|-------------------|--------|
+| 25 | **Home network scan** | Tools → Device Scan → start | Shows devices with IP, MAC, vendor, device type | ⏳ |
+| 26 | **Empty network** | Disconnect all devices except current | Shows only router and current device | ⏳ |
+
+---
+
+### VPN Tunnel
+
+| # | Scenario | How to reproduce | Expected behavior | Result |
+|---|----------|-----------------|-------------------|--------|
+| 27 | **Add VPN key** | Security → VPN → Add → paste VLESS/VMess URI | URI validation, shows server | ⏳ |
+| 28 | **Connect to VPN** | Security → VPN → Connect | sing-box starts (elevated), IP changes | ⏳ |
+| 29 | **Disconnect VPN** | Security → VPN → Disconnect | sing-box stops, IP reverts | ⏳ |
+| 30 | **Invalid key** | Enter an invalid string | Validation error, clear message | ⏳ |
+
+---
+
+## Reverting Changes After Testing
+
+### Restore DNS to automatic
+
+1. Control Panel → Network and Sharing Center
+2. Change adapter settings
+3. Right-click active adapter → Properties
+4. IPv4 → Properties
+5. Select "Obtain DNS server address automatically"
 6. OK → OK
 
-### Включить Wi-Fi адаптер
+### Enable Wi-Fi adapter
 
-1. Диспетчер устройств (Win+X → Диспетчер устройств)
-2. Сетевые адаптеры
-3. ПКМ на Wi-Fi адаптере → Включить устройство
+1. Device Manager (Win+X → Device Manager)
+2. Network adapters
+3. Right-click Wi-Fi adapter → Enable device
 
-### Разблокировать порты в брандмауэре
+### Unblock firewall ports
 
-1. Брандмауэр Windows в режиме повышенной безопасности
-2. Правила для исходящего подключения
-3. Найти созданные тестовые правила → Удалить
+1. Windows Firewall with Advanced Security
+2. Outbound Rules
+3. Find test rules you created → Delete
 
-### Включить роутер
+### Turn on router
 
-1. Включить роутер в розетку
-2. Подождать 1-2 минуты до полной загрузки
-3. Подключить WAN-кабель если был отключён
+1. Plug router back in
+2. Wait 1-2 minutes for full boot
+3. Reconnect WAN cable if it was disconnected
 
 ---
 
-## Шаблон отчёта о тестировании
+## Test Report Template
 
 ```markdown
-## Отчёт о тестировании
+## Test Report
 
-**Дата:** YYYY-MM-DD
-**Версия:** X.Y.Z
-**Тестировщик:** Имя
-**ОС:** Windows 11 / 10
+**Date:** YYYY-MM-DD
+**Version:** X.Y.Z
+**Tester:** Name
+**OS:** Windows 11 / 10
 
-### Результаты
+### Results
 
-| Сценарий | Статус | Комментарий |
-|----------|--------|-------------|
-| 1. Wi-Fi адаптер отключен | ✅/❌/⚠️ | |
-| 2. Wi-Fi не подключен | ✅/❌/⚠️ | |
+| Scenario | Status | Comment |
+|----------|--------|---------|
+| 1. Wi-Fi adapter disabled | ✅/❌/⚠️ | |
+| 2. Wi-Fi not connected | ✅/❌/⚠️ | |
 | ... | | |
 
-### Найденные проблемы
+### Issues Found
 
-1. **[Критичность]** Описание проблемы
-   - Шаги воспроизведения
-   - Ожидаемое поведение
-   - Фактическое поведение
+1. **[Severity]** Issue description
+   - Steps to reproduce
+   - Expected behavior
+   - Actual behavior
 
-### Общий вывод
+### Overall Verdict
 
-[ ] Готово к релизу
-[ ] Требуются исправления
+[ ] Ready for release
+[ ] Fixes required
 ```
 
 ---
 
-## История тестирования
+## Test History
 
-| Дата | Версия | Тестировщик | Пройдено | Провалено | Примечания |
-|------|--------|-------------|----------|-----------|------------|
-| — | — | — | — | — | Первый запуск тестирования |
+| Date | Version | Tester | Passed | Failed | Notes |
+|------|---------|--------|--------|--------|-------|
+| — | — | — | — | — | Initial test plan |
 
 ---
 
-## Связанные документы
+## Related Documents
 
-- [CLAUDE.md](CLAUDE.md) — руководство для разработки
-- [docs/UI-SPEC.md](docs/UI-SPEC.md) — спецификация UI
-- [docs/IMPLEMENTATION-PLAN.md](docs/IMPLEMENTATION-PLAN.md) — план реализации
+- [CLAUDE.md](../CLAUDE.md) — development guide
+- [UI-SPEC.md](UI-SPEC.md) — UI specification
+- [IMPLEMENTATION-PLAN.md](IMPLEMENTATION-PLAN.md) — implementation plan
+- [BACKEND-INTERNALS.md](BACKEND-INTERNALS.md) — backend technical reference
+- [SPEED-TEST-INTERNALS.md](SPEED-TEST-INTERNALS.md) — speed test technical reference

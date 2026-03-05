@@ -1,147 +1,99 @@
-# Netok — UI спецификация (Окно, Настройки, Токены)
+# Netok — UI Specification (Window, Settings, Tokens)
 
-Версия: **UI-SPEC v1 (2025-09-08)**
+Version: **UI-SPEC v2 (2026-03-05)**
 
-Эта спецификация фиксирует визуальные и UX-решения для MVP Netok. Без кода, только поведение и копирайт. Актуально для RU-локали (EN добавим зеркально).
+This specification defines visual and UX decisions for Netok. Behavior and copy only, no code.
 
 ---
 
-## 1) Окно приложения
+## 1) Application Window
 
-* **Дефолтный размер:** ширина **300 px**, высота **480 px**.
-* **Минимальный размер окна:** ширина **240 px**, высота **360 px**. Ниже — запрещаем.
-* **Ресайз:** свободный, поддерживаем **maximize**.
-* **Запоминание:** сохраняем последний размер/позицию и восстанавливаем при запуске.
-* **Хедер (верхний блок 3 строки):** всегда фиксирован сверху; основной контент скроллится под ним.
-* **Брейкпоинты верстки:**
+* **Default size:** width **340 px**, height **640 px**.
+* **Minimum size:** width **340 px**, height **640 px**. Below this — disallowed.
+* **Window frame:** `decorations: false`, `transparent: true` — **custom title bar** (drag region in the header).
+* **Resize:** free, supports **maximize**.
+* **Persistence:** save last size/position and restore on launch.
+* **Header:** custom title bar with drag region; main content scrolls beneath it.
+* **Layout breakpoints:**
 
-  * **Compact ≤ 320 px:** один столбец, узлы в виде строчных карточек (бусина + краткая подпись), детали сворачиваются.
-  * **Regular 321–600 px:** стандартный вид, показываем ключевые строки (IP, Сигнал, Скорость).
-  * **Spacious > 600 px:** больше отступов, подсказки, можно показывать панель деталей справа.
+  * **Compact ≤ 320 px:** single column, nodes as inline cards (dot + short label), details collapsed.
+  * **Regular 321–600 px:** standard view, key rows visible (IP, Signal, Speed).
+  * **Spacious > 600 px:** more padding, tooltips, optional detail panel on the right.
 
-## 2) Настройки (Settings)
+## 2) Navigation & Settings
 
-### MVP: Простая структура (фаза 1)
+### Navigation (Bottom Nav — 4 tabs)
 
-Для MVP используется **простая структура без сайдбара**, доступная через нижний навбар (4-я иконка).
+Bottom bar with 4 icons (no labels):
 
-**Главный экран настроек:**
-* Заголовок: "Настройки"
-* Список настроек:
-  - **Тема** → переход на экран выбора темы
-  - **Язык** → переход на экран выбора языка
-* Внизу: "Версия X.X.X"
-* Нижний навбар (4 иконки)
+| Tab | Icon | Screen | Sub-screens |
+|-----|------|--------|-------------|
+| **Home** | Netok logo (color changes by status: green/yellow/red) | StatusScreen | DiagnosticsScreen, SpeedTestScreen, DeviceScanScreen, NodeDetailScreen |
+| **Security** | Shield | ProtectionHubScreen | DnsProvidersScreen, CustomIpScreen, VpnTunnelScreen, AddVpnScreen, WiFiSecurityScreen |
+| **Tools** | Tools | ToolsScreen | DiagnosticsScreen, SpeedTestScreen, DeviceScanScreen, WiFiSecurityScreen |
+| **Settings** | Gear | SettingsScreen | ThemeSettingsScreen, LanguageSettingsScreen, CloseBehaviorSettingsScreen, AboutScreen, DebugScenariosScreen |
 
-**Экран "Тема":**
-* Заголовок: "Тема"
-* Кнопка назад (стрелка влево)
-* Радио-кнопки:
-  - ☀️ **Светлая** — "Всегда использовать светлый режим интерфейса"
-  - 🌙 **Тёмная** — "Всегда использовать тёмный режим интерфейса"
-  - 💻 **Системная** — "Следовать настройкам системы автоматически"
+Navigation is built on a custom state-based router (no react-router). Supports modal-style overlays and nested sub-screens.
 
-**Экран "Язык":**
-* Заголовок: "Язык"
-* Кнопка назад (стрелка влево)
-* Список языков с чекмарком:
-  - Deutsch
-  - English
-  - Español
-  - Français
-  - Italiano
-  - Русский ✓
+### Settings
 
-### Post-MVP: Расширенная структура (фаза 2)
+Flat list with sub-screens (no sidebar):
 
-В будущих версиях настройки расширятся:
+**Main settings screen:**
+* Title: "Settings"
+* Items:
+  - **Theme** → Light / Dark selection screen
+  - **Language** → language selection screen
+  - **Close behavior** → Minimize to tray / Quit application
+  - **About** → version, licenses, links
+  - **Debug Scenarios** (dev mode) → test diagnostics scenarios
 
-1. **Общие**
-   — Язык интерфейса
-   — Показ геоданных (вкл/выкл) *(влияет только на страну/город в «Интернет»)*
-   — Запоминать размер окна (вкл)
+## 3) Scrolling and List Behavior
 
-2. **Сеть**
-   — Тип соединения *(только чтение)*
-   — Показывать «Название сети (SSID)» (вкл)
-   — Отображать «Сигнал» (вкл)
+* Lists (nodes, settings) use **vertical scroll** when content overflows.
+* macOS: auto-hiding scrollbar. Windows/Linux: **always visible** scrollbar.
+* **Thickness:** 8 px, scroll thumb radius — 8 px, track — muted.
+* Top status block **does not scroll**.
 
-3. **DNS**
-   — Режим DNS: Автоматически / Cloudflare 1.1.1.1 / Google 8.8.8.8 / Свой вариант
-   — Поле для «Свой DNS» (валидация IPv4/IPv6)
-   — Кнопка **Очистить DNS-кэш**
+## 4) Typography and Fonts
 
-4. **Приватность**
-   — Сбор анонимной телеметрии (выкл по умолчанию)
-   — Отправлять отчёты об ошибках (спросить каждый раз)
-   — Публичный IP и гео: показывать на экране (вкл)
+* **Primary font:** **Geist** (`geist` package, weight 400/500/600).
+* **Monospace:** Geist Mono (for metrics, IP addresses, speed values).
+* **Sizes (Regular):**
+  * Page title: 16 px / 600
+  * Group headings: 14 px / 600
+  * Body text: 13 px / 400–500
+  * Captions/helper text: 12 px / 400
+* **Compact:** minus 1 px for each.
+* Line height: 1.35–1.45, clear focus states for accessibility.
 
-5. **Внешний вид**
-   — Тема: Светлая / Тёмная / Системная
-   — Плотность: Компактная / Стандартная
-   — Шрифт: Inter / Roboto *(только выбор, поставляем вместе с приложением)*
+## 5) Buttons and Interactive Elements
 
-6. **Инструменты**
-   — **Короткий тест скорости** (кнопка)
-   — **Открыть страницу входа Wi-Fi**
-   — **Открыть страницу роутера**
-   — **Скопировать результат проверки**
+* **Border radius:** 10–12 px.
+* **Padding:** minimum 8×12 px (Compact), 10×14 px (Regular).
+* **States:** default / hover / active / focus / disabled.
+* **Focus ring:** 2 px, primary/accessible color, visible on any background.
+* **Toggles, selects, inputs** — consistent style; muted placeholder, not gray-on-gray.
 
-7. **О программе**
-   — Версия приложения, лицензии шрифтов/иконок, ссылка «Сообщить о проблеме».
+## 6) Icons (SVG)
 
-**Лэйаут для расширенной версии:**
-* **Лэйаут:** слева **сайдбар** с разделами, справа — список настроек выбранного раздела.
-* **Ширина сайдбара:** 160–200 px (адаптивно: 160 в Regular, 200 в Spacious).
-* **Compact режим (≤320px):** сайдбар заменяется на **верхний таб-бар** или селектор «Раздел».
-* **Заголовок раздела** закреплён над списком настроек.
+* **Set:** Custom SVG icons in `ui/src/components/icons/` (NavigationIcons, UIIcons, DiagnosticIcons, etc.).
+* **Sizes:** 16 px (Compact), 20–24 px (Regular/Spacious).
+* **Color:** `currentColor`; stroke 1.5 px.
+* **UI components:** shadcn/ui (Radix UI primitives + Tailwind + class-variance-authority).
 
-## 3) Скролл и поведение списков
+## 7) Status Dot Indicators
 
-* В списках (узлы, настройки) при нехватке места — **вертикальный скролл**.
-* На macOS можно использовать автоскрытие, на Windows/Linux — **всегда видимый** скроллбар.
-* **Толщина:** 8 px, радиус скролл-ползунка — 8 px, трек — приглушённый.
-* Верхний блок статуса **не скроллится**.
+* **Geometry:** 10–12 px circle, 8 px right margin.
+* **States:**
+  * Working — **#22C55E** (green)
+  * Unavailable — **#EF4444** (red)
+  * Partial — **#F59E0B** (orange)
+  * Unknown — **#9CA3AF** (gray)
+  * Checking — **#3B82F6** stroke + soft pulse (500–800 ms)
+* For colorblind users, meaning is duplicated in text; color is reinforcement only.
 
-## 4) Типографика и шрифты
-
-* **Основной шрифт:** **Inter** (вес 400/500/600).
-* **Альтернатива:** Roboto (или Roboto Flex) — по переключателю в «Внешний вид».
-* **Размеры (Regular):**
-  * Заголовок страницы: 16 px / 600
-  * Заголовки групп: 14 px / 600
-  * Обычный текст: 13 px / 400–500
-  * Подписи/вспомогательный текст: 12 px / 400
-* **Compact:** минус 1 px к каждому пункту.
-* Межстрочный: 1.35–1.45, чёткие фокусы для доступности.
-
-## 5) Кнопки и интерактив
-
-* **Радиус:** 10–12 px.
-* **Паддинги:** минимум 8×12 px (Compact), 10×14 px (Regular).
-* **Состояния:** default / hover / active / focus / disabled.
-* **Фокус-кольцо:** 2 px, цвет primary/доступный, видимый на любом фоне.
-* **Тумблеры, селекты, инпуты** — единый стиль; placeholder приглушённый, не серый-на-сером.
-
-## 6) Иконки (SVG)
-
-* Рекомендация: **Lucide** *или* **Material Symbols Rounded** (единый набор на весь проект).
-* **Размеры:** 16 px (Compact), 20–24 px (Regular/Spacious).
-* **Цвет:** `currentColor`; stroke 1.5 px (для Lucide).
-* **Набор на MVP:** Copy, External Link, Refresh, Settings, Info, Chevron, Globe, Wifi, Ethernet, Router, Computer.
-
-## 7) Бусины-индикаторы
-
-* **Геометрия:** круг 10–12 px, отступ справа 8 px.
-* **Состояния:**
-  * Работает — **#22C55E** (зелёный)
-  * Недоступно — **#EF4444** (красный)
-  * Частично — **#F59E0B** (оранжевый)
-  * Неизвестно — **#9CA3AF** (серый)
-  * Идёт проверка — обводка **#3B82F6** + мягкая пульсация (500–800 мс)
-* Для дальтоников смысл дублируем фактом в тексте; цвет — лишь усиление.
-
-## 8) Цветовые токены (Light/Dark)
+## 8) Color Tokens (Light/Dark)
 
 ### Light
 
@@ -150,7 +102,7 @@
 * Text Primary: **#111827**
 * Text Secondary: **#6B7280**
 * Border/Subtle: **#E5E7EB**
-* Primary (акценты/фокус): **#3B82F6**
+* Primary (accents/focus): **#3B82F6**
 * Danger: **#EF4444**
 * Warning: **#F59E0B**
 * Success: **#22C55E**
@@ -167,179 +119,152 @@
 * Warning: **#FBBF24**
 * Success: **#34D399**
 
-## 9) Копирайт (RU) — готовые строки
+## 9) UI Copy Reference
 
-* Верхний блок:  
-  — «Интернет работает.» / «Интернет недоступен.» / «Интернет частично.»  
-  — «Скорость: {down}/{up} Мбит/с»
-* Кнопки: «Обновить», «Настройки», «Копировать», «Открыть страницу роутера», «Открыть страницу входа Wi-Fi»
-* Узлы: **Компьютер → Сеть → Роутер → Интернет**
-* Сеть (Wi-Fi): «Сигнал: отличный/хороший/средний/слабый ({rssi} dBm)», «Название сети: {ssid}»
-* Сеть (Кабель): «Линк: есть/нет»
-* Роутер: «IP в локальной сети: {ip}»
-* Интернет: «Оператор: {isp}», «IP: {ip}», «{country}, {city}» *(если включено)*
-* Экспорт: «Результат проверки Netok — {date} {time}»
+* Top block:
+  — "Internet is working." / "Internet is unavailable." / "Internet is partially working."
+  — "Speed: {down}/{up} Mbps"
+* Buttons: "Refresh", "Settings", "Copy", "Open router page", "Open Wi-Fi login page"
+* Nodes: **Computer → Network → Router → Internet**
+* Network (Wi-Fi): "Signal: excellent/good/fair/weak ({rssi} dBm)", "Network name: {ssid}"
+* Network (Cable): "Link: up/down"
+* Router: "LAN IP: {ip}"
+* Internet: "ISP: {isp}", "IP: {ip}", "{country}, {city}" *(if enabled)*
+* Export: "Netok check result — {date} {time}"
 
-## 10) Правила «неизвестно»
+## 10) "Unknown" Value Rules
 
-* Показываем «неизвестно» **только для важных полей** (например, «Сигнал: неизвестно»).
-* Второстепенные строки — **скрываем**.
-* Если SSID есть, а RSSI нет — показываем SSID и «Сигнал: неизвестно».
-* Если оператор не определён — показываем только IP (без строки «Оператор»).
+* Show "unknown" **only for important fields** (e.g. "Signal: unknown").
+* Secondary fields — **hide entirely**.
+* If SSID is present but RSSI is not — show SSID and "Signal: unknown".
+* If ISP is not determined — show only IP (omit the "ISP" row).
 
-## 11) QA-сценарии (минимальный набор)
+## 11) QA Scenarios (minimum set)
 
-1. **Первый запуск**: SSID есть, RSSI нет → SSID виден, «Сигнал: неизвестно».
-2. **После «Обновить»**: появился RSSI → показываем уровень сигнала; последующие обновления не откатывают в «неизвестно», пока драйвер стабилен.
-3. **Окно 240×360**: всё кликабельно, скролл есть, хедер фиксирован.
-4. **Настройки/сайдбар**: при ширине 300 px сайдбар превращается в таб-бар; при 800+ — обычный двухколоночный вид.
-5. **Фокус-навигация**: все интерактивные элементы доступны по клавиатуре, видно кольцо фокуса.
-6. **Тёмная тема**: контраст текста и интерактивов ≥ WCAG AA.
+1. **First launch:** SSID present, RSSI missing → SSID visible, "Signal: unknown".
+2. **After "Refresh":** RSSI appears → show signal level; subsequent refreshes don't revert to "unknown" while driver is stable.
+3. **Window 340×640:** everything clickable, scroll works, header is fixed.
+4. **Settings:** flat list navigation, sub-screens with back button.
+5. **Focus navigation:** all interactive elements reachable by keyboard, focus ring visible.
+6. **Dark theme:** text and interactive contrast ≥ WCAG AA.
 
-## 12) Предустановленные ассеты
+## 12) Bundled Assets
 
-* **Шрифты:** Inter (Regular, Medium, SemiBold).
-* **Иконки:** выбранная библиотека (вся в /assets/icons, SVG, префикс `ic_*.svg`).
-* **Бусины:** рисуем вектором (круги), без эмодзи.
+* **Fonts:** Geist (Regular, Medium, SemiBold), Geist Mono.
+* **Icons:** custom SVGs in `ui/src/components/icons/`.
+* **Notifications:** Sonner (`sonner` v2) — toast notifications.
+* **UI components:** shadcn/ui (Radix UI + Tailwind + CVA).
+* **Status dots:** drawn as vector circles, no emoji.
 
-## 13) Интернационализация (i18n)
+## 13) Internationalization (i18n)
 
-### Архитектура системы
+### Architecture
 
-* **Система:** Hybrid JSON + hardcoded для производительности
-* **Файлы:** `/i18n/en.json`, `/i18n/ru.json` (JSON формат)
-* **Модуль:** `/desktop/src/i18n.rs` с функциями `s()`, `t()`, `is_fact_key()`
-* **Fallback:** английский → hardcoded → error message
-* **Загрузка:** один раз при старте, переключение мгновенное
+* **System:** JSON files + React i18next (frontend only)
+* **Files:** `i18n/en.json`, `i18n/ru.json`
+* **Module:** `ui/src/i18n.ts` — i18next initialization
+* **Fallback:** current language → English → key
+* **Loading:** once at startup, switching is instant
+* **Rust-side i18n:** none. Rust returns i18n keys (e.g. `"diagnostic.scenario.wifi_disabled.title"`), frontend translates
 
-### Категории ключей
+### Usage in Code
 
-* **General:** основные элементы (`AppName`, `Loading`, `Settings`)
-* **Nodes:** названия узлов (`NodeComputer`, `NodeNetwork`, `NodeRouter`, `NodeInternet`)
-* **Network types:** типы сетей (`NetworkWifi`, `NetworkCable`, `NetworkUsbModem`)
-* **Fact keys:** ключи данных (`FactSignal`, `FactType`, `FactModel`)
-* **Settings:** разделы настроек (`SettingsGeneral`, `SettingsDns`)
-* **Status:** статусы интернета (`InternetOk`, `InternetPartial`, `InternetDown`)
+```typescript
+import { useTranslation } from 'react-i18next';
 
-### Функции API
+function MyComponent() {
+  const { t } = useTranslation();
 
-#### Простые строки: `s(S::Key)`
-
-```rust
-// Базовое использование
-text(s(S::AppName))           // "Netok"
-button(s(S::Refresh))         // "Обновить" / "Refresh"
-title(s(S::NodeComputer))     // "Компьютер" / "Computer"
-```
-
-#### Шаблонные строки: `t(key, args)`
-
-```rust
-// Скорость интернета
-t("SpeedValue", &[("down", "100"), ("up", "50")])
-// → "Скорость: 100/50 Мбит/с" / "Speed: 100/50 Mbps"
-
-// Сигнал Wi-Fi
-t("SignalValue", &[("grade", "отличный"), ("dbm", "-45")])
-// → "отличный (-45 dBm)" / "excellent (-45 dBm)"
-```
-
-#### Проверка ключей данных: `is_fact_key(fact, S::Key)`
-
-```rust
-// Умная проверка фактов в обоих языках
-if is_fact_key(fact_name, S::FactSignal) {
-    // Обрабатываем "Сигнал" или "Signal"
-}
-if is_fact_key(fact_name, S::FactType) {
-    // Обрабатываем "Тип" или "Type"
+  return (
+    <div>
+      <h1>{t('AppName')}</h1>
+      <p>{t('SpeedValue', { down: '100', up: '50' })}</p>
+    </div>
+  );
 }
 ```
 
-### Правила локализации
+### Localization Rules
 
-#### Русский язык (ru.json)
+#### Russian (ru.json)
 
-* **Тон:** профессиональный, дружелюбный
-* **Терминология:** устоявшиеся IT-термины (DNS, IP, Wi-Fi)
-* **Сокращения:** используем (`Вкл`/`Выкл`, `Мбит/с`)
-* **Пунктуация:** русская типографика (`...` вместо `…`)
-* **Соответствие:** терминология Windows/macOS на русском
+* **Tone:** professional, friendly
+* **Terminology:** established IT terms (DNS, IP, Wi-Fi)
+* **Abbreviations:** standard Russian (`Вкл`/`Выкл`, `Мбит/с`)
+* **Punctuation:** Russian typography
+* **Consistency:** Windows/macOS Russian terminology
 
-#### Английский язык (en.json)
+#### English (en.json)
 
-* **Тон:** четко, кратко
-* **Терминология:** стандартные технические термины
-* **Сокращения:** принятые (`On`/`Off`, `Mbps`)
-* **Пунктуация:** стандартная английская
-* **Соответствие:** платформенные конвенции
+* **Tone:** clear, concise
+* **Terminology:** standard technical terms
+* **Abbreviations:** standard (`On`/`Off`, `Mbps`)
+* **Punctuation:** standard English
+* **Consistency:** platform conventions
 
-#### Универсальные правила
+#### Universal Rules
 
-* **Плейсхолдеры:** сохраняем `{key}` без изменений
-* **Контекст:** учитываем ограничения места в UI
-* **Пользователь:** пишем с точки зрения пользователя
-* **Доступность:** избегаем сложного жаргона
+* **Placeholders:** preserve `{key}` unchanged
+* **Context:** consider UI space constraints
+* **User-facing:** write from the user's perspective
+* **Accessibility:** avoid complex jargon
 
-### Переключение языка
+### Language Switching
 
-* **UI расположение:** Настройки → Общие → Язык
-* **Радио-кнопки:** Русский / English
-* **Применение:** мгновенное, без перезапуска
-* **Сохранение:** только в памяти (планируется persistence)
-* **По умолчанию:** русский язык
+* **UI location:** Settings → Language
+* **Options:** Russian / English
+* **Application:** instant, no restart required
+* **Persistence:** in memory (persistence planned)
+* **Default:** Russian
 
-### Техническая интеграция
+### Technical Integration
 
-#### Добавление новых строк
+#### Adding New Strings
 
-1. **Enum:** добавить в `S` enum (`/desktop/src/i18n.rs`)
-2. **Maps:** добавить в `RU` и `EN` static maps
-3. **JSON:** обновить `en.json` и `ru.json`
-4. **Код:** использовать `s(S::NewKey)` в UI
+1. Add key to `i18n/en.json` and `i18n/ru.json`
+2. Use `t('NewKey')` in React code
 
-#### Проверка качества
+#### Quality Checks
 
-* **Pre-commit hook:** блокирует кириллицу в `desktop/src/`
-* **Тесты:** `cargo test test_i18n` для базовой проверки
-* **Ручное тестирование:** переключение языков в приложении
+* **Pre-commit hook:** blocks Cyrillic in source files
+* **Manual testing:** switch languages in the app
 
-#### Добавление языков
+#### Adding Languages
 
-1. Создать `/i18n/xx.json` (где xx — код языка)
-2. Скопировать из `en.json`, перевести значения
-3. При необходимости добавить в UI селектор языка
+1. Create `/i18n/xx.json` (where xx = language code)
+2. Copy from `en.json`, translate values
+3. Add to UI language selector if needed
 
-### Анти-паттерны (НЕ делать)
+### Anti-patterns (DON'T)
 
-* ❌ Хардкод текста: `text("Настройки")` → ✅ `text(s(S::Settings))`
-* ❌ Прямое сравнение: `k == "Сигнал"` → ✅ `is_fact_key(k, S::FactSignal)`
-* ❌ Смешивание языков: русские ключи в английском интерфейсе
-* ❌ Забывать плейсхолдеры: `"{down} Мбит/с"` без подстановки
+* ❌ Hardcoded text: `<p>Settings</p>` → ✅ `<p>{t('Settings')}</p>`
+* ❌ Cyrillic in `.tsx`/`.ts` files — all strings via `t()`
+* ❌ Forgetting placeholders: `"{down} Mbps"` without substitution
 
-### Производительность
+### Performance
 
-* **Startup:** загрузка JSON ~1ms
+* **Startup:** JSON loading ~1ms
 * **Runtime:** HashMap lookup ~10ns
-* **Memory:** ~50KB для всех переводов
-* **Switching:** ~100μs для переключения языка
+* **Memory:** ~50KB for all translations
+* **Switching:** ~100μs for language change
 
-### Расширения (roadmap)
+### Roadmap
 
-* **Persistence:** сохранение выбора языка в конфиге
-* **Pluralization:** правила для множественного числа
-* **RTL support:** поддержка арабского/иврита
-* **Dynamic loading:** загрузка переводов по требованию
+* **Persistence:** save language choice in config
+* **Pluralization:** plural form rules
+* **RTL support:** Arabic/Hebrew layout support
+* **Dynamic loading:** load translations on demand
 
-## 14) Открытые вопросы (для следующей итерации)
+## 14) Open Questions (next iteration)
 
-* Нужно ли в «Внешний вид» переключение размера шрифта (Small/Medium/Large)?
-* Анимации: оставляем только пульсацию у «идёт проверка» или добавляем fade-in у обновлений строк?
+* Should "Appearance" include font size toggle (Small/Medium/Large)?
+* Animations: keep only the pulse on "checking" or add fade-in for row updates?
 
 ---
 
 ## Changelog
 
-* 2025-09-11: v1.2 — расширен раздел i18n (§13) с подробными правилами и примерами.
-* 2025-01-11: v1.1 — добавлены правила i18n (§13).
-* 2025-09-08: v1 — первичная фиксация UI-SPEC (Окно, Настройки, Токены).
+* 2026-03-05: v2 — updated: window size (340×640), custom title bar, Geist font, navigation (4 tabs), shadcn/ui, Sonner, removed non-existent Rust-side i18n, translated to English.
+* 2025-09-11: v1.2 — expanded i18n section (§13) with detailed rules and examples.
+* 2025-01-11: v1.1 — added i18n rules (§13).
+* 2025-09-08: v1 — initial UI-SPEC (Window, Settings, Tokens).

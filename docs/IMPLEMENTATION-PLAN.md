@@ -1,154 +1,159 @@
 # Netok — Implementation Plan (Network Diagnostics)
 
-**Версия:** v1.0
-**Дата:** 2025-11-13
-**Статус:** Draft → Review → Accepted
+**Version:** v2.0
+**Date:** 2026-03-05
+**Status:** Accepted (most features implemented)
 
 ---
 
-## Общая логика
+## Overview
 
-Netok строит **цепочку соединения** из четырёх узлов:
+Netok builds a **connection chain** of four nodes:
 
 ```
-Компьютер → Сеть → Роутер → Интернет
+Computer → Network → Router → Internet
 ```
 
-Для каждого узла собираются данные из системных источников.
-**Принцип:** Core всё делает локально — никакого своего сервера.
+Each node gathers data from system sources.
+**Principle:** Core does everything locally — no proprietary server.
+
+Detailed technical documentation: [BACKEND-INTERNALS.md](BACKEND-INTERNALS.md)
 
 ---
 
-## 1. Компьютер (Computer Node)
+## 1. Computer Node
 
-### Что определяем:
+### Parameters:
 
-| Параметр | Описание | Приоритет |
-|----------|----------|-----------|
-| **Hostname** | Имя хоста | MVP |
-| **Local IP** | Локальный IP в LAN (первый приватный IPv4) | MVP |
-| **Active Adapter** | Имя активного сетевого адаптера | MVP |
-| **Adapter Model** | Модель адаптера (например "Realtek 8822CE") | Post-MVP |
-| **Device Model** | Модель устройства (например "Dell OptiPlex 7090") | Post-MVP |
-| **Connection Type** | wifi / ethernet / usb / mobile | MVP |
+| Parameter | Description | Status |
+|-----------|-------------|--------|
+| **Hostname** | Machine hostname | ✅ Implemented |
+| **Local IP** | LAN IP address (first private IPv4) | ✅ Implemented |
+| **Active Adapter** | Active network adapter name | ✅ Implemented |
+| **Connection Type** | wifi / ethernet / usb / mobile / disabled / disconnected | ✅ Implemented |
+| **Adapter Model** | Adapter model (from WLAN API `InterfaceDescription`) | ✅ Implemented |
+| **Device Model** | Device model (e.g. "Dell OptiPlex 7090") | ❌ Not implemented |
 
-### Как определяется:
+### Detection methods:
 
-| ОС | Метод | Статус |
-|----|-------|--------|
-| **Windows** | `WinAPI` (GetAdaptersAddresses, GetIfEntry2) | ✅ Частично (hostname, local_ip, adapter name) |
-| **Linux** | `/sys/class/net/*` + `ip addr show` | ✅ Частично (через get_if_addrs) |
-| **macOS** | `ifconfig` + SystemConfiguration | ✅ Частично (через get_if_addrs) |
+| OS | Method | Status |
+|----|--------|--------|
+| **Windows** | `hostname` crate + `get_if_addrs` + WLAN API (`WlanEnumInterfaces` → `strInterfaceDescription`) | ✅ |
+| **Linux** | `hostname` crate + `get_if_addrs` | ✅ Partial |
+| **macOS** | `hostname` crate + `get_if_addrs` | ✅ Partial |
 
-### Текущая реализация:
-- ✅ [netok_core/src/lib.rs:61-98](netok_core/src/lib.rs#L61-L98) - `get_computer_info()`
-- ✅ Получает: hostname, adapter name, local_ip
-- ❌ TODO: Connection Type, Adapter Model, Device Model
+### Implementation:
+- `netok_core/src/diagnostics.rs` — `get_computer_info()`
+- `netok_core/src/infrastructure/wifi.rs` — `get_wifi_info()` (adapter description)
+- `netok_core/src/infrastructure/connection.rs` — `detect_connection_type()`
 
 ---
 
-## 2. Сеть (Network Node)
+## 2. Network Node
 
-### Что определяем:
+### Parameters:
 
-| Параметр | Описание | Приоритет |
-|----------|----------|-----------|
-| **Type** | Wi-Fi / Ethernet / USB / Mobile | MVP |
-| **SSID** | Имя Wi-Fi сети (только для Wi-Fi) | MVP |
-| **RSSI** | Уровень сигнала в dBm (только для Wi-Fi) | MVP |
-| **Signal Quality** | Оценка: отличный/хороший/средний/слабый | MVP |
-| **Channel** | Канал Wi-Fi (например 6, 36) | Post-MVP |
-| **Frequency** | Частота: 2.4 GHz / 5 GHz | Post-MVP |
-| **Link Speed** | Скорость соединения (Mbps) | Post-MVP |
+| Parameter | Description | Status |
+|-----------|-------------|--------|
+| **Type** | Wi-Fi / Ethernet / USB / Mobile / Disabled / Disconnected | ✅ Implemented |
+| **SSID** | Wi-Fi network name | ✅ Implemented |
+| **RSSI** | Signal level in dBm | ✅ Implemented |
+| **Signal Quality** | Rating: excellent/good/fair/weak | ✅ Implemented |
+| **Channel** | Wi-Fi channel (e.g. 6, 36) | ✅ Implemented |
+| **Frequency** | Band: 2.4 GHz / 5 GHz / 6 GHz | ✅ Implemented |
+| **Link Speed** | Connection speed (Mbps) | ✅ Implemented |
+| **Wi-Fi Standard** | Wi-Fi 4/5/6/6E/7 | ✅ Implemented |
+| **Encryption** | WPA2/WPA3/WEP/Open | ✅ Implemented |
+| **Legacy Wi-Fi flag** | Warning for old standards | ✅ Implemented |
 
-### Как определяется:
+### Detection methods:
 
-| ОС | Метод | Статус |
-|----|-------|--------|
-| **Windows** | `WlanAPI` (WlanGetAvailableNetworkList, WlanQueryInterface) | ❌ TODO |
-| **Linux** | `iw dev <iface> link` или `nmcli dev wifi list` | ❌ TODO |
-| **macOS** | `/System/Library/PrivateFrameworks/Apple80211.framework` или `airport -I` | ❌ TODO |
+| OS | Method | Status |
+|----|--------|--------|
+| **Windows** | WLAN API (`WlanQueryInterface`, `WlanGetNetworkBssList`) | ✅ Full |
+| **Linux** | Not implemented | ❌ |
+| **macOS** | Not implemented | ❌ |
 
 ### Signal Quality mapping:
 
 ```
 RSSI (dBm)    | Quality
 --------------|----------
->= -50        | Отличный
--50 до -60    | Хороший
--60 до -70    | Средний
-< -70         | Слабый
+>= -50        | Excellent
+-50 to -60    | Good
+-60 to -70    | Fair
+< -70         | Weak
 ```
+
+### Implementation:
+- `netok_core/src/infrastructure/wifi.rs` — `get_wifi_info()` (SSID, RSSI, channel, speed, standard, BSSID)
+- `netok_core/src/infrastructure/security.rs` — `check_encryption()` (encryption type)
+- `netok_core/src/infrastructure/connection.rs` — `detect_connection_type()`
+- RSSI derived: `-90 + wlanSignalQuality / 2` dBm
+- Channel from frequency: `(freq - 2407) / 5` (2.4 GHz), `(freq - 5000) / 5` (5 GHz)
 
 ---
 
-## 3. Роутер (Router Node)
+## 3. Router Node
 
-### Что определяем:
+### Parameters:
 
-| Параметр | Описание | Приоритет |
-|----------|----------|-----------|
-| **Gateway IP** | IP шлюза (например 192.168.1.1) | MVP |
-| **Gateway MAC** | MAC-адрес шлюза | MVP |
-| **Vendor** | Производитель по OUI (например "TP-Link") | MVP |
-| **Model** | Модель роутера (через UPnP/SNMP) | Post-MVP |
-| **Firmware** | Версия прошивки | Post-MVP |
+| Parameter | Description | Status |
+|-----------|-------------|--------|
+| **Gateway IP** | Gateway IP (e.g. 192.168.1.1) | ✅ Implemented |
+| **Gateway MAC** | Gateway MAC address | ✅ Implemented |
+| **Vendor** | Manufacturer from OUI (e.g. "TP-Link") | ✅ Implemented |
+| **Model** | Router model (via UPnP/SNMP) | ❌ Not implemented |
+| **Firmware** | Firmware version | ❌ Not implemented |
 
-### Как определяется:
+### Detection methods:
 
-| ОС | Метод для Gateway IP | Метод для MAC |
-|----|---------------------|---------------|
-| **Windows** | `GetIpForwardTable2` или `route print` | `GetIpNetTable2` или `arp -a` |
-| **Linux** | `ip route` или `netstat -rn` | `arp -n` или `/proc/net/arp` |
-| **macOS** | `netstat -rn` | `arp -n` |
+| OS | Gateway IP method | MAC method |
+|----|-------------------|------------|
+| **Windows** | `cmd.exe /C route print 0.0.0.0` | PowerShell `Get-NetNeighbor -IPAddress {ip}` |
+| **Linux** | `ip route show default` | Not implemented |
+| **macOS** | `netstat -nr` | Not implemented |
 
 ### OUI Lookup:
 
-- **Источник:** Локальная база `assets/oui.csv` (скачать с IEEE)
-- **Формат:** `MAC_PREFIX,Vendor_Name`
-- **Пример:** `00:1A:2B,TP-Link Technologies Co Ltd`
-- **Update:** Периодическое обновление через CI/CD
+- **Source:** Compiled-in Rust static table `OUI_DATABASE` (30,000+ entries)
+- **File:** `netok_core/src/oui_database.rs` (generated by `scripts/generate_oui_database.py` from IEEE CSV)
+- **Lookup:** By OUI prefix (6→7→8+ hex digits), longest match
+- **Brand corrections:** `netok_core/src/brand_mapping.rs`
+
+### Implementation:
+- `netok_core/src/infrastructure/gateway.rs` — `get_default_gateway()`, `get_router_mac()`
+- `netok_core/src/diagnostics.rs` — `lookup_vendor_by_mac()`
 
 ---
 
-## 4. Интернет (Internet Node)
+## 4. Internet Node
 
-### Что определяем:
+### Parameters:
 
-| Параметр | Описание | Приоритет |
-|----------|----------|-----------|
-| **Public IP** | Публичный IP адрес | MVP |
-| **ISP** | Интернет-провайдер (ASN org) | MVP |
-| **Country** | Страна | MVP |
-| **City** | Город | MVP |
-| **DNS Connectivity** | Проверка резолва DNS | MVP |
-| **HTTP Connectivity** | Проверка доступности HTTP | MVP |
-| **Latency** | Пинг до внешнего сервера | Post-MVP |
-| **Download Speed** | Скорость загрузки (Mbps) | Post-MVP |
-| **Upload Speed** | Скорость отдачи (Mbps) | Post-MVP |
-| **VPN Detection** | Определение VPN/Proxy | Post-MVP |
+| Parameter | Description | Status |
+|-----------|-------------|--------|
+| **Public IP** | Public IP address | ✅ Implemented |
+| **ISP** | Internet service provider (ASN org) | ✅ Implemented |
+| **Country** | Country | ✅ Implemented |
+| **City** | City | ✅ Implemented |
+| **DNS Connectivity** | DNS resolution check | ✅ Implemented |
+| **HTTP Connectivity** | HTTP reachability check | ✅ Implemented |
+| **Download Speed** | Download speed (Mbps) | ✅ Frontend (NDT7) |
+| **Upload Speed** | Upload speed (Mbps) | ✅ Frontend (NDT7) |
+| **Ping / Latency / Jitter** | Latency metrics | ✅ Frontend (NDT7) |
 
-### Как определяется:
+### Detection methods:
 
 #### Public IP + Geo:
 
-| API | Endpoint | Возвращает | Приоритет |
-|-----|----------|------------|-----------|
-| **ipify** | `https://api.ipify.org?format=json` | IP only | Primary |
-| **ipinfo.io** | `https://ipinfo.io/json` | IP, ASN, city, country, org | Primary |
-| **ipapi.co** | `https://ipapi.co/json/` | IP, ASN, city, country | Fallback 1 |
-| **ipwhois.io** | `https://ipwhois.app/json/` | IP, ASN, city, country | Fallback 2 |
-
-**Стратегия fallback:**
-1. Попытка ipinfo.io (один запрос → все данные)
-2. Если ошибка → ipapi.co
-3. Если ошибка → ipwhois.io
-4. Если все упали → только IP через ipify
+- **Method:** `lookup_ip_location(ip)` via `https://ipinfo.io/{ip}/json`
+- **Data:** IP, ISP (org), country, city, region
 
 #### DNS Test:
 
 ```rust
-// Резолв известного домена
+// trust_dns_resolver with system config, 1s timeout
 resolve("one.one.one.one") -> Ok/Fail
 resolve("dns.google") -> Ok/Fail (fallback)
 ```
@@ -156,97 +161,150 @@ resolve("dns.google") -> Ok/Fail (fallback)
 #### HTTP Test:
 
 ```rust
-// GET запрос к стабильному endpoint
+// reqwest::blocking::Client, 2s timeout
 GET https://www.cloudflare.com/cdn-cgi/trace -> Ok/Fail
 GET https://example.com -> Ok/Fail (fallback)
 ```
 
-#### Speed Test (Post-MVP):
+DNS and HTTP tests run **in parallel** via `std::thread::scope`.
 
-| Сервис | Метод | Примечание |
-|--------|-------|------------|
-| **M-Lab** | NDT7 protocol | Open source, рекомендуется Google |
-| **Cloudflare** | `https://speed.cloudflare.com/__down` | Простой HTTP download |
-| **fast.com** | Netflix CDN API | Backup |
+#### Speed Test:
+
+Implemented on the frontend via NDT7 WebSocket (M-Lab). Details: [SPEED-TEST-INTERNALS.md](SPEED-TEST-INTERNALS.md)
 
 ---
 
-## Проверки соединений (Connectivity Tests)
+## 5. Additional Features (implemented)
+
+### Wi-Fi Security (4 checks)
+
+| Check | Method | Status |
+|-------|--------|--------|
+| Encryption | WLAN API → `dot11AuthAlgorithm` | ✅ |
+| Evil Twin | `WlanGetNetworkBssList` → Privacy bit | ✅ |
+| ARP Spoofing | `Get-NetNeighbor` → MAC duplicates | ✅ |
+| DNS Hijacking | System resolver vs raw UDP to 1.1.1.1 | ✅ |
+
+Details: [BACKEND-INTERNALS.md](BACKEND-INTERNALS.md) §1
+
+### Network Device Scan
+
+5-phase scan: ping sweep → ARP table → OUI lookup → reverse DNS → mDNS enrichment.
+
+Details: [BACKEND-INTERNALS.md](BACKEND-INTERNALS.md) §4
+
+### DNS Management (21 providers)
+
+Cloudflare (×3), Google, AdGuard (×3), DNS4EU (×5), Quad9 (×3), OpenDNS (×2), Custom.
+IPv4 + IPv6 support. Managed via `netsh`.
+
+Details: [BACKEND-INTERNALS.md](BACKEND-INTERNALS.md) §4
+
+### VPN Tunnel (sing-box)
+
+- URI parsing: VLESS, VMess, Shadowsocks, Trojan, WireGuard
+- sing-box config generation
+- Elevated sidecar process management
+- IP verification after connection
+
+Implementation: `netok_core/src/infrastructure/vpn/`
+
+---
+
+## Connectivity Tests
 
 ### DNS Test:
-- **Метод:** Резолв `one.one.one.one` (Cloudflare)
-- **Fallback:** Резолв `dns.google` (Google)
-- **Timeout:** 2 секунды
-- **Статус:** Ok / Warn / Fail
+- **Method:** `trust_dns_resolver::Resolver` with system config
+- **Primary:** Resolve `one.one.one.one`
+- **Fallback:** Resolve `dns.google`
+- **Timeout:** 1 second
+- **Status:** Ok / Warn / Fail
 
 ### HTTP Test:
-- **Метод:** `GET https://www.cloudflare.com/cdn-cgi/trace`
+- **Method:** `reqwest::blocking::Client`
+- **Primary:** `GET https://www.cloudflare.com/cdn-cgi/trace`
 - **Fallback:** `GET https://example.com`
-- **Timeout:** 3 секунды
-- **Статус:** Ok / Warn / Fail
-
-### VPN Detection (Post-MVP):
-- Сравнение публичного IP с IP гео-положения
-- DNS leak проверка (резолв через разные DNS серверы)
-- Проверка HTTP headers (X-Forwarded-For)
+- **Timeout:** 2 seconds
+- **Status:** Ok / Warn / Fail
 
 ---
 
-## Таймауты и NFR
+## Timeouts and NFR
 
-Из [docs/SoT-ARCH.md](SoT-ARCH.md):
-
-| Операция | Таймаут | Примечание |
-|----------|---------|------------|
-| **Весь тест** | 1.5s (типично), до `test_timeout_ms` (жёсткий) | Настраиваемо |
-| **DNS query** | 2s | |
-| **HTTP request** | 3s | |
-| **ARP lookup** | 1s | |
-| **Speed test** | 10s | Post-MVP |
+| Operation | Timeout | Notes |
+|-----------|---------|-------|
+| **Full diagnostics** | 1.5s (typical), up to `test_timeout_ms` (hard limit) | Configurable |
+| **DNS query** | 1s | trust_dns_resolver |
+| **HTTP request** | 2s | reqwest blocking |
+| **Speed test** | 10s per phase | NDT7 on frontend |
+| **Device scan ping** | 200ms per host | Batches of 20 |
+| **mDNS browse** | 3s | mdns-sd |
+| **DNS server test** | 5s | trust_dns_resolver |
 
 ---
 
-## Структура данных
+## Data Structures
 
-### DiagnosticsSnapshot (финальная версия):
+### DiagnosticsSnapshot (current):
 
 ```rust
 pub struct DiagnosticsSnapshot {
-    pub at_utc: String,              // ISO 8601 timestamp
-    pub nodes: Vec<NodeInfo>,        // 4 узла
-    pub summary_key: String,         // i18n key: "summary.ok" | "summary.partial" | "summary.down"
-    pub computer: ComputerInfo,      // Computer node details
-    pub network: NetworkInfo,        // Network node details (NEW)
-    pub router: RouterInfo,          // Router node details (NEW)
-    pub internet: InternetInfo,      // Internet node details (NEW)
+    pub at_utc: String,
+    pub nodes: Vec<NodeInfo>,
+    pub summary_key: String,         // "summary.ok" | "summary.warn" | "summary.fail"
+    pub computer: ComputerInfo,
+    pub network: NetworkInfo,
+    pub router: RouterInfo,
+    pub internet: InternetInfo,
+}
+
+pub struct ComputerInfo {
+    pub hostname: Option<String>,
+    pub model: Option<String>,       // Always None (not implemented)
+    pub adapter: Option<String>,
+    pub local_ip: Option<String>,
 }
 
 pub struct NetworkInfo {
-    pub connection_type: ConnectionType,  // Wifi | Ethernet | Usb | Mobile
+    pub connection_type: ConnectionType,
     pub ssid: Option<String>,
-    pub rssi: Option<i32>,                // dBm
-    pub signal_quality: Option<String>,   // i18n key: "signal.excellent" etc
+    pub rssi: Option<i32>,
+    pub signal_quality: Option<String>,
     pub channel: Option<u8>,
-    pub frequency: Option<String>,        // "2.4 GHz" | "5 GHz"
+    pub frequency: Option<String>,    // "2.4 GHz" | "5 GHz" | "6 GHz"
+    pub encryption: Option<String>,   // "WPA2", "WPA3", "WEP", "WPA", "Open"
+    pub link_speed_mbps: Option<u32>,
+    pub wifi_standard: Option<String>, // "Wi-Fi 4 (802.11n)", etc.
+    pub is_legacy_wifi: bool,
 }
 
 pub struct RouterInfo {
     pub gateway_ip: Option<String>,
     pub gateway_mac: Option<String>,
-    pub vendor: Option<String>,           // From OUI lookup
-    pub model: Option<String>,            // From UPnP (Post-MVP)
+    pub vendor: Option<String>,
+    pub model: Option<String>,       // Always None (not implemented)
 }
 
 pub struct InternetInfo {
     pub public_ip: Option<String>,
-    pub isp: Option<String>,              // ASN org
+    pub isp: Option<String>,
     pub country: Option<String>,
     pub city: Option<String>,
     pub dns_ok: bool,
     pub http_ok: bool,
     pub latency_ms: Option<u32>,
-    pub speed_down_mbps: Option<f64>,     // Post-MVP
-    pub speed_up_mbps: Option<f64>,       // Post-MVP
+    pub speed_down_mbps: Option<f64>, // Always None (speed test on frontend)
+    pub speed_up_mbps: Option<f64>,   // Always None (speed test on frontend)
+}
+
+pub enum ConnectionType {
+    Wifi,
+    Ethernet,
+    Usb,
+    Mobile,
+    Disabled,       // Wi-Fi adapter disabled/absent
+    Disconnected,   // Wi-Fi present but not connected
+    Unknown,
 }
 ```
 
@@ -254,23 +312,27 @@ pub struct InternetInfo {
 
 ## Roadmap
 
-### MVP (Phase 1):
-- [ ] Computer: hostname, local_ip, adapter, connection_type
-- [ ] Network: type, SSID, RSSI, signal quality
-- [ ] Router: gateway_ip, gateway_mac, vendor (OUI)
-- [ ] Internet: public_ip, ISP, country, city, DNS test, HTTP test
-- [ ] OUI database integration (local CSV)
-- [ ] Fallback strategy for geo APIs
+### ✅ Implemented (Phase 1 — MVP):
+- [x] Computer: hostname, local_ip, adapter, connection_type
+- [x] Network: type, SSID, RSSI, signal quality
+- [x] Router: gateway_ip, gateway_mac, vendor (OUI)
+- [x] Internet: public_ip, ISP, country, city, DNS test, HTTP test
+- [x] OUI database integration (compiled into Rust)
+- [x] Fallback strategy for geo APIs (ipinfo.io)
 
-### Post-MVP (Phase 2):
-- [ ] Network: channel, frequency, link speed
+### ✅ Implemented (Phase 2 — Post-MVP):
+- [x] Network: channel, frequency, link speed, Wi-Fi standard, encryption
+- [x] Speed test integration (NDT7 on frontend)
+- [x] Wi-Fi Security (4 checks)
+- [x] Network Device Scan (ARP + mDNS + OUI)
+- [x] DNS Management (21 providers, IPv4 + IPv6)
+- [x] VPN Tunnel (sing-box, 5 protocols)
+- [x] Progressive diagnostics (per-node UI updates)
+
+### ❌ Not implemented:
+- [ ] Computer: device model
 - [ ] Router: model via UPnP, firmware version
-- [ ] Internet: latency measurement
-- [ ] Speed test integration (M-Lab NDT7)
-- [ ] VPN detection
-- [ ] Computer: device model, adapter model
-
-### Future (Phase 3):
+- [ ] Linux/macOS: Wi-Fi info, router MAC, ARP table
 - [ ] Historical data tracking
 - [ ] Notifications on connection issues
 - [ ] Network topology visualization
@@ -280,35 +342,31 @@ pub struct InternetInfo {
 
 ## Dependencies
 
-### Rust Crates (для netok_core):
+### Rust Crates (netok_core):
 
 ```toml
 [dependencies]
-# Уже есть:
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
 time = "0.3"
 get_if_addrs = "0.5"
-hostname = "0.4"
+hostname = "0.3"
+reqwest = { version = "0.12", features = ["json", "blocking"] }
+trust-dns-resolver = "0.23"
+csv = "1.3"
+mdns-sd = "0.17"
+thiserror = "1"
 
-# Нужно добавить:
-reqwest = { version = "0.12", features = ["json", "blocking"] }  # HTTP requests
-trust-dns-resolver = "0.23"                                       # DNS lookups
-csv = "1.3"                                                       # OUI database
-
-# Platform-specific:
 [target.'cfg(windows)'.dependencies]
-windows = { version = "0.58", features = ["Win32_NetworkManagement_IpHelper", "Win32_NetworkManagement_WiFi"] }
-
-[target.'cfg(target_os = "linux")'.dependencies]
-# Linux-специфичные крейты если нужны
-
-[target.'cfg(target_os = "macos")'.dependencies]
-# macOS-специфичные крейты если нужны
+windows = { version = "0.58", features = [
+    "Win32_NetworkManagement_WiFi",
+    "Win32_Foundation"
+] }
 ```
 
 ---
 
 ## Changelog
 
-- **2025-11-13 v1.0:** Первичная фиксация плана реализации на основе обсуждения
+- **2026-03-05 v2.0:** Full update — marked all implemented features, updated data structures, added new sections (Security, Device Scan, DNS, VPN), translated to English
+- **2025-11-13 v1.0:** Initial implementation plan
