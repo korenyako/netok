@@ -30,10 +30,12 @@ Generated: 2026-03-05
 │   │   ├── netok-vpn.gif
 │   │   ├── netok-weak.gif
 │   │   └── netok-wifi.gif
+│   ├── BACKEND-INTERNALS.md
 │   ├── IMPLEMENTATION-PLAN.md
 │   ├── MOBILE-PLAN.md
 │   ├── README.md
 │   ├── SoT-ARCH.md
+│   ├── SPEED-TEST-INTERNALS.md
 │   ├── TESTING.md
 │   ├── UI-SPEC.md
 │   └── user-stories.md
