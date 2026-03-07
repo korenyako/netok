@@ -94,12 +94,64 @@ co się zepsuło, gdzie i co z tym zrobić.
   <a href="https://github.com/korenyako/netok/releases/latest"><img src="https://img.shields.io/github/v/release/korenyako/netok?label=Pobierz%20dla%20Windows&style=for-the-badge&logo=windows&logoColor=white" alt="Pobierz dla Windows"></a>
 </p>
 
-### Code signing policy
+### Uwaga dotycząca Windows SmartScreen
 
-Free code signing provided by [SignPath.io](https://signpath.io), certificate by [SignPath Foundation](https://signpath.org).
+Netok nie posiada jeszcze podpisu cyfrowego. Przy pierwszym uruchomieniu Windows może wyświetlić ostrzeżenie SmartScreen — jest to normalne dla niepodpisanych aplikacji. Kliknij „Więcej informacji" → „Uruchom mimo to", aby kontynuować.
 
-- **Roles:** all governance roles (committer, reviewer, approver) are held by [Anton Korenyako](https://github.com/korenyako). See [CONTRIBUTING.md](CONTRIBUTING.md#project-governance) for details.
-- **Privacy:** this application does not transfer any information to other networked systems unless specifically requested by the user or required for core diagnostic functionality. See [PRIVACY.md](PRIVACY.md) for the full list of network requests.
+Aplikacja jest budowana automatycznie z kodu źródłowego za pomocą GitHub Actions. Możesz zweryfikować kompilację, sprawdzając [workflow wydania](https://github.com/korenyako/netok/releases) i porównując sumy kontrolne.
+
+---
+
+## Pod maską
+
+### Łańcuch diagnostyczny
+
+Każdy węzeł łańcucha wykonuje niezależne sprawdzenia — nie jest wymagany dostęp administratora do routera:
+
+**Komputer** — `hostname::get()` dla nazwy maszyny, `get_if_addrs` dla interfejsów sieciowych, Windows WLAN API dla szczegółów adaptera.
+
+**Wi-Fi** — Windows WLAN API (`WlanQueryInterface`): SSID, jakość sygnału konwertowana na dBm (`-90 + quality/2`), prędkość TX, typ PHY → standard Wi-Fi, kanał i pasmo (2,4/5/6 GHz) z `ulChCenterFrequency`. Typ połączenia wykrywany przez dopasowanie wzorca nazwy adaptera.
+
+**Router** — IP bramy parsowane z `route print` (Windows), `ip route` (Linux) lub `netstat -nr` (macOS). Adres MAC przez `Get-NetNeighbor`. Producent identyfikowany przez wyszukiwanie OUI najdłuższego prefiksu w ponad 30 000 wpisach skompilowanych z bazy producentów Wireshark.
+
+**Internet** — Dwa sprawdzenia równolegle: rozwiązywanie DNS przez `trust_dns_resolver` (próbuje `one.one.one.one`, zapasowy `dns.google`) i dostępność HTTP przez `reqwest` (próbuje Cloudflare trace, zapasowy `example.com`). Oba przeszły → OK, jedno przeszło → Partial, oba nie powiodły się → Fail.
+
+### Bezpieczeństwo Wi-Fi
+
+Cztery sekwencyjne sprawdzenia, wszystkie przez Windows WLAN API:
+
+**Szyfrowanie** — Odczytuje `dot11AuthAlgorithm` + `dot11CipherAlgorithm`, mapuje na Open (niebezpieczeństwo) / WEP, WPA (ostrzeżenie) / WPA2, WPA3 (bezpieczne).
+
+**Wykrywanie Evil Twin** — Pobiera wszystkie BSSID pasujące do połączonego SSID przez `WlanGetNetworkBssList`. Sprawdza bit IEEE 802.11 Privacy na każdym AP. Jeśli ten sam SSID ma zarówno otwarte, jak i szyfrowane punkty dostępu → ostrzeżenie.
+
+**Wykrywanie ARP Spoofing** — Odczytuje pełną tabelę ARP przez `Get-NetNeighbor`, buduje mapowanie MAC → IP. Jeśli nie-broadcastowy MAC mapuje do wielu IP włącznie z bramą → niebezpieczeństwo.
+
+**Wykrywanie przejęcia DNS** — Rozwiązuje `example.com` przez systemowy resolver ORAZ przez surowe zapytanie UDP do `1.1.1.1`. Jeśli zbiory IP nie pokrywają się → ostrzeżenie.
+
+Ogólny status bezpieczeństwa = najgorszy wynik z czterech sprawdzeń.
+
+### Test prędkości
+
+Oparty na frontendzie, wykorzystuje NDT7 (Network Diagnostic Tool v7) od M-Lab przez WebSocket:
+
+- Wykrywanie serwera przez M-Lab locate API (najbliższy serwer, cache 5 min)
+- Fazy pobierania/wysyłania ~10 sekund każda
+- **Ping**: mediana z 3 cykli RTT połączenia/zamknięcia WebSocket
+- **Latency**: średnia `TCPInfo.SmoothedRTT` pod obciążeniem
+- **Jitter**: średnia bezwzględna kolejna różnica próbek SmoothedRTT
+- **Wykrywanie bufferbloat**: latency > 3× idle ping
+
+Wyniki przyporządkowane do praktycznych zadań:
+
+| Zadanie | Warunek |
+|---------|---------|
+| Wideo 4K | download ≥ 25 Mbps |
+| Gry online | ping ≤ 50 ms ORAZ jitter ≤ 30 ms |
+| Wideorozmowy | download ≥ 3 Mbps ORAZ ping ≤ 100 ms |
+| Wideo HD | download ≥ 10 Mbps |
+| Muzyka/Podcasty | download ≥ 1 Mbps |
+| Social/Web | download ≥ 3 Mbps |
+| Email/Komunikatory | download ≥ 0,5 Mbps |
 
 ---
 

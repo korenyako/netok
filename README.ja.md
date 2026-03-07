@@ -94,12 +94,64 @@
   <a href="https://github.com/korenyako/netok/releases/latest"><img src="https://img.shields.io/github/v/release/korenyako/netok?label=Windows%E7%89%88%E3%82%92%E3%83%80%E3%82%A6%E3%83%B3%E3%83%AD%E3%83%BC%E3%83%89&style=for-the-badge&logo=windows&logoColor=white" alt="Windows版をダウンロード"></a>
 </p>
 
-### Code signing policy
+### Windows SmartScreen に関する注意
 
-Free code signing provided by [SignPath.io](https://signpath.io), certificate by [SignPath Foundation](https://signpath.org).
+Netok はまだコード署名されていません。初回起動時に Windows が SmartScreen の警告を表示することがありますが、これは署名されていないアプリケーションでは正常な動作です。「詳細情報」→「実行」をクリックして続行してください。
 
-- **Roles:** all governance roles (committer, reviewer, approver) are held by [Anton Korenyako](https://github.com/korenyako). See [CONTRIBUTING.md](CONTRIBUTING.md#project-governance) for details.
-- **Privacy:** this application does not transfer any information to other networked systems unless specifically requested by the user or required for core diagnostic functionality. See [PRIVACY.md](PRIVACY.md) for the full list of network requests.
+このアプリケーションは GitHub Actions を通じてソースコードから自動的にビルドされています。[リリースワークフロー](https://github.com/korenyako/netok/releases)を確認し、チェックサムを比較することでビルドを検証できます。
+
+---
+
+## 内部の仕組み
+
+### 診断チェーン
+
+チェーンの各ノードは独立した検査を実行します — ルーターの管理者アクセスは不要です：
+
+**コンピュータ** — `hostname::get()` でマシン名取得、`get_if_addrs` でネットワークインターフェース、Windows WLAN API でアダプター詳細。
+
+**Wi-Fi** — Windows WLAN API (`WlanQueryInterface`)：SSID、信号品質をdBmに変換（`-90 + quality/2`）、TX速度、PHYタイプ → Wi-Fi規格、`ulChCenterFrequency` からチャンネルと帯域（2.4/5/6 GHz）。接続タイプはアダプター名のパターンマッチングで検出。
+
+**ルーター** — ゲートウェイIPは `route print`（Windows）、`ip route`（Linux）、または `netstat -nr`（macOS）からパース。MACアドレスは `Get-NetNeighbor` 経由。ベンダーはWiresharkメーカーデータベースからコンパイルされた30,000以上のエントリに対する最長プレフィックスOUI検索で特定。
+
+**インターネット** — 2つの検査を並列実行：`trust_dns_resolver` によるDNS解決（`one.one.one.one` を試行、フォールバック `dns.google`）と `reqwest` によるHTTP到達性（Cloudflare traceを試行、フォールバック `example.com`）。両方パス → OK、一方パス → Partial、両方失敗 → Fail。
+
+### Wi-Fiセキュリティ
+
+4つの順次検査、すべてWindows WLAN API経由：
+
+**暗号化** — `dot11AuthAlgorithm` + `dot11CipherAlgorithm` を読み取り、Open（危険）/ WEP、WPA（警告）/ WPA2、WPA3（安全）にマッピング。
+
+**Evil Twin検出** — `WlanGetNetworkBssList` 経由で接続中のSSIDに一致するすべてのBSSIDを取得。各APのIEEE 802.11 Privacyビットをチェック。同じSSIDにオープンと暗号化の両方のアクセスポイントがある場合 → 警告。
+
+**ARPスプーフィング検出** — `Get-NetNeighbor` 経由でARP テーブル全体を読み取り、MAC → IPマッピングを構築。非ブロードキャストMACがゲートウェイを含む複数のIPにマッピングされている場合 → 危険。
+
+**DNSハイジャック検出** — `example.com` をシステムリゾルバ経由 AND `1.1.1.1` へのraw UDPクエリ経由で解決。IPセットが重複しない場合 → 警告。
+
+全体のセキュリティステータス = 4つの検査の最悪の結果。
+
+### 速度テスト
+
+フロントエンドベース、M-LabのNDT7（Network Diagnostic Tool v7）をWebSocket経由で使用：
+
+- M-Lab locate API経由でサーバー検出（最寄りサーバー、5分キャッシュ）
+- ダウンロード/アップロードフェーズ 各約10秒
+- **Ping**：3回のWebSocket接続/切断RTTサイクルの中央値
+- **Latency**：負荷時の `TCPInfo.SmoothedRTT` の平均
+- **Jitter**：SmoothedRTTサンプルの平均絶対連続差分
+- **Bufferbloat検出**：latency > 3× idle ping
+
+結果は実用的なタスクにマッピング：
+
+| タスク | 合格条件 |
+|--------|----------|
+| 4K動画 | download ≥ 25 Mbps |
+| オンラインゲーム | ping ≤ 50 ms かつ jitter ≤ 30 ms |
+| ビデオ通話 | download ≥ 3 Mbps かつ ping ≤ 100 ms |
+| HD動画 | download ≥ 10 Mbps |
+| 音楽/ポッドキャスト | download ≥ 1 Mbps |
+| SNS/Web | download ≥ 3 Mbps |
+| メール/メッセンジャー | download ≥ 0.5 Mbps |
 
 ---
 

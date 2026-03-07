@@ -100,12 +100,11 @@ what's broken, where, and what to do about it.
   <a href="https://github.com/korenyako/netok/releases/latest"><img src="https://img.shields.io/github/v/release/korenyako/netok?label=Download%20for%20Windows&style=for-the-badge&logo=windows&logoColor=white" alt="Download for Windows"></a>
 </p>
 
-### Code signing policy
+### Note on Windows SmartScreen
 
-Free code signing provided by [SignPath.io](https://signpath.io), certificate by [SignPath Foundation](https://signpath.org).
+Netok is not yet code-signed. Windows may show a SmartScreen warning on first launch — this is normal for unsigned applications. Click "More info" → "Run anyway" to proceed.
 
-- **Roles:** all governance roles (committer, reviewer, approver) are held by [Anton Korenyako](https://github.com/korenyako). See [CONTRIBUTING.md](CONTRIBUTING.md#project-governance) for details.
-- **Privacy:** this application does not transfer any information to other networked systems unless specifically requested by the user or required for core diagnostic functionality. See [PRIVACY.md](PRIVACY.md) for the full list of network requests.
+The application is built automatically from source code via GitHub Actions. You can verify the build by checking the [release workflow](https://github.com/korenyako/netok/releases) and comparing checksums.
 
 
 
@@ -176,6 +175,58 @@ Every label, every message, every tooltip is fully translated. No half-baked Goo
 <p align="center">
   <img src="docs/screenshots/netok-rtl.gif" alt="Netok in Farsi — right-to-left interface">
 </p>
+
+
+## Under the Hood
+
+### Diagnostic Chain
+
+Each node in the chain runs independent checks — no router admin access needed:
+
+**Computer** — `hostname::get()` for machine name, `get_if_addrs` for network interfaces, Windows WLAN API for adapter details.
+
+**Wi-Fi** — Windows WLAN API (`WlanQueryInterface`): SSID, signal quality converted to dBm (`-90 + quality/2`), TX rate, PHY type → Wi-Fi standard, channel and band (2.4/5/6 GHz) from `ulChCenterFrequency`. Connection type detected from adapter name pattern matching.
+
+**Router** — Gateway IP parsed from `route print` (Windows), `ip route` (Linux), or `netstat -nr` (macOS). MAC address via `Get-NetNeighbor`. Vendor identified through longest-prefix OUI lookup against 30,000+ entries compiled from the Wireshark manufacturer database.
+
+**Internet** — Two checks run in parallel: DNS resolution via `trust_dns_resolver` (tries `one.one.one.one`, fallback `dns.google`) and HTTP reachability via `reqwest` (tries Cloudflare trace, fallback `example.com`). Both pass → OK, one passes → Partial, both fail → Fail.
+
+### Wi-Fi Security
+
+Four sequential checks, all via Windows WLAN API:
+
+**Encryption** — Reads `dot11AuthAlgorithm` + `dot11CipherAlgorithm`, maps to Open (danger) / WEP, WPA (warning) / WPA2, WPA3 (safe).
+
+**Evil Twin Detection** — Gets all BSSIDs matching the connected SSID via `WlanGetNetworkBssList`. Checks the IEEE 802.11 Privacy bit on each AP. If the same SSID has both open and encrypted access points → warning.
+
+**ARP Spoofing Detection** — Reads the full ARP table via `Get-NetNeighbor`, builds a MAC → IP mapping. If any non-broadcast MAC maps to multiple IPs including the gateway → danger.
+
+**DNS Hijacking Detection** — Resolves `example.com` via the system resolver AND via a raw UDP query to `1.1.1.1`. If the IP sets don't overlap → warning.
+
+Overall security status = worst result of the four checks.
+
+### Speed Test
+
+Frontend-based, using NDT7 (Network Diagnostic Tool v7) by M-Lab over WebSocket:
+
+- Server discovery via M-Lab locate API (nearest server, cached 5 min)
+- Download/upload phases ~10 seconds each
+- **Ping**: median of 3 WebSocket connect/close RTT cycles
+- **Latency**: mean `TCPInfo.SmoothedRTT` under load
+- **Jitter**: mean absolute consecutive difference of SmoothedRTT samples
+- **Bufferbloat detection**: latency > 3× idle ping
+
+Results mapped to practical tasks:
+
+| Task | Pass condition |
+|------|---------------|
+| 4K Video | download ≥ 25 Mbps |
+| Online Gaming | ping ≤ 50 ms AND jitter ≤ 30 ms |
+| Video Calls | download ≥ 3 Mbps AND ping ≤ 100 ms |
+| HD Video | download ≥ 10 Mbps |
+| Music/Podcasts | download ≥ 1 Mbps |
+| Social/Web | download ≥ 3 Mbps |
+| Email/Messengers | download ≥ 0.5 Mbps |
 
 
 ## Built with

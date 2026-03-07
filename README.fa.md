@@ -93,12 +93,64 @@
   <a href="https://github.com/korenyako/netok/releases/latest"><img src="https://img.shields.io/github/v/release/korenyako/netok?label=Download%20for%20Windows&style=for-the-badge&logo=windows&logoColor=white" alt="دانلود برای ویندوز"></a>
 </p>
 
-### Code signing policy
+### نکته درباره Windows SmartScreen
 
-Free code signing provided by [SignPath.io](https://signpath.io), certificate by [SignPath Foundation](https://signpath.org).
+Netok هنوز دارای امضای کد نیست. ممکن است ویندوز هنگام اولین اجرا هشدار SmartScreen نمایش دهد — این برای برنامه‌های بدون امضا عادی است. روی «اطلاعات بیشتر» → «اجرا به هر حال» کلیک کنید تا ادامه دهید.
 
-- **Roles:** all governance roles (committer, reviewer, approver) are held by [Anton Korenyako](https://github.com/korenyako). See [CONTRIBUTING.md](CONTRIBUTING.md#project-governance) for details.
-- **Privacy:** this application does not transfer any information to other networked systems unless specifically requested by the user or required for core diagnostic functionality. See [PRIVACY.md](PRIVACY.md) for the full list of network requests.
+این برنامه به‌طور خودکار از کد منبع از طریق GitHub Actions ساخته می‌شود. می‌توانید با بررسی [گردش کار انتشار](https://github.com/korenyako/netok/releases) و مقایسه چک‌سام‌ها، صحت ساخت را تأیید کنید.
+
+---
+
+## زیر کاپوت
+
+### زنجیره تشخیص
+
+هر گره در زنجیره بررسی‌های مستقل انجام می‌دهد — نیازی به دسترسی مدیریتی روتر نیست:
+
+**کامپیوتر** — `hostname::get()` برای نام ماشین، `get_if_addrs` برای رابط‌های شبکه، Windows WLAN API برای جزئیات آداپتور.
+
+**Wi-Fi** — Windows WLAN API (`WlanQueryInterface`): SSID، کیفیت سیگنال تبدیل شده به dBm (`-90 + quality/2`)، نرخ TX، نوع PHY → استاندارد Wi-Fi، کانال و باند (2.4/5/6 GHz) از `ulChCenterFrequency`. نوع اتصال از طریق تطبیق الگوی نام آداپتور تشخیص داده می‌شود.
+
+**روتر** — IP گیت‌وی از `route print` (ویندوز)، `ip route` (لینوکس) یا `netstat -nr` (مک) تجزیه می‌شود. آدرس MAC از طریق `Get-NetNeighbor`. سازنده از طریق جستجوی OUI با بلندترین پیشوند در بیش از 30,000 ورودی گردآوری شده از پایگاه داده سازندگان Wireshark شناسایی می‌شود.
+
+**اینترنت** — دو بررسی به صورت موازی: تفکیک DNS از طریق `trust_dns_resolver` (ابتدا `one.one.one.one`، جایگزین `dns.google`) و دسترسی‌پذیری HTTP از طریق `reqwest` (ابتدا Cloudflare trace، جایگزین `example.com`). هر دو موفق → OK، یکی موفق → Partial، هر دو ناموفق → Fail.
+
+### امنیت Wi-Fi
+
+چهار بررسی متوالی، همگی از طریق Windows WLAN API:
+
+**رمزگذاری** — خواندن `dot11AuthAlgorithm` + `dot11CipherAlgorithm`، نگاشت به Open (خطر) / WEP، WPA (هشدار) / WPA2، WPA3 (ایمن).
+
+**تشخیص Evil Twin** — دریافت تمام BSSIDهای منطبق با SSID متصل از طریق `WlanGetNetworkBssList`. بررسی بیت IEEE 802.11 Privacy روی هر AP. اگر یک SSID هم نقاط دسترسی باز و هم رمزگذاری شده داشته باشد → هشدار.
+
+**تشخیص ARP Spoofing** — خواندن کامل جدول ARP از طریق `Get-NetNeighbor`، ساخت نگاشت MAC → IP. اگر MAC غیر-broadcast به چندین IP از جمله گیت‌وی نگاشت شود → خطر.
+
+**تشخیص ربودن DNS** — تفکیک `example.com` از طریق resolver سیستم و همچنین از طریق پرس‌وجوی خام UDP به `1.1.1.1`. اگر مجموعه‌های IP همپوشانی نداشته باشند → هشدار.
+
+وضعیت کلی امنیت = بدترین نتیجه از چهار بررسی.
+
+### تست سرعت
+
+مبتنی بر فرانت‌اند، با استفاده از NDT7 (Network Diagnostic Tool v7) توسط M-Lab از طریق WebSocket:
+
+- کشف سرور از طریق M-Lab locate API (نزدیک‌ترین سرور، کش 5 دقیقه)
+- فازهای دانلود/آپلود هرکدام ~10 ثانیه
+- **Ping**: میانه 3 چرخه RTT اتصال/قطع WebSocket
+- **Latency**: میانگین `TCPInfo.SmoothedRTT` تحت بار
+- **Jitter**: میانگین اختلاف مطلق متوالی نمونه‌های SmoothedRTT
+- **تشخیص bufferbloat**: latency > 3× idle ping
+
+نتایج نگاشت شده به کارهای عملی:
+
+| کار | شرط قبولی |
+|-----|-----------|
+| ویدیوی 4K | download ≥ 25 Mbps |
+| بازی آنلاین | ping ≤ 50 ms و jitter ≤ 30 ms |
+| تماس تصویری | download ≥ 3 Mbps و ping ≤ 100 ms |
+| ویدیوی HD | download ≥ 10 Mbps |
+| موسیقی/پادکست | download ≥ 1 Mbps |
+| شبکه‌های اجتماعی/وب | download ≥ 3 Mbps |
+| ایمیل/پیام‌رسان | download ≥ 0.5 Mbps |
 
 ---
 

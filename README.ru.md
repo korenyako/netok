@@ -94,12 +94,64 @@
   <a href="https://github.com/korenyako/netok/releases/latest"><img src="https://img.shields.io/github/v/release/korenyako/netok?label=%D0%A1%D0%BA%D0%B0%D1%87%D0%B0%D1%82%D1%8C%20%D0%B4%D0%BB%D1%8F%20Windows&style=for-the-badge&logo=windows&logoColor=white" alt="Скачать для Windows"></a>
 </p>
 
-### Code signing policy
+### Примечание о Windows SmartScreen
 
-Free code signing provided by [SignPath.io](https://signpath.io), certificate by [SignPath Foundation](https://signpath.org).
+Netok пока не имеет цифровой подписи. При первом запуске Windows может показать предупреждение SmartScreen — это нормально для неподписанных приложений. Нажмите «Подробнее» → «Выполнить в любом случае», чтобы продолжить.
 
-- **Roles:** all governance roles (committer, reviewer, approver) are held by [Anton Korenyako](https://github.com/korenyako). See [CONTRIBUTING.md](CONTRIBUTING.md#project-governance) for details.
-- **Privacy:** this application does not transfer any information to other networked systems unless specifically requested by the user or required for core diagnostic functionality. See [PRIVACY.md](PRIVACY.md) for the full list of network requests.
+Приложение автоматически собирается из исходного кода через GitHub Actions. Вы можете проверить сборку, ознакомившись с [процессом выпуска](https://github.com/korenyako/netok/releases) и сравнив контрольные суммы.
+
+---
+
+## Под капотом
+
+### Диагностическая цепочка
+
+Каждый узел цепочки выполняет независимые проверки — доступ к настройкам роутера не требуется:
+
+**Компьютер** — `hostname::get()` для имени машины, `get_if_addrs` для сетевых интерфейсов, Windows WLAN API для параметров адаптера.
+
+**Wi-Fi** — Windows WLAN API (`WlanQueryInterface`): SSID, качество сигнала с конвертацией в dBm (`-90 + quality/2`), скорость TX, тип PHY → стандарт Wi-Fi, канал и диапазон (2.4/5/6 ГГц) из `ulChCenterFrequency`. Тип подключения определяется по паттерну имени адаптера.
+
+**Роутер** — IP шлюза парсится из `route print` (Windows), `ip route` (Linux) или `netstat -nr` (macOS). MAC-адрес через `Get-NetNeighbor`. Производитель определяется через longest-prefix OUI-поиск по 30 000+ записей из базы производителей Wireshark.
+
+**Интернет** — Две проверки параллельно: DNS-резолвинг через `trust_dns_resolver` (пробует `one.one.one.one`, запасной `dns.google`) и HTTP-доступность через `reqwest` (пробует Cloudflare trace, запасной `example.com`). Обе прошли → OK, одна прошла → Partial, обе провалились → Fail.
+
+### Безопасность Wi-Fi
+
+Четыре последовательные проверки через Windows WLAN API:
+
+**Шифрование** — Читает `dot11AuthAlgorithm` + `dot11CipherAlgorithm`, маппит в Open (опасно) / WEP, WPA (предупреждение) / WPA2, WPA3 (безопасно).
+
+**Обнаружение Evil Twin** — Получает все BSSID, совпадающие с подключённым SSID через `WlanGetNetworkBssList`. Проверяет бит IEEE 802.11 Privacy на каждой точке доступа. Если один SSID имеет и открытые, и зашифрованные точки → предупреждение.
+
+**Обнаружение ARP-спуфинга** — Читает полную ARP-таблицу через `Get-NetNeighbor`, строит маппинг MAC → IP. Если не-broadcast MAC соответствует нескольким IP включая шлюз → опасно.
+
+**Обнаружение DNS-перехвата** — Резолвит `example.com` через системный резолвер И через raw UDP-запрос к `1.1.1.1`. Если множества IP не пересекаются → предупреждение.
+
+Общий статус безопасности = наихудший результат из четырёх проверок.
+
+### Тест скорости
+
+Работает на фронтенде, используя NDT7 (Network Diagnostic Tool v7) от M-Lab через WebSocket:
+
+- Обнаружение сервера через M-Lab locate API (ближайший сервер, кэш 5 мин)
+- Фазы загрузки/выгрузки ~10 секунд каждая
+- **Ping**: медиана 3 циклов RTT подключения/закрытия WebSocket
+- **Latency**: среднее `TCPInfo.SmoothedRTT` под нагрузкой
+- **Jitter**: среднее абсолютной последовательной разности SmoothedRTT
+- **Обнаружение bufferbloat**: latency > 3× idle ping
+
+Результаты привязаны к практическим задачам:
+
+| Задача | Условие |
+|--------|---------|
+| Видео 4K | download ≥ 25 Мбит/с |
+| Онлайн-игры | ping ≤ 50 мс И jitter ≤ 30 мс |
+| Видеозвонки | download ≥ 3 Мбит/с И ping ≤ 100 мс |
+| HD-видео | download ≥ 10 Мбит/с |
+| Музыка/Подкасты | download ≥ 1 Мбит/с |
+| Соцсети/Веб | download ≥ 3 Мбит/с |
+| Почта/Мессенджеры | download ≥ 0.5 Мбит/с |
 
 ---
 

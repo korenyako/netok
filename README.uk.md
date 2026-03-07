@@ -94,12 +94,64 @@
   <a href="https://github.com/korenyako/netok/releases/latest"><img src="https://img.shields.io/github/v/release/korenyako/netok?label=%D0%97%D0%B0%D0%B2%D0%B0%D0%BD%D1%82%D0%B0%D0%B6%D0%B8%D1%82%D0%B8%20%D0%B4%D0%BB%D1%8F%20Windows&style=for-the-badge&logo=windows&logoColor=white" alt="Завантажити для Windows"></a>
 </p>
 
-### Code signing policy
+### Примітка щодо Windows SmartScreen
 
-Free code signing provided by [SignPath.io](https://signpath.io), certificate by [SignPath Foundation](https://signpath.org).
+Netok поки що не має цифрового підпису. При першому запуску Windows може показати попередження SmartScreen — це нормально для непідписаних застосунків. Натисніть «Докладніше» → «Все одно запустити», щоб продовжити.
 
-- **Roles:** all governance roles (committer, reviewer, approver) are held by [Anton Korenyako](https://github.com/korenyako). See [CONTRIBUTING.md](CONTRIBUTING.md#project-governance) for details.
-- **Privacy:** this application does not transfer any information to other networked systems unless specifically requested by the user or required for core diagnostic functionality. See [PRIVACY.md](PRIVACY.md) for the full list of network requests.
+Застосунок автоматично збирається з вихідного коду через GitHub Actions. Ви можете перевірити збірку, переглянувши [процес випуску](https://github.com/korenyako/netok/releases) та порівнявши контрольні суми.
+
+---
+
+## Під капотом
+
+### Діагностичний ланцюг
+
+Кожен вузол ланцюга виконує незалежні перевірки — доступ адміністратора до маршрутизатора не потрібен:
+
+**Комп'ютер** — `hostname::get()` для імені машини, `get_if_addrs` для мережевих інтерфейсів, Windows WLAN API для деталей адаптера.
+
+**Wi-Fi** — Windows WLAN API (`WlanQueryInterface`): SSID, якість сигналу конвертується в dBm (`-90 + quality/2`), швидкість TX, тип PHY → стандарт Wi-Fi, канал і діапазон (2.4/5/6 ГГц) з `ulChCenterFrequency`. Тип з'єднання визначається за патерном імені адаптера.
+
+**Маршрутизатор** — IP шлюзу парситься з `route print` (Windows), `ip route` (Linux) або `netstat -nr` (macOS). MAC-адреса через `Get-NetNeighbor`. Виробник визначається через longest-prefix OUI-пошук серед 30 000+ записів з бази виробників Wireshark.
+
+**Інтернет** — Дві перевірки паралельно: DNS-резолвінг через `trust_dns_resolver` (пробує `one.one.one.one`, запасний `dns.google`) та HTTP-доступність через `reqwest` (пробує Cloudflare trace, запасний `example.com`). Обидві пройшли → OK, одна пройшла → Partial, обидві не пройшли → Fail.
+
+### Безпека Wi-Fi
+
+Чотири послідовні перевірки через Windows WLAN API:
+
+**Шифрування** — Читає `dot11AuthAlgorithm` + `dot11CipherAlgorithm`, мапить у Open (небезпечно) / WEP, WPA (попередження) / WPA2, WPA3 (безпечно).
+
+**Виявлення Evil Twin** — Отримує всі BSSID, що збігаються з підключеним SSID через `WlanGetNetworkBssList`. Перевіряє біт IEEE 802.11 Privacy на кожному AP. Якщо один SSID має і відкриті, і зашифровані точки доступу → попередження.
+
+**Виявлення ARP-спуфінгу** — Читає повну ARP-таблицю через `Get-NetNeighbor`, будує маппінг MAC → IP. Якщо не-broadcast MAC відповідає кільком IP включно зі шлюзом → небезпечно.
+
+**Виявлення DNS-перехоплення** — Резолвить `example.com` через системний резолвер ТА через raw UDP-запит до `1.1.1.1`. Якщо множини IP не перетинаються → попередження.
+
+Загальний статус безпеки = найгірший результат з чотирьох перевірок.
+
+### Тест швидкості
+
+Працює на фронтенді, використовуючи NDT7 (Network Diagnostic Tool v7) від M-Lab через WebSocket:
+
+- Виявлення сервера через M-Lab locate API (найближчий сервер, кеш 5 хв)
+- Фази завантаження/вивантаження ~10 секунд кожна
+- **Ping**: медіана 3 циклів RTT підключення/закриття WebSocket
+- **Latency**: середнє `TCPInfo.SmoothedRTT` під навантаженням
+- **Jitter**: середнє абсолютної послідовної різниці SmoothedRTT
+- **Виявлення bufferbloat**: latency > 3× idle ping
+
+Результати прив'язані до практичних задач:
+
+| Задача | Умова |
+|--------|-------|
+| Відео 4K | download ≥ 25 Мбіт/с |
+| Онлайн-ігри | ping ≤ 50 мс ТА jitter ≤ 30 мс |
+| Відеодзвінки | download ≥ 3 Мбіт/с ТА ping ≤ 100 мс |
+| HD-відео | download ≥ 10 Мбіт/с |
+| Музика/Подкасти | download ≥ 1 Мбіт/с |
+| Соцмережі/Веб | download ≥ 3 Мбіт/с |
+| Пошта/Месенджери | download ≥ 0.5 Мбіт/с |
 
 ---
 

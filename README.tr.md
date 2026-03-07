@@ -94,12 +94,64 @@ ne bozuldu, nerede ve ne yapilmali.
   <a href="https://github.com/korenyako/netok/releases/latest"><img src="https://img.shields.io/github/v/release/korenyako/netok?label=Windows%20i%C3%A7in%20indir&style=for-the-badge&logo=windows&logoColor=white" alt="Windows icin indir"></a>
 </p>
 
-### Code signing policy
+### Windows SmartScreen Hakkında Not
 
-Free code signing provided by [SignPath.io](https://signpath.io), certificate by [SignPath Foundation](https://signpath.org).
+Netok henüz kod imzalı değildir. İlk açılışta Windows bir SmartScreen uyarısı gösterebilir — bu, imzasız uygulamalar için normaldir. Devam etmek için "Daha fazla bilgi" → "Yine de çalıştır" seçeneğine tıklayın.
 
-- **Roles:** all governance roles (committer, reviewer, approver) are held by [Anton Korenyako](https://github.com/korenyako). See [CONTRIBUTING.md](CONTRIBUTING.md#project-governance) for details.
-- **Privacy:** this application does not transfer any information to other networked systems unless specifically requested by the user or required for core diagnostic functionality. See [PRIVACY.md](PRIVACY.md) for the full list of network requests.
+Uygulama, GitHub Actions aracılığıyla kaynak koddan otomatik olarak derlenmektedir. [Yayın iş akışını](https://github.com/korenyako/netok/releases) kontrol ederek ve sağlama toplamlarını karşılaştırarak derlemeyi doğrulayabilirsiniz.
+
+---
+
+## Kaputun altında
+
+### Tanı zinciri
+
+Zincirdeki her düğüm bağımsız kontroller yürütür — yönlendirici yönetici erişimi gerekmez:
+
+**Bilgisayar** — Makine adı için `hostname::get()`, ağ arayüzleri için `get_if_addrs`, adaptör detayları için Windows WLAN API.
+
+**Wi-Fi** — Windows WLAN API (`WlanQueryInterface`): SSID, sinyal kalitesi dBm'e dönüştürülür (`-90 + quality/2`), TX hızı, PHY tipi → Wi-Fi standardı, `ulChCenterFrequency`'den kanal ve bant (2,4/5/6 GHz). Bağlantı türü adaptör adı kalıp eşleştirmesiyle tespit edilir.
+
+**Yönlendirici** — Ağ geçidi IP'si `route print` (Windows), `ip route` (Linux) veya `netstat -nr` (macOS) çıktısından ayrıştırılır. MAC adresi `Get-NetNeighbor` üzerinden. Üretici, Wireshark üretici veritabanından derlenen 30.000+ girişe karşı en uzun önek OUI aramasıyla belirlenir.
+
+**İnternet** — İki kontrol paralel çalışır: `trust_dns_resolver` ile DNS çözümleme (`one.one.one.one` dener, yedek `dns.google`) ve `reqwest` ile HTTP erişilebilirliği (Cloudflare trace dener, yedek `example.com`). İkisi de geçerse → OK, biri geçerse → Partial, ikisi de başarısız → Fail.
+
+### Wi-Fi güvenliği
+
+Dört ardışık kontrol, tümü Windows WLAN API üzerinden:
+
+**Şifreleme** — `dot11AuthAlgorithm` + `dot11CipherAlgorithm` okur, Open (tehlike) / WEP, WPA (uyarı) / WPA2, WPA3 (güvenli) olarak eşler.
+
+**Evil Twin tespiti** — `WlanGetNetworkBssList` üzerinden bağlı SSID ile eşleşen tüm BSSID'leri alır. Her AP'de IEEE 802.11 Privacy bitini kontrol eder. Aynı SSID'de hem açık hem şifreli erişim noktaları varsa → uyarı.
+
+**ARP Spoofing tespiti** — `Get-NetNeighbor` üzerinden tam ARP tablosunu okur, MAC → IP eşlemesi oluşturur. Broadcast olmayan bir MAC, ağ geçidi dahil birden fazla IP'ye eşleniyorsa → tehlike.
+
+**DNS ele geçirme tespiti** — `example.com`'u sistem çözümleyici VE `1.1.1.1`'e ham UDP sorgusu ile çözümler. IP kümeleri örtüşmüyorsa → uyarı.
+
+Genel güvenlik durumu = dört kontrolün en kötü sonucu.
+
+### Hız testi
+
+Frontend tabanlı, M-Lab'ın NDT7'sini (Network Diagnostic Tool v7) WebSocket üzerinden kullanır:
+
+- M-Lab locate API ile sunucu keşfi (en yakın sunucu, 5 dk önbellek)
+- İndirme/yükleme aşamaları her biri ~10 saniye
+- **Ping**: 3 WebSocket bağlantı/kapanış RTT döngüsünün medyanı
+- **Latency**: Yük altında `TCPInfo.SmoothedRTT` ortalaması
+- **Jitter**: SmoothedRTT örneklerinin ortalama mutlak ardışık farkı
+- **Bufferbloat tespiti**: latency > 3× idle ping
+
+Sonuçlar pratik görevlere eşlenir:
+
+| Görev | Geçiş koşulu |
+|-------|--------------|
+| 4K Video | download ≥ 25 Mbps |
+| Çevrimiçi oyun | ping ≤ 50 ms VE jitter ≤ 30 ms |
+| Görüntülü arama | download ≥ 3 Mbps VE ping ≤ 100 ms |
+| HD Video | download ≥ 10 Mbps |
+| Müzik/Podcast | download ≥ 1 Mbps |
+| Sosyal medya/Web | download ≥ 3 Mbps |
+| E-posta/Mesajlaşma | download ≥ 0,5 Mbps |
 
 ---
 

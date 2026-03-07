@@ -94,12 +94,64 @@ ce qui est cassé, où, et quoi faire.
   <a href="https://github.com/korenyako/netok/releases/latest"><img src="https://img.shields.io/github/v/release/korenyako/netok?label=T%C3%A9l%C3%A9charger%20pour%20Windows&style=for-the-badge&logo=windows&logoColor=white" alt="Télécharger pour Windows"></a>
 </p>
 
-### Code signing policy
+### Remarque sur Windows SmartScreen
 
-Free code signing provided by [SignPath.io](https://signpath.io), certificate by [SignPath Foundation](https://signpath.org).
+Netok n'est pas encore signé numériquement. Windows peut afficher un avertissement SmartScreen au premier lancement — c'est normal pour les applications non signées. Cliquez sur « Plus d'infos » → « Exécuter quand même » pour continuer.
 
-- **Roles:** all governance roles (committer, reviewer, approver) are held by [Anton Korenyako](https://github.com/korenyako). See [CONTRIBUTING.md](CONTRIBUTING.md#project-governance) for details.
-- **Privacy:** this application does not transfer any information to other networked systems unless specifically requested by the user or required for core diagnostic functionality. See [PRIVACY.md](PRIVACY.md) for the full list of network requests.
+L'application est compilée automatiquement à partir du code source via GitHub Actions. Vous pouvez vérifier la compilation en consultant le [workflow de publication](https://github.com/korenyako/netok/releases) et en comparant les sommes de contrôle.
+
+---
+
+## Sous le capot
+
+### Chaîne de diagnostic
+
+Chaque nœud de la chaîne exécute des vérifications indépendantes — aucun accès administrateur au routeur requis :
+
+**Ordinateur** — `hostname::get()` pour le nom de la machine, `get_if_addrs` pour les interfaces réseau, Windows WLAN API pour les détails de l'adaptateur.
+
+**Wi-Fi** — Windows WLAN API (`WlanQueryInterface`) : SSID, qualité du signal convertie en dBm (`-90 + quality/2`), débit TX, type PHY → standard Wi-Fi, canal et bande (2,4/5/6 GHz) depuis `ulChCenterFrequency`. Type de connexion détecté par correspondance de motifs du nom de l'adaptateur.
+
+**Routeur** — IP de la passerelle parsée depuis `route print` (Windows), `ip route` (Linux) ou `netstat -nr` (macOS). Adresse MAC via `Get-NetNeighbor`. Fabricant identifié par recherche OUI par plus long préfixe parmi 30 000+ entrées compilées depuis la base de données des fabricants Wireshark.
+
+**Internet** — Deux vérifications en parallèle : résolution DNS via `trust_dns_resolver` (essaie `one.one.one.one`, repli `dns.google`) et accessibilité HTTP via `reqwest` (essaie Cloudflare trace, repli `example.com`). Les deux passent → OK, une passe → Partial, les deux échouent → Fail.
+
+### Sécurité Wi-Fi
+
+Quatre vérifications séquentielles, toutes via Windows WLAN API :
+
+**Chiffrement** — Lit `dot11AuthAlgorithm` + `dot11CipherAlgorithm`, mappe vers Open (danger) / WEP, WPA (avertissement) / WPA2, WPA3 (sûr).
+
+**Détection de Evil Twin** — Récupère tous les BSSIDs correspondant au SSID connecté via `WlanGetNetworkBssList`. Vérifie le bit IEEE 802.11 Privacy sur chaque AP. Si le même SSID a des points d'accès ouverts et chiffrés → avertissement.
+
+**Détection d'ARP Spoofing** — Lit la table ARP complète via `Get-NetNeighbor`, construit un mappage MAC → IP. Si un MAC non-broadcast correspond à plusieurs IPs incluant la passerelle → danger.
+
+**Détection de détournement DNS** — Résout `example.com` via le résolveur système ET via une requête UDP brute vers `1.1.1.1`. Si les ensembles d'IP ne se chevauchent pas → avertissement.
+
+Statut de sécurité global = pire résultat des quatre vérifications.
+
+### Test de vitesse
+
+Basé sur le frontend, utilisant NDT7 (Network Diagnostic Tool v7) de M-Lab via WebSocket :
+
+- Découverte du serveur via M-Lab locate API (serveur le plus proche, cache 5 min)
+- Phases de téléchargement/envoi ~10 secondes chacune
+- **Ping** : médiane de 3 cycles RTT de connexion/fermeture WebSocket
+- **Latency** : moyenne de `TCPInfo.SmoothedRTT` sous charge
+- **Jitter** : moyenne de la différence absolue consécutive des échantillons SmoothedRTT
+- **Détection de bufferbloat** : latency > 3× idle ping
+
+Résultats associés à des tâches pratiques :
+
+| Tâche | Condition |
+|-------|-----------|
+| Vidéo 4K | download ≥ 25 Mbps |
+| Jeux en ligne | ping ≤ 50 ms ET jitter ≤ 30 ms |
+| Appels vidéo | download ≥ 3 Mbps ET ping ≤ 100 ms |
+| Vidéo HD | download ≥ 10 Mbps |
+| Musique/Podcasts | download ≥ 1 Mbps |
+| Réseaux sociaux/Web | download ≥ 3 Mbps |
+| Email/Messagerie | download ≥ 0,5 Mbps |
 
 ---
 
