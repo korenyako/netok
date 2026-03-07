@@ -35,9 +35,8 @@ jobs:
         run: npm ci
         working-directory: ui
 
-      - name: Install Tauri CLI dependencies
-        run: npm ci
-        working-directory: netok_desktop
+      - name: Install Tauri CLI
+        run: npm install -g @tauri-apps/cli
 
       - name: Download sing-box binary
         shell: bash
@@ -55,6 +54,7 @@ jobs:
           tagName: v__VERSION__
           releaseName: 'Netok v__VERSION__'
           releaseBody: 'See the assets to download and install this version.'
+          tauriScript: tauri
           releaseDraft: false
           prerelease: false
           projectPath: netok_desktop

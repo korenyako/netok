@@ -31,11 +31,6 @@ jobs:
         run: |
           npm ci
 
-      - name: Install frontend deps
-        working-directory: netok_desktop
-        run: |
-          npm ci
-
       - name: Download sing-box binary
         shell: bash
         run: |
@@ -43,12 +38,15 @@ jobs:
           unzip -j sing-box.zip "sing-box-1.12.21-windows-amd64/sing-box.exe" -d netok_desktop/src-tauri/binaries/
           mv netok_desktop/src-tauri/binaries/sing-box.exe netok_desktop/src-tauri/binaries/sing-box-x86_64-pc-windows-msvc.exe
 
+      - name: Install Tauri CLI
+        run: npm install -g @tauri-apps/cli
+
       - name: Build (Tauri)
         working-directory: netok_desktop
         env:
           CI: true
         run: |
-          npx tauri build --no-bundle
+          tauri build --no-bundle
 
       - name: Upload binary
         uses: actions/upload-artifact@v4
