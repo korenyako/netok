@@ -52,22 +52,7 @@ pub fn get_wifi_info() -> WifiDetails {
     use windows::Win32::Foundation::*;
     use windows::Win32::NetworkManagement::WiFi::*;
 
-    /// RAII guard for WLAN client handle to ensure proper cleanup.
-    ///
-    /// SAFETY: This guard ensures that WlanCloseHandle is called when the guard
-    /// is dropped, preventing resource leaks.
-    struct WlanHandle(HANDLE);
-
-    impl Drop for WlanHandle {
-        fn drop(&mut self) {
-            // SAFETY: The handle is valid (checked at creation) and must be closed
-            // to free system resources. WlanCloseHandle is safe to call even if
-            // other WLAN operations have failed.
-            unsafe {
-                let _ = WlanCloseHandle(self.0, None);
-            }
-        }
-    }
+    use super::WlanHandle;
 
     // SAFETY: This entire function operates on Windows WLAN API with the following invariants:
     //
@@ -136,11 +121,12 @@ pub fn get_wifi_info() -> WifiDetails {
         let list = &*interface_list;
 
         // Iterate through all interfaces to find connected Wi-Fi
+        // InterfaceInfo is a C flexible array member declared as [T; 1]
+        // in Windows bindings. We must use raw pointer arithmetic instead
+        // of Rust array indexing to avoid UB when dwNumberOfItems > 1.
+        let interface_ptr = list.InterfaceInfo.as_ptr();
         for i in 0..list.dwNumberOfItems as usize {
-            // SAFETY: Array access within bounds.
-            // - i < dwNumberOfItems (loop condition)
-            // - InterfaceInfo is a flexible array member with dwNumberOfItems elements
-            let interface = &list.InterfaceInfo[i];
+            let interface = &*interface_ptr.add(i);
 
             // Get interface description (UTF-16 string)
             // SAFETY: Interface description is a fixed-size array of u16 (UTF-16)

@@ -18,6 +18,21 @@ pub mod security;
 pub mod vpn;
 pub mod wifi;
 
+/// RAII guard for a WLAN client handle — ensures `WlanCloseHandle` on drop.
+///
+/// Used by `wifi.rs` and `security.rs` to prevent resource leaks.
+#[cfg(target_os = "windows")]
+pub(crate) struct WlanHandle(pub windows::Win32::Foundation::HANDLE);
+
+#[cfg(target_os = "windows")]
+impl Drop for WlanHandle {
+    fn drop(&mut self) {
+        unsafe {
+            let _ = windows::Win32::NetworkManagement::WiFi::WlanCloseHandle(self.0, None);
+        }
+    }
+}
+
 /// Create a [`std::process::Command`] that hides the console window on Windows.
 ///
 /// In release builds the app uses `windows_subsystem = "windows"`, so child

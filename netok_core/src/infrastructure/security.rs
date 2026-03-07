@@ -79,66 +79,60 @@ impl std::fmt::Display for EncryptionType {
 #[cfg(target_os = "windows")]
 pub fn check_encryption() -> SecurityCheck {
     let start = std::time::Instant::now();
+    use super::WlanHandle;
     use std::ptr;
     use windows::Win32::Foundation::*;
     use windows::Win32::NetworkManagement::WiFi::*;
 
-    struct WlanHandle(HANDLE);
-
-    impl Drop for WlanHandle {
-        fn drop(&mut self) {
-            unsafe {
-                let _ = WlanCloseHandle(self.0, None);
-            }
-        }
-    }
-
-    unsafe {
-        let mut client_handle: HANDLE = HANDLE::default();
-        let mut negotiated_version: u32 = 0;
-
-        let result = WlanOpenHandle(2, None, &mut negotiated_version, &mut client_handle);
-        if result != 0 || client_handle.is_invalid() {
-            return SecurityCheck {
-                check_type: SecurityCheckType::Encryption,
-                status: SecurityStatus::Warning,
-                details: Some("wifi_unavailable".to_string()),
-            };
-        }
-
-        let _handle_guard = WlanHandle(client_handle);
-
-        let mut interface_list: *mut WLAN_INTERFACE_INFO_LIST = ptr::null_mut();
-        let result = WlanEnumInterfaces(client_handle, None, &mut interface_list);
-        if result != 0 || interface_list.is_null() {
-            return SecurityCheck {
-                check_type: SecurityCheckType::Encryption,
-                status: SecurityStatus::Warning,
-                details: Some("wifi_unavailable".to_string()),
-            };
-        }
-
-        let list = &*interface_list;
-        let mut check_result = SecurityCheck {
+    // SAFETY: Open WLAN handle — FFI call, handle validity checked below.
+    let mut client_handle: HANDLE = HANDLE::default();
+    let mut negotiated_version: u32 = 0;
+    let result = unsafe { WlanOpenHandle(2, None, &mut negotiated_version, &mut client_handle) };
+    if result != 0 || client_handle.is_invalid() {
+        return SecurityCheck {
             check_type: SecurityCheckType::Encryption,
             status: SecurityStatus::Warning,
-            details: Some("not_connected".to_string()),
+            details: Some("wifi_unavailable".to_string()),
         };
+    }
+    let _handle_guard = WlanHandle(client_handle);
 
-        // InterfaceInfo is a C flexible array member declared as [T; 1]
-        // in Windows bindings. We must use raw pointer arithmetic instead
-        // of Rust array indexing to avoid out-of-bounds panics.
-        let interface_ptr = list.InterfaceInfo.as_ptr();
-        for i in 0..list.dwNumberOfItems as usize {
-            let interface = &*interface_ptr.add(i);
-            if interface.isState != wlan_interface_state_connected {
-                continue;
-            }
+    // SAFETY: Enumerate interfaces — pointer checked for null below.
+    let mut interface_list: *mut WLAN_INTERFACE_INFO_LIST = ptr::null_mut();
+    let result = unsafe { WlanEnumInterfaces(client_handle, None, &mut interface_list) };
+    if result != 0 || interface_list.is_null() {
+        return SecurityCheck {
+            check_type: SecurityCheckType::Encryption,
+            status: SecurityStatus::Warning,
+            details: Some("wifi_unavailable".to_string()),
+        };
+    }
 
-            let mut data_size: u32 = 0;
-            let mut connection_attrs: *mut WLAN_CONNECTION_ATTRIBUTES = ptr::null_mut();
+    // SAFETY: interface_list is non-null (checked above), allocated by WlanEnumInterfaces.
+    let list = unsafe { &*interface_list };
+    let mut check_result = SecurityCheck {
+        check_type: SecurityCheckType::Encryption,
+        status: SecurityStatus::Warning,
+        details: Some("not_connected".to_string()),
+    };
 
-            let result = WlanQueryInterface(
+    // InterfaceInfo is a C flexible array member declared as [T; 1]
+    // in Windows bindings. We must use raw pointer arithmetic instead
+    // of Rust array indexing to avoid out-of-bounds panics.
+    let interface_ptr = list.InterfaceInfo.as_ptr();
+    for i in 0..list.dwNumberOfItems as usize {
+        // SAFETY: i < dwNumberOfItems, using raw pointer arithmetic for flexible array.
+        let interface = unsafe { &*interface_ptr.add(i) };
+        if interface.isState != wlan_interface_state_connected {
+            continue;
+        }
+
+        let mut data_size: u32 = 0;
+        let mut connection_attrs: *mut WLAN_CONNECTION_ATTRIBUTES = ptr::null_mut();
+
+        // SAFETY: Query connection attributes — pointer checked below.
+        let result = unsafe {
+            WlanQueryInterface(
                 client_handle,
                 &interface.InterfaceGuid,
                 wlan_intf_opcode_current_connection,
@@ -146,71 +140,72 @@ pub fn check_encryption() -> SecurityCheck {
                 &mut data_size,
                 std::ptr::addr_of_mut!(connection_attrs) as *mut *mut core::ffi::c_void,
                 None,
-            );
+            )
+        };
 
-            if result != 0 || connection_attrs.is_null() {
-                continue;
-            }
-
-            let attrs = &*connection_attrs;
-
-            // Determine auth algorithm
-            let auth = attrs.wlanSecurityAttributes.dot11AuthAlgorithm;
-
-            let enc_type = match auth {
-                DOT11_AUTH_ALGO_80211_OPEN => {
-                    // Check if there's a cipher (could be OWE)
-                    let cipher = attrs.wlanSecurityAttributes.dot11CipherAlgorithm;
-                    if cipher == DOT11_CIPHER_ALGO_NONE {
-                        EncryptionType::Open
-                    } else {
-                        EncryptionType::Wpa2
-                    }
-                }
-                DOT11_AUTH_ALGO_80211_SHARED_KEY => EncryptionType::Wep,
-                DOT11_AUTH_ALGO_WPA => EncryptionType::Wpa,
-                DOT11_AUTH_ALGO_WPA_PSK => EncryptionType::Wpa,
-                DOT11_AUTH_ALGO_RSNA => EncryptionType::Wpa2,
-                DOT11_AUTH_ALGO_RSNA_PSK => EncryptionType::Wpa2,
-                _ => {
-                    // Values >= 0x80000000 are IHV-defined — WPA3 uses SAE (value varies)
-                    // DOT11_AUTH_ALGO_WPA3_SAE = 9 on newer Windows
-                    let raw = auth.0;
-                    if raw == 9 || raw == 10 {
-                        EncryptionType::Wpa3
-                    } else {
-                        EncryptionType::Unknown(format!("auth_{}", raw))
-                    }
-                }
-            };
-
-            let (status, details) = match &enc_type {
-                EncryptionType::Open => (SecurityStatus::Danger, "Open".to_string()),
-                EncryptionType::Wep => (SecurityStatus::Warning, "WEP".to_string()),
-                EncryptionType::Wpa => (SecurityStatus::Warning, "WPA".to_string()),
-                EncryptionType::Wpa2 => (SecurityStatus::Safe, "WPA2".to_string()),
-                EncryptionType::Wpa3 => (SecurityStatus::Safe, "WPA3".to_string()),
-                EncryptionType::Unknown(s) => (SecurityStatus::Safe, s.clone()),
-            };
-
-            check_result = SecurityCheck {
-                check_type: SecurityCheckType::Encryption,
-                status,
-                details: Some(details),
-            };
-
-            WlanFreeMemory(connection_attrs as *const core::ffi::c_void);
-            break;
+        if result != 0 || connection_attrs.is_null() {
+            continue;
         }
 
-        WlanFreeMemory(interface_list as *const core::ffi::c_void);
-        println!(
-            "[security] check_encryption: {:?} in {:.1}ms",
-            check_result.status,
-            start.elapsed().as_secs_f64() * 1000.0
-        );
-        check_result
+        // SAFETY: connection_attrs is non-null, extract values before freeing.
+        let (auth, cipher) = unsafe {
+            let attrs = &*connection_attrs;
+            let auth = attrs.wlanSecurityAttributes.dot11AuthAlgorithm;
+            let cipher = attrs.wlanSecurityAttributes.dot11CipherAlgorithm;
+            WlanFreeMemory(connection_attrs as *const core::ffi::c_void);
+            (auth, cipher)
+        };
+
+        // All logic below is safe — no raw pointers involved.
+        let enc_type = match auth {
+            DOT11_AUTH_ALGO_80211_OPEN => {
+                if cipher == DOT11_CIPHER_ALGO_NONE {
+                    EncryptionType::Open
+                } else {
+                    EncryptionType::Wpa2
+                }
+            }
+            DOT11_AUTH_ALGO_80211_SHARED_KEY => EncryptionType::Wep,
+            DOT11_AUTH_ALGO_WPA => EncryptionType::Wpa,
+            DOT11_AUTH_ALGO_WPA_PSK => EncryptionType::Wpa,
+            DOT11_AUTH_ALGO_RSNA => EncryptionType::Wpa2,
+            DOT11_AUTH_ALGO_RSNA_PSK => EncryptionType::Wpa2,
+            _ => {
+                let raw = auth.0;
+                if raw == 9 || raw == 10 {
+                    EncryptionType::Wpa3
+                } else {
+                    EncryptionType::Unknown(format!("auth_{}", raw))
+                }
+            }
+        };
+
+        let (status, details) = match &enc_type {
+            EncryptionType::Open => (SecurityStatus::Danger, "Open".to_string()),
+            EncryptionType::Wep => (SecurityStatus::Warning, "WEP".to_string()),
+            EncryptionType::Wpa => (SecurityStatus::Warning, "WPA".to_string()),
+            EncryptionType::Wpa2 => (SecurityStatus::Safe, "WPA2".to_string()),
+            EncryptionType::Wpa3 => (SecurityStatus::Safe, "WPA3".to_string()),
+            EncryptionType::Unknown(s) => (SecurityStatus::Safe, s.clone()),
+        };
+
+        check_result = SecurityCheck {
+            check_type: SecurityCheckType::Encryption,
+            status,
+            details: Some(details),
+        };
+
+        break;
     }
+
+    // SAFETY: interface_list was allocated by WlanEnumInterfaces, non-null.
+    unsafe { WlanFreeMemory(interface_list as *const core::ffi::c_void) };
+    println!(
+        "[security] check_encryption: {:?} in {:.1}ms",
+        check_result.status,
+        start.elapsed().as_secs_f64() * 1000.0
+    );
+    check_result
 }
 
 #[cfg(not(target_os = "windows"))]
@@ -230,66 +225,60 @@ pub fn check_encryption() -> SecurityCheck {
 #[cfg(target_os = "windows")]
 pub fn check_evil_twin() -> SecurityCheck {
     let start = std::time::Instant::now();
+    use super::WlanHandle;
     use std::ptr;
     use windows::Win32::Foundation::*;
     use windows::Win32::NetworkManagement::WiFi::*;
 
-    struct WlanHandle(HANDLE);
-
-    impl Drop for WlanHandle {
-        fn drop(&mut self) {
-            unsafe {
-                let _ = WlanCloseHandle(self.0, None);
-            }
-        }
-    }
-
-    unsafe {
-        let mut client_handle: HANDLE = HANDLE::default();
-        let mut negotiated_version: u32 = 0;
-
-        let result = WlanOpenHandle(2, None, &mut negotiated_version, &mut client_handle);
-        if result != 0 || client_handle.is_invalid() {
-            return SecurityCheck {
-                check_type: SecurityCheckType::EvilTwin,
-                status: SecurityStatus::Safe,
-                details: Some("wifi_unavailable".to_string()),
-            };
-        }
-
-        let _handle_guard = WlanHandle(client_handle);
-
-        let mut interface_list: *mut WLAN_INTERFACE_INFO_LIST = ptr::null_mut();
-        let result = WlanEnumInterfaces(client_handle, None, &mut interface_list);
-        if result != 0 || interface_list.is_null() {
-            return SecurityCheck {
-                check_type: SecurityCheckType::EvilTwin,
-                status: SecurityStatus::Safe,
-                details: Some("wifi_unavailable".to_string()),
-            };
-        }
-
-        let list = &*interface_list;
-        let mut check_result = SecurityCheck {
+    // SAFETY: Open WLAN handle — FFI call, handle validity checked below.
+    let mut client_handle: HANDLE = HANDLE::default();
+    let mut negotiated_version: u32 = 0;
+    let result = unsafe { WlanOpenHandle(2, None, &mut negotiated_version, &mut client_handle) };
+    if result != 0 || client_handle.is_invalid() {
+        return SecurityCheck {
             check_type: SecurityCheckType::EvilTwin,
             status: SecurityStatus::Safe,
-            details: None,
+            details: Some("wifi_unavailable".to_string()),
         };
-        let mut bss_scanned: u32 = 0;
+    }
+    let _handle_guard = WlanHandle(client_handle);
 
-        // InterfaceInfo is a C flexible array member — use raw pointer arithmetic.
-        let interface_ptr = list.InterfaceInfo.as_ptr();
-        for i in 0..list.dwNumberOfItems as usize {
-            let interface = &*interface_ptr.add(i);
-            if interface.isState != wlan_interface_state_connected {
-                continue;
-            }
+    // SAFETY: Enumerate interfaces — pointer checked for null below.
+    let mut interface_list: *mut WLAN_INTERFACE_INFO_LIST = ptr::null_mut();
+    let result = unsafe { WlanEnumInterfaces(client_handle, None, &mut interface_list) };
+    if result != 0 || interface_list.is_null() {
+        return SecurityCheck {
+            check_type: SecurityCheckType::EvilTwin,
+            status: SecurityStatus::Safe,
+            details: Some("wifi_unavailable".to_string()),
+        };
+    }
 
-            // Get current SSID
-            let mut data_size: u32 = 0;
-            let mut connection_attrs: *mut WLAN_CONNECTION_ATTRIBUTES = ptr::null_mut();
+    // SAFETY: interface_list is non-null (checked above).
+    let list = unsafe { &*interface_list };
+    let mut check_result = SecurityCheck {
+        check_type: SecurityCheckType::EvilTwin,
+        status: SecurityStatus::Safe,
+        details: None,
+    };
+    let mut bss_scanned: u32 = 0;
 
-            let result = WlanQueryInterface(
+    // InterfaceInfo is a C flexible array member — use raw pointer arithmetic.
+    let interface_ptr = list.InterfaceInfo.as_ptr();
+    for i in 0..list.dwNumberOfItems as usize {
+        // SAFETY: i < dwNumberOfItems, flexible array access via raw pointer.
+        let interface = unsafe { &*interface_ptr.add(i) };
+        if interface.isState != wlan_interface_state_connected {
+            continue;
+        }
+
+        // Get current SSID
+        let mut data_size: u32 = 0;
+        let mut connection_attrs: *mut WLAN_CONNECTION_ATTRIBUTES = ptr::null_mut();
+
+        // SAFETY: Query connection attributes — pointer checked below.
+        let result = unsafe {
+            WlanQueryInterface(
                 client_handle,
                 &interface.InterfaceGuid,
                 wlan_intf_opcode_current_connection,
@@ -297,44 +286,52 @@ pub fn check_evil_twin() -> SecurityCheck {
                 &mut data_size,
                 std::ptr::addr_of_mut!(connection_attrs) as *mut *mut core::ffi::c_void,
                 None,
-            );
+            )
+        };
 
-            if result != 0 || connection_attrs.is_null() {
-                continue;
-            }
+        if result != 0 || connection_attrs.is_null() {
+            continue;
+        }
 
+        // SAFETY: connection_attrs is non-null, extract SSID before freeing.
+        let current_ssid = unsafe {
             let attrs = &*connection_attrs;
             let ssid_len = attrs.wlanAssociationAttributes.dot11Ssid.uSSIDLength as usize;
-            let current_ssid = if ssid_len > 0 && ssid_len <= 32 {
+            let ssid = if ssid_len > 0 && ssid_len <= 32 {
                 let ssid_bytes = &attrs.wlanAssociationAttributes.dot11Ssid.ucSSID[..ssid_len];
                 String::from_utf8(ssid_bytes.to_vec()).ok()
             } else {
                 None
             };
-
             WlanFreeMemory(connection_attrs as *const core::ffi::c_void);
+            ssid
+        };
 
-            let current_ssid = match current_ssid {
-                Some(s) => s,
-                None => continue,
-            };
+        let current_ssid = match current_ssid {
+            Some(s) => s,
+            None => continue,
+        };
 
-            // Scan BSS list for networks with the same SSID
-            let mut bss_list_ptr: *mut WLAN_BSS_LIST = ptr::null_mut();
+        // Scan BSS list for networks with the same SSID
+        let mut bss_list_ptr: *mut WLAN_BSS_LIST = ptr::null_mut();
 
-            let result = WlanGetNetworkBssList(
+        // SAFETY: Get BSS list — pointer checked below.
+        let result = unsafe {
+            WlanGetNetworkBssList(
                 client_handle,
                 &interface.InterfaceGuid,
                 None,
                 dot11_BSS_type_infrastructure,
-                true, // security enabled
+                true,
                 None,
                 &mut bss_list_ptr,
-            );
+            )
+        };
 
-            if result != 0 || bss_list_ptr.is_null() {
-                // Try without security filter
-                let result = WlanGetNetworkBssList(
+        if result != 0 || bss_list_ptr.is_null() {
+            // Try without security filter
+            let result = unsafe {
+                WlanGetNetworkBssList(
                     client_handle,
                     &interface.InterfaceGuid,
                     None,
@@ -342,73 +339,77 @@ pub fn check_evil_twin() -> SecurityCheck {
                     false,
                     None,
                     &mut bss_list_ptr,
-                );
+                )
+            };
 
-                if result != 0 || bss_list_ptr.is_null() {
-                    continue;
-                }
+            if result != 0 || bss_list_ptr.is_null() {
+                continue;
             }
-
-            let bss_list = &*bss_list_ptr;
-
-            let mut has_encrypted = false;
-            let mut has_open = false;
-
-            // wlanBssEntries is a C flexible array member — use raw pointer arithmetic.
-            let bss_entry_ptr = bss_list.wlanBssEntries.as_ptr();
-            for j in 0..bss_list.dwNumberOfItems as usize {
-                let entry = &*bss_entry_ptr.add(j);
-
-                let entry_ssid_len = entry.dot11Ssid.uSSIDLength as usize;
-                if entry_ssid_len == 0 || entry_ssid_len > 32 {
-                    continue;
-                }
-
-                let entry_ssid_bytes = &entry.dot11Ssid.ucSSID[..entry_ssid_len];
-                let entry_ssid = match String::from_utf8(entry_ssid_bytes.to_vec()) {
-                    Ok(s) => s,
-                    Err(_) => continue,
-                };
-
-                if entry_ssid != current_ssid {
-                    continue;
-                }
-
-                // Check if this BSSID has privacy (encryption)
-                // The capability info bit 4 (0x0010) indicates privacy
-                let has_privacy = (entry.usCapabilityInformation & 0x0010) != 0;
-
-                if has_privacy {
-                    has_encrypted = true;
-                } else {
-                    has_open = true;
-                }
-            }
-
-            bss_scanned = bss_list.dwNumberOfItems;
-            WlanFreeMemory(bss_list_ptr as *const core::ffi::c_void);
-
-            // Suspicious: same SSID has both open and encrypted APs
-            if has_open && has_encrypted {
-                check_result = SecurityCheck {
-                    check_type: SecurityCheckType::EvilTwin,
-                    status: SecurityStatus::Warning,
-                    details: Some(current_ssid),
-                };
-            }
-
-            break;
         }
 
-        WlanFreeMemory(interface_list as *const core::ffi::c_void);
-        println!(
-            "[security] check_evil_twin: {:?} (scanned {} BSSIDs) in {:.1}ms",
-            check_result.status,
-            bss_scanned,
-            start.elapsed().as_secs_f64() * 1000.0
-        );
-        check_result
+        // SAFETY: bss_list_ptr is non-null (checked above).
+        let bss_list = unsafe { &*bss_list_ptr };
+
+        let mut has_encrypted = false;
+        let mut has_open = false;
+
+        // wlanBssEntries is a C flexible array member — use raw pointer arithmetic.
+        let bss_entry_ptr = bss_list.wlanBssEntries.as_ptr();
+        for j in 0..bss_list.dwNumberOfItems as usize {
+            // SAFETY: j < dwNumberOfItems, flexible array access via raw pointer.
+            let (entry_ssid_bytes, capability) = unsafe {
+                let entry = &*bss_entry_ptr.add(j);
+                let ssid_len = entry.dot11Ssid.uSSIDLength as usize;
+                if ssid_len == 0 || ssid_len > 32 {
+                    continue;
+                }
+                let bytes = entry.dot11Ssid.ucSSID[..ssid_len].to_vec();
+                (bytes, entry.usCapabilityInformation)
+            };
+
+            let entry_ssid = match String::from_utf8(entry_ssid_bytes) {
+                Ok(s) => s,
+                Err(_) => continue,
+            };
+
+            if entry_ssid != current_ssid {
+                continue;
+            }
+
+            // The capability info bit 4 (0x0010) indicates privacy
+            let has_privacy = (capability & 0x0010) != 0;
+            if has_privacy {
+                has_encrypted = true;
+            } else {
+                has_open = true;
+            }
+        }
+
+        bss_scanned = bss_list.dwNumberOfItems;
+        // SAFETY: bss_list_ptr was allocated by WlanGetNetworkBssList.
+        unsafe { WlanFreeMemory(bss_list_ptr as *const core::ffi::c_void) };
+
+        // Suspicious: same SSID has both open and encrypted APs
+        if has_open && has_encrypted {
+            check_result = SecurityCheck {
+                check_type: SecurityCheckType::EvilTwin,
+                status: SecurityStatus::Warning,
+                details: Some(current_ssid),
+            };
+        }
+
+        break;
     }
+
+    // SAFETY: interface_list was allocated by WlanEnumInterfaces.
+    unsafe { WlanFreeMemory(interface_list as *const core::ffi::c_void) };
+    println!(
+        "[security] check_evil_twin: {:?} (scanned {} BSSIDs) in {:.1}ms",
+        check_result.status,
+        bss_scanned,
+        start.elapsed().as_secs_f64() * 1000.0
+    );
+    check_result
 }
 
 #[cfg(not(target_os = "windows"))]
