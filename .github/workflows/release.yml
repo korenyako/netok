@@ -55,7 +55,6 @@ jobs:
           tagName: v__VERSION__
           releaseName: 'Netok v__VERSION__'
           releaseBody: 'See the assets to download and install this version.'
-          tauriScript: npx tauri
           releaseDraft: false
           prerelease: false
           projectPath: netok_desktop
