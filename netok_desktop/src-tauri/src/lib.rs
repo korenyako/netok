@@ -941,6 +941,27 @@ fn update_tray_language(app: tauri::AppHandle, lang: String) -> Result<(), Strin
     Ok(())
 }
 
+// ==================== Autostart ====================
+
+#[tauri::command]
+fn get_autostart_enabled(app: tauri::AppHandle) -> Result<bool, String> {
+    use tauri_plugin_autostart::ManagerExt;
+    app.autolaunch()
+        .is_enabled()
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+fn set_autostart_enabled(app: tauri::AppHandle, enabled: bool) -> Result<(), String> {
+    use tauri_plugin_autostart::ManagerExt;
+    let manager = app.autolaunch();
+    if enabled {
+        manager.enable().map_err(|e| e.to_string())
+    } else {
+        manager.disable().map_err(|e| e.to_string())
+    }
+}
+
 // ==================== App Entry ====================
 
 /// Kill any orphaned sing-box processes left from a previous crash or Ctrl+C.
@@ -989,6 +1010,10 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_process::init())
+        .plugin(tauri_plugin_autostart::init(
+            tauri_plugin_autostart::MacosLauncher::LaunchAgent,
+            None,
+        ))
         .manage(Arc::new(Mutex::new(VpnProcessState::default())))
         .invoke_handler(tauri::generate_handler![
             get_settings,
@@ -1012,7 +1037,9 @@ pub fn run() {
             validate_vpn_key,
             connect_vpn,
             disconnect_vpn,
-            get_vpn_status
+            get_vpn_status,
+            get_autostart_enabled,
+            set_autostart_enabled
         ])
         .setup(|app| {
             kill_orphaned_singbox();

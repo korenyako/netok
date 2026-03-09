@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { CloseButton } from '../components/WindowControls';
 import { useUpdateChecker } from '../hooks/useUpdateChecker';
+import logoSvg from '../assets/logo.svg';
 
 interface AboutScreenProps {
   onBack: () => void;
@@ -80,6 +81,12 @@ export function AboutScreen({ onBack, onNavigateToDebugScenarios }: AboutScreenP
 
       {/* Content */}
       <div className="flex-1 px-4 pb-4 flex flex-col min-h-0 overflow-y-auto space-y-4">
+        {/* Logo */}
+        <div className="flex items-center gap-4 pt-2 pb-2 px-4">
+          <img src={logoSvg} alt="Netok" className="w-16 h-16" />
+          <span className="text-5xl font-medium font-mono text-white" style={{ letterSpacing: '-2px', marginTop: '-4px' }}>netok</span>
+        </div>
+
         {/* Info */}
         <Card className="bg-transparent">
           <CardContent className="px-4 py-3">

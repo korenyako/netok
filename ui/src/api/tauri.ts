@@ -253,3 +253,12 @@ export interface WiFiSecurityReport {
 export async function checkWifiSecurity(): Promise<WiFiSecurityReport> {
   return await invoke<WiFiSecurityReport>('check_wifi_security');
 }
+
+// Autostart
+export async function getAutostartEnabled(): Promise<boolean> {
+  return await invoke<boolean>('get_autostart_enabled');
+}
+
+export async function setAutostartEnabled(enabled: boolean): Promise<void> {
+  return await invoke('set_autostart_enabled', { enabled });
+}

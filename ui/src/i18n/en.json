@@ -176,6 +176,8 @@
       "close_minimize_desc": "The app will continue running in the system tray",
       "close_quit": "Close application",
       "close_quit_desc": "Completely exit the application",
+      "autostart": "Launch at startup",
+      "autostart_desc": "Start Netok when Windows starts",
       "about": "About",
       "about_desc": "Version and app info"
     },

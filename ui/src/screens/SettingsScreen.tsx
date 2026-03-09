@@ -1,8 +1,10 @@
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Sun, Moon, Languages, Minimize2, Info } from '../components/icons/UIIcons';
+import { ArrowLeft, Sun, Moon, Languages, Minimize2, Power, Info } from '../components/icons/UIIcons';
 
 import { useThemeStore } from '../stores/themeStore';
 import { useCloseBehaviorStore } from '../stores/closeBehaviorStore';
+import { getAutostartEnabled, setAutostartEnabled } from '../api/tauri';
 import { LANGUAGES, type LanguageCode } from '../constants/languages';
 import { Button } from '@/components/ui/button';
 import { MenuCard } from '@/components/MenuCard';
@@ -22,6 +24,25 @@ export function SettingsScreen({ onNavigateToTheme, onNavigateToLanguage, onNavi
   const { theme: currentTheme } = useThemeStore();
   const { closeBehavior } = useCloseBehaviorStore();
   const currentLanguage = i18n.language;
+
+  const [autostartEnabled, setAutostartState] = useState(false);
+  const [autostartLoading, setAutostartLoading] = useState(true);
+
+  useEffect(() => {
+    getAutostartEnabled()
+      .then(setAutostartState)
+      .catch(() => {})
+      .finally(() => setAutostartLoading(false));
+  }, []);
+
+  const handleAutostartChange = async (enabled: boolean) => {
+    setAutostartState(enabled);
+    try {
+      await setAutostartEnabled(enabled);
+    } catch {
+      setAutostartState(!enabled);
+    }
+  };
 
   const themeIcon = currentTheme === 'dark'
     ? <Moon className="w-5 h-5 text-foreground" />
@@ -78,6 +99,16 @@ export function SettingsScreen({ onNavigateToTheme, onNavigateToLanguage, onNavi
             subtitle={closeBehaviorSubtitle}
             trailing="chevron"
             onClick={onNavigateToCloseBehavior}
+          />
+
+          <MenuCard
+            icon={<Power className="w-5 h-5 text-foreground" />}
+            title={t('settings.general.autostart')}
+            subtitle={t('settings.general.autostart_desc')}
+            trailing="switch"
+            switchChecked={autostartEnabled}
+            onSwitchChange={handleAutostartChange}
+            switchDisabled={autostartLoading}
           />
 
           <MenuCard
