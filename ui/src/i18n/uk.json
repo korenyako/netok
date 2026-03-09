@@ -176,6 +176,12 @@
       "close_minimize_desc": "Застосунок продовжить працювати в системному треї",
       "close_quit": "Закривати застосунок",
       "close_quit_desc": "Повністю завершити роботу застосунку",
+      "autostart": "Запуск при старті",
+      "autostart_desc": "Запускати Netok разом з Windows",
+      "autostart_on": "Разом з Windows",
+      "autostart_on_desc": "Netok запуститься автоматично при вході в систему",
+      "autostart_off": "Запускати вручну",
+      "autostart_off_desc": "Відкривати Netok самостійно, коли потрібно",
       "about": "Про програму",
       "about_desc": "Версія та інформація"
     },

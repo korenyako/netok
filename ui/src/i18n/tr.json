@@ -176,6 +176,12 @@
       "close_minimize_desc": "Uygulama sistem tepsisinde çalışmaya devam edecek",
       "close_quit": "Uygulamayı kapat",
       "close_quit_desc": "Uygulamadan tamamen çık",
+      "autostart": "Başlangıçta aç",
+      "autostart_desc": "Netok'u Windows ile başlat",
+      "autostart_on": "Windows ile başlat",
+      "autostart_on_desc": "Netok oturum açıldığında otomatik başlar",
+      "autostart_off": "Elle başlat",
+      "autostart_off_desc": "Netok'u ihtiyaç duyduğunuzda kendiniz açın",
       "about": "Hakkında",
       "about_desc": "Sürüm ve uygulama bilgisi"
     },

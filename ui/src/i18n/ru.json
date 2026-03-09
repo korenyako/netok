@@ -178,6 +178,10 @@
       "close_quit_desc": "Полностью завершить работу приложения",
       "autostart": "Запуск при старте",
       "autostart_desc": "Запускать Netok вместе с Windows",
+      "autostart_on": "Вместе с Windows",
+      "autostart_on_desc": "Netok запустится автоматически при входе в систему",
+      "autostart_off": "Запускать вручную",
+      "autostart_off_desc": "Открывать Netok самостоятельно, когда нужно",
       "about": "О программе",
       "about_desc": "Версия и информация"
     },

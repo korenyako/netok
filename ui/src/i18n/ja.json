@@ -176,6 +176,12 @@
       "close_minimize_desc": "アプリはシステムトレイで動作し続けます",
       "close_quit": "アプリケーションを終了",
       "close_quit_desc": "アプリケーションを完全に終了します",
+      "autostart": "スタートアップ起動",
+      "autostart_desc": "Windows起動時にNetokを開始",
+      "autostart_on": "Windowsと起動",
+      "autostart_on_desc": "サインイン時にNetokを自動起動",
+      "autostart_off": "手動で起動",
+      "autostart_off_desc": "必要なときにNetokを開く",
       "about": "アプリについて",
       "about_desc": "バージョンとアプリ情報"
     },

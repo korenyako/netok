@@ -176,6 +176,12 @@
       "close_minimize_desc": "برنامه در سینی سیستم به کار خود ادامه می‌دهد",
       "close_quit": "بستن برنامه",
       "close_quit_desc": "خروج کامل از برنامه",
+      "autostart": "اجرا در هنگام راه‌اندازی",
+      "autostart_desc": "اجرای Netok همراه با ویندوز",
+      "autostart_on": "همراه با ویندوز",
+      "autostart_on_desc": "Netok هنگام ورود به سیستم به‌طور خودکار اجرا می‌شود",
+      "autostart_off": "اجرای دستی",
+      "autostart_off_desc": "Netok را هر زمان که نیاز داشتید خودتان باز کنید",
       "about": "درباره",
       "about_desc": "نسخه و اطلاعات برنامه"
     },

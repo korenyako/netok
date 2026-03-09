@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Sun, Moon, Languages, Minimize2, Power, Info } from '../components/icons/UIIcons';
 
 import { useThemeStore } from '../stores/themeStore';
 import { useCloseBehaviorStore } from '../stores/closeBehaviorStore';
-import { getAutostartEnabled, setAutostartEnabled } from '../api/tauri';
+import { useAutostartStore } from '../stores/autostartStore';
 import { LANGUAGES, type LanguageCode } from '../constants/languages';
 import { Button } from '@/components/ui/button';
 import { MenuCard } from '@/components/MenuCard';
@@ -14,35 +14,17 @@ interface SettingsScreenProps {
   onNavigateToTheme: () => void;
   onNavigateToLanguage: () => void;
   onNavigateToCloseBehavior: () => void;
+  onNavigateToAutostart: () => void;
   onNavigateToAbout: () => void;
   onBack?: () => void;
 }
 
-export function SettingsScreen({ onNavigateToTheme, onNavigateToLanguage, onNavigateToCloseBehavior, onNavigateToAbout, onBack }: SettingsScreenProps) {
+export function SettingsScreen({ onNavigateToTheme, onNavigateToLanguage, onNavigateToCloseBehavior, onNavigateToAutostart, onNavigateToAbout, onBack }: SettingsScreenProps) {
   const { t, i18n } = useTranslation();
 
   const { theme: currentTheme } = useThemeStore();
   const { closeBehavior } = useCloseBehaviorStore();
   const currentLanguage = i18n.language;
-
-  const [autostartEnabled, setAutostartState] = useState(false);
-  const [autostartLoading, setAutostartLoading] = useState(true);
-
-  useEffect(() => {
-    getAutostartEnabled()
-      .then(setAutostartState)
-      .catch(() => {})
-      .finally(() => setAutostartLoading(false));
-  }, []);
-
-  const handleAutostartChange = async (enabled: boolean) => {
-    setAutostartState(enabled);
-    try {
-      await setAutostartEnabled(enabled);
-    } catch {
-      setAutostartState(!enabled);
-    }
-  };
 
   const themeIcon = currentTheme === 'dark'
     ? <Moon className="w-5 h-5 text-foreground" />
@@ -60,6 +42,18 @@ export function SettingsScreen({ onNavigateToTheme, onNavigateToLanguage, onNavi
   const closeBehaviorSubtitle = closeBehavior === 'minimize_to_tray'
     ? t('settings.general.close_minimize')
     : t('settings.general.close_quit');
+
+  const { enabled: autostartEnabled, fetch: fetchAutostart } = useAutostartStore();
+
+  useEffect(() => {
+    fetchAutostart();
+  }, [fetchAutostart]);
+
+  const autostartSubtitle = autostartEnabled === null
+    ? t('settings.general.autostart_desc')
+    : autostartEnabled
+      ? t('settings.general.autostart_on')
+      : t('settings.general.autostart_off');
 
   return (
     <div className="flex flex-col h-full bg-background">
@@ -104,11 +98,9 @@ export function SettingsScreen({ onNavigateToTheme, onNavigateToLanguage, onNavi
           <MenuCard
             icon={<Power className="w-5 h-5 text-foreground" />}
             title={t('settings.general.autostart')}
-            subtitle={t('settings.general.autostart_desc')}
-            trailing="switch"
-            switchChecked={autostartEnabled}
-            onSwitchChange={handleAutostartChange}
-            switchDisabled={autostartLoading}
+            subtitle={autostartSubtitle}
+            trailing="chevron"
+            onClick={onNavigateToAutostart}
           />
 
           <MenuCard

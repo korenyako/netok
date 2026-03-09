@@ -176,6 +176,12 @@
       "close_minimize_desc": "앱이 시스템 트레이에서 계속 실행됩니다",
       "close_quit": "애플리케이션 종료",
       "close_quit_desc": "애플리케이션을 완전히 종료합니다",
+      "autostart": "시작 시 실행",
+      "autostart_desc": "Windows 시작 시 Netok 실행",
+      "autostart_on": "Windows와 함께 시작",
+      "autostart_on_desc": "로그인 시 Netok이 자동으로 시작됩니다",
+      "autostart_off": "수동으로 시작",
+      "autostart_off_desc": "필요할 때 직접 Netok을 여세요",
       "about": "정보",
       "about_desc": "버전 및 앱 정보"
     },

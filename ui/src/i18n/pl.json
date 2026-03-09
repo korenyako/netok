@@ -176,6 +176,12 @@
       "close_minimize_desc": "Aplikacja będzie nadal działać w zasobniku systemowym",
       "close_quit": "Zamknij aplikację",
       "close_quit_desc": "Całkowicie zakończ działanie aplikacji",
+      "autostart": "Uruchamiaj przy starcie",
+      "autostart_desc": "Uruchamiaj Netok razem z Windows",
+      "autostart_on": "Z systemem Windows",
+      "autostart_on_desc": "Netok uruchomi się automatycznie przy logowaniu",
+      "autostart_off": "Uruchamiaj ręcznie",
+      "autostart_off_desc": "Otwieraj Netok samodzielnie, gdy potrzebujesz",
       "about": "O programie",
       "about_desc": "Wersja i informacje o aplikacji"
     },

@@ -1,0 +1,77 @@
+import { useTranslation } from 'react-i18next';
+import { ArrowLeft, Check } from '../components/icons/UIIcons';
+import { useAutostartStore } from '../stores/autostartStore';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { CloseButton } from '../components/WindowControls';
+import { cn } from '@/lib/utils';
+
+interface AutostartSettingsScreenProps {
+  onBack: () => void;
+}
+
+export function AutostartSettingsScreen({ onBack }: AutostartSettingsScreenProps) {
+  const { t } = useTranslation();
+  const { enabled, setEnabled } = useAutostartStore();
+
+  const options: Array<{
+    id: boolean;
+    title: string;
+    description: string;
+  }> = [
+    {
+      id: true,
+      title: t('settings.general.autostart_on'),
+      description: t('settings.general.autostart_on_desc'),
+    },
+    {
+      id: false,
+      title: t('settings.general.autostart_off'),
+      description: t('settings.general.autostart_off_desc'),
+    },
+  ];
+
+  return (
+    <div className="flex flex-col h-full bg-background">
+      <div data-tauri-drag-region className="px-4 pt-4 pb-3">
+        <div className="flex items-center gap-2 pointer-events-auto">
+          <Button variant="ghost" size="icon" onClick={onBack}>
+            <ArrowLeft className="w-5 h-5 text-muted-foreground rtl-flip" />
+          </Button>
+          <h1 className="flex-1 text-lg font-semibold text-foreground">{t('settings.general.autostart')}</h1>
+          <CloseButton />
+        </div>
+      </div>
+
+      <div className="flex-1 px-4 pb-4 flex flex-col min-h-0 overflow-y-auto">
+        <div className="space-y-2">
+          {options.map((option) => {
+            const isSelected = enabled !== null && enabled === option.id;
+            return (
+              <Card
+                key={String(option.id)}
+                className={cn(
+                  'cursor-pointer transition-colors',
+                  isSelected
+                    ? 'border-muted-foreground/40 bg-accent hover:bg-accent-hover'
+                    : 'bg-transparent hover:bg-accent'
+                )}
+                onClick={() => setEnabled(option.id)}
+              >
+                <CardContent className="flex items-center gap-3 px-4 py-3">
+                  <div className="flex-1 min-w-0">
+                    <span className="text-base font-medium leading-normal">{option.title}</span>
+                    <div className="text-sm text-muted-foreground leading-normal mt-0.5">
+                      {option.description}
+                    </div>
+                  </div>
+                  {isSelected && <Check className="w-5 h-5 text-primary shrink-0" />}
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -176,6 +176,12 @@
       "close_minimize_desc": "Die App läuft weiter im Infobereich der Taskleiste",
       "close_quit": "Anwendung beenden",
       "close_quit_desc": "Die Anwendung vollständig beenden",
+      "autostart": "Beim Start öffnen",
+      "autostart_desc": "Netok mit Windows starten",
+      "autostart_on": "Mit Windows starten",
+      "autostart_on_desc": "Netok startet automatisch bei der Anmeldung",
+      "autostart_off": "Manuell starten",
+      "autostart_off_desc": "Netok bei Bedarf selbst öffnen",
       "about": "Über",
       "about_desc": "Version und App-Informationen"
     },

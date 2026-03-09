@@ -176,6 +176,12 @@
       "close_minimize_desc": "L'application continuera de fonctionner dans la zone de notification",
       "close_quit": "Quitter l'application",
       "close_quit_desc": "Fermer complètement l'application",
+      "autostart": "Lancer au démarrage",
+      "autostart_desc": "Démarrer Netok avec Windows",
+      "autostart_on": "Avec Windows",
+      "autostart_on_desc": "Netok démarrera automatiquement à la connexion",
+      "autostart_off": "Lancer manuellement",
+      "autostart_off_desc": "Ouvrir Netok quand vous en avez besoin",
       "about": "À propos",
       "about_desc": "Version et informations sur l'application"
     },

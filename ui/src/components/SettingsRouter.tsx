@@ -2,6 +2,7 @@ import { SettingsScreen } from '../screens/SettingsScreen';
 import { ThemeSettingsScreen } from '../screens/ThemeSettingsScreen';
 import { LanguageSettingsScreen } from '../screens/LanguageSettingsScreen';
 import { CloseBehaviorSettingsScreen } from '../screens/CloseBehaviorSettingsScreen';
+import { AutostartSettingsScreen } from '../screens/AutostartSettingsScreen';
 import { AboutScreen } from '../screens/AboutScreen';
 import { DebugScenariosScreen } from '../screens/DebugScenariosScreen';
 import type { SettingsSubScreen } from '../hooks/useNavigation';
@@ -24,6 +25,9 @@ export function SettingsRouter({ subScreen, onSetSubScreen, onBack, onNavigateTo
 
     case 'close-behavior':
       return <CloseBehaviorSettingsScreen onBack={onBack} />;
+
+    case 'autostart':
+      return <AutostartSettingsScreen onBack={onBack} />;
 
     case 'about':
       return (
@@ -49,6 +53,7 @@ export function SettingsRouter({ subScreen, onSetSubScreen, onBack, onNavigateTo
           onNavigateToTheme={() => onSetSubScreen('theme')}
           onNavigateToLanguage={() => onSetSubScreen('language')}
           onNavigateToCloseBehavior={() => onSetSubScreen('close-behavior')}
+          onNavigateToAutostart={() => onSetSubScreen('autostart')}
           onNavigateToAbout={() => onSetSubScreen('about')}
           onBack={onBack}
         />

@@ -178,6 +178,10 @@
       "close_quit_desc": "Completely exit the application",
       "autostart": "Launch at startup",
       "autostart_desc": "Start Netok when Windows starts",
+      "autostart_on": "With Windows",
+      "autostart_on_desc": "Netok will start automatically when you sign in",
+      "autostart_off": "Launch manually",
+      "autostart_off_desc": "Open Netok yourself when you need it",
       "about": "About",
       "about_desc": "Version and app info"
     },

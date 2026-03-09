@@ -283,6 +283,7 @@ Generated: 2026-03-09
 │   │   ├── screens
 │   │   │   ├── AboutScreen.tsx
 │   │   │   ├── AddVpnScreen.tsx
+│   │   │   ├── AutostartSettingsScreen.tsx
 │   │   │   ├── CloseBehaviorSettingsScreen.tsx
 │   │   │   ├── CustomIpScreen.tsx
 │   │   │   ├── DebugScenariosScreen.tsx
@@ -301,6 +302,7 @@ Generated: 2026-03-09
 │   │   │   └── WiFiSecurityScreen.tsx
 │   │   ├── store
 │   │   ├── stores
+│   │   │   ├── autostartStore.ts
 │   │   │   ├── closeBehaviorStore.ts
 │   │   │   ├── demoStore.ts
 │   │   │   ├── deviceScanStore.ts
