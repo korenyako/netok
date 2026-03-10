@@ -25,7 +25,7 @@ cargo tauri dev
 
 ### Good First Contributions
 
-- **Translations** — improve or add languages in the `ui/src/i18n` folder. Netok supports 14 languages and we'd love to make them better.
+- **Translations** — improve or add languages in the `ui/src/i18n` folder. Netok supports 14 languages and I'd love to make them better with your help.
 - **Bug reports** — if something doesn't work as expected, open an issue.
 - **Documentation** — fix typos, improve clarity, add examples.
 
@@ -37,7 +37,7 @@ If you want to work on something not listed, please open an issue first to discu
 
 ### Areas Where Help Is Especially Welcome
 
-- **macOS support** — we currently don't have a Mac to develop and test on
+- **macOS / Linux support** — platform-specific testing and fixes
 - **Error scenarios** — human-readable explanations for common network problems
 - **Testing** — expanding test coverage, especially edge cases
 
@@ -64,7 +64,7 @@ netok/
 
 ### Commits
 
-We use conventional commits:
+The project uses conventional commits:
 
 ```
 feat: add WiFi channel detection
