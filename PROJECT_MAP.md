@@ -356,7 +356,6 @@ Generated: 2026-03-10
 ├── CODE_OF_CONDUCT.md
 ├── CONTRIBUTING.md
 ├── etsy-hover-effects-fixed.html
-├── landing.html
 ├── LICENSE
 ├── logo.svg
 ├── MACOS_PORT_ANALYSIS.md
