@@ -48,7 +48,7 @@ jobs:
         env:
           CI: true
         run: |
-          npm run tauri build
+          npm run tauri -- build -t x86_64-pc-windows-msvc
 
       - name: Collect artifacts
         id: collect

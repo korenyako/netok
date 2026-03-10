@@ -55,6 +55,7 @@ jobs:
           tagName: v__VERSION__
           releaseName: 'Netok v__VERSION__'
           releaseBody: 'See the assets to download and install this version.'
+          args: ${{ matrix.args }}
           releaseDraft: false
           prerelease: false
           projectPath: netok_desktop
