@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: windows-2022
+          - platform: windows-latest
             args: --target x86_64-pc-windows-msvc
     runs-on: ${{ matrix.platform }}
 
@@ -25,6 +25,8 @@ jobs:
           node-version: 22
 
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.93.1
 
       - uses: Swatinem/rust-cache@v2
         with:

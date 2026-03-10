@@ -9,7 +9,7 @@ on:
 
 jobs:
   build-windows:
-    runs-on: windows-2022
+    runs-on: windows-latest
 
     steps:
       - name: Checkout
@@ -23,7 +23,7 @@ jobs:
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: stable
+          toolchain: 1.93.1
           targets: x86_64-pc-windows-msvc
 
       - name: Install UI dependencies
@@ -43,25 +43,12 @@ jobs:
           unzip -j sing-box.zip "sing-box-1.12.21-windows-amd64/sing-box.exe" -d netok_desktop/src-tauri/binaries/
           mv netok_desktop/src-tauri/binaries/sing-box.exe netok_desktop/src-tauri/binaries/sing-box-x86_64-pc-windows-msvc.exe
 
-      - name: Debug - check files
-        shell: bash
-        run: |
-          echo "=== binaries dir ==="
-          ls -la netok_desktop/src-tauri/binaries/
-          echo "=== windows dir ==="
-          ls -la netok_desktop/src-tauri/windows/
-          echo "=== icons dir ==="
-          ls -la netok_desktop/src-tauri/icons/
-          echo "=== cargo build dir (if exists) ==="
-          ls -la target/release/build/ 2>/dev/null || echo "no build dir yet"
-
       - name: Build (Tauri)
         working-directory: netok_desktop
         env:
           CI: true
-          RUST_BACKTRACE: "1"
         run: |
-          npm run tauri -- build -v -t x86_64-pc-windows-msvc
+          npm run tauri build
 
       - name: Collect artifacts
         id: collect
