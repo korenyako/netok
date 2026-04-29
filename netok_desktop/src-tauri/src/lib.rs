@@ -960,6 +960,54 @@ fn set_autostart_enabled(app: tauri::AppHandle, enabled: bool) -> Result<(), Str
     }
 }
 
+// ==================== Start Minimized ====================
+
+fn start_minimized_path(app: &tauri::AppHandle) -> Result<PathBuf, String> {
+    let dir = app
+        .path()
+        .app_config_dir()
+        .map_err(|e| format!("Failed to resolve app config dir: {}", e))?;
+    std::fs::create_dir_all(&dir)
+        .map_err(|e| format!("Failed to create app config dir: {}", e))?;
+    Ok(dir.join("start_minimized"))
+}
+
+fn read_start_minimized_override(app: &tauri::AppHandle) -> Option<bool> {
+    let path = start_minimized_path(app).ok()?;
+    let raw = std::fs::read_to_string(&path).ok()?;
+    match raw.trim() {
+        "1" | "true" => Some(true),
+        "0" | "false" => Some(false),
+        _ => None,
+    }
+}
+
+fn write_start_minimized_override(app: &tauri::AppHandle, enabled: bool) -> Result<(), String> {
+    let path = start_minimized_path(app)?;
+    std::fs::write(&path, if enabled { "1" } else { "0" })
+        .map_err(|e| format!("Failed to write start_minimized: {}", e))
+}
+
+/// Decide whether the app window should stay hidden on startup.
+/// Falls back to the autostart-enabled state when the user has not made an explicit choice.
+fn resolve_should_start_minimized(app: &tauri::AppHandle) -> bool {
+    if let Some(v) = read_start_minimized_override(app) {
+        return v;
+    }
+    use tauri_plugin_autostart::ManagerExt;
+    app.autolaunch().is_enabled().unwrap_or(false)
+}
+
+#[tauri::command]
+fn get_start_minimized(app: tauri::AppHandle) -> Option<bool> {
+    read_start_minimized_override(&app)
+}
+
+#[tauri::command]
+fn set_start_minimized(app: tauri::AppHandle, enabled: bool) -> Result<(), String> {
+    write_start_minimized_override(&app, enabled)
+}
+
 // ==================== App Entry ====================
 
 /// Kill any orphaned sing-box processes left from a previous crash or Ctrl+C.
@@ -1037,11 +1085,19 @@ pub fn run() {
             disconnect_vpn,
             get_vpn_status,
             get_autostart_enabled,
-            set_autostart_enabled
+            set_autostart_enabled,
+            get_start_minimized,
+            set_start_minimized
         ])
         .setup(|app| {
             kill_orphaned_singbox();
             create_tray(app)?;
+            if !resolve_should_start_minimized(app.handle()) {
+                if let Some(window) = app.get_webview_window("main") {
+                    let _ = window.show();
+                    let _ = window.set_focus();
+                }
+            }
             Ok(())
         })
         .on_window_event(|window, event| {

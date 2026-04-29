@@ -262,3 +262,12 @@ export async function getAutostartEnabled(): Promise<boolean> {
 export async function setAutostartEnabled(enabled: boolean): Promise<void> {
   return await invoke('set_autostart_enabled', { enabled });
 }
+
+// Start minimized — null = unset (use autostart-derived default)
+export async function getStartMinimized(): Promise<boolean | null> {
+  return await invoke<boolean | null>('get_start_minimized');
+}
+
+export async function setStartMinimized(enabled: boolean): Promise<void> {
+  return await invoke('set_start_minimized', { enabled });
+}

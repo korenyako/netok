@@ -182,6 +182,8 @@
       "autostart_on_desc": "Netok will start automatically when you sign in",
       "autostart_off": "Launch manually",
       "autostart_off_desc": "Open Netok yourself when you need it",
+      "start_minimized": "Start minimized",
+      "start_minimized_desc": "Netok will run in the tray; click the icon to open the window",
       "about": "About",
       "about_desc": "Version and app info"
     },

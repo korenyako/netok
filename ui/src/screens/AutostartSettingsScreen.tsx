@@ -1,8 +1,11 @@
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Check } from '../components/icons/UIIcons';
 import { useAutostartStore } from '../stores/autostartStore';
+import { useStartMinimizedStore } from '../stores/startMinimizedStore';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { MenuCard } from '@/components/MenuCard';
 import { CloseButton } from '../components/WindowControls';
 import { cn } from '@/lib/utils';
 
@@ -12,7 +15,18 @@ interface AutostartSettingsScreenProps {
 
 export function AutostartSettingsScreen({ onBack }: AutostartSettingsScreenProps) {
   const { t } = useTranslation();
-  const { enabled, setEnabled } = useAutostartStore();
+  const { enabled, fetch: fetchAutostart, setEnabled } = useAutostartStore();
+  const {
+    override: startMinimizedOverride,
+    loaded: startMinimizedLoaded,
+    fetch: fetchStartMinimized,
+    setOverride: setStartMinimizedOverride,
+  } = useStartMinimizedStore();
+
+  useEffect(() => {
+    fetchAutostart();
+    fetchStartMinimized();
+  }, [fetchAutostart, fetchStartMinimized]);
 
   const options: Array<{
     id: boolean;
@@ -30,6 +44,11 @@ export function AutostartSettingsScreen({ onBack }: AutostartSettingsScreenProps
       description: t('settings.general.autostart_off_desc'),
     },
   ];
+
+  // Display value: explicit user override, otherwise derive default from autostart state.
+  const startMinimizedChecked =
+    startMinimizedOverride ?? (enabled === true);
+  const startMinimizedDisabled = !startMinimizedLoaded || enabled === null;
 
   return (
     <div className="flex flex-col h-full bg-background">
@@ -70,6 +89,17 @@ export function AutostartSettingsScreen({ onBack }: AutostartSettingsScreenProps
               </Card>
             );
           })}
+        </div>
+
+        <div className="mt-6">
+          <MenuCard
+            title={t('settings.general.start_minimized')}
+            subtitle={t('settings.general.start_minimized_desc')}
+            trailing="switch"
+            switchChecked={startMinimizedChecked}
+            switchDisabled={startMinimizedDisabled}
+            onSwitchChange={(checked) => setStartMinimizedOverride(checked)}
+          />
         </div>
       </div>
     </div>

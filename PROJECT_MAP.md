@@ -1,6 +1,6 @@
 # Project Map - Netok
 
-Generated: 2026-03-10
+Generated: 2026-04-29
 
 ## TREE (ASCII)
 
@@ -309,6 +309,7 @@ Generated: 2026-03-10
 │   │   │   ├── diagnosticsStore.ts
 │   │   │   ├── dnsStore.ts
 │   │   │   ├── speedTestStore.ts
+│   │   │   ├── startMinimizedStore.ts
 │   │   │   ├── themeStore.ts
 │   │   │   ├── useDnsStore.ts
 │   │   │   ├── vpnStore.ts
@@ -400,8 +401,8 @@ Generated: 2026-03-10
   "identifier": "netok",
 
   "build": {
-    "beforeDevCommand": "npm run dev --prefix ../ui",
-    "beforeBuildCommand": "npm run build --prefix ../ui",
+    "beforeDevCommand": "npm run dev --prefix ui",
+    "beforeBuildCommand": "npm run build --prefix ui",
     "devUrl": "http://localhost:5173",
     "frontendDist": "../../ui/dist"
   },
@@ -416,7 +417,8 @@ Generated: 2026-03-10
         "minHeight": 640,
         "resizable": true,
         "decorations": false,
-        "transparent": true
+        "transparent": true,
+        "visible": false
       }
     ]
   },
@@ -442,9 +444,7 @@ Generated: 2026-03-10
       "binaries/sing-box"
     ],
     "resources": {
-      "binaries/wintun.dll": "./"
-    },
-// ... (truncated due to syntax error)
+      "binaries/wintun.dll": "./"}}}
 ```
 
 ### ui/package.json
@@ -629,8 +629,8 @@ function App() {
 
 ### Build Commands
 
-- **Dev Command**: npm run dev --prefix ../ui
-- **Build Command**: npm run build --prefix ../ui
+- **Dev Command**: npm run dev --prefix ui
+- **Build Command**: npm run build --prefix ui
 - **Dev Path**: <http://localhost:5173>
 - **Dist Dir**: ../../ui/dist
 - **Window Title**: Netok
