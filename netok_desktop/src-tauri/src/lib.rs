@@ -967,8 +967,7 @@ fn start_minimized_path(app: &tauri::AppHandle) -> Result<PathBuf, String> {
         .path()
         .app_config_dir()
         .map_err(|e| format!("Failed to resolve app config dir: {}", e))?;
-    std::fs::create_dir_all(&dir)
-        .map_err(|e| format!("Failed to create app config dir: {}", e))?;
+    std::fs::create_dir_all(&dir).map_err(|e| format!("Failed to create app config dir: {}", e))?;
     Ok(dir.join("start_minimized"))
 }
 
