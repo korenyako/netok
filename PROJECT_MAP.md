@@ -1,6 +1,6 @@
 # Project Map - Netok
 
-Generated: 2026-04-29
+Generated: 2026-06-12
 
 ## TREE (ASCII)
 
@@ -109,6 +109,24 @@ Generated: 2026-04-29
 │   ├── package-lock.json
 │   ├── package.json
 │   └── tsconfig.json
+├── knowledge
+│   ├── domain
+│   │   └── overview.md
+│   ├── plans
+│   │   ├── mobile.md
+│   │   └── roadmap.md
+│   ├── subsystems
+│   │   ├── diagnostics.md
+│   │   ├── dns.md
+│   │   ├── speed-test.md
+│   │   ├── tray-autostart.md
+│   │   └── vpn.md
+│   ├── architecture.md
+│   ├── decisions.md
+│   ├── i18n.md
+│   ├── INDEX.md
+│   ├── log.md
+│   └── testing.md
 ├── netok_bridge
 │   ├── src
 │   │   ├── lib.rs
@@ -141,29 +159,6 @@ Generated: 2026-04-29
 │   │   └── oui_database.rs
 │   └── Cargo.toml
 ├── netok_desktop
-│   ├── public
-│   │   ├── tauri.svg
-│   │   └── vite.svg
-│   ├── src
-│   │   ├── assets
-│   │   │   └── react.svg
-│   │   ├── components
-│   │   │   ├── MainPage.tsx
-│   │   │   └── Settings.tsx
-│   │   ├── hooks
-│   │   │   └── useLanguage.ts
-│   │   ├── locales
-│   │   │   ├── en
-│   │   │   │   └── common.json
-│   │   │   └── ru
-│   │   │       └── common.json
-│   │   ├── App.css
-│   │   ├── App.tsx
-│   │   ├── i18n-config.ts
-│   │   ├── i18n.ts
-│   │   ├── index.css
-│   │   ├── main.tsx
-│   │   └── vite-env.d.ts
 │   ├── src-tauri
 │   │   ├── binaries
 │   │   │   ├── sing-box-x86_64-pc-windows-msvc.exe
@@ -196,16 +191,11 @@ Generated: 2026-04-29
 │   │   ├── Cargo.toml
 │   │   └── tauri.conf.json
 │   ├── .gitignore
-│   ├── index.html
 │   ├── package-lock.json
 │   ├── package.json
-│   ├── postcss.config.js
-│   ├── README.md
-│   ├── tailwind.config.js
-│   ├── tsconfig.json
-│   ├── tsconfig.node.json
-│   └── vite.config.ts
+│   └── README.md
 ├── scripts
+│   ├── check-i18n.mjs
 │   ├── generate_oui_database.py
 │   ├── generate_project_map.mjs
 │   └── process_manuf.py
@@ -273,7 +263,8 @@ Generated: 2026-04-29
 │   │   │   ├── ja.json
 │   │   │   ├── ko.json
 │   │   │   ├── pl.json
-│   │   │   ├── pt.json
+│   │   │   ├── pt-BR.json
+│   │   │   ├── pt-PT.json
 │   │   │   ├── ru.json
 │   │   │   ├── tr.json
 │   │   │   ├── uk.json
@@ -379,11 +370,13 @@ Generated: 2026-04-29
 ├── README.ko.md
 ├── README.md
 ├── README.pl.md
-├── README.pt.md
+├── README.pt-BR.md
+├── README.pt-PT.md
 ├── README.ru.md
 ├── README.tr.md
 ├── README.uk.md
 ├── README.zh.md
+├── release-notes-v0.6.0.md
 ├── SECURITY.md
 ├── speedtest-prototype-v2.html
 └── THIRD_PARTY_LICENSES.md
@@ -453,7 +446,7 @@ Generated: 2026-04-29
 {
   "name": "ui",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.6.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -651,7 +644,8 @@ function App() {
 - ja
 - ko
 - pl
-- pt
+- pt-BR
+- pt-PT
 - ru
 - tr
 - uk

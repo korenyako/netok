@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <b>English</b> | <a href="README.de.md">Deutsch</a> | <a href="README.es.md">Español</a> | <a href="README.fa.md">فارسی</a> | <a href="README.fr.md">Français</a> | <a href="README.it.md">Italiano</a> | <a href="README.ja.md">日本語</a> | <a href="README.ko.md">한국어</a> | <a href="README.pl.md">Polski</a> | <a href="README.pt.md">Português</a> | <a href="README.ru.md">Русский</a> | <a href="README.tr.md">Türkçe</a> | <a href="README.uk.md">Українська</a> | <a href="README.zh.md">中文</a>
+  <b>English</b> | <a href="README.de.md">Deutsch</a> | <a href="README.es.md">Español</a> | <a href="README.fa.md">فارسی</a> | <a href="README.fr.md">Français</a> | <a href="README.it.md">Italiano</a> | <a href="README.ja.md">日本語</a> | <a href="README.ko.md">한국어</a> | <a href="README.pl.md">Polski</a> | <a href="README.pt-BR.md">Português (Brasil)</a> | <a href="README.pt-PT.md">Português (Portugal)</a> | <a href="README.ru.md">Русский</a> | <a href="README.tr.md">Türkçe</a> | <a href="README.uk.md">Українська</a> | <a href="README.zh.md">中文</a>
 </p>
 
 <h1 align="center">Netok</h1>
@@ -170,7 +170,7 @@ Detect weak encryption, open networks, and other vulnerabilities. Know if your W
 Netok speaks 15 languages — including right-to-left scripts like Farsi.
 Every label, every message, every tooltip is fully translated. No half-baked Google Translate patches — each locale is reviewed for natural phrasing.
 
-**Supported:** English, Deutsch, Español, Français, Italiano, Polski, Português, Türkçe, Українська, Русский, 日本語, 한국어, 中文, فارسی, and more coming.
+**Supported:** English, Deutsch, Español, Français, Italiano, Polski, Português (Brasil), Português (Portugal), Türkçe, Українська, Русский, 日本語, 한국어, 中文, فارسی.
 
 <p align="center">
   <img src="docs/screenshots/netok-rtl.gif" alt="Netok in Farsi — right-to-left interface">

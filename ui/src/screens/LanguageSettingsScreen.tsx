@@ -13,9 +13,12 @@ interface LanguageSettingsScreenProps {
   onBack: () => void;
 }
 
+// Maps a language code (e.g. "pt-BR") to its lang.* i18n key suffix (e.g. "pt_BR").
+const langKey = (code: string) => `lang.${code.replace('-', '_')}`;
+
 const languageOrder: LanguageCode[] = [
   // Latin script (alphabetical by native name)
-  'de', 'en', 'es', 'fr', 'it', 'pl', 'pt', 'tr',
+  'de', 'en', 'es', 'fr', 'it', 'pl', 'pt-BR', 'pt-PT', 'tr',
   // Cyrillic script
   'ru', 'uk',
   // Arabic script
@@ -45,7 +48,7 @@ export function LanguageSettingsScreen({ onBack }: LanguageSettingsScreenProps) 
     const q = searchQuery.toLowerCase();
     return languageOrder.filter((code) => {
       const native = LANGUAGES[code].native.toLowerCase();
-      const translated = t(`lang.${code}`).toLowerCase();
+      const translated = t(langKey(code)).toLowerCase();
       return native.includes(q) || translated.includes(q) || code.includes(q);
     });
   }, [searchQuery, t]);
@@ -103,7 +106,7 @@ export function LanguageSettingsScreen({ onBack }: LanguageSettingsScreenProps) 
               <LanguageCard
                 key={code}
                 title={LANGUAGES[code].native}
-                subtitle={t(`lang.${code}`)}
+                subtitle={t(langKey(code))}
                 isSelected={isSelected}
                 onClick={() => handleLanguageChange(code)}
               />

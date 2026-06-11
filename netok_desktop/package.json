@@ -1,12 +1,9 @@
 {
   "name": "netok_desktop",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.6.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
     "tauri": "tauri",
     "dev:ui": "npm --prefix ../ui run dev",
     "build:ui": "npm --prefix ../ui run build"

@@ -37,6 +37,11 @@ const resources = {
 
 const supportedCodes = Object.keys(LANGUAGES) as LanguageCode[];
 
+// TODO(rtl): Persian (fa) is marked dir: 'rtl' in the language registry, but this
+// mobile app does not yet apply RTL layout. Wire up I18nManager.allowRTL/forceRTL on
+// language change (and bundle an Arabic-script font) so fa renders right-to-left.
+// The desktop ui/ app handles this via ThemeProvider; mobile still needs it.
+
 export function resolveSystemLanguage(): LanguageCode {
   // On mobile, we'll default to 'en' initially.
   // The actual locale detection happens after async init.

@@ -126,6 +126,9 @@ jobs:
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Check i18n parity
+        run: node scripts/check-i18n.mjs
+
       - name: Install UI dependencies
         working-directory: ui
         run: npm ci

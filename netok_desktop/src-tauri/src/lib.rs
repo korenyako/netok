@@ -869,17 +869,23 @@ async fn monitor_vpn_process(pid: u32, state: Arc<Mutex<VpnProcessState>>, app: 
 
 // ==================== System Tray ====================
 
-fn build_tray_menu(
-    app: &tauri::AppHandle,
-    lang: &str,
-) -> Result<Menu<tauri::Wry>, Box<dyn std::error::Error>> {
-    let (open_label, quit_label) = match lang {
+/// Returns the (open, quit) tray menu labels for a UI language code.
+///
+/// Only the language codes the frontend can actually emit are named here. Bare
+/// `"pt"` is intentionally NOT a named arm: Portuguese was split into `pt-BR` /
+/// `pt-PT`, the language picker emits only those, and any persisted legacy `"pt"`
+/// is migrated to `pt-BR` on load (see ui/src/i18n.ts). Should a stray `"pt"` (or
+/// any other region-tagged code) still reach here, the fallback resolves it by
+/// base language — so legacy `"pt"` lands on Portuguese — before defaulting to
+/// English for genuinely unknown codes.
+fn tray_labels(lang: &str) -> (&'static str, &'static str) {
+    match lang {
         "ru" => ("Открыть Netok", "Выйти"),
         "de" => ("Netok öffnen", "Beenden"),
         "es" => ("Abrir Netok", "Salir"),
         "fr" => ("Ouvrir Netok", "Quitter"),
         "it" => ("Apri Netok", "Esci"),
-        "pt" => ("Abrir Netok", "Sair"),
+        "pt-BR" | "pt-PT" => ("Abrir Netok", "Sair"),
         "tr" => ("Netok'u Aç", "Çıkış"),
         "fa" => ("باز کردن Netok", "خروج"),
         "zh" => ("打开 Netok", "退出"),
@@ -887,8 +893,19 @@ fn build_tray_menu(
         "ko" => ("Netok 열기", "종료"),
         "uk" => ("Відкрити Netok", "Вийти"),
         "pl" => ("Otwórz Netok", "Zamknij"),
-        _ => ("Open Netok", "Quit"),
-    };
+        // Unknown / legacy codes: resolve by base language, else fall back to English.
+        _ => match lang.split('-').next().unwrap_or(lang) {
+            "pt" => ("Abrir Netok", "Sair"),
+            _ => ("Open Netok", "Quit"),
+        },
+    }
+}
+
+fn build_tray_menu(
+    app: &tauri::AppHandle,
+    lang: &str,
+) -> Result<Menu<tauri::Wry>, Box<dyn std::error::Error>> {
+    let (open_label, quit_label) = tray_labels(lang);
 
     let open_item = MenuItem::with_id(app, "open", open_label, true, None::<&str>)?;
     let quit_item = MenuItem::with_id(app, "quit", quit_label, true, None::<&str>)?;
@@ -1114,4 +1131,37 @@ pub fn run() {
                 }
             }
         });
+}
+
+#[cfg(test)]
+mod tests {
+    use super::tray_labels;
+
+    #[test]
+    fn tray_labels_portuguese_variants_use_portuguese() {
+        // Both real Portuguese codes the frontend emits map to Portuguese labels.
+        assert_eq!(tray_labels("pt-BR"), ("Abrir Netok", "Sair"));
+        assert_eq!(tray_labels("pt-PT"), ("Abrir Netok", "Sair"));
+    }
+
+    #[test]
+    fn tray_labels_legacy_pt_still_resolves_to_portuguese() {
+        // Bare "pt" is migrated to pt-BR on the frontend and is no longer a named
+        // arm, but if it ever reaches the tray it must still resolve to Portuguese
+        // via the base-language fallback — not to the English default.
+        assert_eq!(tray_labels("pt"), ("Abrir Netok", "Sair"));
+    }
+
+    #[test]
+    fn tray_labels_unknown_code_falls_back_to_english() {
+        assert_eq!(tray_labels("en"), ("Open Netok", "Quit"));
+        assert_eq!(tray_labels("xx"), ("Open Netok", "Quit"));
+        assert_eq!(tray_labels("zz-ZZ"), ("Open Netok", "Quit"));
+    }
+
+    #[test]
+    fn tray_labels_named_language_is_unaffected() {
+        assert_eq!(tray_labels("ru"), ("Открыть Netok", "Выйти"));
+        assert_eq!(tray_labels("pl"), ("Otwórz Netok", "Zamknij"));
+    }
 }

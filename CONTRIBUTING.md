@@ -25,7 +25,7 @@ cargo tauri dev
 
 ### Good First Contributions
 
-- **Translations** — improve or add languages in the `ui/src/i18n` folder. Netok supports 14 languages and I'd love to make them better with your help.
+- **Translations** — improve or add languages in the `ui/src/i18n` folder. Netok supports 15 languages and I'd love to make them better with your help.
 - **Bug reports** — if something doesn't work as expected, open an issue.
 - **Documentation** — fix typos, improve clarity, add examples.
 

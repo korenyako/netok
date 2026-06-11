@@ -252,7 +252,7 @@ function MyComponent() {
 
 * **Persistence:** save language choice in config
 * **Pluralization:** plural form rules
-* **RTL support:** Arabic/Hebrew layout support
+* **RTL support:** Persian (Farsi) right-to-left layout
 * **Dynamic loading:** load translations on demand
 
 ## 14) Open Questions (next iteration)

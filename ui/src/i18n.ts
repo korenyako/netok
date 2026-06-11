@@ -7,7 +7,8 @@ import deTranslations from './i18n/de.json';
 import esTranslations from './i18n/es.json';
 import frTranslations from './i18n/fr.json';
 import itTranslations from './i18n/it.json';
-import ptTranslations from './i18n/pt.json';
+import ptBrTranslations from './i18n/pt-BR.json';
+import ptPtTranslations from './i18n/pt-PT.json';
 import trTranslations from './i18n/tr.json';
 import faTranslations from './i18n/fa.json';
 import zhTranslations from './i18n/zh.json';
@@ -23,7 +24,8 @@ const resources = {
   es: { translation: esTranslations },
   fr: { translation: frTranslations },
   it: { translation: itTranslations },
-  pt: { translation: ptTranslations },
+  'pt-BR': { translation: ptBrTranslations },
+  'pt-PT': { translation: ptPtTranslations },
   tr: { translation: trTranslations },
   fa: { translation: faTranslations },
   zh: { translation: zhTranslations },
@@ -37,8 +39,17 @@ const supportedCodes = Object.keys(LANGUAGES) as LanguageCode[];
 
 /** Resolve navigator.language to one of our supported language codes */
 export function resolveSystemLanguage(): LanguageCode {
-  const browserLang = navigator.language; // e.g. "ru-RU", "en-US", "zh-CN"
+  const browserLang = navigator.language; // e.g. "ru-RU", "en-US", "pt-BR", "pt-PT"
+  // Exact match first, so regional codes like "pt-BR"/"pt-PT" resolve directly.
+  if (supportedCodes.includes(browserLang as LanguageCode)) {
+    return browserLang as LanguageCode;
+  }
   const base = browserLang.split('-')[0].toLowerCase();
+  // Portuguese has no plain "pt" entry — split by region: "pt-BR" → Brazil, everything
+  // else (plain "pt", pt-PT, pt-AO, …) → European Portuguese.
+  if (base === 'pt') {
+    return browserLang.toLowerCase() === 'pt-br' ? 'pt-BR' : 'pt-PT';
+  }
   if (supportedCodes.includes(base as LanguageCode)) {
     return base as LanguageCode;
   }
@@ -68,7 +79,12 @@ export function getSystemLanguageDisplay(): string {
 }
 
 // Read saved language from localStorage
-const savedLang = localStorage.getItem('netok.lang') || 'system';
+let savedLang = localStorage.getItem('netok.lang') || 'system';
+// Migrate legacy "pt" preference (Portuguese was split into pt-BR / pt-PT).
+if (savedLang === 'pt') {
+  savedLang = 'pt-BR';
+  localStorage.setItem('netok.lang', savedLang);
+}
 const resolvedLang = savedLang === 'system' ? resolveSystemLanguage() : savedLang;
 
 i18next
