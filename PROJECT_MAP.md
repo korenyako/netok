@@ -194,6 +194,8 @@ Generated: 2026-06-12
 │   ├── package-lock.json
 │   ├── package.json
 │   └── README.md
+├── release-notes
+│   └── v0.6.0.md
 ├── scripts
 │   ├── check-i18n.mjs
 │   ├── generate_oui_database.py

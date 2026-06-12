@@ -46,6 +46,30 @@ jobs:
           unzip -j sing-box.zip "sing-box-1.12.21-windows-amd64/sing-box.exe" -d netok_desktop/src-tauri/binaries/
           mv netok_desktop/src-tauri/binaries/sing-box.exe netok_desktop/src-tauri/binaries/sing-box-x86_64-pc-windows-msvc.exe
 
+      # Release notes live at release-notes/v<version>.md and must be committed BEFORE
+      # tagging. The content below is fed to tauri-action's releaseBody, which becomes
+      # BOTH the GitHub Release body AND the in-app updater notes (latest.json). Since
+      # latest.json is signed at build time and can't be edited afterward, the notes
+      # must be in the repo before the build. If the file is missing, a minimal fallback
+      # is generated so the build still succeeds.
+      - name: Read release notes
+        id: release_notes
+        shell: bash
+        run: |
+          NOTES_FILE="release-notes/${GITHUB_REF_NAME}.md"
+          if [ -f "$NOTES_FILE" ]; then
+            echo "Using release notes from $NOTES_FILE"
+          else
+            echo "No $NOTES_FILE found — generating fallback body"
+            mkdir -p release-notes
+            printf 'Netok %s — see the commit history for details.\n' "$GITHUB_REF_NAME" > "$NOTES_FILE"
+          fi
+          {
+            echo "body<<__NETOK_NOTES_EOF__"
+            cat "$NOTES_FILE"
+            echo "__NETOK_NOTES_EOF__"
+          } >> "$GITHUB_OUTPUT"
+
       - uses: tauri-apps/tauri-action@v0.5.16
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -54,7 +78,7 @@ jobs:
         with:
           tagName: v__VERSION__
           releaseName: 'Netok v__VERSION__'
-          releaseBody: 'See the assets to download and install this version.'
+          releaseBody: ${{ steps.release_notes.outputs.body }}
           args: ${{ matrix.args }}
           releaseDraft: false
           prerelease: false
