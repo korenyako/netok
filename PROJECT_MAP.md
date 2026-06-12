@@ -376,7 +376,6 @@ Generated: 2026-06-12
 ├── README.tr.md
 ├── README.uk.md
 ├── README.zh.md
-├── release-notes-v0.6.0.md
 ├── SECURITY.md
 ├── speedtest-prototype-v2.html
 └── THIRD_PARTY_LICENSES.md
